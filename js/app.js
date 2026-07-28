@@ -4,14 +4,66 @@
 
   /* ---------- Состояние ---------- */
   const KEY = 'pyquest_v1';
-  const DEF = { xp: 0, streak: 0, lastDay: null, start: null, name: '', mods: {}, ach: [], finalBest: 0, rm: {} };
+  const AUTH_KEY = 'pyquest_auth';
+  function freshState() {
+    return { xp: 0, streak: 0, lastDay: null, start: null, name: '', mods: {}, ach: [], finalBest: 0, rm: {} };
+  }
+  let AUTH = null;
+  try { AUTH = JSON.parse(localStorage.getItem(AUTH_KEY) || 'null'); } catch (e) { AUTH = null; }
   let S = load();
 
   function load() {
-    try { return Object.assign({}, DEF, JSON.parse(localStorage.getItem(KEY) || '{}')); }
-    catch (e) { return Object.assign({}, DEF); }
+    try { return Object.assign(freshState(), JSON.parse(localStorage.getItem(KEY) || '{}')); }
+    catch (e) { return freshState(); }
   }
-  function save() { localStorage.setItem(KEY, JSON.stringify(S)); }
+  function save() {
+    localStorage.setItem(KEY, JSON.stringify(S));
+    scheduleSync();
+  }
+
+  /* ---------- API и синхронизация ---------- */
+  async function api(path, method, body, keepalive) {
+    const headers = { 'Content-Type': 'application/json' };
+    if (AUTH && AUTH.token) headers['Authorization'] = 'Bearer ' + AUTH.token;
+    const res = await fetch('/api' + path, {
+      method: method || 'GET', headers,
+      body: body ? JSON.stringify(body) : undefined,
+      keepalive: !!keepalive,
+    });
+    let data = {};
+    try { data = await res.json(); } catch (e) { /* пустой ответ */ }
+    if (res.status === 401 && AUTH && path !== '/login' && path !== '/register') {
+      forceLogout('Сессия истекла — войди заново');
+      throw new Error('401');
+    }
+    if (!res.ok) throw new Error(data.error || 'Сервер недоступен (' + res.status + ')');
+    return data;
+  }
+
+  let syncTimer = null, syncDirty = false, syncBusy = false;
+  function scheduleSync() {
+    if (!AUTH) return;
+    syncDirty = true;
+    clearTimeout(syncTimer);
+    syncTimer = setTimeout(() => pushState().catch(() => {}), 1500);
+  }
+  async function pushState(keepalive) {
+    if (!AUTH || !syncDirty || syncBusy) return;
+    syncBusy = true;
+    try { await api('/state', 'PUT', { state: S }, keepalive); syncDirty = false; }
+    finally { syncBusy = false; }
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden' && syncDirty) pushState(true).catch(() => {});
+  });
+  setInterval(() => { if (syncDirty) pushState().catch(() => {}); }, 30000);
+
+  function stateScore(s) { return s ? (s.xp || 0) * 10 + Object.keys(s.mods || {}).length : -1; }
+  function richer(a, b) { return stateScore(a) >= stateScore(b) ? a : b; }
+  function clearDrafts() {
+    Object.keys(localStorage).filter(k => k.indexOf('pyquest_code_') === 0)
+      .forEach(k => localStorage.removeItem(k));
+  }
   function mod(id) {
     if (!S.mods[id]) S.mods[id] = { theory: false, quizBest: 0, tasks: {}, examBest: 0, examPerfect: false };
     return S.mods[id];
@@ -169,6 +221,15 @@
     document.querySelector('#stat-streak b').textContent = S.streak;
     document.querySelector('#stat-xp b').textContent = S.xp;
     document.getElementById('stat-rank').textContent = r.name;
+    const userChip = document.getElementById('stat-user');
+    const logoutBtn = document.getElementById('logout-btn');
+    const stats = document.querySelector('.topbar-stats');
+    if (userChip) {
+      userChip.style.display = AUTH ? '' : 'none';
+      userChip.querySelector('b').textContent = AUTH ? AUTH.username : '';
+    }
+    if (logoutBtn) logoutBtn.style.display = AUTH ? '' : 'none';
+    if (stats) stats.classList.toggle('logged-out', !AUTH);
   }
 
   /* ---------- Редактор: Tab = 4 пробела ---------- */
@@ -190,6 +251,7 @@
   function route() {
     if (examSession && examSession.timer) clearInterval(examSession.timer);
     examSession = null;
+    if (!AUTH) return renderAuth('login');
     const parts = (location.hash.slice(2) || '').split('/').filter(Boolean);
     window.scrollTo(0, 0);
     if (parts[0] === 'm' && parts[1]) {
@@ -809,7 +871,113 @@
     draw();
   }
 
+  /* ---------- Вход и регистрация ---------- */
+  function renderAuth(mode) {
+    const local = load();
+    const lastUser = localStorage.getItem('pyquest_last_user');
+    const hasLocal = local.xp > 0 && !lastUser; // старый прогресс без аккаунта
+    const isReg = mode === 'register';
+    app.innerHTML =
+      '<div class="auth-wrap"><div class="auth-card">' +
+      '<div class="auth-logo"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#0ea5e9"/><path d="M8 20l5-5 4 3 7-8" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' +
+      '<h1>Py<b>Quest</b></h1>' +
+      '<p class="auth-sub">Аккаунт хранит твой прогресс на сервере — учись с любого устройства.</p>' +
+      '<div class="auth-tabs">' +
+      '<div class="auth-tab' + (!isReg ? ' active' : '') + '" data-mode="login">Вход</div>' +
+      '<div class="auth-tab' + (isReg ? ' active' : '') + '" data-mode="register">Регистрация</div></div>' +
+      (hasLocal ? '<div class="auth-banner">' + ic('zap') + ' Найден локальный прогресс: <b>' + local.xp + ' XP</b>. После ' + (isReg ? 'регистрации' : 'входа') + ' он привяжется к аккаунту.</div>' : '') +
+      '<form id="auth-form" autocomplete="on">' +
+      '<label class="auth-field">Логин<input id="auth-user" type="text" autocomplete="username" placeholder="например, aziz" maxlength="20" required></label>' +
+      '<label class="auth-field">Пароль<input id="auth-pass" type="password" autocomplete="' + (isReg ? 'new-password' : 'current-password') + '" placeholder="минимум 6 символов" minlength="6" required></label>' +
+      '<div class="auth-error" id="auth-error" style="display:none"></div>' +
+      '<button class="btn auth-submit" type="submit" id="auth-submit">' + (isReg ? 'Создать аккаунт' : 'Войти') + '</button>' +
+      '</form>' +
+      '<p class="auth-hint">' + (isReg ? 'Уже есть аккаунт? Жми «Вход».' : 'Впервые здесь? Жми «Регистрация» — это 10 секунд.') + '</p>' +
+      '</div></div>';
+
+    app.querySelectorAll('.auth-tab').forEach(t => t.addEventListener('click', () => renderAuth(t.getAttribute('data-mode'))));
+    document.getElementById('auth-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const btn = document.getElementById('auth-submit');
+      const errEl = document.getElementById('auth-error');
+      const username = document.getElementById('auth-user').value.trim();
+      const password = document.getElementById('auth-pass').value;
+      errEl.style.display = 'none';
+      btn.disabled = true;
+      btn.textContent = 'Секунду…';
+      try {
+        const res = await api(isReg ? '/register' : '/login', 'POST', { username, password });
+        await completeAuth(res.username, res.token);
+      } catch (err) {
+        errEl.textContent = err.message;
+        errEl.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = isReg ? 'Создать аккаунт' : 'Войти';
+      }
+    });
+  }
+
+  async function completeAuth(username, token) {
+    AUTH = { token, username };
+    localStorage.setItem(AUTH_KEY, JSON.stringify(AUTH));
+    const lastUser = localStorage.getItem('pyquest_last_user');
+    let local = load();
+    if (lastUser && lastUser.toLowerCase() !== username.toLowerCase()) {
+      local = null; // локальные данные другого пользователя не переносим
+      clearDrafts();
+    }
+    localStorage.setItem('pyquest_last_user', username);
+    let remote = null;
+    try { remote = (await api('/state')).state; } catch (e) { /* оффлайн — работаем с локальным */ }
+    S = Object.assign(freshState(), richer(local, remote) || {});
+    if (!S.start) S.start = today();
+    save();
+    pushState().catch(() => {});
+    topbar();
+    if (location.hash && location.hash !== '#/') location.hash = '#/';
+    route();
+    toast('Привет, <b>' + esc(username) + '</b>! Прогресс синхронизируется автоматически.');
+  }
+
+  function forceLogout(msg) {
+    AUTH = null;
+    localStorage.removeItem(AUTH_KEY);
+    topbar();
+    if (msg) toast(msg);
+    renderAuth('login');
+  }
+
+  async function doLogout() {
+    try { await pushState(); } catch (e) { /* не критично */ }
+    try { await api('/logout', 'POST'); } catch (e) { /* не критично */ }
+    AUTH = null;
+    localStorage.removeItem(AUTH_KEY);
+    localStorage.removeItem(KEY);
+    clearDrafts();
+    S = freshState();
+    topbar();
+    location.hash = '#/';
+    renderAuth('login');
+  }
+
   /* ---------- Старт ---------- */
-  topbar();
-  route();
+  async function boot() {
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) logoutBtn.addEventListener('click', doLogout);
+    topbar();
+    if (!AUTH) { renderAuth('login'); return; }
+    try {
+      const remote = (await api('/state')).state;
+      S = Object.assign(freshState(), richer(load(), remote) || {});
+      if (!S.start) S.start = today();
+      save();
+      pushState().catch(() => {});
+    } catch (e) {
+      if (e.message === '401') return; // forceLogout уже показал экран входа
+      toast('Нет связи с сервером — прогресс сохраняется локально');
+    }
+    topbar();
+    route();
+  }
+  boot();
 })();
