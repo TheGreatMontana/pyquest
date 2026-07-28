@@ -706,7 +706,7 @@
     }
 
     function start() {
-      examSession = { idx: 0, pts: 0, timeLeft: exam.time, timer: null, taskIdx: 0 };
+      examSession = { idx: 0, pts: 0, timeLeft: exam.time, timer: null, taskIdx: 0, answers: [], taskResults: [] };
       examSession.timer = setInterval(() => {
         examSession.timeLeft--;
         const el = document.getElementById('ex-time');
@@ -733,7 +733,9 @@
           '<button class="quiz-opt" data-i="' + i + '">' + esc(o) + '</button>').join('') + '</div></div>';
       if (!isFinal) bindTabs(ctxId);
       app.querySelectorAll('.quiz-opt').forEach(btn => btn.addEventListener('click', () => {
-        if (+btn.getAttribute('data-i') === q.a) s.pts++;
+        const chosen = +btn.getAttribute('data-i');
+        s.answers.push(chosen);
+        if (chosen === q.a) s.pts++;
         s.idx++;
         drawQ();
       }));
@@ -775,12 +777,17 @@
         try {
           if (t.sql) {
             const res = await SqlRunner.check(ed.value, t, x => { document.getElementById('py-status').textContent = x; });
+            s.taskResults.push({ title: t.title, ok: res.ok, detail: res.ok ? '' : res.message });
             if (res.ok) s.pts += 3;
           } else {
             const res = await PyRunner.run(ed.value, t.tests, t.stdin || [], x => { document.getElementById('py-status').textContent = x; });
-            if (!res.err && !res.test_err) s.pts += 3;
+            const ok = !res.err && !res.test_err;
+            s.taskResults.push({ title: t.title, ok, detail: ok ? '' : (res.test_err || res.err || '') });
+            if (ok) s.pts += 3;
           }
-        } catch (e) { /* задача не засчитана */ }
+        } catch (e) {
+          s.taskResults.push({ title: t.title, ok: false, detail: 'Не удалось проверить: ' + e.message });
+        }
         s.taskIdx++;
         drawTask();
       });
@@ -808,14 +815,42 @@
       checkAch();
       const msg = passed
         ? (isFinal ? 'Python-трек завершён. Забирай сертификат!' : 'Экзамен сдан — следующий модуль открыт.')
-        : 'Не хватило баллов. Повтори теорию и задачи — и возвращайся.';
+        : 'Не хватило баллов. Разбери ошибки ниже — и пересдай.';
+
+      /* Разбор ошибок: вопросы */
+      let review = '';
+      exam.questions.forEach((q, i) => {
+        const given = s.answers[i];
+        if (given === q.a) return;
+        review += '<div class="review-item">' +
+          '<div class="review-q"><span class="review-num">' + (i + 1) + '</span>' + q.q + '</div>' +
+          (q.code ? codeBlock(q.code, sqlMode ? 'sql' : 'py') : '') +
+          '<p class="review-ans bad">Твой ответ: ' + (given === undefined ? '⏱ не успел ответить' : esc(q.options[given])) + '</p>' +
+          '<p class="review-ans good">Правильный: ' + esc(q.options[q.a]) + '</p>' +
+          (q.explain ? '<p class="review-explain">' + q.explain + '</p>' : '') +
+          '</div>';
+      });
+      /* Разбор ошибок: практические задачи */
+      tasks.forEach((t, i) => {
+        const tr = s.taskResults[i];
+        if (tr && tr.ok) return;
+        review += '<div class="review-item">' +
+          '<div class="review-q"><span class="review-num">' + ic('terminal') + '</span>Задача: ' + t.title + '</div>' +
+          '<p class="review-ans bad">' + (tr ? ('Не засчитана' + (tr.detail ? ': ' + esc(tr.detail) : '')) : '⏱ время вышло — задача не сдана') + '</p>' +
+          '<p class="review-explain">Потренируй похожие задачи во вкладке «Задачи» — там есть подсказки.</p>' +
+          '</div>';
+      });
+
       app.innerHTML = header +
         '<div class="quiz-box"><div class="quiz-result">' +
         '<div class="score-ring' + (passed ? ' pass' : '') + '"><span>' + pct + '%</span></div>' +
         '<h2>' + s.pts + ' / ' + totalPts + ' баллов</h2><p>' + msg + '</p>' +
         '<button class="btn secondary" id="ex-retry">Пересдать</button> ' +
         (passed ? (isFinal ? '<a class="btn" href="#/cert">Сертификат</a>' : '<a class="btn" href="#/">На карту</a>') : '') +
-        '</div></div>';
+        '</div></div>' +
+        (review
+          ? '<div class="review-wrap"><h3>' + ic('target') + ' Разбор ошибок</h3>' + review + '</div>'
+          : '<div class="review-wrap perfect"><h3>' + ic('check', 'ok') + ' Ни одной ошибки — безупречно!</h3></div>');
       if (!isFinal) bindTabs(ctxId);
       document.getElementById('ex-retry').addEventListener('click', intro);
       examSession = null;

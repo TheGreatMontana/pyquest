@@ -449,6 +449,37 @@ pre.code code { background: none; padding: 0; color: var(--text); font-size: 1em
 .exam-timer.low span { border-color: var(--danger); color: var(--danger); animation: pulse 1s infinite; }
 @keyframes pulse { 50% { opacity: .5; } }
 
+/* ===== Разбор ошибок после экзамена ===== */
+.review-wrap {
+  margin-top: 18px; background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 22px 24px; animation: fadeIn .3s;
+}
+.review-wrap h3 { display: flex; align-items: center; gap: 9px; font-size: 1.05rem; margin-bottom: 16px; color: var(--danger); }
+.review-wrap.perfect h3 { color: var(--success); margin-bottom: 0; }
+.review-item {
+  border: 1px solid var(--border); border-left: 3px solid var(--danger);
+  border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; background: var(--surface);
+}
+.review-item:last-child { margin-bottom: 0; }
+.review-q { font-weight: 600; margin-bottom: 8px; line-height: 1.5; display: flex; gap: 9px; align-items: baseline; }
+.review-q code { background: #0a1120; padding: 2px 7px; border-radius: 6px; font-family: var(--mono); font-size: .85em; color: #7dd3fc; }
+.review-num {
+  flex-shrink: 0; min-width: 24px; height: 24px; padding: 0 4px; border-radius: 7px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: rgba(248,113,113,.12); color: var(--danger);
+  font-family: var(--mono); font-size: .8rem; font-weight: 600; align-self: flex-start;
+}
+.review-ans { font-size: .89rem; margin-top: 6px; padding-left: 33px; }
+.review-ans.bad { color: var(--danger); }
+.review-ans.good { color: var(--success); }
+.review-explain { font-size: .85rem; color: var(--muted); margin-top: 7px; padding-left: 33px; line-height: 1.5; }
+.review-item pre.code { margin: 8px 0 4px 33px; }
+@media (max-width: 640px) {
+  .review-wrap { padding: 16px 14px; }
+  .review-ans, .review-explain { padding-left: 0; }
+  .review-item pre.code { margin-left: 0; }
+}
+
 /* ===== Сертификат ===== */
 .cert-wrap { text-align: center; }
 .cert-wrap h1 { margin-bottom: 10px; }
