@@ -1,0 +1,183 @@
+{
+ "id": "backend-intro",
+ "schema": 2,
+ "modules": [
+  {
+   "id": "be-01",
+   "title": { "ru": "Как устроен веб: клиент, сервер, HTTP", "uz": "Veb qanday ishlaydi: klient, server, HTTP", "en": "How the web works: client, server, HTTP" },
+   "tagline": { "ru": "Запрос, ответ, статусы и JSON — фундамент любого бэкенда", "uz": "So'rov, javob, statuslar va JSON — har qanday backend poydevori", "en": "Request, response, status codes and JSON — the foundation of any backend" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "Клиент и сервер", "uz": "Klient va server", "en": "Client and server" },
+     "blocks": [
+      { "type": "text", "html": {
+        "ru": "<p>Когда ты открываешь сайт, происходит диалог двух программ. <b>Клиент</b> (браузер) отправляет <b>запрос</b>, <b>сервер</b> отвечает <b>ответом</b>. Всё, что делает бэкенд-разработчик, — это пишет ту программу, которая отвечает.</p>",
+        "uz": "<p>Saytni ochganingizda ikkita dastur o'rtasida muloqot boshlanadi. <b>Klient</b> (brauzer) <b>so'rov</b> yuboradi, <b>server</b> <b>javob</b> qaytaradi. Backend dasturchi aynan javob beruvchi dasturni yozadi.</p>",
+        "en": "<p>When you open a website, two programs start a dialogue. The <b>client</b> (browser) sends a <b>request</b>, the <b>server</b> returns a <b>response</b>. A backend developer writes the program that responds.</p>" } },
+      { "type": "text", "html": {
+        "ru": "<p>Этот сайт — живой пример: браузер запросил страницу, а Python-сервер на другом конце отдал её и хранит твой прогресс.</p>",
+        "uz": "<p>Bu sayt — tirik misol: brauzer sahifani so'radi, narigi tomondagi Python-server uni berdi va taraqqiyotingizni saqlaydi.</p>",
+        "en": "<p>This very site is a live example: your browser requested the page, and a Python server on the other end served it and stores your progress.</p>" } },
+      { "type": "note", "kind": "note", "html": {
+        "ru": "Сервер — это не «железный ящик», а <b>программа</b>, которая слушает порт и отвечает на запросы. Она может работать даже на твоём ноутбуке.",
+        "uz": "Server — bu «temir quti» emas, balki portni tinglaydigan va so'rovlarga javob beradigan <b>dastur</b>. U hatto noutbukingizda ham ishlashi mumkin.",
+        "en": "A server is not a metal box — it's a <b>program</b> that listens on a port and answers requests. It can run on your own laptop." } }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "HTTP-методы и статусы", "uz": "HTTP metodlari va statuslari", "en": "HTTP methods and status codes" },
+     "blocks": [
+      { "type": "text", "html": {
+        "ru": "<p><b>Метод</b> говорит, что мы хотим сделать:</p><ul><li><code>GET</code> — получить данные</li><li><code>POST</code> — создать новое</li><li><code>PUT</code> / <code>PATCH</code> — изменить</li><li><code>DELETE</code> — удалить</li></ul>",
+        "uz": "<p><b>Metod</b> nima qilmoqchi ekanimizni bildiradi:</p><ul><li><code>GET</code> — ma'lumot olish</li><li><code>POST</code> — yangi yaratish</li><li><code>PUT</code> / <code>PATCH</code> — o'zgartirish</li><li><code>DELETE</code> — o'chirish</li></ul>",
+        "en": "<p>The <b>method</b> says what we want to do:</p><ul><li><code>GET</code> — fetch data</li><li><code>POST</code> — create something new</li><li><code>PUT</code> / <code>PATCH</code> — update</li><li><code>DELETE</code> — remove</li></ul>" } },
+      { "type": "text", "html": {
+        "ru": "<p><b>Статус ответа</b> — трёхзначное число. Первая цифра говорит главное:</p><ul><li><code>2xx</code> — успех (<code>200 OK</code>, <code>201 Created</code>)</li><li><code>3xx</code> — перенаправление</li><li><code>4xx</code> — ошибка клиента (<code>404 Not Found</code>, <code>401 Unauthorized</code>)</li><li><code>5xx</code> — ошибка сервера (<code>500</code>)</li></ul>",
+        "uz": "<p><b>Javob statusi</b> — uch xonali son. Birinchi raqam asosiy narsani bildiradi:</p><ul><li><code>2xx</code> — muvaffaqiyat (<code>200 OK</code>, <code>201 Created</code>)</li><li><code>3xx</code> — qayta yo'naltirish</li><li><code>4xx</code> — klient xatosi (<code>404 Not Found</code>, <code>401 Unauthorized</code>)</li><li><code>5xx</code> — server xatosi (<code>500</code>)</li></ul>",
+        "en": "<p>The <b>status code</b> is a three-digit number. The first digit tells the story:</p><ul><li><code>2xx</code> — success (<code>200 OK</code>, <code>201 Created</code>)</li><li><code>3xx</code> — redirect</li><li><code>4xx</code> — client error (<code>404 Not Found</code>, <code>401 Unauthorized</code>)</li><li><code>5xx</code> — server error (<code>500</code>)</li></ul>" } },
+      { "type": "checkpoint",
+        "q": { "ru": "Пользователь ввёл неверный пароль. Какой статус вернёт правильно спроектированный сервер?", "uz": "Foydalanuvchi noto'g'ri parol kiritdi. To'g'ri loyihalangan server qaysi statusni qaytaradi?", "en": "A user entered a wrong password. Which status should a well-designed server return?" },
+        "options": [
+          { "ru": "200 OK", "uz": "200 OK", "en": "200 OK" },
+          { "ru": "401 Unauthorized", "uz": "401 Unauthorized", "en": "401 Unauthorized" },
+          { "ru": "500 Internal Server Error", "uz": "500 Internal Server Error", "en": "500 Internal Server Error" },
+          { "ru": "404 Not Found", "uz": "404 Not Found", "en": "404 Not Found" }
+        ], "a": 1,
+        "explain": { "ru": "Ошибся клиент, а не сервер — значит 4xx. Именно так отвечает API этого сайта при неверном пароле.", "uz": "Xato klientda, serverda emas — demak 4xx. Shu saytning API'si ham noto'g'ri parolda shunday javob beradi.", "en": "The client made the error, not the server — hence 4xx. This site's own API answers exactly this way on a wrong password." } },
+      { "type": "match",
+        "pairs": [
+          { "left": { "ru": "GET", "uz": "GET", "en": "GET" }, "right": { "ru": "Получить данные", "uz": "Ma'lumot olish", "en": "Fetch data" } },
+          { "left": { "ru": "POST", "uz": "POST", "en": "POST" }, "right": { "ru": "Создать новую запись", "uz": "Yangi yozuv yaratish", "en": "Create a new record" } },
+          { "left": { "ru": "DELETE", "uz": "DELETE", "en": "DELETE" }, "right": { "ru": "Удалить", "uz": "O'chirish", "en": "Remove" } },
+          { "left": { "ru": "404", "uz": "404", "en": "404" }, "right": { "ru": "Не найдено", "uz": "Topilmadi", "en": "Not found" } }
+        ] }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "JSON — язык обмена данными", "uz": "JSON — ma'lumot almashish tili", "en": "JSON — the data exchange format" },
+     "blocks": [
+      { "type": "text", "html": {
+        "ru": "<p>Сервер и клиент обмениваются данными в формате <b>JSON</b>. Он почти неотличим от словарей и списков Python — поэтому ты его уже понимаешь.</p>",
+        "uz": "<p>Server va klient <b>JSON</b> formatida ma'lumot almashadi. U Python lug'atlari va ro'yxatlariga juda o'xshaydi — demak siz uni allaqachon tushunasiz.</p>",
+        "en": "<p>Server and client exchange data as <b>JSON</b>. It looks almost exactly like Python dictionaries and lists — so you already understand it.</p>" } },
+      { "type": "run", "lang": "python", "code": "import json\n\nuser = {'id': 7, 'name': 'Aziz', 'skills': ['python', 'sql'], 'active': True}\n\ntext = json.dumps(user, ensure_ascii=False)   # объект -> строка JSON\nprint(text)\n\nback = json.loads(text)                       # строка JSON -> объект\nprint(back['skills'][0])" },
+      { "type": "note", "kind": "trap", "html": {
+        "ru": "В JSON <code>true</code>/<code>false</code>/<code>null</code> пишутся с маленькой буквы, а в Python — <code>True</code>/<code>False</code>/<code>None</code>. Модуль <code>json</code> конвертирует это автоматически.",
+        "uz": "JSON'da <code>true</code>/<code>false</code>/<code>null</code> kichik harf bilan, Python'da esa <code>True</code>/<code>False</code>/<code>None</code>. <code>json</code> moduli buni avtomatik o'giradi.",
+        "en": "In JSON it's lowercase <code>true</code>/<code>false</code>/<code>null</code>; in Python it's <code>True</code>/<code>False</code>/<code>None</code>. The <code>json</code> module converts automatically." } },
+      { "type": "predict", "lang": "python",
+        "code": "import json\ndata = json.loads('{\"count\": 3, \"items\": [\"a\", \"b\"]}')\nprint(data['count'] + len(data['items']))",
+        "options": [
+          { "ru": "5", "uz": "5", "en": "5" },
+          { "ru": "32", "uz": "32", "en": "32" },
+          { "ru": "3", "uz": "3", "en": "3" },
+          { "ru": "Ошибка", "uz": "Xato", "en": "Error" }
+        ], "a": 0,
+        "explain": { "ru": "<code>data['count']</code> = 3 (число), <code>len(items)</code> = 2. Итого 5.", "uz": "<code>data['count']</code> = 3 (son), <code>len(items)</code> = 2. Jami 5.", "en": "<code>data['count']</code> is 3 (a number) and <code>len(items)</code> is 2, so 5." } }
+     ]
+    },
+    {
+     "id": "l4",
+     "title": { "ru": "REST API: правила хорошего сервиса", "uz": "REST API: yaxshi xizmat qoidalari", "en": "REST APIs: rules of a good service" },
+     "blocks": [
+      { "type": "text", "html": {
+        "ru": "<p><b>REST</b> — набор соглашений о том, как строить API. Главное: адрес описывает <b>ресурс</b> (существительное), а метод — <b>действие</b>.</p>",
+        "uz": "<p><b>REST</b> — API qurish bo'yicha kelishuvlar to'plami. Asosiysi: manzil <b>resursni</b> (ot) bildiradi, metod esa <b>harakatni</b>.</p>",
+        "en": "<p><b>REST</b> is a set of conventions for building APIs. The key idea: the URL names a <b>resource</b> (a noun), the method expresses the <b>action</b>.</p>" } },
+      { "type": "code", "lang": "python", "code": "GET    /api/users        # список пользователей\nGET    /api/users/7      # один пользователь\nPOST   /api/users        # создать пользователя\nPATCH  /api/users/7      # изменить\nDELETE /api/users/7      # удалить\n\n# Плохо: /api/getUsers, /api/createUserNow, /api/deleteUser7" },
+      { "type": "findbug",
+        "lines": [
+          "GET  /api/orders",
+          "POST /api/createOrder",
+          "GET  /api/orders/42",
+          "DELETE /api/orders/42"
+        ],
+        "bugLine": 1,
+        "explain": { "ru": "Действие уже выражено методом <code>POST</code>, поэтому глагол в адресе лишний. Правильно: <code>POST /api/orders</code>.", "uz": "Harakat allaqachon <code>POST</code> metodida ifodalangan, manzildagi fe'l ortiqcha. To'g'risi: <code>POST /api/orders</code>.", "en": "The action is already expressed by <code>POST</code>, so the verb in the path is redundant. Correct: <code>POST /api/orders</code>." } },
+      { "type": "order",
+        "steps": [
+          { "ru": "Браузер отправляет POST /api/login с логином и паролем", "uz": "Brauzer login va parol bilan POST /api/login yuboradi", "en": "The browser sends POST /api/login with username and password" },
+          { "ru": "Сервер ищет пользователя в базе данных", "uz": "Server bazadan foydalanuvchini qidiradi", "en": "The server looks the user up in the database" },
+          { "ru": "Сервер сверяет хеш пароля", "uz": "Server parol xeshini tekshiradi", "en": "The server verifies the password hash" },
+          { "ru": "Сервер отвечает 200 OK и выдаёт токен", "uz": "Server 200 OK javob beradi va token beradi", "en": "The server responds 200 OK and issues a token" },
+          { "ru": "Браузер сохраняет токен и шлёт его в следующих запросах", "uz": "Brauzer tokenni saqlaydi va keyingi so'rovlarda yuboradi", "en": "The browser stores the token and sends it with later requests" }
+        ] },
+      { "type": "summary", "items": [
+        { "ru": "Клиент шлёт запрос, сервер возвращает ответ — это весь веб в одном предложении", "uz": "Klient so'rov yuboradi, server javob qaytaradi — bir jumlada butun veb", "en": "Client sends a request, server returns a response — the whole web in one sentence" },
+        { "ru": "Метод = действие, адрес = ресурс, статус = результат", "uz": "Metod = harakat, manzil = resurs, status = natija", "en": "Method = action, URL = resource, status = outcome" },
+        { "ru": "JSON — это словари и списки Python, переданные текстом", "uz": "JSON — bu matn ko'rinishida uzatilgan Python lug'at va ro'yxatlari", "en": "JSON is Python dicts and lists sent as text" }
+      ] }
+     ]
+    }
+   ],
+   "quiz": [
+    { "q": { "ru": "Какой метод используют, чтобы <b>получить</b> данные?", "uz": "Ma'lumot <b>olish</b> uchun qaysi metod ishlatiladi?", "en": "Which method is used to <b>fetch</b> data?" },
+      "options": [{ "ru": "GET", "uz": "GET", "en": "GET" }, { "ru": "POST", "uz": "POST", "en": "POST" }, { "ru": "DELETE", "uz": "DELETE", "en": "DELETE" }, { "ru": "PATCH", "uz": "PATCH", "en": "PATCH" }], "a": 0,
+      "explain": { "ru": "<code>GET</code> — чтение данных без изменения состояния сервера.", "uz": "<code>GET</code> — server holatini o'zgartirmasdan ma'lumot o'qish.", "en": "<code>GET</code> reads data without changing server state." } },
+    { "q": { "ru": "Что означает статус 404?", "uz": "404 statusi nimani anglatadi?", "en": "What does status 404 mean?" },
+      "options": [{ "ru": "Успех", "uz": "Muvaffaqiyat", "en": "Success" }, { "ru": "Ресурс не найден", "uz": "Resurs topilmadi", "en": "Resource not found" }, { "ru": "Ошибка сервера", "uz": "Server xatosi", "en": "Server error" }, { "ru": "Нужна авторизация", "uz": "Avtorizatsiya kerak", "en": "Authorization required" }], "a": 1,
+      "explain": { "ru": "4xx — ошибки клиента; 404 значит «по этому адресу ничего нет».", "uz": "4xx — klient xatolari; 404 «bu manzilda hech narsa yo'q» degani.", "en": "4xx are client errors; 404 means «nothing exists at this address»." } },
+    { "q": { "ru": "Что вернёт <code>json.loads('{\"a\": 1}')</code>?", "uz": "<code>json.loads('{\"a\": 1}')</code> nima qaytaradi?", "en": "What does <code>json.loads('{\"a\": 1}')</code> return?" },
+      "options": [{ "ru": "Строку", "uz": "Satr", "en": "A string" }, { "ru": "Словарь Python", "uz": "Python lug'ati", "en": "A Python dictionary" }, { "ru": "Список", "uz": "Ro'yxat", "en": "A list" }, { "ru": "Ошибку", "uz": "Xato", "en": "An error" }], "a": 1,
+      "explain": { "ru": "<code>loads</code> = load string: превращает текст JSON в объект Python.", "uz": "<code>loads</code> = load string: JSON matnini Python obyektiga aylantiradi.", "en": "<code>loads</code> = load string: turns JSON text into a Python object." } },
+    { "q": { "ru": "Какой адрес спроектирован по REST правильно?", "uz": "Qaysi manzil REST bo'yicha to'g'ri loyihalangan?", "en": "Which URL follows REST conventions?" },
+      "options": [{ "ru": "GET /api/getAllUsers", "uz": "GET /api/getAllUsers", "en": "GET /api/getAllUsers" }, { "ru": "GET /api/users", "uz": "GET /api/users", "en": "GET /api/users" }, { "ru": "POST /api/users/deleteUser", "uz": "POST /api/users/deleteUser", "en": "POST /api/users/deleteUser" }, { "ru": "GET /api/users/create", "uz": "GET /api/users/create", "en": "GET /api/users/create" }], "a": 1,
+      "explain": { "ru": "Адрес — существительное (ресурс), действие выражает метод.", "uz": "Manzil — ot (resurs), harakatni metod bildiradi.", "en": "The URL is a noun (a resource); the method expresses the action." } },
+    { "q": { "ru": "Сервер упал с необработанной ошибкой. Какой статус?", "uz": "Serverda ishlov berilmagan xato yuz berdi. Qaysi status?", "en": "The server crashed with an unhandled error. Which status?" },
+      "options": [{ "ru": "400", "uz": "400", "en": "400" }, { "ru": "403", "uz": "403", "en": "403" }, { "ru": "500", "uz": "500", "en": "500" }, { "ru": "200", "uz": "200", "en": "200" }], "a": 2,
+      "explain": { "ru": "5xx — вина сервера. 500 — «внутренняя ошибка сервера».", "uz": "5xx — server aybi. 500 — «ichki server xatosi».", "en": "5xx means the server is at fault. 500 is «internal server error»." } },
+    { "q": { "ru": "Зачем API возвращает токен после входа?", "uz": "Nega API kirishdan keyin token qaytaradi?", "en": "Why does an API return a token after login?" },
+      "options": [{ "ru": "Чтобы шифровать базу", "uz": "Bazani shifrlash uchun", "en": "To encrypt the database" }, { "ru": "Чтобы клиент доказывал, кто он, в следующих запросах", "uz": "Klient keyingi so'rovlarda kimligini isbotlashi uchun", "en": "So the client can prove who it is on later requests" }, { "ru": "Чтобы ускорить сервер", "uz": "Serverni tezlashtirish uchun", "en": "To make the server faster" }, { "ru": "Это необязательно", "uz": "Bu shart emas", "en": "It is optional" }], "a": 1,
+      "explain": { "ru": "HTTP не помнит предыдущих запросов, поэтому клиент прикладывает токен каждый раз. Именно так работает вход на этом сайте.", "uz": "HTTP oldingi so'rovlarni eslamaydi, shuning uchun klient har safar token yuboradi. Bu saytdagi kirish ham shunday ishlaydi.", "en": "HTTP does not remember previous requests, so the client attaches a token each time. That's exactly how login on this site works." } }
+   ],
+   "tasks": [
+    { "id": "t1", "kind": "python",
+      "title": { "ru": "Разбери ответ API", "uz": "API javobini tahlil qiling", "en": "Parse an API response" },
+      "brief": { "ru": "json.loads и доступ к полям", "uz": "json.loads va maydonlarga kirish", "en": "json.loads and field access" },
+      "desc": { "ru": "<p>Дана строка ответа API. Разбери её через <code>json.loads</code> и выведи имя пользователя и количество его навыков в формате: <code>Aziz: 2 навыка</code></p>", "uz": "<p>API javob satri berilgan. Uni <code>json.loads</code> orqali tahlil qiling va foydalanuvchi ismi va ko'nikmalari sonini chiqaring: <code>Aziz: 2 навыка</code></p>", "en": "<p>Given an API response string, parse it with <code>json.loads</code> and print the user name and skill count as: <code>Aziz: 2 навыка</code></p>" },
+      "starter": "import json\n\nresponse = '{\"name\": \"Aziz\", \"skills\": [\"python\", \"sql\"]}'\n# разбери JSON и выведи результат\n",
+      "tests": "assert 'Aziz: 2' in _stdout, 'Ожидался вывод: Aziz: 2 навыка'",
+      "hint": { "ru": "data = json.loads(response), потом print(f\"{data['name']}: {len(data['skills'])} навыка\")", "uz": "data = json.loads(response), keyin print(f\"{data['name']}: {len(data['skills'])} навыка\")", "en": "data = json.loads(response), then print(f\"{data['name']}: {len(data['skills'])} навыка\")" } },
+    { "id": "t2", "kind": "python",
+      "title": { "ru": "Роутер по статусам", "uz": "Statuslar bo'yicha router", "en": "Status code router" },
+      "brief": { "ru": "Функция + условия", "uz": "Funksiya + shartlar", "en": "Function + conditions" },
+      "desc": { "ru": "<p>Напиши функцию <code>describe(status)</code>: для 2xx вернуть <code>\"успех\"</code>, для 4xx — <code>\"ошибка клиента\"</code>, для 5xx — <code>\"ошибка сервера\"</code>, иначе <code>\"другое\"</code>.</p>", "uz": "<p><code>describe(status)</code> funksiyasini yozing: 2xx uchun <code>\"успех\"</code>, 4xx uchun <code>\"ошибка клиента\"</code>, 5xx uchun <code>\"ошибка сервера\"</code>, aks holda <code>\"другое\"</code>.</p>", "en": "<p>Write <code>describe(status)</code>: return <code>\"успех\"</code> for 2xx, <code>\"ошибка клиента\"</code> for 4xx, <code>\"ошибка сервера\"</code> for 5xx, otherwise <code>\"другое\"</code>.</p>" },
+      "starter": "def describe(status):\n    # подсказка: status // 100 даёт первую цифру\n    pass\n\nprint(describe(200))\nprint(describe(404))\nprint(describe(500))\n",
+      "tests": "assert describe(200) == 'успех', 'describe(200) должно вернуть: успех'\nassert describe(201) == 'успех', '201 - тоже успех'\nassert describe(404) == 'ошибка клиента', 'describe(404): ошибка клиента'\nassert describe(401) == 'ошибка клиента', '401 - ошибка клиента'\nassert describe(500) == 'ошибка сервера', 'describe(500): ошибка сервера'\nassert describe(301) == 'другое', '3xx - другое'",
+      "hint": { "ru": "group = status // 100; if group == 2: return 'успех' и так далее.", "uz": "group = status // 100; if group == 2: return 'успех' va hokazo.", "en": "group = status // 100; if group == 2: return 'успех' and so on." } },
+    { "id": "t3", "kind": "python",
+      "title": { "ru": "Собери ответ API", "uz": "API javobini yig'ing", "en": "Build an API response" },
+      "brief": { "ru": "json.dumps", "uz": "json.dumps", "en": "json.dumps" },
+      "desc": { "ru": "<p>Напиши функцию <code>make_response(name, xp)</code>, которая возвращает <b>строку JSON</b> с полями <code>name</code>, <code>xp</code> и <code>status</code> = <code>\"ok\"</code>.</p>", "uz": "<p><code>make_response(name, xp)</code> funksiyasini yozing: <code>name</code>, <code>xp</code> va <code>status</code> = <code>\"ok\"</code> maydonlari bilan <b>JSON satr</b> qaytarsin.</p>", "en": "<p>Write <code>make_response(name, xp)</code> returning a <b>JSON string</b> with fields <code>name</code>, <code>xp</code> and <code>status</code> = <code>\"ok\"</code>.</p>" },
+      "starter": "import json\n\ndef make_response(name, xp):\n    pass\n\nprint(make_response('Aziz', 340))\n",
+      "tests": "import json as _j\n_r = _j.loads(make_response('Aziz', 340))\nassert _r['name'] == 'Aziz', 'В ответе должно быть поле name'\nassert _r['xp'] == 340, 'В ответе должно быть поле xp (числом)'\nassert _r['status'] == 'ok', 'В ответе должно быть поле status = ok'\nassert isinstance(make_response('X', 1), str), 'Функция должна вернуть СТРОКУ (json.dumps), а не словарь'",
+      "hint": { "ru": "return json.dumps({'name': name, 'xp': xp, 'status': 'ok'})", "uz": "return json.dumps({'name': name, 'xp': xp, 'status': 'ok'})", "en": "return json.dumps({'name': name, 'xp': xp, 'status': 'ok'})" } }
+   ],
+   "exam": {
+    "time": 480,
+    "questions": [
+     { "q": { "ru": "Какой метод создаёт новую запись?", "uz": "Qaysi metod yangi yozuv yaratadi?", "en": "Which method creates a new record?" },
+       "options": [{ "ru": "GET", "uz": "GET", "en": "GET" }, { "ru": "POST", "uz": "POST", "en": "POST" }, { "ru": "DELETE", "uz": "DELETE", "en": "DELETE" }, { "ru": "HEAD", "uz": "HEAD", "en": "HEAD" }], "a": 1 },
+     { "q": { "ru": "201 Created — это какая группа статусов?", "uz": "201 Created — qaysi status guruhi?", "en": "201 Created belongs to which group?" },
+       "options": [{ "ru": "Успех", "uz": "Muvaffaqiyat", "en": "Success" }, { "ru": "Ошибка клиента", "uz": "Klient xatosi", "en": "Client error" }, { "ru": "Ошибка сервера", "uz": "Server xatosi", "en": "Server error" }, { "ru": "Перенаправление", "uz": "Qayta yo'naltirish", "en": "Redirect" }], "a": 0 },
+     { "q": { "ru": "Что делает <code>json.dumps</code>?", "uz": "<code>json.dumps</code> nima qiladi?", "en": "What does <code>json.dumps</code> do?" },
+       "options": [{ "ru": "Строку JSON → объект", "uz": "JSON satr → obyekt", "en": "JSON string → object" }, { "ru": "Объект → строку JSON", "uz": "Obyekt → JSON satr", "en": "Object → JSON string" }, { "ru": "Отправляет запрос", "uz": "So'rov yuboradi", "en": "Sends a request" }, { "ru": "Читает файл", "uz": "Faylni o'qiydi", "en": "Reads a file" }], "a": 1 },
+     { "q": { "ru": "Почему пароли хранят в виде хеша, а не текстом?", "uz": "Nima uchun parollar matn emas, xesh sifatida saqlanadi?", "en": "Why are passwords stored hashed rather than as text?" },
+       "options": [{ "ru": "Так быстрее", "uz": "Shunday tezroq", "en": "It is faster" }, { "ru": "Чтобы при утечке базы пароли не были раскрыты", "uz": "Baza sizib chiqsa parollar oshkor bo'lmasligi uchun", "en": "So a database leak does not expose the passwords" }, { "ru": "Экономит место", "uz": "Joy tejaydi", "en": "It saves space" }, { "ru": "Требование HTTP", "uz": "HTTP talabi", "en": "HTTP requires it" }], "a": 1 },
+     { "q": { "ru": "HTTP без токена/сессии — какой он?", "uz": "Token/sessiyasiz HTTP qanday?", "en": "HTTP without a token or session is…" },
+       "options": [{ "ru": "Помнит предыдущие запросы", "uz": "Oldingi so'rovlarni eslaydi", "en": "Stateful — it remembers previous requests" }, { "ru": "Не помнит предыдущие запросы", "uz": "Oldingi so'rovlarni eslamaydi", "en": "Stateless — it remembers nothing" }, { "ru": "Работает только с JSON", "uz": "Faqat JSON bilan ishlaydi", "en": "JSON-only" }, { "ru": "Шифрует всё сам", "uz": "Hammasini o'zi shifrlaydi", "en": "Encrypts everything by itself" }], "a": 1 }
+    ],
+    "tasks": [
+     { "kind": "python",
+       "title": { "ru": "Мини-обработчик запросов", "uz": "Mini so'rov ishlovchisi", "en": "Mini request handler" },
+       "desc": { "ru": "<p>Напиши функцию <code>handle(method, path)</code>, имитирующую роутер:</p><ul><li><code>GET /api/users</code> → <code>200</code></li><li><code>POST /api/users</code> → <code>201</code></li><li>любой другой путь → <code>404</code></li></ul>", "uz": "<p>Router'ni taqlid qiluvchi <code>handle(method, path)</code> funksiyasini yozing:</p><ul><li><code>GET /api/users</code> → <code>200</code></li><li><code>POST /api/users</code> → <code>201</code></li><li>boshqa yo'l → <code>404</code></li></ul>", "en": "<p>Write <code>handle(method, path)</code> emulating a router:</p><ul><li><code>GET /api/users</code> → <code>200</code></li><li><code>POST /api/users</code> → <code>201</code></li><li>anything else → <code>404</code></li></ul>" },
+       "starter": "def handle(method, path):\n    pass\n\nprint(handle('GET', '/api/users'))\nprint(handle('POST', '/api/users'))\nprint(handle('GET', '/nope'))\n",
+       "tests": "assert handle('GET', '/api/users') == 200, \"GET /api/users -> 200\"\nassert handle('POST', '/api/users') == 201, \"POST /api/users -> 201\"\nassert handle('GET', '/nope') == 404, \"неизвестный путь -> 404\"\nassert handle('DELETE', '/api/users') == 404, \"неподдерживаемый метод -> 404\"" }
+    ]
+   }
+  }
+ ]
+}

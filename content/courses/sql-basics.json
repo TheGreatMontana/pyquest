@@ -1,0 +1,1451 @@
+{
+ "id": "sql-basics",
+ "schema": 2,
+ "modules": [
+  {
+   "id": "sb-01",
+   "legacyId": "s01",
+   "title": {
+    "ru": "Базы данных и SELECT"
+   },
+   "tagline": {
+    "ru": "Что такое БД, таблицы и первые запросы · Week 1"
+   },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": {
+      "ru": "Что такое база данных и SQL"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><b>База данных</b> — организованное хранилище данных. Данные лежат в <b>таблицах</b>: колонки задают структуру (имя, тип), строки — сами данные. Это фундамент профессии Data Engineer.</p>"
+       }
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><b>SQL</b> — язык запросов к базе. <b>T-SQL</b> — диалект SQL в Microsoft SQL Server, именно его требует программа ментора (Week 1: установить SQL Server 2019 + SSMS).</p>"
+       }
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>На этом сайте встроен настоящий SQL-движок — все запросы выполняются прямо в браузере на учебной базе магазина электроники. Синтаксис базовых запросов в тренажёре и в SQL Server одинаковый; где есть отличия — я отмечу плашкой <i>«в SQL Server»</i>.</p>"
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": {
+      "ru": "Наша учебная база: магазин"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>В базе 6 таблиц:</p>"
+       }
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<ul><li><code>customers</code> — клиенты (id, name, city, country, reg_date)</li><li><code>products</code> — товары (id, name, category_id, price, stock)</li><li><code>categories</code> — категории товаров</li><li><code>orders</code> — заказы (id, customer_id, order_date, status)</li><li><code>order_items</code> — состав заказов (order_id, product_id, qty, unit_price)</li><li><code>employees</code> — сотрудники (id, name, title, manager_id, salary, city)</li></ul>"
+       }
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Посмотри на клиентов — выполни запрос:</p>"
+       }
+      },
+      {
+       "type": "sqlrun",
+       "lang": "sql",
+       "code": "SELECT * FROM customers;"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><code>SELECT * FROM таблица</code> — «выбери все колонки из таблицы». Звёздочка = все колонки.</p>"
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": {
+      "ru": "SELECT: выбираем колонки"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>В работе почти никогда не тянут все колонки — перечисляют нужные через запятую:</p>"
+       }
+      },
+      {
+       "type": "sqlrun",
+       "lang": "sql",
+       "code": "SELECT name, price\nFROM products;"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Колонке можно дать псевдоним через <code>AS</code> — так делают отчёты читаемыми:</p>"
+       }
+      },
+      {
+       "type": "sqlrun",
+       "lang": "sql",
+       "code": "SELECT name AS product_name,\n       price AS price_usd\nFROM products;"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>SQL не чувствителен к регистру (<code>select</code> = <code>SELECT</code>), но ключевые слова принято писать ЗАГЛАВНЫМИ. Запрос завершается точкой с запятой.</p>"
+       }
+      }
+     ]
+    },
+    {
+     "id": "l4",
+     "title": {
+      "ru": "CREATE TABLE и типы данных"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Таблицы создаются командой <code>CREATE TABLE</code> — для каждой колонки задаётся тип. Основные типы в SQL Server:</p>"
+       }
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<ul><li><code>INT</code> — целые числа</li><li><code>DECIMAL(10,2)</code> — точные дробные (деньги!)</li><li><code>NVARCHAR(100)</code> — текст до 100 символов (N = юникод)</li><li><code>DATE</code>, <code>DATETIME2</code> — даты</li><li><code>BIT</code> — да/нет</li></ul>"
+       }
+      },
+      {
+       "type": "code",
+       "lang": "sql",
+       "code": "-- Так выглядит T-SQL в SQL Server:\nCREATE TABLE suppliers (\n    id   INT IDENTITY(1,1) PRIMARY KEY,\n    name NVARCHAR(100) NOT NULL,\n    city NVARCHAR(50)\n);"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><i>В тренажёре</i> (SQLite) типы проще: <code>INTEGER</code>, <code>REAL</code>, <code>TEXT</code>, а вместо <code>IDENTITY</code> автономер даёт <code>INTEGER PRIMARY KEY</code>. Суть та же.</p>"
+       }
+      },
+      {
+       "type": "sqlrun",
+       "lang": "sql",
+       "code": "CREATE TABLE suppliers (\n    id   INTEGER PRIMARY KEY,\n    name TEXT NOT NULL,\n    city TEXT\n);\nINSERT INTO suppliers (name, city) VALUES ('TechImport', 'Ташкент');\nSELECT * FROM suppliers;"
+      }
+     ]
+    },
+    {
+     "id": "l5",
+     "title": {
+      "ru": "Ограничения (constraints) — Week 1"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Ограничения защищают данные от мусора — их спрашивают на каждом собеседовании:</p>"
+       }
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<ul><li><code>PRIMARY KEY</code> — уникальный идентификатор строки</li><li><code>FOREIGN KEY</code> — ссылка на строку другой таблицы (так связаны <code>products.category_id</code> → <code>categories.id</code>)</li><li><code>NOT NULL</code> — колонка обязана иметь значение</li><li><code>UNIQUE</code> — значения не повторяются</li><li><code>DEFAULT</code> — значение по умолчанию</li><li><code>CHECK</code> — своё правило (например, цена больше нуля)</li></ul>"
+       }
+      },
+      {
+       "type": "code",
+       "lang": "sql",
+       "code": "CREATE TABLE stores (\n    id        INT PRIMARY KEY,\n    name      NVARCHAR(50) NOT NULL,\n    ytd_sales DECIMAL(12,2) CHECK (ytd_sales >= 0),  -- только положительные\n    region    NVARCHAR(30) DEFAULT 'Unknown'\n);"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Это ровно то, что требует HW Week 1 ментора: базы HR и Store с CHECK, DEFAULT и внешними ключами. После этого модуля домашка станет понятной.</p>"
+       }
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": {
+      "ru": "Что делает запрос <code>SELECT * FROM orders</code>?"
+     },
+     "options": [
+      {
+       "ru": "Удаляет таблицу orders"
+      },
+      {
+       "ru": "Выбирает все колонки и строки из orders"
+      },
+      {
+       "ru": "Создаёт таблицу orders"
+      },
+      {
+       "ru": "Выбирает только первую строку"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "<code>SELECT *</code> — выбрать все колонки, без условий вернутся все строки."
+     }
+    },
+    {
+     "q": {
+      "ru": "Какой тип в SQL Server правильный для хранения денег?"
+     },
+     "options": [
+      {
+       "ru": "FLOAT"
+      },
+      {
+       "ru": "DECIMAL(10,2)"
+      },
+      {
+       "ru": "NVARCHAR(20)"
+      },
+      {
+       "ru": "BIT"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "<code>DECIMAL</code> хранит точные дробные значения — для денег нельзя использовать приблизительный FLOAT."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что такое PRIMARY KEY?"
+     },
+     "options": [
+      {
+       "ru": "Пароль таблицы"
+      },
+      {
+       "ru": "Уникальный идентификатор строки"
+      },
+      {
+       "ru": "Первая колонка таблицы"
+      },
+      {
+       "ru": "Самая важная таблица"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Первичный ключ уникально определяет каждую строку — обычно это колонка id."
+     }
+    },
+    {
+     "q": {
+      "ru": "Зачем нужен FOREIGN KEY?"
+     },
+     "options": [
+      {
+       "ru": "Для быстрого поиска"
+      },
+      {
+       "ru": "Для связи с строкой другой таблицы"
+      },
+      {
+       "ru": "Для шифрования"
+      },
+      {
+       "ru": "Для сортировки"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Внешний ключ ссылается на строку другой таблицы: <code>orders.customer_id</code> → <code>customers.id</code>."
+     }
+    },
+    {
+     "q": {
+      "ru": "Какое ограничение запретит записать отрицательную цену?"
+     },
+     "options": [
+      {
+       "ru": "NOT NULL"
+      },
+      {
+       "ru": "DEFAULT"
+      },
+      {
+       "ru": "CHECK (price >= 0)"
+      },
+      {
+       "ru": "UNIQUE"
+      }
+     ],
+     "a": 2,
+     "explain": {
+      "ru": "<code>CHECK</code> задаёт произвольное правило для значений колонки."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что делает IDENTITY(1,1) в SQL Server?"
+     },
+     "options": [
+      {
+       "ru": "Проверяет уникальность"
+      },
+      {
+       "ru": "Автоматически нумерует строки: 1, 2, 3…"
+      },
+      {
+       "ru": "Создаёт индекс"
+      },
+      {
+       "ru": "Запрещает NULL"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "<code>IDENTITY(старт, шаг)</code> — автоинкремент. В HW Week 1 нужно IDENTITY(100,10)!"
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "title": {
+      "ru": "Все сотрудники"
+     },
+     "brief": {
+      "ru": "SELECT * FROM"
+     },
+     "desc": {
+      "ru": "<p>Выведи <b>все колонки</b> всех сотрудников из таблицы <code>employees</code>.</p>"
+     },
+     "starter": "-- напиши запрос\n",
+     "hint": {
+      "ru": "SELECT * FROM employees;"
+     },
+     "kind": "sql",
+     "solution": "SELECT * FROM employees;"
+    },
+    {
+     "id": "t2",
+     "title": {
+      "ru": "Прайс-лист"
+     },
+     "brief": {
+      "ru": "Выбор колонок"
+     },
+     "desc": {
+      "ru": "<p>Из таблицы <code>products</code> выведи только две колонки: <code>name</code> и <code>price</code>.</p>"
+     },
+     "starter": "-- только name и price\n",
+     "hint": {
+      "ru": "Колонки перечисляются через запятую: SELECT name, price FROM …"
+     },
+     "kind": "sql",
+     "solution": "SELECT name, price FROM products;"
+    },
+    {
+     "id": "t3",
+     "title": {
+      "ru": "Своя таблица"
+     },
+     "brief": {
+      "ru": "CREATE TABLE + INSERT"
+     },
+     "desc": {
+      "ru": "<p>Создай таблицу <code>couriers</code> с колонками: <code>id INTEGER PRIMARY KEY</code>, <code>name TEXT NOT NULL</code>, <code>phone TEXT</code>. Добавь двух курьеров: (1, 'Джасур', '+998901112233') и (2, 'Умид', '+998907776655').</p>"
+     },
+     "starter": "-- CREATE TABLE couriers (...);\n-- INSERT INTO couriers VALUES (...);\n",
+     "hint": {
+      "ru": "CREATE TABLE couriers (id INTEGER PRIMARY KEY, name TEXT NOT NULL, phone TEXT); потом два INSERT INTO couriers VALUES (…);"
+     },
+     "kind": "sql",
+     "solution": "CREATE TABLE couriers (id INTEGER PRIMARY KEY, name TEXT NOT NULL, phone TEXT);\nINSERT INTO couriers VALUES (1, 'Джасур', '+998901112233');\nINSERT INTO couriers VALUES (2, 'Умид', '+998907776655');",
+     "checkQuery": "SELECT id, name, phone FROM couriers ORDER BY id;"
+    }
+   ],
+   "exam": {
+    "time": 480,
+    "questions": [
+     {
+      "q": {
+       "ru": "Как выбрать колонки name и city из таблицы customers?"
+      },
+      "options": [
+       {
+        "ru": "SELECT name + city FROM customers"
+       },
+       {
+        "ru": "SELECT name, city FROM customers"
+       },
+       {
+        "ru": "GET name, city FROM customers"
+       },
+       {
+        "ru": "SELECT FROM customers name, city"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "Что делает AS в запросе?"
+      },
+      "options": [
+       {
+        "ru": "Сортирует"
+       },
+       {
+        "ru": "Даёт колонке псевдоним"
+       },
+       {
+        "ru": "Фильтрует"
+       },
+       {
+        "ru": "Объединяет таблицы"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "Какая таблица в нашей базе связывает заказы и товары?"
+      },
+      "options": [
+       {
+        "ru": "customers"
+       },
+       {
+        "ru": "categories"
+       },
+       {
+        "ru": "order_items"
+       },
+       {
+        "ru": "employees"
+       }
+      ],
+      "a": 2
+     },
+     {
+      "q": {
+       "ru": "Колонка обязана иметь значение. Какое ограничение?"
+      },
+      "options": [
+       {
+        "ru": "UNIQUE"
+       },
+       {
+        "ru": "NOT NULL"
+       },
+       {
+        "ru": "CHECK"
+       },
+       {
+        "ru": "DEFAULT"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "Что вернёт SELECT * FROM categories?"
+      },
+      "options": [
+       {
+        "ru": "Только имена категорий"
+       },
+       {
+        "ru": "Все строки и колонки categories"
+       },
+       {
+        "ru": "Количество категорий"
+       },
+       {
+        "ru": "Ошибку"
+       }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "title": {
+       "ru": "Каталог с остатками"
+      },
+      "desc": {
+       "ru": "<p>Выведи из <code>products</code> три колонки: <code>name</code>, <code>price</code>, <code>stock</code>.</p>"
+      },
+      "starter": "",
+      "kind": "sql",
+      "solution": "SELECT name, price, stock FROM products;"
+     }
+    ]
+   },
+   "sqlModule": true
+  },
+  {
+   "id": "sb-02",
+   "legacyId": "s02",
+   "title": {
+    "ru": "Фильтрация и сортировка"
+   },
+   "tagline": {
+    "ru": "WHERE, ORDER BY, DISTINCT, NULL, CASE · Week 2"
+   },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": {
+      "ru": "WHERE — фильтр строк"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><code>WHERE</code> оставляет только строки, где условие истинно. Операторы: <code>=</code>, <code>&lt;&gt;</code> (не равно), <code>&gt;</code>, <code>&lt;</code>, <code>&gt;=</code>, <code>&lt;=</code>:</p>"
+       }
+      },
+      {
+       "type": "sqlrun",
+       "lang": "sql",
+       "code": "SELECT name, price\nFROM products\nWHERE price > 500;"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Текст сравнивается в одинарных кавычках. Условия соединяются через <code>AND</code> / <code>OR</code>, как в Python:</p>"
+       }
+      },
+      {
+       "type": "sqlrun",
+       "lang": "sql",
+       "code": "SELECT name, city\nFROM customers\nWHERE country = 'Узбекистан' AND city <> 'Ташкент';"
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": {
+      "ru": "IN, BETWEEN, LIKE"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Три удобных оператора для фильтров:</p>"
+       }
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<ul><li><code>IN (a, b, c)</code> — значение из списка</li><li><code>BETWEEN x AND y</code> — диапазон, границы включаются</li><li><code>LIKE</code> — шаблон текста: <code>%</code> — любые символы, <code>_</code> — один символ</li></ul>"
+       }
+      },
+      {
+       "type": "sqlrun",
+       "lang": "sql",
+       "code": "SELECT name, price\nFROM products\nWHERE price BETWEEN 100 AND 300;"
+      },
+      {
+       "type": "sqlrun",
+       "lang": "sql",
+       "code": "SELECT name\nFROM products\nWHERE name LIKE 'Монитор%';"
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": {
+      "ru": "NULL — отсутствие значения"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><code>NULL</code> — это «нет данных». С ним не работают обычные сравнения: <code>manager_id = NULL</code> НЕ сработает. Только <code>IS NULL</code> / <code>IS NOT NULL</code>:</p>"
+       }
+      },
+      {
+       "type": "sqlrun",
+       "lang": "sql",
+       "code": "SELECT name, title\nFROM employees\nWHERE manager_id IS NULL;"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>У директора нет руководителя — поэтому NULL. Это классика собеседований: «почему = NULL не работает?» Ответ: NULL не равен даже сам себе, любое сравнение с NULL даёт «неизвестно».</p>"
+       }
+      }
+     ]
+    },
+    {
+     "id": "l4",
+     "title": {
+      "ru": "ORDER BY и DISTINCT"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><code>ORDER BY</code> сортирует результат: <code>ASC</code> — по возрастанию (по умолчанию), <code>DESC</code> — по убыванию. <code>DISTINCT</code> убирает дубликаты:</p>"
+       }
+      },
+      {
+       "type": "sqlrun",
+       "lang": "sql",
+       "code": "SELECT name, price\nFROM products\nORDER BY price DESC;"
+      },
+      {
+       "type": "sqlrun",
+       "lang": "sql",
+       "code": "SELECT DISTINCT city\nFROM customers;"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Ограничение количества строк: в SQL Server — <code>SELECT TOP 3 …</code>, в тренажёре (SQLite) и PostgreSQL — <code>LIMIT 3</code> в конце запроса:</p>"
+       }
+      },
+      {
+       "type": "sqlrun",
+       "lang": "sql",
+       "code": "SELECT name, price\nFROM products\nORDER BY price DESC\nLIMIT 3;"
+      }
+     ]
+    },
+    {
+     "id": "l5",
+     "title": {
+      "ru": "CASE — условия внутри запроса"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><code>CASE</code> — это if/elif/else внутри SQL. Создаёт вычисляемую колонку:</p>"
+       }
+      },
+      {
+       "type": "sqlrun",
+       "lang": "sql",
+       "code": "SELECT name, price,\n  CASE\n    WHEN price >= 800 THEN 'дорогой'\n    WHEN price >= 200 THEN 'средний'\n    ELSE 'бюджетный'\n  END AS segment\nFROM products;"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Порядок веток важен — выполняется первая подходящая, как elif в Python. CASE постоянно используется в отчётах и витринах данных.</p>"
+       }
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": {
+      "ru": "Как выбрать товары дешевле 100?"
+     },
+     "options": [
+      {
+       "ru": "SELECT * FROM products IF price < 100"
+      },
+      {
+       "ru": "SELECT * FROM products WHERE price < 100"
+      },
+      {
+       "ru": "SELECT * FROM products HAVING price < 100"
+      },
+      {
+       "ru": "FILTER products BY price < 100"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Фильтр строк — это <code>WHERE условие</code>."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что означает <code>&lt;&gt;</code> в SQL?"
+     },
+     "options": [
+      {
+       "ru": "Меньше и больше"
+      },
+      {
+       "ru": "Не равно"
+      },
+      {
+       "ru": "Диапазон"
+      },
+      {
+       "ru": "Сравнение строк"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "<code>&lt;&gt;</code> — «не равно» (в большинстве СУБД работает и <code>!=</code>)."
+     }
+    },
+    {
+     "q": {
+      "ru": "Как найти строки, где manager_id пустой?"
+     },
+     "options": [
+      {
+       "ru": "WHERE manager_id = NULL"
+      },
+      {
+       "ru": "WHERE manager_id == NULL"
+      },
+      {
+       "ru": "WHERE manager_id IS NULL"
+      },
+      {
+       "ru": "WHERE manager_id = 0"
+      }
+     ],
+     "a": 2,
+     "explain": {
+      "ru": "С NULL работают только <code>IS NULL</code> и <code>IS NOT NULL</code> — сравнение через = всегда даёт «неизвестно»."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что найдёт <code>WHERE name LIKE 'А%'</code>?"
+     },
+     "options": [
+      {
+       "ru": "Имена, оканчивающиеся на А"
+      },
+      {
+       "ru": "Имена, начинающиеся с А"
+      },
+      {
+       "ru": "Имена, содержащие А"
+      },
+      {
+       "ru": "Имена ровно из одной буквы А"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "<code>%</code> — любое продолжение, значит шаблон «А%» = начинается с А."
+     }
+    },
+    {
+     "q": {
+      "ru": "Как отсортировать по цене от дорогих к дешёвым?"
+     },
+     "options": [
+      {
+       "ru": "ORDER BY price"
+      },
+      {
+       "ru": "ORDER BY price ASC"
+      },
+      {
+       "ru": "ORDER BY price DESC"
+      },
+      {
+       "ru": "SORT price DESC"
+      }
+     ],
+     "a": 2,
+     "explain": {
+      "ru": "<code>DESC</code> — по убыванию. Без указания сортировка идёт по возрастанию (ASC)."
+     }
+    },
+    {
+     "q": {
+      "ru": "Чем TOP отличается от LIMIT?"
+     },
+     "options": [
+      {
+       "ru": "Ничем, TOP — в SQL Server, LIMIT — в SQLite/PostgreSQL"
+      },
+      {
+       "ru": "TOP быстрее"
+      },
+      {
+       "ru": "LIMIT сортирует, TOP нет"
+      },
+      {
+       "ru": "TOP выбирает случайные строки"
+      }
+     ],
+     "a": 0,
+     "explain": {
+      "ru": "Это одно и то же ограничение количества строк, просто разные диалекты: <code>SELECT TOP 5</code> (T-SQL) против <code>LIMIT 5</code>."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что вернёт CASE, если ни одно WHEN не подошло и есть ELSE?"
+     },
+     "options": [
+      {
+       "ru": "Ошибку"
+      },
+      {
+       "ru": "NULL"
+      },
+      {
+       "ru": "Значение из ELSE"
+      },
+      {
+       "ru": "Первое WHEN"
+      }
+     ],
+     "a": 2,
+     "explain": {
+      "ru": "Как else в Python: не подошло ни одно условие — берётся ELSE (без ELSE было бы NULL)."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "title": {
+      "ru": "Бюджетные товары"
+     },
+     "brief": {
+      "ru": "WHERE"
+     },
+     "desc": {
+      "ru": "<p>Выведи <code>name</code> и <code>price</code> товаров дешевле 100.</p>"
+     },
+     "starter": "SELECT name, price\nFROM products\n-- добавь условие\n",
+     "hint": {
+      "ru": "WHERE price < 100"
+     },
+     "kind": "sql",
+     "solution": "SELECT name, price FROM products WHERE price < 100;"
+    },
+    {
+     "id": "t2",
+     "title": {
+      "ru": "Клиенты из Узбекистана по алфавиту"
+     },
+     "brief": {
+      "ru": "WHERE + ORDER BY"
+     },
+     "desc": {
+      "ru": "<p>Выведи <code>name</code> и <code>city</code> клиентов из страны <code>Узбекистан</code>, отсортировав по имени по алфавиту.</p>"
+     },
+     "starter": "-- WHERE + ORDER BY\n",
+     "hint": {
+      "ru": "WHERE country = 'Узбекистан' ORDER BY name — текст в одинарных кавычках."
+     },
+     "kind": "sql",
+     "solution": "SELECT name, city FROM customers WHERE country = 'Узбекистан' ORDER BY name;",
+     "orderMatters": true
+    },
+    {
+     "id": "t3",
+     "title": {
+      "ru": "Активные заказы июня"
+     },
+     "brief": {
+      "ru": "IN + диапазон дат"
+     },
+     "desc": {
+      "ru": "<p>Выведи <code>id</code>, <code>order_date</code>, <code>status</code> заказов за июнь 2026 (даты от <code>2026-06-01</code> до <code>2026-06-30</code>) со статусом <code>done</code> или <code>shipped</code>.</p>"
+     },
+     "starter": "-- даты сравниваются как текст: order_date >= '2026-06-01'\n",
+     "hint": {
+      "ru": "BETWEEN '2026-06-01' AND '2026-06-30' и status IN ('done', 'shipped') через AND."
+     },
+     "kind": "sql",
+     "solution": "SELECT id, order_date, status FROM orders WHERE order_date BETWEEN '2026-06-01' AND '2026-06-30' AND status IN ('done', 'shipped');"
+    }
+   ],
+   "exam": {
+    "time": 540,
+    "questions": [
+     {
+      "q": {
+       "ru": "Что выберет <code>WHERE price BETWEEN 100 AND 300</code>?"
+      },
+      "options": [
+       {
+        "ru": "Только 100 и 300"
+       },
+       {
+        "ru": "От 100 до 300, границы включаются"
+       },
+       {
+        "ru": "От 101 до 299"
+       },
+       {
+        "ru": "Больше 300"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "Как выбрать заказы со статусом new ИЛИ shipped?"
+      },
+      "options": [
+       {
+        "ru": "status IN ('new', 'shipped')"
+       },
+       {
+        "ru": "status = 'new' AND status = 'shipped'"
+       },
+       {
+        "ru": "status LIKE 'new+shipped'"
+       },
+       {
+        "ru": "status BETWEEN new AND shipped"
+       }
+      ],
+      "a": 0
+     },
+     {
+      "q": {
+       "ru": "Что делает DISTINCT?"
+      },
+      "options": [
+       {
+        "ru": "Сортирует"
+       },
+       {
+        "ru": "Убирает повторяющиеся строки"
+       },
+       {
+        "ru": "Считает строки"
+       },
+       {
+        "ru": "Фильтрует NULL"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "Как в SQL Server взять первые 5 строк?"
+      },
+      "options": [
+       {
+        "ru": "LIMIT 5"
+       },
+       {
+        "ru": "SELECT TOP 5 …"
+       },
+       {
+        "ru": "FIRST 5"
+       },
+       {
+        "ru": "ROWNUM 5"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "Что вернёт <code>WHERE stock = NULL</code>?"
+      },
+      "options": [
+       {
+        "ru": "Строки с пустым stock"
+       },
+       {
+        "ru": "Все строки"
+       },
+       {
+        "ru": "Ни одной строки"
+       },
+       {
+        "ru": "Ошибку синтаксиса"
+       }
+      ],
+      "a": 2
+     }
+    ],
+    "tasks": [
+     {
+      "title": {
+       "ru": "Товары в наличии, сначала дорогие"
+      },
+      "desc": {
+       "ru": "<p>Выведи <code>name</code> и <code>price</code> товаров, которых есть на складе (<code>stock &gt; 0</code>), отсортировав по цене от дорогих к дешёвым.</p>"
+      },
+      "starter": "",
+      "kind": "sql",
+      "solution": "SELECT name, price FROM products WHERE stock > 0 ORDER BY price DESC;",
+      "orderMatters": true
+     }
+    ]
+   },
+   "sqlModule": true
+  },
+  {
+   "id": "sb-03",
+   "legacyId": "s03",
+   "title": {
+    "ru": "Функции и множества"
+   },
+   "tagline": {
+    "ru": "Строки, даты, CAST, UNION и EXCEPT · Week 2"
+   },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": {
+      "ru": "Строковые функции"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>SQL умеет обрабатывать текст прямо в запросе. Главные функции (T-SQL → тренажёр):</p>"
+       }
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<ul><li><code>UPPER / LOWER</code> — регистр (одинаково везде)</li><li><code>LEN</code> → <code>LENGTH</code> — длина строки</li><li><code>SUBSTRING</code> → <code>SUBSTR</code> — часть строки</li><li>Склейка: в T-SQL <code>+</code> или <code>CONCAT</code>, в тренажёре <code>||</code></li><li><code>REPLACE</code> — замена (одинаково)</li></ul>"
+       }
+      },
+      {
+       "type": "sqlrun",
+       "lang": "sql",
+       "code": "SELECT UPPER(name) AS name_upper,\n       LENGTH(name) AS name_len\nFROM customers\nLIMIT 5;"
+      },
+      {
+       "type": "sqlrun",
+       "lang": "sql",
+       "code": "SELECT name || ' — ' || city AS info\nFROM employees\nLIMIT 5;"
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": {
+      "ru": "Числа и даты"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><code>ROUND(x, n)</code> округляет до n знаков. Из даты можно извлекать части: в T-SQL — <code>YEAR(d)</code>, <code>MONTH(d)</code>, <code>DATEDIFF</code>, <code>DATEADD</code>, <code>GETDATE()</code>; в тренажёре — <code>strftime</code>:</p>"
+       }
+      },
+      {
+       "type": "sqlrun",
+       "lang": "sql",
+       "code": "SELECT id, order_date,\n       strftime('%m', order_date) AS month\nFROM orders\nLIMIT 6;"
+      },
+      {
+       "type": "code",
+       "lang": "sql",
+       "code": "-- То же самое в SQL Server:\nSELECT id, order_date, MONTH(order_date) AS month\nFROM orders;\n-- Текущий момент: GETDATE(); разница дат: DATEDIFF(day, d1, d2)"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>В программе Week 2 у ментора datetime-функциям посвящено 3 видео — это важная тема для Data Engineer (партиции по датам, отчёты по месяцам).</p>"
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": {
+      "ru": "CAST и COALESCE"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><code>CAST(x AS тип)</code> преобразует тип — как <code>int()</code> и <code>str()</code> в Python:</p>"
+       }
+      },
+      {
+       "type": "sqlrun",
+       "lang": "sql",
+       "code": "SELECT name, CAST(price AS INTEGER) AS price_int\nFROM products\nLIMIT 5;"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><code>COALESCE(a, b, …)</code> возвращает первое не-NULL значение — главный способ заменить пустоту на значение по умолчанию:</p>"
+       }
+      },
+      {
+       "type": "sqlrun",
+       "lang": "sql",
+       "code": "SELECT name, COALESCE(manager_id, 0) AS manager\nFROM employees;"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>В T-SQL есть ещё <code>ISNULL(a, b)</code> — то же самое, но только для двух аргументов. На собеседованиях любят спрашивать разницу.</p>"
+       }
+      }
+     ]
+    },
+    {
+     "id": "l4",
+     "title": {
+      "ru": "UNION, EXCEPT, INTERSECT"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Результаты двух запросов можно объединять как множества:</p>"
+       }
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<ul><li><code>UNION</code> — объединение без дубликатов</li><li><code>UNION ALL</code> — объединение с дубликатами (быстрее)</li><li><code>EXCEPT</code> — строки первого запроса, которых нет во втором</li><li><code>INTERSECT</code> — только общие строки</li></ul>"
+       }
+      },
+      {
+       "type": "sqlrun",
+       "lang": "sql",
+       "code": "SELECT city FROM customers\nUNION\nSELECT city FROM employees;"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Правило: количество и типы колонок в обоих запросах должны совпадать. Это темы видео Week 2: Union, Except, Intersect.</p>"
+       }
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": {
+      "ru": "Как склеить строки в тренажёре (SQLite)?"
+     },
+     "options": [
+      {
+       "ru": "CONCAT только"
+      },
+      {
+       "ru": "Оператор ||"
+      },
+      {
+       "ru": "Оператор +"
+      },
+      {
+       "ru": "JOIN"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "В SQLite/PostgreSQL склейка — <code>||</code>. В T-SQL — <code>+</code> или CONCAT."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что вернёт <code>COALESCE(NULL, NULL, 5, 7)</code>?"
+     },
+     "options": [
+      {
+       "ru": "NULL"
+      },
+      {
+       "ru": "5"
+      },
+      {
+       "ru": "7"
+      },
+      {
+       "ru": "Ошибку"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "COALESCE идёт слева направо и возвращает первое не-NULL — это 5."
+     }
+    },
+    {
+     "q": {
+      "ru": "Чем UNION отличается от UNION ALL?"
+     },
+     "options": [
+      {
+       "ru": "Ничем"
+      },
+      {
+       "ru": "UNION убирает дубликаты, UNION ALL — нет"
+      },
+      {
+       "ru": "UNION ALL сортирует"
+      },
+      {
+       "ru": "UNION работает с одной таблицей"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "UNION делает дедупликацию (медленнее), UNION ALL просто складывает результаты."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что делает EXCEPT?"
+     },
+     "options": [
+      {
+       "ru": "Объединяет всё"
+      },
+      {
+       "ru": "Строки первого запроса, которых нет во втором"
+      },
+      {
+       "ru": "Общие строки"
+      },
+      {
+       "ru": "Убирает NULL"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "EXCEPT — разность множеств: «что есть у меня, но нет у тебя»."
+     }
+    },
+    {
+     "q": {
+      "ru": "Как преобразовать price к целому?"
+     },
+     "options": [
+      {
+       "ru": "TO_INT(price)"
+      },
+      {
+       "ru": "CAST(price AS INTEGER)"
+      },
+      {
+       "ru": "INT(price)"
+      },
+      {
+       "ru": "price.astype(int)"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "<code>CAST(значение AS тип)</code> — стандарт SQL. В T-SQL есть ещё CONVERT."
+     }
+    },
+    {
+     "q": {
+      "ru": "Функция длины строки в T-SQL?"
+     },
+     "options": [
+      {
+       "ru": "LENGTH"
+      },
+      {
+       "ru": "LEN"
+      },
+      {
+       "ru": "SIZE"
+      },
+      {
+       "ru": "COUNT"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "В SQL Server — <code>LEN()</code>, в SQLite/PostgreSQL — <code>LENGTH()</code>. Разные диалекты!"
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "title": {
+      "ru": "Города заглавными"
+     },
+     "brief": {
+      "ru": "UPPER"
+     },
+     "desc": {
+      "ru": "<p>Выведи имя клиента (<code>name</code>) и его город ЗАГЛАВНЫМИ буквами с псевдонимом <code>city_upper</code>.</p>"
+     },
+     "starter": "-- UPPER(city) AS city_upper\n",
+     "hint": {
+      "ru": "SELECT name, UPPER(city) AS city_upper FROM customers;"
+     },
+     "kind": "sql",
+     "solution": "SELECT name, UPPER(city) AS city_upper FROM customers;"
+    },
+    {
+     "id": "t2",
+     "title": {
+      "ru": "Скидка 10%"
+     },
+     "brief": {
+      "ru": "ROUND + арифметика"
+     },
+     "desc": {
+      "ru": "<p>Выведи <code>name</code> и цену со скидкой 10% (price * 0.9), округлённую до 1 знака, с псевдонимом <code>sale_price</code>.</p>"
+     },
+     "starter": "-- ROUND(выражение, 1)\n",
+     "hint": {
+      "ru": "ROUND(price * 0.9, 1) AS sale_price"
+     },
+     "kind": "sql",
+     "solution": "SELECT name, ROUND(price * 0.9, 1) AS sale_price FROM products;"
+    },
+    {
+     "id": "t3",
+     "title": {
+      "ru": "Все города компании"
+     },
+     "brief": {
+      "ru": "UNION"
+     },
+     "desc": {
+      "ru": "<p>Выведи единый список городов без дубликатов: города клиентов (<code>customers.city</code>) плюс города сотрудников (<code>employees.city</code>).</p>"
+     },
+     "starter": "-- два SELECT, между ними UNION\n",
+     "hint": {
+      "ru": "SELECT city FROM customers UNION SELECT city FROM employees; — UNION сам уберёт дубликаты."
+     },
+     "kind": "sql",
+     "solution": "SELECT city FROM customers UNION SELECT city FROM employees;"
+    }
+   ],
+   "exam": {
+    "time": 540,
+    "questions": [
+     {
+      "q": {
+       "ru": "Что вернёт <code>UPPER('sql')</code>?"
+      },
+      "options": [
+       {
+        "ru": "sql"
+       },
+       {
+        "ru": "SQL"
+       },
+       {
+        "ru": "Sql"
+       },
+       {
+        "ru": "Ошибку"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "ISNULL(a, b) в T-SQL — это аналог…"
+      },
+      "options": [
+       {
+        "ru": "CASE"
+       },
+       {
+        "ru": "COALESCE для двух аргументов"
+       },
+       {
+        "ru": "EXCEPT"
+       },
+       {
+        "ru": "CAST"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "Требование к запросам в UNION?"
+      },
+      "options": [
+       {
+        "ru": "Одна и та же таблица"
+       },
+       {
+        "ru": "Одинаковое число и типы колонок"
+       },
+       {
+        "ru": "Не больше 2 колонок"
+       },
+       {
+        "ru": "Обязательный ORDER BY"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "Что вернёт <code>ROUND(7.86, 1)</code>?"
+      },
+      "options": [
+       {
+        "ru": "7.8"
+       },
+       {
+        "ru": "7.9"
+       },
+       {
+        "ru": "8"
+       },
+       {
+        "ru": "7.86"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "INTERSECT возвращает…"
+      },
+      "options": [
+       {
+        "ru": "Все строки обоих запросов"
+       },
+       {
+        "ru": "Только строки, которые есть в обоих запросах"
+       },
+       {
+        "ru": "Разность"
+       },
+       {
+        "ru": "Дубликаты"
+       }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "title": {
+       "ru": "Руководитель без пустот"
+      },
+      "desc": {
+       "ru": "<p>Выведи <code>name</code> сотрудника и <code>manager_id</code>, заменив NULL на 0, с псевдонимом <code>manager</code>.</p>"
+      },
+      "starter": "",
+      "kind": "sql",
+      "solution": "SELECT name, COALESCE(manager_id, 0) AS manager FROM employees;"
+     }
+    ]
+   },
+   "sqlModule": true
+  }
+ ]
+}

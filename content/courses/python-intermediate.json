@@ -1,0 +1,1511 @@
+{
+ "id": "python-intermediate",
+ "schema": 2,
+ "modules": [
+  {
+   "id": "pi-01",
+   "legacyId": "m06",
+   "title": {
+    "ru": "Словари"
+   },
+   "tagline": {
+    "ru": "Пары ключ-значение и работа с ними"
+   },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": {
+      "ru": "📖 Словарь — данные с именами"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><b>Словарь (dict)</b> хранит пары <code>ключ: значение</code> в фигурных скобках. Это как настоящий словарь: по слову (ключу) находишь перевод (значение):</p>"
+       }
+      },
+      {
+       "type": "run",
+       "lang": "python",
+       "code": "player = {\n    'name': 'Азиз',\n    'level': 7,\n    'gold': 250\n}\nprint(player)\nprint(player['name'])   # доступ по ключу\nprint(player['gold'])"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>В списке элементы достают по номеру, а в словаре — по ключу. Это удобнее, когда у данных есть смысловые имена.</p>"
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": {
+      "ru": "✏️ Изменение словаря"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Добавить или изменить значение — просто присвой по ключу:</p>"
+       }
+      },
+      {
+       "type": "run",
+       "lang": "python",
+       "code": "player = {'name': 'Азиз', 'gold': 250}\nplayer['gold'] = 300        # изменили\nplayer['weapon'] = 'меч'    # добавили новый ключ\nprint(player)\ndel player['weapon']        # удалили\nprint(player)"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Проверка наличия ключа — оператором <code>in</code>:</p>"
+       }
+      },
+      {
+       "type": "run",
+       "lang": "python",
+       "code": "player = {'name': 'Азиз'}\nprint('name' in player)\nprint('level' in player)"
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": {
+      "ru": "🛡️ get() — безопасный доступ"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Если ключа нет, <code>player['xp']</code> уронит программу с ошибкой <code>KeyError</code>. Метод <code>get()</code> вместо ошибки вернёт <code>None</code> или значение по умолчанию:</p>"
+       }
+      },
+      {
+       "type": "run",
+       "lang": "python",
+       "code": "player = {'name': 'Азиз'}\nprint(player.get('name'))\nprint(player.get('xp'))        # None, а не ошибка\nprint(player.get('xp', 0))     # 0 по умолчанию"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Классика подсчёта чего-либо: <code>counts[x] = counts.get(x, 0) + 1</code></p>"
+       }
+      }
+     ]
+    },
+    {
+     "id": "l4",
+     "title": {
+      "ru": "🔁 Перебор словаря циклом"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>По словарю можно ходить циклом. Три способа:</p>"
+       }
+      },
+      {
+       "type": "run",
+       "lang": "python",
+       "code": "prices = {'кофе': 15, 'чай': 10, 'сок': 12}\n# по ключам\nfor item in prices:\n    print(item)\n# по значениям\nprint(sum(prices.values()))\n# по парам сразу\nfor item, price in prices.items():\n    print(f'{item}: {price} тыс сум')"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><code>.keys()</code> — все ключи, <code>.values()</code> — все значения, <code>.items()</code> — пары. Чаще всего нужен <code>.items()</code>.</p>"
+       }
+      }
+     ]
+    },
+    {
+     "id": "l5",
+     "title": {
+      "ru": "🏗️ Вложенные структуры"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Значением словаря может быть что угодно — даже список или другой словарь. Так строятся сложные данные:</p>"
+       }
+      },
+      {
+       "type": "run",
+       "lang": "python",
+       "code": "team = {\n    'aziz': {'level': 7, 'items': ['меч', 'щит']},\n    'timur': {'level': 4, 'items': ['лук']}\n}\nprint(team['aziz']['level'])\nprint(team['timur']['items'][0])"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Читай цепочку слева направо: взять <code>team['aziz']</code> (словарь) → из него <code>['items']</code> (список) → из него <code>[0]</code> (элемент). Именно так выглядят данные в реальных API и базах!</p>"
+       }
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": {
+      "ru": "В каких скобках создаётся словарь?"
+     },
+     "options": [
+      {
+       "ru": "[ ]"
+      },
+      {
+       "ru": "( )"
+      },
+      {
+       "ru": "{ }"
+      },
+      {
+       "ru": "< >"
+      }
+     ],
+     "a": 2,
+     "explain": {
+      "ru": "Словари — в фигурных скобках: <code>{'ключ': значение}</code>."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что выведет код?"
+     },
+     "options": [
+      {
+       "ru": "1"
+      },
+      {
+       "ru": "2"
+      },
+      {
+       "ru": "b"
+      },
+      {
+       "ru": "Ошибку"
+      }
+     ],
+     "a": 1,
+     "code": "d = {'a': 1, 'b': 2}\nprint(d['b'])",
+     "explain": {
+      "ru": "По ключу «b» лежит значение 2."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что будет, если обратиться к несуществующему ключу через [ ]?"
+     },
+     "options": [
+      {
+       "ru": "Вернётся None"
+      },
+      {
+       "ru": "Вернётся 0"
+      },
+      {
+       "ru": "Ошибка KeyError"
+      },
+      {
+       "ru": "Ключ создастся"
+      }
+     ],
+     "a": 2,
+     "explain": {
+      "ru": "Квадратные скобки с несуществующим ключом — <code>KeyError</code>. Безопасно — через <code>get()</code>."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что вернёт <code>d.get('x', 99)</code>, если ключа x нет?"
+     },
+     "options": [
+      {
+       "ru": "None"
+      },
+      {
+       "ru": "99"
+      },
+      {
+       "ru": "Ошибку"
+      },
+      {
+       "ru": "'x'"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Второй аргумент <code>get()</code> — значение по умолчанию, если ключа нет."
+     }
+    },
+    {
+     "q": {
+      "ru": "Как добавить в словарь d ключ «xp» со значением 100?"
+     },
+     "options": [
+      {
+       "ru": "d.append('xp', 100)"
+      },
+      {
+       "ru": "d['xp'] = 100"
+      },
+      {
+       "ru": "d.add('xp': 100)"
+      },
+      {
+       "ru": "d + {'xp': 100}"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Просто присваивание по новому ключу: <code>d['xp'] = 100</code>."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что даёт метод <code>.items()</code>?"
+     },
+     "options": [
+      {
+       "ru": "Только ключи"
+      },
+      {
+       "ru": "Только значения"
+      },
+      {
+       "ru": "Пары (ключ, значение)"
+      },
+      {
+       "ru": "Количество элементов"
+      }
+     ],
+     "a": 2,
+     "explain": {
+      "ru": "<code>.items()</code> возвращает пары — удобно для цикла: <code>for k, v in d.items():</code>"
+     }
+    },
+    {
+     "q": {
+      "ru": "Что выведет код?"
+     },
+     "options": [
+      {
+       "ru": "10"
+      },
+      {
+       "ru": "20"
+      },
+      {
+       "ru": "[10, 20]"
+      },
+      {
+       "ru": "Ошибку"
+      }
+     ],
+     "a": 1,
+     "code": "data = {'a': [10, 20]}\nprint(data['a'][1])",
+     "explain": {
+      "ru": "Сначала по ключу «a» достаём список [10, 20], потом из него элемент [1] — это 20."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "title": {
+      "ru": "Профиль героя"
+     },
+     "brief": {
+      "ru": "Создание и изменение"
+     },
+     "desc": {
+      "ru": "<p>Создай словарь <code>hero</code> с ключами: <code>name</code> = <code>\"Рыцарь\"</code>, <code>hp</code> = <code>100</code>. Потом: добавь ключ <code>gold</code> со значением <code>50</code> и уменьши <code>hp</code> на 30. Выведи словарь.</p>"
+     },
+     "starter": "# создай словарь hero\n# добавь gold, уменьши hp\n",
+     "hint": {
+      "ru": "hero = {'name': 'Рыцарь', 'hp': 100}, потом hero['gold'] = 50 и hero['hp'] -= 30"
+     },
+     "kind": "python",
+     "tests": "assert 'hero' in dir(), 'Создай словарь hero'\nassert hero.get('name') == 'Рыцарь', 'hero[\\'name\\'] должно быть: Рыцарь'\nassert hero.get('hp') == 70, 'hp должно стать 70 (100 - 30)'\nassert hero.get('gold') == 50, 'Добавь ключ gold = 50'\nassert 'Рыцарь' in _stdout, 'Выведи словарь через print(hero)'"
+    },
+    {
+     "id": "t2",
+     "title": {
+      "ru": "Магазин зелий"
+     },
+     "brief": {
+      "ru": "Перебор .items()"
+     },
+     "desc": {
+      "ru": "<p>Дан словарь цен. Выведи каждую позицию строкой <code>товар - цена монет</code> и в конце <code>Всего: сумма</code>:</p><pre class=\"code\">зелье - 30 монет\nэликсир - 80 монет\nяд - 45 монет\nВсего: 155</pre>"
+     },
+     "starter": "shop = {'зелье': 30, 'эликсир': 80, 'яд': 45}\n# цикл по shop.items()\n",
+     "hint": {
+      "ru": "for name, price in shop.items(): print(f'{name} - {price} монет'), потом print(f'Всего: {sum(shop.values())}')"
+     },
+     "kind": "python",
+     "tests": "assert 'зелье - 30 монет' in _stdout, 'Нужна строка: зелье - 30 монет'\nassert 'эликсир - 80 монет' in _stdout, 'Нужна строка: эликсир - 80 монет'\nassert 'яд - 45 монет' in _stdout, 'Нужна строка: яд - 45 монет'\nassert 'Всего: 155' in _stdout, 'В конце: Всего: 155 (это sum(shop.values()))'"
+    },
+    {
+     "id": "t3",
+     "title": {
+      "ru": "Счётчик голосов"
+     },
+     "brief": {
+      "ru": "get() с умолчанием"
+     },
+     "desc": {
+      "ru": "<p>Дан список голосов за игроков. Посчитай голоса в словарь <code>votes</code> и выведи его. Ожидаемый результат: <code>{'aziz': 3, 'timur': 2, 'bek': 1}</code></p>"
+     },
+     "starter": "voting = ['aziz', 'timur', 'aziz', 'bek', 'timur', 'aziz']\nvotes = {}\n# для каждого имени: votes[name] = votes.get(name, 0) + 1\n",
+     "hint": {
+      "ru": "for name in voting: votes[name] = votes.get(name, 0) + 1 — get вернёт 0 для нового имени."
+     },
+     "kind": "python",
+     "tests": "assert votes == {'aziz': 3, 'timur': 2, 'bek': 1}, 'Ожидалось: aziz=3, timur=2, bek=1. Сейчас: ' + str(votes)\nassert 'aziz' in _stdout, 'Выведи словарь: print(votes)'"
+    }
+   ],
+   "exam": {
+    "time": 540,
+    "questions": [
+     {
+      "q": {
+       "ru": "Что выведет код?"
+      },
+      "options": [
+       {
+        "ru": "5"
+       },
+       {
+        "ru": "10"
+       },
+       {
+        "ru": "15"
+       },
+       {
+        "ru": "Ошибку"
+       }
+      ],
+      "a": 2,
+      "code": "d = {'x': 5}\nd['x'] = d['x'] + 10\nprint(d['x'])"
+     },
+     {
+      "q": {
+       "ru": "Что выведет код?"
+      },
+      "options": [
+       {
+        "ru": "True"
+       },
+       {
+        "ru": "False"
+       },
+       {
+        "ru": "1"
+       },
+       {
+        "ru": "Ошибку"
+       }
+      ],
+      "a": 1,
+      "code": "d = {'a': 1}\nprint('b' in d)"
+     },
+     {
+      "q": {
+       "ru": "Как удалить ключ «a» из словаря d?"
+      },
+      "options": [
+       {
+        "ru": "d.remove('a')"
+       },
+       {
+        "ru": "del d['a']"
+       },
+       {
+        "ru": "d.delete('a')"
+       },
+       {
+        "ru": "d - 'a'"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "Что выведет код?"
+      },
+      "options": [
+       {
+        "ru": "6"
+       },
+       {
+        "ru": "3"
+       },
+       {
+        "ru": "2"
+       },
+       {
+        "ru": "Ошибку"
+       }
+      ],
+      "a": 1,
+      "code": "d = {'a': 1, 'b': 2, 'c': 3}\nprint(len(d))"
+     },
+     {
+      "q": {
+       "ru": "Что выведет код?"
+      },
+      "options": [
+       {
+        "ru": "top"
+       },
+       {
+        "ru": "mid"
+       },
+       {
+        "ru": "7"
+       },
+       {
+        "ru": "Ошибку"
+       }
+      ],
+      "a": 2,
+      "code": "d = {'top': {'mid': 7}}\nprint(d['top']['mid'])"
+     },
+     {
+      "q": {
+       "ru": "Что вернёт <code>sum(d.values())</code> для <code>d = {'a': 10, 'b': 5}</code>?"
+      },
+      "options": [
+       {
+        "ru": "2"
+       },
+       {
+        "ru": "15"
+       },
+       {
+        "ru": "'ab'"
+       },
+       {
+        "ru": "Ошибку"
+       }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "title": {
+       "ru": "База игроков"
+      },
+      "desc": {
+       "ru": "<p>Дан словарь уровней игроков. Найди игрока с максимальным уровнем и выведи: <code>Чемпион: имя (уровень N)</code></p><p>Ожидаемый вывод: <code>Чемпион: sara (уровень 12)</code></p>"
+      },
+      "starter": "players = {'aziz': 8, 'sara': 12, 'bek': 5}\n# подсказка: цикл по items() и сравнение с максимумом\nbest_name = ''\nbest_level = 0\n",
+      "kind": "python",
+      "tests": "assert 'Чемпион: sara (уровень 12)' in _stdout, 'Ожидалось: Чемпион: sara (уровень 12)'"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pi-02",
+   "legacyId": "m07",
+   "title": {
+    "ru": "Циклы while"
+   },
+   "tagline": {
+    "ru": "Циклы по условию и валидация ввода"
+   },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": {
+      "ru": "♾️ while — цикл «пока»"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><code>for</code> повторяет известное число раз, а <code>while</code> — <b>пока условие истинно</b>. Сколько раз — заранее неизвестно:</p>"
+       }
+      },
+      {
+       "type": "run",
+       "lang": "python",
+       "code": "hp = 50\nwhile hp > 0:\n    print(f'HP: {hp}')\n    hp -= 20\nprint('Бой окончен!')"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Схема: проверить условие → выполнить тело → снова проверить → … Как только условие станет <code>False</code>, цикл заканчивается.</p>"
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": {
+      "ru": "💣 Бесконечный цикл — главная опасность"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Если условие НИКОГДА не станет ложным — программа зависнет навсегда:</p>"
+       }
+      },
+      {
+       "type": "code",
+       "lang": "python",
+       "code": "n = 1\nwhile n < 5:\n    print(n)\n    # ЗАБЫЛИ n += 1 - цикл бесконечный! Программа зависла"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Правило: внутри <code>while</code> обязательно должно что-то менять переменную из условия. Проверь себя вопросом: «когда этот цикл закончится?»</p>"
+       }
+      },
+      {
+       "type": "run",
+       "lang": "python",
+       "code": "n = 1\nwhile n < 5:\n    print(n)\n    n += 1  # вот спасение!"
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": {
+      "ru": "🚪 while True + break"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Популярный приём: крутить цикл вечно и выходить по <code>break</code>, когда случилось нужное событие:</p>"
+       }
+      },
+      {
+       "type": "run",
+       "lang": "python",
+       "code": "secret = 7\nattempts = [3, 9, 7, 5]\ni = 0\nwhile True:\n    guess = attempts[i]\n    print(f'Попытка: {guess}')\n    if guess == secret:\n        print('Угадал! 🎉')\n        break\n    i += 1"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Так пишут игровые циклы, меню и обработку команд: «работай, пока пользователь не скажет выход».</p>"
+       }
+      }
+     ]
+    },
+    {
+     "id": "l4",
+     "title": {
+      "ru": "✅ Валидация ввода"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Классика <code>while</code>: переспрашивать, пока пользователь не введёт правильное значение:</p>"
+       }
+      },
+      {
+       "type": "code",
+       "lang": "python",
+       "code": "password = ''\nwhile password != 'python123':\n    password = input('Пароль: ')\nprint('Доступ разрешён!')"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Или с подсчётом попыток:</p>"
+       }
+      },
+      {
+       "type": "code",
+       "lang": "python",
+       "code": "attempts = 3\nwhile attempts > 0:\n    code = input('Код: ')\n    if code == '1234':\n        print('Открыто!')\n        break\n    attempts -= 1\n    print(f'Неверно. Осталось: {attempts}')"
+      }
+     ]
+    },
+    {
+     "id": "l5",
+     "title": {
+      "ru": "⚔️ for vs while — что выбрать?"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<ul><li><b>for</b> — когда известно, СКОЛЬКО раз или ПО ЧЕМУ идём: по списку, по range, по строке</li><li><b>while</b> — когда повторяем ДО СОБЫТИЯ: пока жив, пока не угадал, пока не ввели «стоп»</li></ul>"
+       }
+      },
+      {
+       "type": "run",
+       "lang": "python",
+       "code": "# копим до цели - число шагов неизвестно заранее\ngold = 0\nday = 0\nwhile gold < 100:\n    day += 1\n    gold += day * 5\nprint(f'Накопили {gold} золота за {day} дней')"
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": {
+      "ru": "Когда завершается цикл while?"
+     },
+     "options": [
+      {
+       "ru": "После 10 повторений"
+      },
+      {
+       "ru": "Когда условие станет False"
+      },
+      {
+       "ru": "Когда условие станет True"
+      },
+      {
+       "ru": "Никогда"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "<code>while</code> крутится, ПОКА условие True, и останавливается, когда оно стало False."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что не так с этим кодом?"
+     },
+     "options": [
+      {
+       "ru": "Нет двоеточия"
+      },
+      {
+       "ru": "x не меняется — цикл бесконечный"
+      },
+      {
+       "ru": "while нельзя с print"
+      },
+      {
+       "ru": "Всё в порядке"
+      }
+     ],
+     "a": 1,
+     "code": "x = 0\nwhile x < 3:\n    print(x)",
+     "explain": {
+      "ru": "<code>x</code> всегда 0, условие вечно True — программа зависнет. Нужно <code>x += 1</code> в теле."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что выведет код?"
+     },
+     "options": [
+      {
+       "ru": "3 2 1"
+      },
+      {
+       "ru": "3 2 1 0"
+      },
+      {
+       "ru": "0 1 2 3"
+      },
+      {
+       "ru": "Бесконечно"
+      }
+     ],
+     "a": 0,
+     "code": "n = 3\nwhile n > 0:\n    print(n)\n    n -= 1",
+     "explain": {
+      "ru": "n уменьшается: 3, 2, 1. При n = 0 условие ложно — стоп."
+     }
+    },
+    {
+     "q": {
+      "ru": "Зачем нужен приём while True?"
+     },
+     "options": [
+      {
+       "ru": "Это ошибка"
+      },
+      {
+       "ru": "Цикл до break — выход по событию"
+      },
+      {
+       "ru": "Ускоряет программу"
+      },
+      {
+       "ru": "Только для чисел"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "<code>while True</code> крутится вечно, выход делают через <code>break</code> — по событию."
+     }
+    },
+    {
+     "q": {
+      "ru": "Сколько раз выполнится тело?"
+     },
+     "options": [
+      {
+       "ru": "10"
+      },
+      {
+       "ru": "5"
+      },
+      {
+       "ru": "0"
+      },
+      {
+       "ru": "Бесконечно"
+      }
+     ],
+     "a": 2,
+     "code": "i = 10\nwhile i < 5:\n    print(i)",
+     "explain": {
+      "ru": "Условие 10 < 5 ложно СРАЗУ — тело не выполнится ни разу."
+     }
+    },
+    {
+     "q": {
+      "ru": "Когда while лучше, чем for?"
+     },
+     "options": [
+      {
+       "ru": "Перебор списка"
+      },
+      {
+       "ru": "Повтор ровно 10 раз"
+      },
+      {
+       "ru": "Повтор до неизвестного события"
+      },
+      {
+       "ru": "Перебор строки"
+      }
+     ],
+     "a": 2,
+     "explain": {
+      "ru": "<code>while</code> — когда число повторений заранее неизвестно: «пока не угадал», «пока не ввели стоп»."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "title": {
+      "ru": "Степени двойки"
+     },
+     "brief": {
+      "ru": "Накопление в while"
+     },
+     "desc": {
+      "ru": "<p>Выведи все степени двойки меньше 100 (каждую с новой строки): 1, 2, 4, 8, 16, 32, 64.</p>"
+     },
+     "starter": "n = 1\n# пока n < 100: выводи и удваивай\n",
+     "hint": {
+      "ru": "while n < 100: print(n) и n *= 2 (умножить n на 2)."
+     },
+     "kind": "python",
+     "tests": "lines = [l.strip() for l in _stdout.strip().splitlines()]\nassert lines == ['1', '2', '4', '8', '16', '32', '64'], 'Ожидалось: 1 2 4 8 16 32 64 в столбик. Получилось: ' + str(lines)"
+    },
+    {
+     "id": "t2",
+     "title": {
+      "ru": "Посадка ракеты"
+     },
+     "brief": {
+      "ru": "Цикл с изменением условия"
+     },
+     "desc": {
+      "ru": "<p>Ракета на высоте 1000 м, каждую секунду снижается на 150 м. Выводи высоту каждую секунду (<code>Высота: X</code>), пока она больше 0, а затем строку <code>Посадка!</code></p>"
+     },
+     "starter": "height = 1000\n# твой код\n",
+     "hint": {
+      "ru": "while height > 0: print(f\"Высота: {height}\") и height -= 150. print(\"Посадка!\") — после цикла, без отступа."
+     },
+     "kind": "python",
+     "tests": "assert 'Высота: 1000' in _stdout, 'Первая строка: Высота: 1000'\nassert 'Высота: 100' in _stdout, 'Последняя высота перед посадкой: 100'\nassert 'Посадка!' in _stdout, 'После цикла выведи: Посадка!'\nassert 'Высота: -50' not in _stdout, 'Отрицательной высоты быть не должно - проверь условие while'"
+    },
+    {
+     "id": "t3",
+     "title": {
+      "ru": "Угадай число"
+     },
+     "brief": {
+      "ru": "while True + break"
+     },
+     "desc": {
+      "ru": "<p>Загадано число 7. Программа в цикле читает попытки через <code>input()</code>: если меньше — выводит <code>Больше!</code>, если больше — <code>Меньше!</code>, если угадал — <code>Победа!</code> и выходит из цикла.</p><p>Проверка введёт: 3, 9, 7.</p>"
+     },
+     "starter": "secret = 7\nwhile True:\n    guess = int(input('Число: '))\n    # твой код\n",
+     "hint": {
+      "ru": "if guess < secret: print(\"Больше!\") elif guess > secret: print(\"Меньше!\") else: print(\"Победа!\") и break"
+     },
+     "kind": "python",
+     "tests": "assert 'Больше!' in _stdout, 'При вводе 3 нужно вывести: Больше!'\nassert 'Меньше!' in _stdout, 'При вводе 9 нужно вывести: Меньше!'\nassert 'Победа!' in _stdout, 'При вводе 7 нужно вывести: Победа! и сделать break'",
+     "stdin": [
+      "3",
+      "9",
+      "7"
+     ]
+    }
+   ],
+   "exam": {
+    "time": 540,
+    "questions": [
+     {
+      "q": {
+       "ru": "Что выведет код?"
+      },
+      "options": [
+       {
+        "ru": "4"
+       },
+       {
+        "ru": "10"
+       },
+       {
+        "ru": "15"
+       },
+       {
+        "ru": "Бесконечный цикл"
+       }
+      ],
+      "a": 1,
+      "code": "s = 0\nn = 1\nwhile n <= 4:\n    s += n\n    n += 1\nprint(s)"
+     },
+     {
+      "q": {
+       "ru": "Что выведет код?"
+      },
+      "options": [
+       {
+        "ru": "8"
+       },
+       {
+        "ru": "4"
+       },
+       {
+        "ru": "2"
+       },
+       {
+        "ru": "1"
+       }
+      ],
+      "a": 2,
+      "code": "x = 8\nwhile x > 2:\n    x = x // 2\nprint(x)"
+     },
+     {
+      "q": {
+       "ru": "Как прервать цикл изнутри?"
+      },
+      "options": [
+       {
+        "ru": "stop"
+       },
+       {
+        "ru": "exit"
+       },
+       {
+        "ru": "break"
+       },
+       {
+        "ru": "end"
+       }
+      ],
+      "a": 2
+     },
+     {
+      "q": {
+       "ru": "Что выведет код?"
+      },
+      "options": [
+       {
+        "ru": "3"
+       },
+       {
+        "ru": "6"
+       },
+       {
+        "ru": "9"
+       },
+       {
+        "ru": "Бесконечный цикл"
+       }
+      ],
+      "a": 2,
+      "code": "n = 0\nwhile True:\n    n += 3\n    if n >= 9:\n        break\nprint(n)"
+     },
+     {
+      "q": {
+       "ru": "Какой цикл выбрать для «спрашивай пароль, пока не введут верный»?"
+      },
+      "options": [
+       {
+        "ru": "for c 10 попытками"
+       },
+       {
+        "ru": "while"
+       },
+       {
+        "ru": "Оба нельзя"
+       },
+       {
+        "ru": "if"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "Что выведет код?"
+      },
+      "options": [
+       {
+        "ru": "4"
+       },
+       {
+        "ru": "5"
+       },
+       {
+        "ru": "10"
+       },
+       {
+        "ru": "20"
+       }
+      ],
+      "a": 1,
+      "code": "count = 0\nn = 20\nwhile n > 1:\n    n = n / 2\n    count += 1\nprint(count)"
+     }
+    ],
+    "tasks": [
+     {
+      "title": {
+       "ru": "Банковский вклад"
+      },
+      "desc": {
+       "ru": "<p>На вкладе 1000 сум, каждый год сумма растёт на 10% (<code>money *= 1.1</code>). Посчитай через while, за сколько лет сумма превысит 2000, и выведи: <code>Лет: N</code></p><p>Ожидаемый вывод: <code>Лет: 8</code></p>"
+      },
+      "starter": "money = 1000\nyears = 0\n# пока money <= 2000\n",
+      "kind": "python",
+      "tests": "assert 'Лет: 8' in _stdout, 'Правильный ответ: Лет: 8. Проверь цикл: while money <= 2000: money *= 1.1, years += 1'"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pi-03",
+   "legacyId": "m08",
+   "title": {
+    "ru": "Функции"
+   },
+   "tagline": {
+    "ru": "def, параметры, return и области видимости"
+   },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": {
+      "ru": "🧩 Функция — свой собственный кирпичик"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><b>Функция</b> — именованный кусок кода, который можно вызывать сколько угодно раз. Ты уже пользуешься чужими: <code>print()</code>, <code>len()</code>, <code>input()</code>. Пора писать свои!</p>"
+       }
+      },
+      {
+       "type": "run",
+       "lang": "python",
+       "code": "def greet():\n    print('Привет, боец!')\n    print('Добро пожаловать в игру')\n\ngreet()\ngreet()  # вызвал дважды - выполнилось дважды"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><code>def имя():</code> — объявление, тело с отступом. Важно: код функции выполняется только при <b>вызове</b> <code>имя()</code>, а не при объявлении.</p>"
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": {
+      "ru": "📥 Параметры — вход функции"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>В скобках объявляют <b>параметры</b> — данные, которые функция принимает:</p>"
+       }
+      },
+      {
+       "type": "run",
+       "lang": "python",
+       "code": "def greet(name, level):\n    print(f'Привет, {name}! Твой уровень: {level}')\n\ngreet('Азиз', 7)\ngreet('Тимур', 3)"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Параметрам можно давать значения по умолчанию — тогда их можно не передавать:</p>"
+       }
+      },
+      {
+       "type": "run",
+       "lang": "python",
+       "code": "def attack(damage=10):\n    print(f'Удар на {damage}!')\n\nattack()      # возьмётся 10\nattack(50)    # передали своё"
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": {
+      "ru": "📤 return — выход функции"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><code>return</code> возвращает результат наружу — его можно сохранить в переменную и использовать дальше:</p>"
+       }
+      },
+      {
+       "type": "run",
+       "lang": "python",
+       "code": "def add(a, b):\n    return a + b\n\nresult = add(3, 4)\nprint(result)\nprint(add(10, 20) * 2)  # результат можно сразу использовать"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>⚠️ Разница, которую путают ВСЕ новички: <code>print</code> просто показывает на экране, а <code>return</code> отдаёт значение программе. После <code>return</code> функция сразу завершается:</p>"
+       }
+      },
+      {
+       "type": "run",
+       "lang": "python",
+       "code": "def check(n):\n    if n > 0:\n        return 'плюс'\n    return 'минус или ноль'\n\nprint(check(5))\nprint(check(-3))"
+      }
+     ]
+    },
+    {
+     "id": "l4",
+     "title": {
+      "ru": "🏠 Области видимости"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Переменные, созданные <b>внутри</b> функции, — локальные: снаружи их не видно:</p>"
+       }
+      },
+      {
+       "type": "run",
+       "lang": "python",
+       "code": "def calc():\n    secret = 42   # локальная переменная\n    return secret * 2\n\nprint(calc())\n# print(secret) - тут была бы ошибка: снаружи secret не существует"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Хорошая привычка: функция берёт всё через параметры и отдаёт через <code>return</code>. Так код легко читать и тестировать.</p>"
+       }
+      }
+     ]
+    },
+    {
+     "id": "l5",
+     "title": {
+      "ru": "🏗️ Собираем программу из функций"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Большая программа — это набор маленьких функций, каждая делает одно дело:</p>"
+       }
+      },
+      {
+       "type": "run",
+       "lang": "python",
+       "code": "def get_discount(total):\n    if total >= 5000:\n        return 0.25\n    if total >= 1000:\n        return 0.1\n    return 0\n\ndef final_price(total):\n    return total * (1 - get_discount(total))\n\nprint(final_price(6000))\nprint(final_price(500))"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Функция может вызывать другую функцию — так из кирпичиков собирается дом. Это главный навык программиста!</p>"
+       }
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": {
+      "ru": "Каким словом объявляется функция?"
+     },
+     "options": [
+      {
+       "ru": "function"
+      },
+      {
+       "ru": "def"
+      },
+      {
+       "ru": "func"
+      },
+      {
+       "ru": "lambda"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Функции объявляются через <code>def имя():</code>."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что выведет код?"
+     },
+     "options": [
+      {
+       "ru": "привет (один раз)"
+      },
+      {
+       "ru": "привет привет"
+      },
+      {
+       "ru": "Ничего"
+      },
+      {
+       "ru": "Ошибку"
+      }
+     ],
+     "a": 1,
+     "code": "def f():\n    print('привет')\n\nf()\nf()",
+     "explain": {
+      "ru": "Функция вызвана дважды — тело выполнилось два раза."
+     }
+    },
+    {
+     "q": {
+      "ru": "В чём разница print и return?"
+     },
+     "options": [
+      {
+       "ru": "Никакой"
+      },
+      {
+       "ru": "print показывает на экране, return отдаёт значение программе"
+      },
+      {
+       "ru": "return быстрее"
+      },
+      {
+       "ru": "print только для строк"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "<code>return</code> возвращает значение, чтобы код мог его использовать; <code>print</code> лишь выводит на экран."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что выведет код?"
+     },
+     "options": [
+      {
+       "ru": "6"
+      },
+      {
+       "ru": "9"
+      },
+      {
+       "ru": "12"
+      },
+      {
+       "ru": "36"
+      }
+     ],
+     "a": 2,
+     "code": "def double(x):\n    return x * 2\n\ny = double(double(3))\nprint(y)",
+     "explain": {
+      "ru": "double(3) = 6, double(6) = 12. Функции можно вкладывать."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что вернёт функция без return?"
+     },
+     "options": [
+      {
+       "ru": "0"
+      },
+      {
+       "ru": "Пустую строку"
+      },
+      {
+       "ru": "None"
+      },
+      {
+       "ru": "Ошибку"
+      }
+     ],
+     "a": 2,
+     "explain": {
+      "ru": "Если <code>return</code> нет, функция возвращает <code>None</code>."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что выведет код?"
+     },
+     "options": [
+      {
+       "ru": "Привет, name"
+      },
+      {
+       "ru": "Привет, гость"
+      },
+      {
+       "ru": "Ошибку"
+      },
+      {
+       "ru": "Привет,"
+      }
+     ],
+     "a": 1,
+     "code": "def hi(name='гость'):\n    return f'Привет, {name}'\n\nprint(hi())",
+     "explain": {
+      "ru": "Аргумент не передан — используется значение по умолчанию «гость»."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что выведет код?"
+     },
+     "options": [
+      {
+       "ru": "5 и после"
+      },
+      {
+       "ru": "5"
+      },
+      {
+       "ru": "после"
+      },
+      {
+       "ru": "Ошибку"
+      }
+     ],
+     "a": 1,
+     "code": "def f(n):\n    return n\n    print('после')\n\nprint(f(5))",
+     "explain": {
+      "ru": "После <code>return</code> функция сразу завершается — <code>print('после')</code> недостижим."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "title": {
+      "ru": "Приветствие уровня"
+     },
+     "brief": {
+      "ru": "def + параметры"
+     },
+     "desc": {
+      "ru": "<p>Напиши функцию <code>welcome(name, level)</code>, которая <b>возвращает</b> (return!) строку: <code>name [уровень level] вошёл в игру</code>.</p><p>Например, <code>welcome(\"Азиз\", 5)</code> → <code>Азиз [уровень 5] вошёл в игру</code></p>"
+     },
+     "starter": "def welcome(name, level):\n    # верни f-строку\n    pass\n\nprint(welcome(\"Азиз\", 5))\n",
+     "hint": {
+      "ru": "return f'{name} [уровень {level}] вошёл в игру' — и убери pass."
+     },
+     "kind": "python",
+     "tests": "assert welcome('Азиз', 5) == 'Азиз [уровень 5] вошёл в игру', 'welcome(\\'Азиз\\', 5) должно вернуть: Азиз [уровень 5] вошёл в игру. Вернулось: ' + repr(welcome('Азиз', 5))\nassert welcome('Bob', 1) == 'Bob [уровень 1] вошёл в игру', 'Функция должна работать с ЛЮБЫМ именем, не только Азиз'"
+    },
+    {
+     "id": "t2",
+     "title": {
+      "ru": "Максимум из трёх"
+     },
+     "brief": {
+      "ru": "return + сравнения"
+     },
+     "desc": {
+      "ru": "<p>Напиши функцию <code>max3(a, b, c)</code>, которая возвращает наибольшее из трёх чисел. Встроенной функцией <code>max()</code> пользоваться нельзя — только if!</p>"
+     },
+     "starter": "def max3(a, b, c):\n    # сравни и верни наибольшее (без max()!)\n    pass\n\nprint(max3(3, 9, 5))\n",
+     "hint": {
+      "ru": "if a >= b and a >= c: return a — и так для каждого. Или сравнивай по очереди с переменной best."
+     },
+     "kind": "python",
+     "tests": "assert max3(3, 9, 5) == 9, 'max3(3, 9, 5) должно вернуть 9'\nassert max3(10, 2, 3) == 10, 'max3(10, 2, 3) должно вернуть 10'\nassert max3(1, 2, 30) == 30, 'max3(1, 2, 30) должно вернуть 30'\nassert max3(7, 7, 7) == 7, 'max3(7, 7, 7) должно вернуть 7'"
+    },
+    {
+     "id": "t3",
+     "title": {
+      "ru": "Калькулятор XP"
+     },
+     "brief": {
+      "ru": "Функции вызывают функции"
+     },
+     "desc": {
+      "ru": "<p>Напиши две функции:</p><ul><li><code>xp_for_level(level)</code> — возвращает <code>level * 100</code></li><li><code>total_xp(levels)</code> — принимает список уровней и возвращает сумму XP за все, используя первую функцию</li></ul><p><code>total_xp([1, 2, 3])</code> → <code>600</code></p>"
+     },
+     "starter": "def xp_for_level(level):\n    pass\n\ndef total_xp(levels):\n    # цикл + вызов xp_for_level\n    pass\n\nprint(total_xp([1, 2, 3]))\n",
+     "hint": {
+      "ru": "total = 0, потом for lvl in levels: total += xp_for_level(lvl), в конце return total."
+     },
+     "kind": "python",
+     "tests": "assert xp_for_level(5) == 500, 'xp_for_level(5) должно вернуть 500'\nassert total_xp([1, 2, 3]) == 600, 'total_xp([1, 2, 3]) должно вернуть 600 (100+200+300)'\nassert total_xp([10]) == 1000, 'total_xp([10]) должно вернуть 1000'\nassert total_xp([]) == 0, 'total_xp([]) должно вернуть 0 для пустого списка'"
+    }
+   ],
+   "exam": {
+    "time": 600,
+    "questions": [
+     {
+      "q": {
+       "ru": "Что выведет код?"
+      },
+      "options": [
+       {
+        "ru": "8"
+       },
+       {
+        "ru": "16"
+       },
+       {
+        "ru": "44"
+       },
+       {
+        "ru": "None"
+       }
+      ],
+      "a": 1,
+      "code": "def sq(x):\n    return x * x\n\nprint(sq(4))"
+     },
+     {
+      "q": {
+       "ru": "Что выведет код?"
+      },
+      "options": [
+       {
+        "ru": "5"
+       },
+       {
+        "ru": "10"
+       },
+       {
+        "ru": "15"
+       },
+       {
+        "ru": "Ошибку"
+       }
+      ],
+      "a": 2,
+      "code": "def f(a, b=10):\n    return a + b\n\nprint(f(5))"
+     },
+     {
+      "q": {
+       "ru": "Что выведет код?"
+      },
+      "options": [
+       {
+        "ru": "5"
+       },
+       {
+        "ru": "None"
+       },
+       {
+        "ru": "Ошибку NameError"
+       },
+       {
+        "ru": "0"
+       }
+      ],
+      "a": 2,
+      "code": "def test():\n    x = 5\n\ntest()\nprint(x)"
+     },
+     {
+      "q": {
+       "ru": "Что выведет код?"
+      },
+      "options": [
+       {
+        "ru": "чёт"
+       },
+       {
+        "ru": "нечет"
+       },
+       {
+        "ru": "None"
+       },
+       {
+        "ru": "7"
+       }
+      ],
+      "a": 1,
+      "code": "def m(n):\n    if n % 2 == 0:\n        return 'чёт'\n    return 'нечет'\n\nprint(m(7))"
+     },
+     {
+      "q": {
+       "ru": "Что выведет код?"
+      },
+      "options": [
+       {
+        "ru": "5 и 5"
+       },
+       {
+        "ru": "5 и None"
+       },
+       {
+        "ru": "None и 5"
+       },
+       {
+        "ru": "Ошибку"
+       }
+      ],
+      "a": 1,
+      "code": "def add(a, b):\n    print(a + b)\n\nx = add(2, 3)\nprint(x)"
+     },
+     {
+      "q": {
+       "ru": "Сколько параметров у функции <code>def f(a, b, c=1):</code> можно НЕ передавать?"
+      },
+      "options": [
+       {
+        "ru": "Ни одного"
+       },
+       {
+        "ru": "Один (c)"
+       },
+       {
+        "ru": "Два"
+       },
+       {
+        "ru": "Все"
+       }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "title": {
+       "ru": "Оценка по баллам"
+      },
+      "desc": {
+       "ru": "<p>Напиши функцию <code>grade(score)</code>: 90+ → <code>\"A\"</code>, 70–89 → <code>\"B\"</code>, 50–69 → <code>\"C\"</code>, меньше 50 → <code>\"F\"</code>. Выведи <code>grade(95)</code>, <code>grade(71)</code>, <code>grade(30)</code> — каждый с новой строки.</p>"
+      },
+      "starter": "def grade(score):\n    pass\n\nprint(grade(95))\nprint(grade(71))\nprint(grade(30))\n",
+      "kind": "python",
+      "tests": "assert grade(95) == 'A', 'grade(95) должно вернуть A'\nassert grade(90) == 'A', 'grade(90) - это уже A (90+)'\nassert grade(71) == 'B', 'grade(71) должно вернуть B'\nassert grade(50) == 'C', 'grade(50) - это C'\nassert grade(30) == 'F', 'grade(30) должно вернуть F'"
+     }
+    ]
+   }
+  }
+ ]
+}
