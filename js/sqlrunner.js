@@ -1,22 +1,34 @@
-/* PyQuest — SQL-тренажёр на sql.js (SQLite в WebAssembly) */
+/* PyQuest — SQL-тренажёр на sql.js (SQLite в WebAssembly).
+   Учебная база загружается лениво из content/sql/store-db.sql. */
 (function () {
   let SQL = null;
   let loading = null;
+  let seed = null;
   const CDN = 'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/';
 
+  /** Схема учебной базы задаётся снаружи (content.js), чтобы данные жили в content/. */
+  function setSeed(text) { seed = text; }
+
   async function ensure(onStatus) {
-    if (SQL) return SQL;
+    if (SQL && seed) return SQL;
     if (!loading) {
       loading = (async () => {
         if (onStatus) onStatus('Загружаю SQL-движок (~1 МБ, один раз)…');
-        await new Promise((res, rej) => {
-          const s = document.createElement('script');
-          s.src = CDN + 'sql-wasm.js';
-          s.onload = res;
-          s.onerror = () => rej(new Error('Не удалось загрузить sql.js. Проверь интернет.'));
-          document.head.appendChild(s);
-        });
-        SQL = await window.initSqlJs({ locateFile: f => CDN + f });
+        if (!SQL) {
+          await new Promise((res, rej) => {
+            const s = document.createElement('script');
+            s.src = CDN + 'sql-wasm.js';
+            s.onload = res;
+            s.onerror = () => rej(new Error('Не удалось загрузить sql.js. Проверь интернет.'));
+            document.head.appendChild(s);
+          });
+          SQL = await window.initSqlJs({ locateFile: f => CDN + f });
+        }
+        if (!seed) {
+          const res = await fetch('content/sql/store-db.sql?v=' + (window.PQ_VERSION || '1'));
+          if (!res.ok) throw new Error('Не удалось загрузить учебную базу');
+          seed = await res.text();
+        }
         return SQL;
       })();
     }
@@ -25,13 +37,12 @@
 
   function freshDb() {
     const db = new SQL.Database();
-    db.run(window.SQL_SEED);
+    db.run(seed);
     return db;
   }
 
-  /* Выполнить скрипт, вернуть последний результат-таблицу */
   function runScript(db, sql) {
-    const results = db.exec(sql); // массив {columns, values} для каждого SELECT
+    const results = db.exec(sql);
     return results.length ? results[results.length - 1] : { columns: [], values: [] };
   }
 
@@ -42,7 +53,6 @@
   }
   function normRows(res) { return res.values.map(row => row.map(norm)); }
 
-  /** Запуск для кнопки «Выполнить»: {result} или {error} */
   async function run(sql, onStatus) {
     await ensure(onStatus);
     if (onStatus) onStatus('');
@@ -57,7 +67,7 @@
     }
   }
 
-  /** Проверка задачи: сравнение с эталонным решением. {ok, message, result} */
+  /** Проверка задачи: сравнение результата запроса с эталонным решением. */
   async function check(sql, task, onStatus) {
     await ensure(onStatus);
     if (onStatus) onStatus('');
@@ -107,12 +117,11 @@
     }
   }
 
-  /* HTML-таблица результата (максимум 30 строк) */
   function tableHtml(res) {
     if (!res || !res.columns.length) return '<p class="sql-empty">Запрос выполнен, строк не возвращено.</p>';
     const esc = x => String(x === null ? 'NULL' : x).replace(/&/g, '&amp;').replace(/</g, '&lt;');
-    let h = '<div class="sql-table-wrap"><table class="sql-table"><thead><tr>' +
-      res.columns.map(c => '<th>' + esc(c) + '</th>').join('') + '</tr></thead><tbody>';
+    let h = '<div class="sql-table-wrap" tabindex="0"><table class="sql-table"><thead><tr>' +
+      res.columns.map(c => '<th scope="col">' + esc(c) + '</th>').join('') + '</tr></thead><tbody>';
     res.values.slice(0, 30).forEach(row => {
       h += '<tr>' + row.map(v => '<td' + (v === null ? ' class="null"' : '') + '>' + esc(v) + '</td>').join('') + '</tr>';
     });
@@ -121,5 +130,5 @@
     return h;
   }
 
-  window.SqlRunner = { run, check, ensure, tableHtml, isReady: () => !!SQL };
+  window.SqlRunner = { run, check, ensure, tableHtml, setSeed, isReady: () => !!(SQL && seed) };
 })();

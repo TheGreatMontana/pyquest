@@ -1,0 +1,1630 @@
+{
+ "schema": 2,
+ "languages": [
+  "ru",
+  "uz",
+  "en"
+ ],
+ "skills": [
+  {
+   "id": "python-syntax",
+   "category": "language",
+   "title": {
+    "ru": "Синтаксис Python",
+    "uz": "Python sintaksisi",
+    "en": "Python syntax"
+   }
+  },
+  {
+   "id": "python-collections",
+   "category": "language",
+   "title": {
+    "ru": "Коллекции Python",
+    "uz": "Python to'plamlari",
+    "en": "Python collections"
+   }
+  },
+  {
+   "id": "python-control-flow",
+   "category": "language",
+   "title": {
+    "ru": "Ветвления и циклы",
+    "uz": "Shartlar va sikllar",
+    "en": "Control flow"
+   }
+  },
+  {
+   "id": "python-functions",
+   "category": "language",
+   "title": {
+    "ru": "Функции",
+    "uz": "Funksiyalar",
+    "en": "Functions"
+   }
+  },
+  {
+   "id": "python-oop",
+   "category": "language",
+   "title": {
+    "ru": "ООП в Python",
+    "uz": "Python'da OOP",
+    "en": "Python OOP"
+   }
+  },
+  {
+   "id": "python-io",
+   "category": "language",
+   "title": {
+    "ru": "Файлы и ввод-вывод",
+    "uz": "Fayllar va I/O",
+    "en": "Files and I/O"
+   }
+  },
+  {
+   "id": "sql-select",
+   "category": "data",
+   "title": {
+    "ru": "SELECT и фильтрация",
+    "uz": "SELECT va filtrlash",
+    "en": "SELECT and filtering"
+   }
+  },
+  {
+   "id": "sql-joins",
+   "category": "data",
+   "title": {
+    "ru": "JOIN и агрегация",
+    "uz": "JOIN va agregatsiya",
+    "en": "JOIN and aggregation"
+   }
+  },
+  {
+   "id": "sql-window",
+   "category": "data",
+   "title": {
+    "ru": "CTE и оконные функции",
+    "uz": "CTE va oyna funksiyalari",
+    "en": "CTE and window functions"
+   }
+  },
+  {
+   "id": "algo-complexity",
+   "category": "cs",
+   "title": {
+    "ru": "Сложность алгоритмов",
+    "uz": "Algoritmlar murakkabligi",
+    "en": "Algorithmic complexity"
+   }
+  },
+  {
+   "id": "algo-structures",
+   "category": "cs",
+   "title": {
+    "ru": "Структуры данных",
+    "uz": "Ma'lumot tuzilmalari",
+    "en": "Data structures"
+   }
+  },
+  {
+   "id": "http-basics",
+   "category": "web",
+   "title": {
+    "ru": "HTTP и API",
+    "uz": "HTTP va API",
+    "en": "HTTP and APIs"
+   }
+  },
+  {
+   "id": "data-analysis",
+   "category": "data",
+   "title": {
+    "ru": "Анализ данных",
+    "uz": "Ma'lumotlar tahlili",
+    "en": "Data analysis"
+   }
+  },
+  {
+   "id": "security-basics",
+   "category": "security",
+   "title": {
+    "ru": "Основы безопасности",
+    "uz": "Xavfsizlik asoslari",
+    "en": "Security fundamentals"
+   }
+  }
+ ],
+ "courses": [
+  {
+   "id": "python-basics",
+   "title": {
+    "ru": "Python: основы",
+    "uz": "Python: asoslar",
+    "en": "Python Fundamentals"
+   },
+   "description": {
+    "ru": "Установка, переменные и типы, списки, циклы и условия. Полный фундамент языка с нуля.",
+    "uz": "O'rnatish, o'zgaruvchilar va turlar, ro'yxatlar, sikllar va shartlar. Tildan noldan to'liq poydevor.",
+    "en": "Setup, variables and types, lists, loops and conditions. A complete language foundation from zero."
+   },
+   "glyph": "code",
+   "color": "#38bdf8",
+   "level": "beginner",
+   "status": "full",
+   "estimatedHours": 18,
+   "requires": [],
+   "grants": [
+    "python-syntax",
+    "python-collections",
+    "python-control-flow"
+   ],
+   "legacyIds": [
+    "m01",
+    "m02",
+    "m03",
+    "m04",
+    "m05"
+   ],
+   "moduleCount": 5
+  },
+  {
+   "id": "python-intermediate",
+   "title": {
+    "ru": "Python: средний уровень",
+    "uz": "Python: o'rta daraja",
+    "en": "Intermediate Python"
+   },
+   "description": {
+    "ru": "Словари, циклы while и функции — то, с чего начинается настоящее программирование.",
+    "uz": "Lug'atlar, while sikllari va funksiyalar — haqiqiy dasturlash shu yerdan boshlanadi.",
+    "en": "Dictionaries, while loops and functions — where real programming begins."
+   },
+   "glyph": "code",
+   "color": "#38bdf8",
+   "level": "intermediate",
+   "status": "full",
+   "estimatedHours": 14,
+   "requires": [
+    "python-syntax",
+    "python-control-flow"
+   ],
+   "grants": [
+    "python-functions"
+   ],
+   "legacyIds": [
+    "m06",
+    "m07",
+    "m08"
+   ],
+   "moduleCount": 3
+  },
+  {
+   "id": "python-advanced",
+   "title": {
+    "ru": "Python: ООП и файлы",
+    "uz": "Python: OOP va fayllar",
+    "en": "Advanced Python: OOP and Files"
+   },
+   "description": {
+    "ru": "Классы, объекты, наследование и работа с файлами. Завершается большим финальным экзаменом.",
+    "uz": "Sinflar, obyektlar, meros va fayllar bilan ishlash. Katta yakuniy imtihon bilan yakunlanadi.",
+    "en": "Classes, objects, inheritance and file handling. Ends with a comprehensive final exam."
+   },
+   "glyph": "code",
+   "color": "#38bdf8",
+   "level": "intermediate",
+   "status": "full",
+   "estimatedHours": 14,
+   "requires": [
+    "python-functions"
+   ],
+   "grants": [
+    "python-oop",
+    "python-io"
+   ],
+   "legacyIds": [
+    "m09",
+    "m10",
+    "final"
+   ],
+   "moduleCount": 2
+  },
+  {
+   "id": "sql-basics",
+   "title": {
+    "ru": "SQL: основы",
+    "uz": "SQL: asoslar",
+    "en": "SQL Fundamentals"
+   },
+   "description": {
+    "ru": "Базы данных, SELECT, фильтрация, функции и множества. Тренажёр с настоящей базой в браузере.",
+    "uz": "Ma'lumotlar bazasi, SELECT, filtrlash, funksiyalar va to'plamlar. Brauzerdagi haqiqiy baza bilan trenajyor.",
+    "en": "Databases, SELECT, filtering, functions and set operations. Real database trainer in your browser."
+   },
+   "glyph": "db",
+   "color": "#f59e0b",
+   "level": "beginner",
+   "status": "full",
+   "estimatedHours": 16,
+   "requires": [],
+   "grants": [
+    "sql-select"
+   ],
+   "legacyIds": [
+    "s01",
+    "s02",
+    "s03"
+   ],
+   "moduleCount": 3
+  },
+  {
+   "id": "sql-advanced",
+   "title": {
+    "ru": "SQL: продвинутый",
+    "uz": "SQL: ilg'or daraja",
+    "en": "Advanced SQL"
+   },
+   "description": {
+    "ru": "JOIN, GROUP BY, подзапросы, CTE и оконные функции — то, что спрашивают на собеседованиях.",
+    "uz": "JOIN, GROUP BY, ichki so'rovlar, CTE va oyna funksiyalari — suhbatlarda so'raladigan mavzular.",
+    "en": "JOINs, GROUP BY, subqueries, CTEs and window functions — the interview essentials."
+   },
+   "glyph": "db",
+   "color": "#f59e0b",
+   "level": "advanced",
+   "status": "full",
+   "estimatedHours": 18,
+   "requires": [
+    "sql-select"
+   ],
+   "grants": [
+    "sql-joins",
+    "sql-window"
+   ],
+   "legacyIds": [
+    "s04",
+    "s05",
+    "s06"
+   ],
+   "moduleCount": 3
+  },
+  {
+   "id": "algorithms",
+   "title": {
+    "ru": "Алгоритмы и структуры данных",
+    "uz": "Algoritmlar va ma'lumot tuzilmalari",
+    "en": "Algorithms and Data Structures"
+   },
+   "description": {
+    "ru": "Сложность, поиск, сортировки, рекурсия, хеш-таблицы и графы. Подготовка к LeetCode.",
+    "uz": "Murakkablik, qidiruv, saralash, rekursiya, xesh-jadvallar va graflar. LeetCode'ga tayyorgarlik.",
+    "en": "Complexity, search, sorting, recursion, hash tables and graphs. LeetCode preparation."
+   },
+   "glyph": "algo",
+   "color": "#a78bfa",
+   "level": "intermediate",
+   "status": "full",
+   "estimatedHours": 16,
+   "requires": [
+    "python-functions"
+   ],
+   "grants": [
+    "algo-complexity",
+    "algo-structures"
+   ],
+   "legacyIds": [
+    "a01",
+    "a02",
+    "a03",
+    "a04"
+   ],
+   "moduleCount": 4
+  },
+  {
+   "id": "backend-intro",
+   "title": {
+    "ru": "Бэкенд: введение",
+    "uz": "Backend: kirish",
+    "en": "Backend Development: Introduction"
+   },
+   "description": {
+    "ru": "Как устроен веб: клиент и сервер, HTTP, статусы, REST API и JSON. Первый шаг в бэкенд.",
+    "uz": "Veb qanday ishlaydi: klient va server, HTTP, statuslar, REST API va JSON. Backend'ga birinchi qadam.",
+    "en": "How the web works: client and server, HTTP, status codes, REST APIs and JSON. Your first backend step."
+   },
+   "glyph": "server",
+   "color": "#34d399",
+   "level": "beginner",
+   "status": "starter",
+   "estimatedHours": 6,
+   "requires": [
+    "python-syntax"
+   ],
+   "grants": [
+    "http-basics"
+   ],
+   "legacyIds": [],
+   "moduleCount": 1
+  },
+  {
+   "id": "analytics-intro",
+   "title": {
+    "ru": "Аналитика данных: введение",
+    "uz": "Ma'lumotlar tahlili: kirish",
+    "en": "Data Analytics: Introduction"
+   },
+   "description": {
+    "ru": "Метрики, средние и медианы, работа с таблицами и первые выводы из данных.",
+    "uz": "Metrikalar, o'rtacha va mediana, jadvallar bilan ishlash va ma'lumotlardan birinchi xulosalar.",
+    "en": "Metrics, averages and medians, working with tables and drawing first conclusions from data."
+   },
+   "glyph": "chart",
+   "color": "#60a5fa",
+   "level": "beginner",
+   "status": "starter",
+   "estimatedHours": 6,
+   "requires": [
+    "python-collections"
+   ],
+   "grants": [
+    "data-analysis"
+   ],
+   "legacyIds": [],
+   "moduleCount": 1
+  },
+  {
+   "id": "security-intro",
+   "title": {
+    "ru": "Кибербезопасность: введение",
+    "uz": "Kiberxavfsizlik: kirish",
+    "en": "Cybersecurity: Introduction"
+   },
+   "description": {
+    "ru": "Триада CIA, хеширование паролей, SQL-инъекции и базовая гигиена безопасности разработчика.",
+    "uz": "CIA triadasi, parollarni xeshlash, SQL-in'ektsiyalar va dasturchining xavfsizlik gigiyenasi.",
+    "en": "The CIA triad, password hashing, SQL injection and a developer's security hygiene."
+   },
+   "glyph": "shield",
+   "color": "#f87171",
+   "level": "beginner",
+   "status": "starter",
+   "estimatedHours": 6,
+   "requires": [
+    "python-syntax"
+   ],
+   "grants": [
+    "security-basics"
+   ],
+   "legacyIds": [],
+   "moduleCount": 1
+  }
+ ],
+ "careerPaths": [
+  {
+   "id": "de-path",
+   "stages": [
+    {
+     "id": "de-st1",
+     "title": {
+      "ru": "Фундамент: Python",
+      "uz": "Poydevor: Python",
+      "en": "Foundation: Python"
+     },
+     "courses": [
+      "python-basics",
+      "python-intermediate",
+      "python-advanced"
+     ]
+    },
+    {
+     "id": "de-st2",
+     "title": {
+      "ru": "Язык данных: SQL",
+      "uz": "Ma'lumotlar tili: SQL",
+      "en": "The language of data: SQL"
+     },
+     "courses": [
+      "sql-basics",
+      "sql-advanced"
+     ]
+    },
+    {
+     "id": "de-st3",
+     "title": {
+      "ru": "Алгоритмическое мышление",
+      "uz": "Algoritmik fikrlash",
+      "en": "Algorithmic thinking"
+     },
+     "courses": [
+      "algorithms"
+     ]
+    },
+    {
+     "id": "de-st4",
+     "title": {
+      "ru": "Инструменты инженера данных",
+      "uz": "Ma'lumot muhandisi vositalari",
+      "en": "Data engineering tools"
+     },
+     "courses": [],
+     "external": true
+    }
+   ]
+  },
+  {
+   "id": "backend-path",
+   "stages": [
+    {
+     "id": "be-st1",
+     "title": {
+      "ru": "Фундамент: Python",
+      "uz": "Poydevor: Python",
+      "en": "Foundation: Python"
+     },
+     "courses": [
+      "python-basics",
+      "python-intermediate",
+      "python-advanced"
+     ]
+    },
+    {
+     "id": "be-st2",
+     "title": {
+      "ru": "Веб и API",
+      "uz": "Veb va API",
+      "en": "Web and APIs"
+     },
+     "courses": [
+      "backend-intro"
+     ]
+    },
+    {
+     "id": "be-st3",
+     "title": {
+      "ru": "Базы данных",
+      "uz": "Ma'lumotlar bazalari",
+      "en": "Databases"
+     },
+     "courses": [
+      "sql-basics",
+      "sql-advanced"
+     ]
+    },
+    {
+     "id": "be-st4",
+     "title": {
+      "ru": "Алгоритмы для собеседований",
+      "uz": "Suhbatlar uchun algoritmlar",
+      "en": "Interview algorithms"
+     },
+     "courses": [
+      "algorithms"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "analytics-path",
+   "stages": [
+    {
+     "id": "an-st1",
+     "title": {
+      "ru": "Фундамент: Python",
+      "uz": "Poydevor: Python",
+      "en": "Foundation: Python"
+     },
+     "courses": [
+      "python-basics",
+      "python-intermediate"
+     ]
+    },
+    {
+     "id": "an-st2",
+     "title": {
+      "ru": "SQL для аналитика",
+      "uz": "Tahlilchi uchun SQL",
+      "en": "SQL for analysts"
+     },
+     "courses": [
+      "sql-basics",
+      "sql-advanced"
+     ]
+    },
+    {
+     "id": "an-st3",
+     "title": {
+      "ru": "Анализ данных",
+      "uz": "Ma'lumotlar tahlili",
+      "en": "Data analysis"
+     },
+     "courses": [
+      "analytics-intro"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "security-path",
+   "stages": [
+    {
+     "id": "se-st1",
+     "title": {
+      "ru": "Фундамент: Python",
+      "uz": "Poydevor: Python",
+      "en": "Foundation: Python"
+     },
+     "courses": [
+      "python-basics",
+      "python-intermediate"
+     ]
+    },
+    {
+     "id": "se-st2",
+     "title": {
+      "ru": "Основы безопасности",
+      "uz": "Xavfsizlik asoslari",
+      "en": "Security fundamentals"
+     },
+     "courses": [
+      "security-intro"
+     ]
+    },
+    {
+     "id": "se-st3",
+     "title": {
+      "ru": "Базы данных и инъекции",
+      "uz": "Bazalar va in'ektsiyalar",
+      "en": "Databases and injection"
+     },
+     "courses": [
+      "sql-basics"
+     ]
+    }
+   ]
+  }
+ ],
+ "domains": [
+  {
+   "id": "data-engineering",
+   "careerPath": "de-path",
+   "glyph": "db",
+   "color": "#f59e0b",
+   "status": "full",
+   "featured": true,
+   "title": {
+    "ru": "Data Engineering",
+    "uz": "Data Engineering",
+    "en": "Data Engineering"
+   },
+   "tagline": {
+    "ru": "Python, SQL и алгоритмы — путь инженера данных по программе твоего ментора",
+    "uz": "Python, SQL va algoritmlar — mentoring dasturi bo'yicha ma'lumot muhandisi yo'li",
+    "en": "Python, SQL and algorithms — the data engineer path from your mentor's program"
+   }
+  },
+  {
+   "id": "backend",
+   "careerPath": "backend-path",
+   "glyph": "server",
+   "color": "#34d399",
+   "status": "starter",
+   "title": {
+    "ru": "Бэкенд-разработка",
+    "uz": "Backend dasturlash",
+    "en": "Backend Development"
+   },
+   "tagline": {
+    "ru": "Серверы, HTTP, REST API и базы данных",
+    "uz": "Serverlar, HTTP, REST API va ma'lumotlar bazalari",
+    "en": "Servers, HTTP, REST APIs and databases"
+   }
+  },
+  {
+   "id": "data-analytics",
+   "careerPath": "analytics-path",
+   "glyph": "chart",
+   "color": "#60a5fa",
+   "status": "starter",
+   "title": {
+    "ru": "Аналитика данных",
+    "uz": "Ma'lumotlar tahlili",
+    "en": "Data Analytics"
+   },
+   "tagline": {
+    "ru": "SQL, метрики и выводы из данных",
+    "uz": "SQL, metrikalar va ma'lumotlardan xulosalar",
+    "en": "SQL, metrics and insights from data"
+   }
+  },
+  {
+   "id": "cybersecurity",
+   "careerPath": "security-path",
+   "glyph": "shield",
+   "color": "#f87171",
+   "status": "starter",
+   "title": {
+    "ru": "Кибербезопасность",
+    "uz": "Kiberxavfsizlik",
+    "en": "Cybersecurity"
+   },
+   "tagline": {
+    "ru": "Защита данных, пароли, инъекции и безопасный код",
+    "uz": "Ma'lumotlarni himoyalash, parollar, in'ektsiyalar va xavfsiz kod",
+    "en": "Data protection, passwords, injection and secure code"
+   }
+  },
+  {
+   "id": "ai",
+   "glyph": "brain",
+   "color": "#c084fc",
+   "status": "planned",
+   "title": {
+    "ru": "Искусственный интеллект",
+    "uz": "Sun'iy intellekt",
+    "en": "Artificial Intelligence"
+   },
+   "tagline": {
+    "ru": "Нейросети, LLM и работа с ИИ-моделями",
+    "uz": "Neyron tarmoqlar, LLM va AI modellari",
+    "en": "Neural networks, LLMs and AI models"
+   }
+  },
+  {
+   "id": "machine-learning",
+   "glyph": "brain",
+   "color": "#c084fc",
+   "status": "planned",
+   "title": {
+    "ru": "Машинное обучение",
+    "uz": "Mashinali o'qitish",
+    "en": "Machine Learning"
+   },
+   "tagline": {
+    "ru": "Модели, признаки и метрики качества",
+    "uz": "Modellar, belgilar va sifat metrikalari",
+    "en": "Models, features and quality metrics"
+   }
+  },
+  {
+   "id": "deep-learning",
+   "glyph": "brain",
+   "color": "#c084fc",
+   "status": "planned",
+   "title": {
+    "ru": "Глубокое обучение",
+    "uz": "Chuqur o'qitish",
+    "en": "Deep Learning"
+   },
+   "tagline": {
+    "ru": "Нейросети, свёртки и трансформеры",
+    "uz": "Neyron tarmoqlar, konvolyutsiya va transformerlar",
+    "en": "Neural nets, convolutions and transformers"
+   }
+  },
+  {
+   "id": "nlp",
+   "glyph": "brain",
+   "color": "#c084fc",
+   "status": "planned",
+   "title": {
+    "ru": "Обработка языка (NLP)",
+    "uz": "Tabiiy tilni qayta ishlash",
+    "en": "Natural Language Processing"
+   },
+   "tagline": {
+    "ru": "Тексты, эмбеддинги и языковые модели",
+    "uz": "Matnlar, embeddinglar va til modellari",
+    "en": "Text, embeddings and language models"
+   }
+  },
+  {
+   "id": "computer-vision",
+   "glyph": "eye",
+   "color": "#c084fc",
+   "status": "planned",
+   "title": {
+    "ru": "Компьютерное зрение",
+    "uz": "Kompyuter ko'rish",
+    "en": "Computer Vision"
+   },
+   "tagline": {
+    "ru": "Изображения, детекция и сегментация",
+    "uz": "Tasvirlar, detektsiya va segmentatsiya",
+    "en": "Images, detection and segmentation"
+   }
+  },
+  {
+   "id": "infosec",
+   "glyph": "shield",
+   "color": "#f87171",
+   "status": "planned",
+   "title": {
+    "ru": "Информационная безопасность",
+    "uz": "Axborot xavfsizligi",
+    "en": "Information Security"
+   },
+   "tagline": {
+    "ru": "Политики, аудит и управление рисками",
+    "uz": "Siyosatlar, audit va risklarni boshqarish",
+    "en": "Policies, audit and risk management"
+   }
+  },
+  {
+   "id": "frontend",
+   "glyph": "code",
+   "color": "#38bdf8",
+   "status": "planned",
+   "title": {
+    "ru": "Фронтенд-разработка",
+    "uz": "Frontend dasturlash",
+    "en": "Frontend Development"
+   },
+   "tagline": {
+    "ru": "HTML, CSS, JavaScript и интерфейсы",
+    "uz": "HTML, CSS, JavaScript va interfeyslar",
+    "en": "HTML, CSS, JavaScript and interfaces"
+   }
+  },
+  {
+   "id": "fullstack",
+   "glyph": "layers",
+   "color": "#34d399",
+   "status": "planned",
+   "title": {
+    "ru": "Full-Stack разработка",
+    "uz": "Full-Stack dasturlash",
+    "en": "Full-Stack Development"
+   },
+   "tagline": {
+    "ru": "Фронтенд и бэкенд в одном пути",
+    "uz": "Frontend va backend bir yo'lda",
+    "en": "Frontend and backend in one path"
+   }
+  },
+  {
+   "id": "big-data",
+   "glyph": "db",
+   "color": "#f59e0b",
+   "status": "planned",
+   "title": {
+    "ru": "Big Data",
+    "uz": "Big Data",
+    "en": "Big Data"
+   },
+   "tagline": {
+    "ru": "Spark, Kafka и распределённая обработка",
+    "uz": "Spark, Kafka va taqsimlangan ishlov",
+    "en": "Spark, Kafka and distributed processing"
+   }
+  },
+  {
+   "id": "cloud",
+   "glyph": "cloud",
+   "color": "#60a5fa",
+   "status": "planned",
+   "title": {
+    "ru": "Облачная инженерия",
+    "uz": "Bulutli muhandislik",
+    "en": "Cloud Engineering"
+   },
+   "tagline": {
+    "ru": "AWS, GCP, Azure и облачные хранилища",
+    "uz": "AWS, GCP, Azure va bulutli saqlash",
+    "en": "AWS, GCP, Azure and cloud storage"
+   }
+  },
+  {
+   "id": "devops",
+   "glyph": "layers",
+   "color": "#34d399",
+   "status": "planned",
+   "title": {
+    "ru": "DevOps",
+    "uz": "DevOps",
+    "en": "DevOps"
+   },
+   "tagline": {
+    "ru": "Docker, CI/CD и эксплуатация",
+    "uz": "Docker, CI/CD va ekspluatatsiya",
+    "en": "Docker, CI/CD and operations"
+   }
+  },
+  {
+   "id": "software-engineering",
+   "glyph": "code",
+   "color": "#a78bfa",
+   "status": "planned",
+   "title": {
+    "ru": "Основы разработки ПО",
+    "uz": "Dasturiy ta'minot asoslari",
+    "en": "Software Engineering Fundamentals"
+   },
+   "tagline": {
+    "ru": "Git, тестирование, архитектура и код-ревью",
+    "uz": "Git, testlash, arxitektura va kod-revyu",
+    "en": "Git, testing, architecture and code review"
+   }
+  }
+ ],
+ "legacyMap": {
+  "m01": "python-basics/pb-01",
+  "m02": "python-basics/pb-02",
+  "m03": "python-basics/pb-03",
+  "m04": "python-basics/pb-04",
+  "m05": "python-basics/pb-05",
+  "m06": "python-intermediate/pi-01",
+  "m07": "python-intermediate/pi-02",
+  "m08": "python-intermediate/pi-03",
+  "m09": "python-advanced/pa-01",
+  "m10": "python-advanced/pa-02",
+  "final": "python-advanced/final",
+  "s01": "sql-basics/sb-01",
+  "s02": "sql-basics/sb-02",
+  "s03": "sql-basics/sb-03",
+  "s04": "sql-advanced/sa-01",
+  "s05": "sql-advanced/sa-02",
+  "s06": "sql-advanced/sa-03",
+  "a01": "algorithms/alg-01",
+  "a02": "algorithms/alg-02",
+  "a03": "algorithms/alg-03",
+  "a04": "algorithms/alg-04"
+ },
+ "xpRewards": {
+  "lesson": 20,
+  "quizAnswer": 10,
+  "task": 40,
+  "examPass": 120,
+  "examPerfect": 60,
+  "finalPass": 300,
+  "courseComplete": 100,
+  "interactiveBlock": 15
+ },
+ "ranks": [
+  {
+   "xp": 0,
+   "title": {
+    "ru": "Новичок",
+    "uz": "Yangi boshlovchi",
+    "en": "Novice"
+   }
+  },
+  {
+   "xp": 200,
+   "title": {
+    "ru": "Ученик",
+    "uz": "O'quvchi",
+    "en": "Apprentice"
+   }
+  },
+  {
+   "xp": 500,
+   "title": {
+    "ru": "Кодер",
+    "uz": "Koder",
+    "en": "Coder"
+   }
+  },
+  {
+   "xp": 900,
+   "title": {
+    "ru": "Практик",
+    "uz": "Amaliyotchi",
+    "en": "Practitioner"
+   }
+  },
+  {
+   "xp": 1400,
+   "title": {
+    "ru": "Питонист",
+    "uz": "Pythonchi",
+    "en": "Pythonista"
+   }
+  },
+  {
+   "xp": 2100,
+   "title": {
+    "ru": "Мастер кода",
+    "uz": "Kod ustasi",
+    "en": "Code Master"
+   }
+  },
+  {
+   "xp": 3000,
+   "title": {
+    "ru": "Сенсей",
+    "uz": "Sensey",
+    "en": "Sensei"
+   }
+  },
+  {
+   "xp": 4200,
+   "title": {
+    "ru": "Инженер данных",
+    "uz": "Ma'lumot muhandisi",
+    "en": "Data Engineer"
+   }
+  }
+ ],
+ "achievements": [
+  {
+   "id": "first-code",
+   "icon": "⌨️",
+   "title": {
+    "ru": "Первый код",
+    "uz": "Birinchi kod",
+    "en": "First code"
+   },
+   "desc": {
+    "ru": "Реши первую задачу",
+    "uz": "Birinchi masalani yech",
+    "en": "Solve your first task"
+   }
+  },
+  {
+   "id": "quiz-perfect",
+   "icon": "🎯",
+   "title": {
+    "ru": "Снайпер",
+    "uz": "Snayper",
+    "en": "Sharpshooter"
+   },
+   "desc": {
+    "ru": "Пройди квиз на 100%",
+    "uz": "Viktorinani 100% yech",
+    "en": "Score 100% on a quiz"
+   }
+  },
+  {
+   "id": "boss-1",
+   "icon": "🗡️",
+   "title": {
+    "ru": "Первый экзамен",
+    "uz": "Birinchi imtihon",
+    "en": "First exam"
+   },
+   "desc": {
+    "ru": "Сдай первый экзамен",
+    "uz": "Birinchi imtihonni topshir",
+    "en": "Pass your first exam"
+   }
+  },
+  {
+   "id": "streak-3",
+   "icon": "🔥",
+   "title": {
+    "ru": "Огонёк",
+    "uz": "Uchqun",
+    "en": "Spark"
+   },
+   "desc": {
+    "ru": "3 дня подряд",
+    "uz": "Ketma-ket 3 kun",
+    "en": "3 days in a row"
+   }
+  },
+  {
+   "id": "streak-7",
+   "icon": "🌋",
+   "title": {
+    "ru": "Неделя силы",
+    "uz": "Kuch haftasi",
+    "en": "Week of power"
+   },
+   "desc": {
+    "ru": "7 дней подряд",
+    "uz": "Ketma-ket 7 kun",
+    "en": "7 days in a row"
+   }
+  },
+  {
+   "id": "sql-first",
+   "icon": "🗄️",
+   "title": {
+    "ru": "SELECT-мастер",
+    "uz": "SELECT ustasi",
+    "en": "SELECT master"
+   },
+   "desc": {
+    "ru": "Реши первую SQL-задачу",
+    "uz": "Birinchi SQL masalasini yech",
+    "en": "Solve your first SQL task"
+   }
+  },
+  {
+   "id": "half-way",
+   "icon": "⛰️",
+   "title": {
+    "ru": "Экватор",
+    "uz": "Ekvator",
+    "en": "Halfway"
+   },
+   "desc": {
+    "ru": "Пройди 10 модулей",
+    "uz": "10 ta modulni tugat",
+    "en": "Complete 10 modules"
+   }
+  },
+  {
+   "id": "exam-perfect",
+   "icon": "💎",
+   "title": {
+    "ru": "Безупречно",
+    "uz": "Benuqson",
+    "en": "Flawless"
+   },
+   "desc": {
+    "ru": "Экзамен на 100%",
+    "uz": "Imtihon 100%",
+    "en": "Score 100% on an exam"
+   }
+  },
+  {
+   "id": "xp-1000",
+   "icon": "⚡",
+   "title": {
+    "ru": "Тысячник",
+    "uz": "Mingchi",
+    "en": "Thousandaire"
+   },
+   "desc": {
+    "ru": "Набери 1000 XP",
+    "uz": "1000 XP to'pla",
+    "en": "Earn 1000 XP"
+   }
+  },
+  {
+   "id": "all-tasks",
+   "icon": "🧠",
+   "title": {
+    "ru": "Решала",
+    "uz": "Yechuvchi",
+    "en": "Problem solver"
+   },
+   "desc": {
+    "ru": "Реши 30 задач",
+    "uz": "30 ta masala yech",
+    "en": "Solve 30 tasks"
+   }
+  },
+  {
+   "id": "course-python",
+   "icon": "🐍",
+   "title": {
+    "ru": "Питон приручён",
+    "uz": "Python qo'lga o'rgatildi",
+    "en": "Python tamed"
+   },
+   "desc": {
+    "ru": "Пройди все курсы Python",
+    "uz": "Barcha Python kurslarini tugat",
+    "en": "Complete all Python courses"
+   }
+  },
+  {
+   "id": "course-sql",
+   "icon": "👑",
+   "title": {
+    "ru": "Повелитель данных",
+    "uz": "Ma'lumotlar hukmdori",
+    "en": "Data ruler"
+   },
+   "desc": {
+    "ru": "Пройди все курсы SQL",
+    "uz": "Barcha SQL kurslarini tugat",
+    "en": "Complete all SQL courses"
+   }
+  },
+  {
+   "id": "course-algo",
+   "icon": "🧮",
+   "title": {
+    "ru": "Алгоритмист",
+    "uz": "Algoritmchi",
+    "en": "Algorithmist"
+   },
+   "desc": {
+    "ru": "Пройди курс алгоритмов",
+    "uz": "Algoritmlar kursini tugat",
+    "en": "Complete the algorithms course"
+   }
+  },
+  {
+   "id": "polyglot",
+   "icon": "🌍",
+   "title": {
+    "ru": "Полиглот",
+    "uz": "Poliglot",
+    "en": "Polyglot"
+   },
+   "desc": {
+    "ru": "Позанимайся на двух языках",
+    "uz": "Ikki tilda shug'ullan",
+    "en": "Study in two languages"
+   }
+  },
+  {
+   "id": "career-de",
+   "icon": "🏆",
+   "title": {
+    "ru": "Data Engineer",
+    "uz": "Data Engineer",
+    "en": "Data Engineer"
+   },
+   "desc": {
+    "ru": "Заверши путь Data Engineering",
+    "uz": "Data Engineering yo'lini yakunla",
+    "en": "Complete the Data Engineering path"
+   }
+  }
+ ],
+ "mentorPlan": {
+  "weeks": [
+   {
+    "week": 1,
+    "title": {
+     "ru": "Python: фундамент",
+     "uz": "Python: poydevor",
+     "en": "Python: foundation"
+    },
+    "items": {
+     "ru": [
+      "Курс «Python: основы» — модули 1–5",
+      "Установи Python и VS Code",
+      "Занимайся каждый день — держи стрик"
+     ],
+     "uz": [
+      "«Python: asoslar» kursi — 1–5 modullar",
+      "Python va VS Code o'rnat",
+      "Har kuni shug'ullan — striklarni saqla"
+     ],
+     "en": [
+      "Python Fundamentals — modules 1–5",
+      "Install Python and VS Code",
+      "Study daily — keep your streak"
+     ]
+    }
+   },
+   {
+    "week": 2,
+    "title": {
+     "ru": "Python: уверенность",
+     "uz": "Python: ishonch",
+     "en": "Python: confidence"
+    },
+    "items": {
+     "ru": [
+      "Курсы «Средний уровень» и «ООП и файлы»",
+      "Финальный экзамен Python",
+      "Решения пуш на GitHub с комментариями"
+     ],
+     "uz": [
+      "«O'rta daraja» va «OOP va fayllar» kurslari",
+      "Python yakuniy imtihoni",
+      "Yechimlarni izohlar bilan GitHub'ga push qil"
+     ],
+     "en": [
+      "Intermediate and Advanced Python courses",
+      "Python final exam",
+      "Push your solutions to GitHub with comments"
+     ]
+    }
+   },
+   {
+    "week": 3,
+    "title": {
+     "ru": "SQL: старт (Week 1–2)",
+     "uz": "SQL: boshlanish (Week 1–2)",
+     "en": "SQL: start (Week 1–2)"
+    },
+    "items": {
+     "ru": [
+      "Курс «SQL: основы»",
+      "Установи SQL Server 2019 + SSMS",
+      "Видео kudvenkat из Week 1–2"
+     ],
+     "uz": [
+      "«SQL: asoslar» kursi",
+      "SQL Server 2019 + SSMS o'rnat",
+      "Week 1–2 dan kudvenkat videolari"
+     ],
+     "en": [
+      "SQL Fundamentals course",
+      "Install SQL Server 2019 + SSMS",
+      "kudvenkat videos from Week 1–2"
+     ]
+    }
+   },
+   {
+    "week": 4,
+    "title": {
+     "ru": "SQL: сила (Week 3–4)",
+     "uz": "SQL: kuch (Week 3–4)",
+     "en": "SQL: power (Week 3–4)"
+    },
+    "items": {
+     "ru": [
+      "Курс «SQL: продвинутый»",
+      "Видео Week 3–4",
+      "Упражнения Week 2–3 — ответы отправь Аслону"
+     ],
+     "uz": [
+      "«SQL: ilg'or daraja» kursi",
+      "Week 3–4 videolari",
+      "Week 2–3 mashqlari — javoblarni Aslonga yubor"
+     ],
+     "en": [
+      "Advanced SQL course",
+      "Week 3–4 videos",
+      "Week 2–3 exercises — send answers to your mentor"
+     ]
+    }
+   },
+   {
+    "week": 5,
+    "title": {
+     "ru": "Алгоритмы",
+     "uz": "Algoritmlar",
+     "en": "Algorithms"
+    },
+    "items": {
+     "ru": [
+      "Курс «Алгоритмы и структуры данных»",
+      "«Грокаем алгоритмы» главы 1–6",
+      "Первые 10 задач Easy на LeetCode"
+     ],
+     "uz": [
+      "«Algoritmlar va ma'lumot tuzilmalari» kursi",
+      "«Grokking Algorithms» 1–6 boblar",
+      "LeetCode'da birinchi 10 ta Easy masala"
+     ],
+     "en": [
+      "Algorithms and Data Structures course",
+      "Grokking Algorithms chapters 1–6",
+      "First 10 Easy problems on LeetCode"
+     ]
+    }
+   },
+   {
+    "week": 6,
+    "title": {
+     "ru": "Реальная практика",
+     "uz": "Haqiqiy amaliyot",
+     "en": "Real practice"
+    },
+    "items": {
+     "ru": [
+      "SQL Practice Problems (файл ментора)",
+      "Pandas: первые шаги",
+      "Мини-проект: Django + Docker",
+      "Покажи результаты Аслону"
+     ],
+     "uz": [
+      "SQL Practice Problems (mentor fayli)",
+      "Pandas: birinchi qadamlar",
+      "Mini-loyiha: Django + Docker",
+      "Natijalarni Aslonga ko'rsat"
+     ],
+     "en": [
+      "SQL Practice Problems (mentor's file)",
+      "Pandas: first steps",
+      "Mini project: Django + Docker",
+      "Show your results to your mentor"
+     ]
+    }
+   }
+  ]
+ },
+ "mentorRoadmap": [
+  {
+   "id": "rm-sql-ext",
+   "title": {
+    "ru": "SQL Server — полная программа ментора",
+    "uz": "SQL Server — mentorning to'liq dasturi",
+    "en": "SQL Server — the full mentor programme"
+   },
+   "items": [
+    {
+     "id": "sqlserver-install",
+     "text": {
+      "ru": "Установить SQL Server 2019 + SSMS, импортировать AdventureWorks2019 (Week 1)",
+      "uz": "SQL Server 2019 + SSMS o'rnatish, AdventureWorks2019 import qilish (Week 1)",
+      "en": "Install SQL Server 2019 + SSMS, import AdventureWorks2019 (Week 1)"
+     }
+    },
+    {
+     "id": "kudvenkat",
+     "text": {
+      "ru": "Плейлист kudvenkat — 150 видео по SQL Server",
+      "uz": "kudvenkat pleylisti — SQL Server bo'yicha 150 video",
+      "en": "kudvenkat playlist — 150 SQL Server videos"
+     },
+     "link": "https://www.youtube.com/watch?v=n1iwngG_zNY&list=PL08903FB7ACA1C2FB"
+    },
+    {
+     "id": "kudvenkat-articles",
+     "text": {
+      "ru": "Статьи kudvenkat (если видео сложно на слух — читай)",
+      "uz": "kudvenkat maqolalari (video qiyin bo'lsa — o'qing)",
+      "en": "kudvenkat articles (easier to translate than video)"
+     },
+     "link": "https://csharp-video-tutorials.blogspot.com/p/free-sql-server-video-tutorials-for.html"
+    },
+    {
+     "id": "tsqlv4",
+     "text": {
+      "ru": "Развернуть базу TSQLV4 (файл TSQLV4.sql) и практиковаться на ней",
+      "uz": "TSQLV4 bazasini o'rnatish (TSQLV4.sql fayli) va mashq qilish",
+      "en": "Deploy the TSQLV4 database (TSQLV4.sql) and practise on it"
+     }
+    },
+    {
+     "id": "week-hw",
+     "text": {
+      "ru": "Домашки Week 1–4: HW_for_Week_1, Week 2–3 Exercises.sql — решить и отправить Аслону",
+      "uz": "Week 1–4 uy vazifalari: HW_for_Week_1, Week 2–3 Exercises.sql — yechib Aslonga yuborish",
+      "en": "Week 1–4 homework: HW_for_Week_1, Week 2–3 Exercises.sql — solve and send to your mentor"
+     }
+    },
+    {
+     "id": "spp",
+     "text": {
+      "ru": "SQL Practice Problems — 54 задачи (PDF + setup-скрипты)",
+      "uz": "SQL Practice Problems — 54 masala (PDF + setup skriptlar)",
+      "en": "SQL Practice Problems — 54 exercises (PDF + setup scripts)"
+     }
+    },
+    {
+     "id": "bengan",
+     "text": {
+      "ru": "Книга «T-SQL Fundamentals» Ицика Бен-Гана",
+      "uz": "Itzik Ben-Ganning «T-SQL Fundamentals» kitobi",
+      "en": "«T-SQL Fundamentals» by Itzik Ben-Gan"
+     }
+    }
+   ]
+  },
+  {
+   "id": "rm-algo",
+   "title": {
+    "ru": "Алгоритмы и подготовка к собеседованиям",
+    "uz": "Algoritmlar va suhbatlarga tayyorgarlik",
+    "en": "Algorithms and interview preparation"
+   },
+   "items": [
+    {
+     "id": "grokking",
+     "text": {
+      "ru": "«Грокаем алгоритмы» Бхаргавы — прочитать целиком",
+      "uz": "Bhargava «Grokking Algorithms» — to'liq o'qish",
+      "en": "«Grokking Algorithms» by Bhargava — read it fully"
+     }
+    },
+    {
+     "id": "leetcode50",
+     "text": {
+      "ru": "50+ задач на LeetCode / HackerRank / robocontest",
+      "uz": "LeetCode / HackerRank / robocontest'da 50+ masala",
+      "en": "50+ problems on LeetCode / HackerRank / robocontest"
+     },
+     "link": "https://leetcode.com/"
+    },
+    {
+     "id": "interview-guide",
+     "text": {
+      "ru": "Data Engineer Interview Preparation — полный гайд",
+      "uz": "Data Engineer Interview Preparation — to'liq qo'llanma",
+      "en": "Data Engineer Interview Preparation — complete guide"
+     },
+     "link": "https://medium.com/@nishasreedharan/data-engineer-interview-preparation-complete-guide-98a9d16f6889"
+    }
+   ]
+  },
+  {
+   "id": "rm-python-pro",
+   "title": {
+    "ru": "Python продвинутый (из WT-python-skills)",
+    "uz": "Ilg'or Python (WT-python-skills dan)",
+    "en": "Advanced Python (from WT-python-skills)"
+   },
+   "items": [
+    {
+     "id": "files-formats",
+     "text": {
+      "ru": "Работа с .csv и .json (не только .txt)",
+      "uz": ".csv va .json bilan ishlash (faqat .txt emas)",
+      "en": "Working with .csv and .json (not just .txt)"
+     }
+    },
+    {
+     "id": "regex",
+     "text": {
+      "ru": "Регулярные выражения (regex)",
+      "uz": "Muntazam ifodalar (regex)",
+      "en": "Regular expressions (regex)"
+     }
+    },
+    {
+     "id": "api",
+     "text": {
+      "ru": "API: свой CRUD-сервис + requests (GET/POST, валидация ответов)",
+      "uz": "API: o'z CRUD xizmati + requests (GET/POST, javoblarni tekshirish)",
+      "en": "APIs: your own CRUD service + requests (GET/POST, response validation)"
+     }
+    },
+    {
+     "id": "venv",
+     "text": {
+      "ru": "Virtual environment: venv + pip",
+      "uz": "Virtual muhit: venv + pip",
+      "en": "Virtual environment: venv + pip"
+     }
+    },
+    {
+     "id": "sql-connect",
+     "text": {
+      "ru": "Подключение Python к SQL Server / PostgreSQL без ORM",
+      "uz": "Python'ni SQL Server / PostgreSQL ga ORM'siz ulash",
+      "en": "Connecting Python to SQL Server / PostgreSQL without an ORM"
+     }
+    },
+    {
+     "id": "modules",
+     "text": {
+      "ru": "Модули: стандартная библиотека + свои пакеты",
+      "uz": "Modullar: standart kutubxona + o'z paketlaringiz",
+      "en": "Modules: the standard library and your own packages"
+     }
+    }
+   ]
+  },
+  {
+   "id": "rm-de",
+   "title": {
+    "ru": "Инструменты Data Engineer",
+    "uz": "Data Engineer vositalari",
+    "en": "Data engineering tools"
+   },
+   "items": [
+    {
+     "id": "pandas",
+     "text": {
+      "ru": "Pandas: чтение csv/excel/json, фильтры, merge, дедупликация",
+      "uz": "Pandas: csv/excel/json o'qish, filtrlar, merge, dublikatlarni olib tashlash",
+      "en": "Pandas: reading csv/excel/json, filters, merge, deduplication"
+     }
+    },
+    {
+     "id": "numpy",
+     "text": {
+      "ru": "NumPy и matplotlib",
+      "uz": "NumPy va matplotlib",
+      "en": "NumPy and matplotlib"
+     }
+    },
+    {
+     "id": "pyspark",
+     "text": {
+      "ru": "PySpark или dask — большие данные",
+      "uz": "PySpark yoki dask — katta ma'lumotlar",
+      "en": "PySpark or dask — big data"
+     }
+    },
+    {
+     "id": "airflow",
+     "text": {
+      "ru": "Airflow / Prefect — понимать логику DAG",
+      "uz": "Airflow / Prefect — DAG mantiqini tushunish",
+      "en": "Airflow / Prefect — understanding DAG logic"
+     }
+    },
+    {
+     "id": "formats",
+     "text": {
+      "ru": "Форматы: CSV vs Parquet vs JSON",
+      "uz": "Formatlar: CSV vs Parquet vs JSON",
+      "en": "Formats: CSV vs Parquet vs JSON"
+     }
+    },
+    {
+     "id": "cloud",
+     "text": {
+      "ru": "Облака: S3, Blob, GCS, BigQuery",
+      "uz": "Bulutlar: S3, Blob, GCS, BigQuery",
+      "en": "Clouds: S3, Blob, GCS, BigQuery"
+     }
+    }
+   ]
+  },
+  {
+   "id": "rm-eng",
+   "title": {
+    "ru": "Инженерная культура",
+    "uz": "Muhandislik madaniyati",
+    "en": "Engineering culture"
+   },
+   "items": [
+    {
+     "id": "django",
+     "text": {
+      "ru": "Backend-проект на Django: хостинг + Docker + GitHub",
+      "uz": "Django backend loyihasi: hosting + Docker + GitHub",
+      "en": "A Django backend project: hosting + Docker + GitHub"
+     }
+    },
+    {
+     "id": "git-pro",
+     "text": {
+      "ru": "Git глубже: ветки, pull request, приватные репо",
+      "uz": "Git chuqurroq: branchlar, pull request, private repolar",
+      "en": "Deeper Git: branches, pull requests, private repos"
+     }
+    },
+    {
+     "id": "github-push",
+     "text": {
+      "ru": "Всё, что пишешь — пуш на GitHub с комментариями",
+      "uz": "Yozgan hamma narsangizni izohlar bilan GitHub'ga push qiling",
+      "en": "Push everything you write to GitHub with comments"
+     }
+    },
+    {
+     "id": "docker",
+     "text": {
+      "ru": "Docker: контейнеры и образы",
+      "uz": "Docker: konteynerlar va imijlar",
+      "en": "Docker: containers and images"
+     }
+    },
+    {
+     "id": "linux",
+     "text": {
+      "ru": "Linux и bash-скрипты",
+      "uz": "Linux va bash skriptlar",
+      "en": "Linux and bash scripting"
+     }
+    },
+    {
+     "id": "cicd",
+     "text": {
+      "ru": "CI/CD: как устроены пайплайны",
+      "uz": "CI/CD: pipeline qanday ishlaydi",
+      "en": "CI/CD: how pipelines work"
+     }
+    },
+    {
+     "id": "english",
+     "text": {
+      "ru": "Английский — каждый день параллельно",
+      "uz": "Ingliz tili — har kuni parallel ravishda",
+      "en": "English — every day, in parallel"
+     }
+    }
+   ]
+  }
+ ],
+ "mentorLinks": [
+  {
+   "text": {
+    "ru": "Плейлист от ментора №1",
+    "uz": "Mentordan pleylist №1",
+    "en": "Mentor playlist #1"
+   },
+   "link": "https://www.youtube.com/playlist?list=PLkFqzDs4R3qwP5NNpsrCFMnAewAMlJqtR"
+  },
+  {
+   "text": {
+    "ru": "Плейлист от ментора №2",
+    "uz": "Mentordan pleylist №2",
+    "en": "Mentor playlist #2"
+   },
+   "link": "https://www.youtube.com/playlist?list=PLgmMEXZSJs0-_IJQAcvomI0ZK1Eo9WJly"
+  },
+  {
+   "text": {
+    "ru": "Плейлист от ментора №3",
+    "uz": "Mentordan pleylist №3",
+    "en": "Mentor playlist #3"
+   },
+   "link": "https://www.youtube.com/playlist?list=PLduM7bkxBdOfrkeXwUQBYl3dKwclDjXcd"
+  }
+ ]
+}

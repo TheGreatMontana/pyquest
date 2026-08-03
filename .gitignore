@@ -5,3 +5,6 @@ node_modules/
 __pycache__/
 *.pyc
 *.db
+backups/
+tools/node_modules/
+tools/.out/

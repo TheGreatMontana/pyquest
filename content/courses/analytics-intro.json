@@ -1,0 +1,140 @@
+{
+ "id": "analytics-intro",
+ "schema": 2,
+ "modules": [
+  {
+   "id": "an-01",
+   "title": { "ru": "Первые шаги в анализе данных", "uz": "Ma'lumotlar tahlilida birinchi qadamlar", "en": "First steps in data analysis" },
+   "tagline": { "ru": "Метрики, среднее против медианы и честные выводы из чисел", "uz": "Metrikalar, o'rtacha va mediana, raqamlardan halol xulosalar", "en": "Metrics, mean vs median and honest conclusions from numbers" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "Что такое метрика", "uz": "Metrika nima", "en": "What a metric is" },
+     "blocks": [
+      { "type": "text", "html": {
+        "ru": "<p><b>Метрика</b> — это число, которое отвечает на конкретный вопрос о бизнесе. «Много продаж» — не метрика. «Выручка за июнь: 12 400 000 сум» — метрика.</p><p>Работа аналитика: превратить расплывчатый вопрос в число, которое можно посчитать и перепроверить.</p>",
+        "uz": "<p><b>Metrika</b> — biznes haqidagi aniq savolga javob beradigan raqam. «Ko'p sotuv» — metrika emas. «Iyun oyidagi tushum: 12 400 000 so'm» — metrika.</p><p>Tahlilchining ishi: noaniq savolni hisoblab va qayta tekshirib bo'ladigan raqamga aylantirish.</p>",
+        "en": "<p>A <b>metric</b> is a number that answers a specific business question. «Lots of sales» is not a metric. «June revenue: 12,400,000 UZS» is.</p><p>An analyst's job is turning a vague question into a number you can compute and verify.</p>" } },
+      { "type": "run", "lang": "python", "code": "sales = [120, 340, 90, 560, 210, 480, 150]\n\nprint('Всего продаж:', len(sales))\nprint('Выручка:', sum(sales))\nprint('Средний чек:', round(sum(sales) / len(sales), 1))\nprint('Лучший день:', max(sales))" },
+      { "type": "note", "kind": "tip", "html": {
+        "ru": "Всё это ты уже умеешь из курса Python: <code>len</code>, <code>sum</code>, <code>max</code>. Аналитика — не новый язык, а новые вопросы к данным.",
+        "uz": "Bularning barchasini Python kursidan bilasiz: <code>len</code>, <code>sum</code>, <code>max</code>. Tahlil — yangi til emas, ma'lumotlarga yangi savollar.",
+        "en": "You already know all of this from the Python course: <code>len</code>, <code>sum</code>, <code>max</code>. Analytics isn't a new language — it's new questions about data." } }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "Среднее против медианы", "uz": "O'rtacha va mediana", "en": "Mean versus median" },
+     "blocks": [
+      { "type": "text", "html": {
+        "ru": "<p><b>Среднее</b> — сумма делить на количество. Проблема: одно огромное значение искажает картину.</p><p><b>Медиана</b> — значение ровно посередине отсортированного списка. Она устойчива к выбросам.</p>",
+        "uz": "<p><b>O'rtacha</b> — yig'indini songa bo'lish. Muammo: bitta ulkan qiymat manzarani buzadi.</p><p><b>Mediana</b> — saralangan ro'yxatning o'rtasidagi qiymat. U chetdagi qiymatlarga chidamli.</p>",
+        "en": "<p>The <b>mean</b> is the sum divided by the count. Problem: one huge value distorts the picture.</p><p>The <b>median</b> is the middle value of a sorted list. It resists outliers.</p>" } },
+      { "type": "run", "lang": "python", "code": "def median(values):\n    s = sorted(values)\n    n = len(s)\n    mid = n // 2\n    if n % 2:\n        return s[mid]\n    return (s[mid - 1] + s[mid]) / 2\n\nsalaries = [900, 1000, 1100, 1050, 12000]   # последний - директор\nprint('Среднее:', sum(salaries) / len(salaries))\nprint('Медиана:', median(salaries))" },
+      { "type": "note", "kind": "trap", "html": {
+        "ru": "Среднее 3210 не описывает никого: четверо получают около 1000, один — 12000. Медиана 1050 честнее. Именно поэтому зарплаты в отчётах показывают медианой.",
+        "uz": "3210 o'rtacha hech kimni tavsiflamaydi: to'rttasi 1000 atrofida, bittasi 12000 oladi. 1050 mediana halolroq. Shuning uchun hisobotlarda maoshlar mediana bilan ko'rsatiladi.",
+        "en": "A mean of 3210 describes nobody: four people earn about 1000 and one earns 12000. The median of 1050 is more honest — which is why salary reports use medians." } },
+      { "type": "predict", "lang": "python",
+        "code": "values = [10, 20, 30, 40]\nprint(sorted(values)[len(values) // 2])",
+        "options": [
+          { "ru": "20", "uz": "20", "en": "20" },
+          { "ru": "30", "uz": "30", "en": "30" },
+          { "ru": "25", "uz": "25", "en": "25" },
+          { "ru": "Ошибка", "uz": "Xato", "en": "Error" }
+        ], "a": 1,
+        "explain": { "ru": "<code>4 // 2 = 2</code>, элемент с индексом 2 — это 30. Настоящая медиана здесь 25 (среднее двух центральных) — вот почему для чётной длины нужен отдельный случай.", "uz": "<code>4 // 2 = 2</code>, 2-indeksdagi element — 30. Haqiqiy mediana bu yerda 25 (ikkita markaziy qiymat o'rtachasi) — juft uzunlik uchun alohida holat shuning uchun kerak.", "en": "<code>4 // 2 = 2</code>, and index 2 holds 30. The true median here is 25 (average of the two middle values) — that's why even-length lists need a separate case." } }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "Группировка и доли", "uz": "Guruhlash va ulushlar", "en": "Grouping and shares" },
+     "blocks": [
+      { "type": "text", "html": {
+        "ru": "<p>Настоящая аналитика начинается, когда данные <b>разрезают по категориям</b>: выручка по городам, продажи по категориям товара, пользователи по источникам.</p><p>В Python это словарь-копилка, в SQL — <code>GROUP BY</code>. Логика одна и та же.</p>",
+        "uz": "<p>Haqiqiy tahlil ma'lumotlar <b>toifalarga bo'linganda</b> boshlanadi: shaharlar bo'yicha tushum, tovar toifalari bo'yicha sotuv, manbalar bo'yicha foydalanuvchilar.</p><p>Python'da bu lug'at-kopilka, SQL'da — <code>GROUP BY</code>. Mantiq bir xil.</p>",
+        "en": "<p>Real analysis starts when you <b>slice data by category</b>: revenue by city, sales by product category, users by acquisition channel.</p><p>In Python it's an accumulator dictionary; in SQL it's <code>GROUP BY</code>. Same logic.</p>" } },
+      { "type": "run", "lang": "python", "code": "orders = [\n    ('Ташкент', 120), ('Самарканд', 80), ('Ташкент', 340),\n    ('Бухара', 60), ('Самарканд', 150), ('Ташкент', 90),\n]\n\nby_city = {}\nfor city, amount in orders:\n    by_city[city] = by_city.get(city, 0) + amount\n\ntotal = sum(by_city.values())\nfor city, amount in sorted(by_city.items(), key=lambda x: -x[1]):\n    share = round(amount / total * 100, 1)\n    print(f'{city}: {amount} ({share}%)')" },
+      { "type": "checkpoint",
+        "q": { "ru": "Ты посчитал, что конверсия выросла с 2% до 3%. Как корректно это описать?", "uz": "Konversiya 2% dan 3% ga o'sganini hisobladingiz. Buni qanday to'g'ri tasvirlash kerak?", "en": "You measured conversion growing from 2% to 3%. How do you describe it correctly?" },
+        "options": [
+          { "ru": "Выросла на 1 процентный пункт (в 1.5 раза)", "uz": "1 foiz punktga o'sdi (1.5 barobar)", "en": "Grew by 1 percentage point (1.5×)" },
+          { "ru": "Выросла на 1%", "uz": "1% ga o'sdi", "en": "Grew by 1%" },
+          { "ru": "Выросла на 50 процентных пунктов", "uz": "50 foiz punktga o'sdi", "en": "Grew by 50 percentage points" },
+          { "ru": "Разницы в формулировке нет", "uz": "Ifodada farq yo'q", "en": "The wording makes no difference" }
+        ], "a": 0,
+        "explain": { "ru": "Разница между 2% и 3% — это <b>1 процентный пункт</b>, а относительный рост — <b>в 1.5 раза (на 50%)</b>. Путать эти формулировки — классическая ошибка в отчётах.", "uz": "2% va 3% orasidagi farq — <b>1 foiz punkt</b>, nisbiy o'sish esa <b>1.5 barobar (50%)</b>. Bu ifodalarni chalkashtirish — hisobotlardagi klassik xato.", "en": "The gap between 2% and 3% is <b>1 percentage point</b>, while the relative growth is <b>1.5× (50%)</b>. Confusing the two is a classic reporting mistake." } },
+      { "type": "summary", "items": [
+        { "ru": "Метрика — число, отвечающее на конкретный вопрос", "uz": "Metrika — aniq savolga javob beruvchi raqam", "en": "A metric is a number answering a specific question" },
+        { "ru": "Медиана честнее среднего, когда есть выбросы", "uz": "Chetdagi qiymatlar bo'lsa, mediana o'rtachadan halolroq", "en": "The median beats the mean when outliers exist" },
+        { "ru": "Группировка по категориям — основа любого отчёта", "uz": "Toifalar bo'yicha guruhlash — har qanday hisobot asosi", "en": "Grouping by category underpins every report" },
+        { "ru": "Процент и процентный пункт — разные вещи", "uz": "Foiz va foiz punkti — turli narsalar", "en": "Percent and percentage point are different things" }
+      ] }
+     ]
+    }
+   ],
+   "quiz": [
+    { "q": { "ru": "Что такое медиана?", "uz": "Mediana nima?", "en": "What is the median?" },
+      "options": [{ "ru": "Сумма делить на количество", "uz": "Yig'indini songa bo'lish", "en": "Sum divided by count" }, { "ru": "Значение посередине отсортированного списка", "uz": "Saralangan ro'yxat o'rtasidagi qiymat", "en": "The middle value of a sorted list" }, { "ru": "Самое частое значение", "uz": "Eng ko'p uchraydigan qiymat", "en": "The most frequent value" }, { "ru": "Разница максимума и минимума", "uz": "Maksimum va minimum farqi", "en": "Max minus min" }], "a": 1,
+      "explain": { "ru": "Среднее — это сумма/количество, а медиана — центральный элемент после сортировки.", "uz": "O'rtacha — yig'indi/son, mediana esa saralashdan keyingi markaziy element.", "en": "The mean is sum/count; the median is the central element after sorting." } },
+    { "q": { "ru": "Зарплаты: 900, 1000, 1100, 20000. Что показать в отчёте?", "uz": "Maoshlar: 900, 1000, 1100, 20000. Hisobotda nima ko'rsatish kerak?", "en": "Salaries: 900, 1000, 1100, 20000. What belongs in the report?" },
+      "options": [{ "ru": "Среднее — оно выше", "uz": "O'rtachani — u yuqoriroq", "en": "The mean — it's higher" }, { "ru": "Медиану — выброс не исказит картину", "uz": "Medianani — chetdagi qiymat manzarani buzmaydi", "en": "The median — the outlier won't distort it" }, { "ru": "Максимум", "uz": "Maksimumni", "en": "The maximum" }, { "ru": "Без разницы", "uz": "Farqi yo'q", "en": "It doesn't matter" }], "a": 1,
+      "explain": { "ru": "20000 — выброс: среднее станет 5750, чего не получает никто. Медиана 1050 честнее.", "uz": "20000 — chetdagi qiymat: o'rtacha 5750 bo'ladi, buni hech kim olmaydi. 1050 mediana halolroq.", "en": "20000 is an outlier: the mean becomes 5750, which nobody earns. The median of 1050 is fairer." } },
+    { "q": { "ru": "Как в Python посчитать сумму по категориям?", "uz": "Python'da toifalar bo'yicha yig'indini qanday hisoblash mumkin?", "en": "How do you sum by category in Python?" },
+      "options": [{ "ru": "Словарём: d[key] = d.get(key, 0) + value", "uz": "Lug'at bilan: d[key] = d.get(key, 0) + value", "en": "With a dict: d[key] = d.get(key, 0) + value" }, { "ru": "Только вручную", "uz": "Faqat qo'lda", "en": "Only manually" }, { "ru": "Через max()", "uz": "max() orqali", "en": "Using max()" }, { "ru": "Это невозможно", "uz": "Bu mumkin emas", "en": "It's impossible" }], "a": 0,
+      "explain": { "ru": "Тот же приём, что и в модуле «Словари» Python-курса — здесь он становится инструментом аналитика.", "uz": "Python kursidagi «Lug'atlar» modulidagi usul — bu yerda u tahlilchi vositasiga aylanadi.", "en": "The same trick as in the Python dictionaries module — here it becomes an analyst's tool." } },
+    { "q": { "ru": "Конверсия выросла с 4% до 6%. На сколько процентных пунктов?", "uz": "Konversiya 4% dan 6% ga o'sdi. Necha foiz punktga?", "en": "Conversion grew from 4% to 6%. By how many percentage points?" },
+      "options": [{ "ru": "На 50", "uz": "50 ga", "en": "By 50" }, { "ru": "На 2", "uz": "2 ga", "en": "By 2" }, { "ru": "На 6", "uz": "6 ga", "en": "By 6" }, { "ru": "На 1.5", "uz": "1.5 ga", "en": "By 1.5" }], "a": 1,
+      "explain": { "ru": "6 − 4 = 2 процентных пункта. А относительный рост — в 1.5 раза (на 50%).", "uz": "6 − 4 = 2 foiz punkti. Nisbiy o'sish esa 1.5 barobar (50%).", "en": "6 − 4 = 2 percentage points. The relative growth is 1.5× (50%)." } },
+    { "q": { "ru": "Что вернёт <code>sum(d.values())</code> для словаря выручки по городам?", "uz": "Shaharlar bo'yicha tushum lug'ati uchun <code>sum(d.values())</code> nima qaytaradi?", "en": "For a revenue-by-city dict, what does <code>sum(d.values())</code> return?" },
+      "options": [{ "ru": "Количество городов", "uz": "Shaharlar soni", "en": "The number of cities" }, { "ru": "Общую выручку", "uz": "Umumiy tushumni", "en": "Total revenue" }, { "ru": "Список городов", "uz": "Shaharlar ro'yxatini", "en": "A list of cities" }, { "ru": "Ошибку", "uz": "Xato", "en": "An error" }], "a": 1,
+      "explain": { "ru": "<code>.values()</code> даёт суммы по городам, <code>sum</code> складывает их в общий итог.", "uz": "<code>.values()</code> shaharlar bo'yicha summalarni beradi, <code>sum</code> ularni umumiy natijaga qo'shadi.", "en": "<code>.values()</code> yields per-city sums and <code>sum</code> adds them into the grand total." } }
+   ],
+   "tasks": [
+    { "id": "t1", "kind": "python",
+      "title": { "ru": "Считаем медиану", "uz": "Medianani hisoblaymiz", "en": "Compute the median" },
+      "brief": { "ru": "Сортировка + чётность", "uz": "Saralash + juftlik", "en": "Sorting + parity" },
+      "desc": { "ru": "<p>Напиши функцию <code>median(values)</code>: для нечётной длины — центральный элемент, для чётной — среднее двух центральных. Пустой список → <code>0</code>.</p>", "uz": "<p><code>median(values)</code> funksiyasini yozing: toq uzunlikda — markaziy element, juftda — ikkita markaziyning o'rtachasi. Bo'sh ro'yxat → <code>0</code>.</p>", "en": "<p>Write <code>median(values)</code>: for odd length return the middle element, for even the average of the two middle ones. Empty list → <code>0</code>.</p>" },
+      "starter": "def median(values):\n    pass\n\nprint(median([3, 1, 2]))\nprint(median([10, 20, 30, 40]))\n",
+      "tests": "assert median([3, 1, 2]) == 2, 'median([3,1,2]) = 2 (не забудь отсортировать!)'\nassert median([10, 20, 30, 40]) == 25, 'При чётной длине - среднее двух центральных: 25'\nassert median([5]) == 5, 'Один элемент - он сам'\nassert median([]) == 0, 'Пустой список - 0'\nassert median([7, 1]) == 4, 'median([7,1]) = 4'",
+      "hint": { "ru": "s = sorted(values), n = len(s), mid = n // 2. Если n нечётное — s[mid], иначе (s[mid-1] + s[mid]) / 2.", "uz": "s = sorted(values), n = len(s), mid = n // 2. n toq bo'lsa — s[mid], aks holda (s[mid-1] + s[mid]) / 2.", "en": "s = sorted(values), n = len(s), mid = n // 2. If n is odd return s[mid], else (s[mid-1] + s[mid]) / 2." } },
+    { "id": "t2", "kind": "python",
+      "title": { "ru": "Выручка по городам", "uz": "Shaharlar bo'yicha tushum", "en": "Revenue by city" },
+      "brief": { "ru": "Группировка словарём", "uz": "Lug'at bilan guruhlash", "en": "Grouping with a dict" },
+      "desc": { "ru": "<p>Напиши функцию <code>revenue_by_city(orders)</code>: принимает список пар (город, сумма), возвращает словарь «город → суммарная выручка».</p>", "uz": "<p><code>revenue_by_city(orders)</code> funksiyasini yozing: (shahar, summa) juftliklar ro'yxatini oladi, «shahar → umumiy tushum» lug'atini qaytaradi.</p>", "en": "<p>Write <code>revenue_by_city(orders)</code>: takes a list of (city, amount) pairs and returns a dict «city → total revenue».</p>" },
+      "starter": "def revenue_by_city(orders):\n    result = {}\n    # цикл + get()\n    pass\n\ndata = [('Ташкент', 100), ('Бухара', 50), ('Ташкент', 200)]\nprint(revenue_by_city(data))\n",
+      "tests": "assert revenue_by_city([('Ташкент', 100), ('Бухара', 50), ('Ташкент', 200)]) == {'Ташкент': 300, 'Бухара': 50}, 'Ташкент должен быть 300, Бухара 50'\nassert revenue_by_city([]) == {}, 'Пустой список - пустой словарь'\nassert revenue_by_city([('A', 5)]) == {'A': 5}, 'Один заказ'",
+      "hint": { "ru": "for city, amount in orders: result[city] = result.get(city, 0) + amount", "uz": "for city, amount in orders: result[city] = result.get(city, 0) + amount", "en": "for city, amount in orders: result[city] = result.get(city, 0) + amount" } },
+    { "id": "t3", "kind": "python",
+      "title": { "ru": "Доля лидера", "uz": "Yetakchining ulushi", "en": "Leader's share" },
+      "brief": { "ru": "Проценты и округление", "uz": "Foizlar va yaxlitlash", "en": "Percentages and rounding" },
+      "desc": { "ru": "<p>Напиши функцию <code>top_share(data)</code>: принимает словарь «категория → сумма», возвращает долю лидера в процентах, округлённую до 1 знака. Пустой словарь → <code>0</code>.</p><p>Для <code>{'A': 300, 'B': 100}</code> → <code>75.0</code></p>", "uz": "<p><code>top_share(data)</code> funksiyasini yozing: «toifa → summa» lug'atini oladi, yetakchining foiz ulushini 1 xonagacha yaxlitlab qaytaradi. Bo'sh lug'at → <code>0</code>.</p><p><code>{'A': 300, 'B': 100}</code> uchun → <code>75.0</code></p>", "en": "<p>Write <code>top_share(data)</code>: takes a dict «category → amount» and returns the leader's share as a percentage rounded to 1 decimal. Empty dict → <code>0</code>.</p><p>For <code>{'A': 300, 'B': 100}</code> → <code>75.0</code></p>" },
+      "starter": "def top_share(data):\n    pass\n\nprint(top_share({'A': 300, 'B': 100}))\n",
+      "tests": "assert top_share({'A': 300, 'B': 100}) == 75.0, \"{'A':300,'B':100} -> 75.0\"\nassert top_share({'X': 10}) == 100.0, 'Единственная категория - 100%'\nassert top_share({}) == 0, 'Пустой словарь - 0'\nassert top_share({'A': 1, 'B': 1, 'C': 1}) == 33.3, 'Три равные доли - 33.3'",
+      "hint": { "ru": "if not data: return 0. Дальше total = sum(data.values()), return round(max(data.values()) / total * 100, 1)", "uz": "if not data: return 0. Keyin total = sum(data.values()), return round(max(data.values()) / total * 100, 1)", "en": "if not data: return 0. Then total = sum(data.values()), return round(max(data.values()) / total * 100, 1)" } }
+   ],
+   "exam": {
+    "time": 420,
+    "questions": [
+     { "q": { "ru": "Данные: 1, 2, 3, 100. Что больше — среднее или медиана?", "uz": "Ma'lumot: 1, 2, 3, 100. Qaysi kattaroq — o'rtacha yoki mediana?", "en": "Data: 1, 2, 3, 100. Which is larger — mean or median?" },
+       "options": [{ "ru": "Среднее", "uz": "O'rtacha", "en": "Mean" }, { "ru": "Медиана", "uz": "Mediana", "en": "Median" }, { "ru": "Они равны", "uz": "Ular teng", "en": "They are equal" }, { "ru": "Нельзя определить", "uz": "Aniqlab bo'lmaydi", "en": "Impossible to tell" }], "a": 0 },
+     { "q": { "ru": "Что делает <code>sorted(d.items(), key=lambda x: -x[1])</code>?", "uz": "<code>sorted(d.items(), key=lambda x: -x[1])</code> nima qiladi?", "en": "What does <code>sorted(d.items(), key=lambda x: -x[1])</code> do?" },
+       "options": [{ "ru": "Сортирует по ключу", "uz": "Kalit bo'yicha saralaydi", "en": "Sorts by key" }, { "ru": "Сортирует по значению по убыванию", "uz": "Qiymat bo'yicha kamayish tartibida saralaydi", "en": "Sorts by value, descending" }, { "ru": "Удаляет дубликаты", "uz": "Dublikatlarni o'chiradi", "en": "Removes duplicates" }, { "ru": "Считает сумму", "uz": "Yig'indini hisoblaydi", "en": "Computes the sum" }], "a": 1 },
+     { "q": { "ru": "Метрика должна быть…", "uz": "Metrika qanday bo'lishi kerak…", "en": "A metric must be…" },
+       "options": [{ "ru": "Красивой", "uz": "Chiroyli", "en": "Beautiful" }, { "ru": "Измеримой и однозначной", "uz": "O'lchanadigan va aniq", "en": "Measurable and unambiguous" }, { "ru": "Большой", "uz": "Katta", "en": "Large" }, { "ru": "Секретной", "uz": "Maxfiy", "en": "Secret" }], "a": 1 },
+     { "q": { "ru": "Продажи упали с 200 до 150. На сколько процентов?", "uz": "Sotuv 200 dan 150 ga tushdi. Necha foizga?", "en": "Sales dropped from 200 to 150. By what percent?" },
+       "options": [{ "ru": "На 50%", "uz": "50% ga", "en": "By 50%" }, { "ru": "На 25%", "uz": "25% ga", "en": "By 25%" }, { "ru": "На 75%", "uz": "75% ga", "en": "By 75%" }, { "ru": "На 33%", "uz": "33% ga", "en": "By 33%" }], "a": 1 },
+     { "q": { "ru": "Зачем аналитику SQL?", "uz": "Tahlilchiga SQL nima uchun kerak?", "en": "Why does an analyst need SQL?" },
+       "options": [{ "ru": "Чтобы делать сайты", "uz": "Saytlar yaratish uchun", "en": "To build websites" }, { "ru": "Чтобы доставать и группировать данные прямо в базе", "uz": "Ma'lumotlarni bevosita bazadan olish va guruhlash uchun", "en": "To pull and group data right inside the database" }, { "ru": "Чтобы рисовать графики", "uz": "Grafiklar chizish uchun", "en": "To draw charts" }, { "ru": "SQL не нужен", "uz": "SQL kerak emas", "en": "SQL isn't needed" }], "a": 1 }
+    ],
+    "tasks": [
+     { "kind": "python",
+       "title": { "ru": "Отчёт по категориям", "uz": "Toifalar bo'yicha hisobot", "en": "Category report" },
+       "desc": { "ru": "<p>Напиши функцию <code>report(orders)</code>: из списка пар (категория, сумма) вернуть <b>список строк</b> вида <code>\"категория: сумма\"</code>, отсортированный по сумме по убыванию.</p><p>Для <code>[('A', 10), ('B', 30)]</code> → <code>['B: 30', 'A: 10']</code></p>", "uz": "<p><code>report(orders)</code> funksiyasini yozing: (toifa, summa) juftliklaridan <code>\"toifa: summa\"</code> ko'rinishidagi <b>satrlar ro'yxatini</b> summa bo'yicha kamayish tartibida qaytaring.</p><p><code>[('A', 10), ('B', 30)]</code> uchun → <code>['B: 30', 'A: 10']</code></p>", "en": "<p>Write <code>report(orders)</code>: from a list of (category, amount) pairs return a <b>list of strings</b> like <code>\"category: amount\"</code>, sorted by amount descending.</p><p>For <code>[('A', 10), ('B', 30)]</code> → <code>['B: 30', 'A: 10']</code></p>" },
+       "starter": "def report(orders):\n    pass\n\nprint(report([('A', 10), ('B', 30), ('A', 5)]))\n",
+       "tests": "assert report([('A', 10), ('B', 30)]) == ['B: 30', 'A: 10'], \"Ожидалось ['B: 30', 'A: 10']\"\nassert report([('A', 10), ('B', 30), ('A', 5)]) == ['B: 30', 'A: 15'], 'Суммы одной категории складываются: A = 15'\nassert report([]) == [], 'Пустой список - пустой результат'" }
+    ]
+   }
+  }
+ ]
+}

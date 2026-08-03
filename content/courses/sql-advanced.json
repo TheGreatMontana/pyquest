@@ -1,0 +1,1390 @@
+{
+ "id": "sql-advanced",
+ "schema": 2,
+ "modules": [
+  {
+   "id": "sa-01",
+   "legacyId": "s04",
+   "title": {
+    "ru": "JOIN: соединение таблиц"
+   },
+   "tagline": {
+    "ru": "INNER, LEFT, self-join и связи таблиц · Week 3"
+   },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": {
+      "ru": "Зачем нужны JOIN"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Данные специально разложены по таблицам без повторов (это называется <b>нормализация</b> — темы 1NF/2NF/3NF из Week 3). В <code>products</code> лежит только <code>category_id</code>, а имя категории — в <code>categories</code>.</p>"
+       }
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><code>JOIN</code> соединяет таблицы обратно по условию — обычно «внешний ключ = первичный ключ»:</p>"
+       }
+      },
+      {
+       "type": "sqlrun",
+       "lang": "sql",
+       "code": "SELECT p.name, c.name AS category\nFROM products AS p\nJOIN categories AS c ON p.category_id = c.id\nLIMIT 6;"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Обрати внимание на псевдонимы таблиц (<code>p</code>, <code>c</code>) — с ними запрос короче и читаемее. <code>ON</code> — условие соединения.</p>"
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": {
+      "ru": "INNER JOIN — только совпадения"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><code>INNER JOIN</code> (или просто <code>JOIN</code>) оставляет только строки, у которых нашлась пара в другой таблице:</p>"
+       }
+      },
+      {
+       "type": "sqlrun",
+       "lang": "sql",
+       "code": "SELECT o.id, o.order_date, cu.name\nFROM orders AS o\nJOIN customers AS cu ON o.customer_id = cu.id\nWHERE o.status = 'done'\nLIMIT 6;"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Схема чтения: FROM первая таблица → JOIN вторая → ON как соединять → дальше обычные WHERE/ORDER BY. JOIN-ов в одном запросе может быть сколько угодно.</p>"
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": {
+      "ru": "LEFT JOIN — все слева + совпадения справа"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><code>LEFT JOIN</code> сохраняет ВСЕ строки левой таблицы. Если пары справа нет — там будет NULL. Классика: «клиенты, у которых нет заказов»:</p>"
+       }
+      },
+      {
+       "type": "sqlrun",
+       "lang": "sql",
+       "code": "SELECT cu.name, o.id AS order_id\nFROM customers AS cu\nLEFT JOIN orders AS o ON o.customer_id = cu.id\nWHERE o.id IS NULL;"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Есть ещё <code>RIGHT JOIN</code> (зеркальный) и <code>FULL JOIN</code> (все строки обеих таблиц) — в SQL Server есть оба, в тренажёре RIGHT/FULL заменяются перестановкой таблиц в LEFT JOIN.</p>"
+       }
+      }
+     ]
+    },
+    {
+     "id": "l4",
+     "title": {
+      "ru": "Self-join — таблица сама с собой"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Таблицу можно соединить с самой собой — так решают задачу «сотрудник и его руководитель» (руководитель — тоже строка employees):</p>"
+       }
+      },
+      {
+       "type": "sqlrun",
+       "lang": "sql",
+       "code": "SELECT e.name AS employee,\n       m.name AS manager\nFROM employees AS e\nLEFT JOIN employees AS m ON e.manager_id = m.id;"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Секрет — два разных псевдонима одной таблицы (<code>e</code> и <code>m</code>). LEFT JOIN нужен, чтобы директор (без руководителя) не пропал. Это любимый вопрос собеседований!</p>"
+       }
+      }
+     ]
+    },
+    {
+     "id": "l5",
+     "title": {
+      "ru": "Цепочки JOIN: 3+ таблицы"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Реальные отчёты соединяют несколько таблиц подряд. «Что купили в каждом заказе»:</p>"
+       }
+      },
+      {
+       "type": "sqlrun",
+       "lang": "sql",
+       "code": "SELECT o.id AS order_id, cu.name AS customer,\n       p.name AS product, oi.qty\nFROM orders AS o\nJOIN customers AS cu ON o.customer_id = cu.id\nJOIN order_items AS oi ON oi.order_id = o.id\nJOIN products AS p ON p.id = oi.product_id\nLIMIT 8;"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Каждый JOIN добавляет таблицу в цепочку по своему ключу. Так устроен почти каждый рабочий запрос Data Engineer — освой это до автоматизма.</p>"
+       }
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": {
+      "ru": "Что делает INNER JOIN?"
+     },
+     "options": [
+      {
+       "ru": "Берёт все строки обеих таблиц"
+      },
+      {
+       "ru": "Только строки, у которых нашлась пара по условию ON"
+      },
+      {
+       "ru": "Все строки левой таблицы"
+      },
+      {
+       "ru": "Складывает таблицы вертикально"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "INNER JOIN оставляет только совпадения по условию <code>ON</code>."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что будет в колонках правой таблицы у LEFT JOIN без совпадения?"
+     },
+     "options": [
+      {
+       "ru": "0"
+      },
+      {
+       "ru": "Пустая строка"
+      },
+      {
+       "ru": "NULL"
+      },
+      {
+       "ru": "Строка пропадёт"
+      }
+     ],
+     "a": 2,
+     "explain": {
+      "ru": "LEFT JOIN сохраняет строку левой таблицы, а справа подставляет NULL."
+     }
+    },
+    {
+     "q": {
+      "ru": "Для чего пишут ON в JOIN?"
+     },
+     "options": [
+      {
+       "ru": "Фильтр результата"
+      },
+      {
+       "ru": "Условие соединения таблиц"
+      },
+      {
+       "ru": "Сортировка"
+      },
+      {
+       "ru": "Выбор колонок"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "<code>ON</code> говорит, по каким колонкам таблицы соединяются, обычно FK = PK."
+     }
+    },
+    {
+     "q": {
+      "ru": "Как найти клиентов БЕЗ заказов?"
+     },
+     "options": [
+      {
+       "ru": "INNER JOIN + WHERE"
+      },
+      {
+       "ru": "LEFT JOIN + WHERE o.id IS NULL"
+      },
+      {
+       "ru": "UNION"
+      },
+      {
+       "ru": "DISTINCT"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "LEFT JOIN сохранит всех клиентов, а у клиентов без заказов колонки заказа будут NULL — их и ловим."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что такое self-join?"
+     },
+     "options": [
+      {
+       "ru": "JOIN без ON"
+      },
+      {
+       "ru": "Соединение таблицы с самой собой через два псевдонима"
+      },
+      {
+       "ru": "JOIN трёх таблиц"
+      },
+      {
+       "ru": "Ошибка"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Одна таблица под двумя псевдонимами — так связывают сотрудника и его руководителя."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что такое нормализация (Week 3)?"
+     },
+     "options": [
+      {
+       "ru": "Сжатие базы"
+      },
+      {
+       "ru": "Разделение данных по таблицам без дублирования"
+      },
+      {
+       "ru": "Сортировка таблиц"
+      },
+      {
+       "ru": "Резервное копирование"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Нормальные формы (1NF, 2NF, 3NF) — правила проектирования таблиц без повторов данных."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "title": {
+      "ru": "Товары с категориями"
+     },
+     "brief": {
+      "ru": "INNER JOIN"
+     },
+     "desc": {
+      "ru": "<p>Выведи название товара (псевдоним <code>product</code>) и название его категории (псевдоним <code>category</code>) — соедини <code>products</code> и <code>categories</code>.</p>"
+     },
+     "starter": "SELECT p.name AS product, c.name AS category\nFROM products AS p\n-- допиши JOIN\n",
+     "hint": {
+      "ru": "JOIN categories AS c ON p.category_id = c.id"
+     },
+     "kind": "sql",
+     "solution": "SELECT p.name AS product, c.name AS category FROM products AS p JOIN categories AS c ON p.category_id = c.id;"
+    },
+    {
+     "id": "t2",
+     "title": {
+      "ru": "Все клиенты и их заказы"
+     },
+     "brief": {
+      "ru": "LEFT JOIN"
+     },
+     "desc": {
+      "ru": "<p>Выведи имя клиента (<code>name</code>) и <code>id</code> его заказов (псевдоним <code>order_id</code>) — <b>включая клиентов без заказов</b> (у них order_id будет NULL).</p>"
+     },
+     "starter": "-- LEFT JOIN сохранит всех клиентов\n",
+     "hint": {
+      "ru": "FROM customers AS cu LEFT JOIN orders AS o ON o.customer_id = cu.id"
+     },
+     "kind": "sql",
+     "solution": "SELECT cu.name, o.id AS order_id FROM customers AS cu LEFT JOIN orders AS o ON o.customer_id = cu.id;"
+    },
+    {
+     "id": "t3",
+     "title": {
+      "ru": "Кто чей руководитель"
+     },
+     "brief": {
+      "ru": "Self-join"
+     },
+     "desc": {
+      "ru": "<p>Выведи имя сотрудника (псевдоним <code>employee</code>) и имя его руководителя (псевдоним <code>manager</code>). Директор тоже должен попасть в результат — с NULL вместо руководителя.</p>"
+     },
+     "starter": "-- employees дважды: AS e и AS m\n",
+     "hint": {
+      "ru": "FROM employees AS e LEFT JOIN employees AS m ON e.manager_id = m.id"
+     },
+     "kind": "sql",
+     "solution": "SELECT e.name AS employee, m.name AS manager FROM employees AS e LEFT JOIN employees AS m ON e.manager_id = m.id;"
+    }
+   ],
+   "exam": {
+    "time": 600,
+    "questions": [
+     {
+      "q": {
+       "ru": "JOIN без слова INNER — это…"
+      },
+      "options": [
+       {
+        "ru": "LEFT JOIN"
+       },
+       {
+        "ru": "INNER JOIN"
+       },
+       {
+        "ru": "FULL JOIN"
+       },
+       {
+        "ru": "Ошибка"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "Сколько строк даст INNER JOIN, если совпадений нет?"
+      },
+      "options": [
+       {
+        "ru": "Все строки левой"
+       },
+       {
+        "ru": "0 строк"
+       },
+       {
+        "ru": "Все строки правой"
+       },
+       {
+        "ru": "NULL-строки"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "В цепочке из 4 таблиц сколько нужно JOIN?"
+      },
+      "options": [
+       {
+        "ru": "1"
+       },
+       {
+        "ru": "2"
+       },
+       {
+        "ru": "3"
+       },
+       {
+        "ru": "4"
+       }
+      ],
+      "a": 2
+     },
+     {
+      "q": {
+       "ru": "orders.customer_id → customers.id — это связь…"
+      },
+      "options": [
+       {
+        "ru": "PRIMARY KEY к PRIMARY KEY"
+       },
+       {
+        "ru": "FOREIGN KEY к PRIMARY KEY"
+       },
+       {
+        "ru": "UNIQUE к CHECK"
+       },
+       {
+        "ru": "Без связи"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "RIGHT JOIN A → B равен…"
+      },
+      "options": [
+       {
+        "ru": "LEFT JOIN B → A"
+       },
+       {
+        "ru": "INNER JOIN"
+       },
+       {
+        "ru": "FULL JOIN"
+       },
+       {
+        "ru": "UNION"
+       }
+      ],
+      "a": 0
+     }
+    ],
+    "tasks": [
+     {
+      "title": {
+       "ru": "Дорогая электроника с категорией"
+      },
+      "desc": {
+       "ru": "<p>Выведи название товара (псевдоним <code>product</code>), категорию (псевдоним <code>category</code>) и <code>price</code> для товаров дороже 500.</p>"
+      },
+      "starter": "",
+      "kind": "sql",
+      "solution": "SELECT p.name AS product, c.name AS category, p.price FROM products AS p JOIN categories AS c ON p.category_id = c.id WHERE p.price > 500;"
+     }
+    ]
+   },
+   "sqlModule": true
+  },
+  {
+   "id": "sa-02",
+   "legacyId": "s05",
+   "title": {
+    "ru": "GROUP BY и подзапросы"
+   },
+   "tagline": {
+    "ru": "Агрегаты, HAVING, вложенные запросы · Week 2–3"
+   },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": {
+      "ru": "Агрегатные функции"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Агрегаты сворачивают много строк в одно число:</p>"
+       }
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<ul><li><code>COUNT(*)</code> — количество строк</li><li><code>SUM(x)</code> — сумма</li><li><code>AVG(x)</code> — среднее</li><li><code>MIN(x)</code> / <code>MAX(x)</code> — минимум и максимум</li></ul>"
+       }
+      },
+      {
+       "type": "sqlrun",
+       "lang": "sql",
+       "code": "SELECT COUNT(*) AS orders_count,\n       MIN(order_date) AS first_order,\n       MAX(order_date) AS last_order\nFROM orders;"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Важно: <code>COUNT(колонка)</code> не считает NULL, а <code>COUNT(*)</code> считает все строки.</p>"
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": {
+      "ru": "GROUP BY — свёртка по группам"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><code>GROUP BY</code> делит строки на группы и применяет агрегаты к каждой группе отдельно. «Сколько клиентов в каждой стране»:</p>"
+       }
+      },
+      {
+       "type": "sqlrun",
+       "lang": "sql",
+       "code": "SELECT country, COUNT(*) AS customers_count\nFROM customers\nGROUP BY country;"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Железное правило: в SELECT могут быть только колонки из GROUP BY и агрегаты. Всё остальное — ошибка (SQL Server прямо её выбросит).</p>"
+       }
+      },
+      {
+       "type": "sqlrun",
+       "lang": "sql",
+       "code": "SELECT status, COUNT(*) AS cnt\nFROM orders\nGROUP BY status;"
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": {
+      "ru": "HAVING — фильтр групп"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><code>WHERE</code> фильтрует строки ДО группировки, <code>HAVING</code> — группы ПОСЛЕ. Разница WHERE vs HAVING — вопрос из каждого собеседования (и отдельное видео Week 2):</p>"
+       }
+      },
+      {
+       "type": "sqlrun",
+       "lang": "sql",
+       "code": "SELECT customer_id, COUNT(*) AS orders_cnt\nFROM orders\nGROUP BY customer_id\nHAVING COUNT(*) >= 2;"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Порядок выполнения запроса: <code>FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY</code>. Именно поэтому в WHERE нельзя писать агрегаты — групп ещё не существует.</p>"
+       }
+      }
+     ]
+    },
+    {
+     "id": "l4",
+     "title": {
+      "ru": "Подзапросы"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><b>Подзапрос</b> — запрос внутри запроса, в скобках. «Товары дороже средней цены»:</p>"
+       }
+      },
+      {
+       "type": "sqlrun",
+       "lang": "sql",
+       "code": "SELECT name, price\nFROM products\nWHERE price > (SELECT AVG(price) FROM products);"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Подзапрос может возвращать и список — тогда используется с <code>IN</code>. «Клиенты, у которых есть заказы»:</p>"
+       }
+      },
+      {
+       "type": "sqlrun",
+       "lang": "sql",
+       "code": "SELECT name\nFROM customers\nWHERE id IN (SELECT customer_id FROM orders);"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><b>Коррелированный</b> подзапрос ссылается на строку внешнего запроса и выполняется для каждой строки — тема отдельного видео Week 2. Часто его можно заменить на JOIN (и это быстрее — тема Week 3 про performance).</p>"
+       }
+      }
+     ]
+    },
+    {
+     "id": "l5",
+     "title": {
+      "ru": "JOIN + GROUP BY = отчёт"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Настоящая мощь — соединить таблицы и свернуть. «Выручка по каждому заказу»:</p>"
+       }
+      },
+      {
+       "type": "sqlrun",
+       "lang": "sql",
+       "code": "SELECT o.id, SUM(oi.qty * oi.unit_price) AS revenue\nFROM orders AS o\nJOIN order_items AS oi ON oi.order_id = o.id\nGROUP BY o.id\nORDER BY revenue DESC\nLIMIT 5;"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Такие запросы — ежедневная работа Data Engineer: витрины, отчёты, метрики. Освой связку JOIN + GROUP BY + HAVING — и половина рабочих задач тебе по плечу.</p>"
+       }
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": {
+      "ru": "Что вернёт <code>SELECT COUNT(*) FROM products</code>?"
+     },
+     "options": [
+      {
+       "ru": "Сумму цен"
+      },
+      {
+       "ru": "Количество строк в products"
+      },
+      {
+       "ru": "Количество колонок"
+      },
+      {
+       "ru": "Первую строку"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "<code>COUNT(*)</code> считает строки таблицы (или группы)."
+     }
+    },
+    {
+     "q": {
+      "ru": "В чём разница WHERE и HAVING?"
+     },
+     "options": [
+      {
+       "ru": "Никакой"
+      },
+      {
+       "ru": "WHERE фильтрует строки до группировки, HAVING — группы после"
+      },
+      {
+       "ru": "HAVING быстрее"
+      },
+      {
+       "ru": "WHERE только для чисел"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Порядок: FROM → WHERE → GROUP BY → HAVING. Агрегаты можно фильтровать только в HAVING."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что можно писать в SELECT при GROUP BY country?"
+     },
+     "options": [
+      {
+       "ru": "Любые колонки"
+      },
+      {
+       "ru": "Только country и агрегаты"
+      },
+      {
+       "ru": "Только агрегаты"
+      },
+      {
+       "ru": "Только country"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Колонки из GROUP BY + агрегатные функции. Остальное — ошибка."
+     }
+    },
+    {
+     "q": {
+      "ru": "Считает ли COUNT(manager_id) строки с NULL?"
+     },
+     "options": [
+      {
+       "ru": "Да"
+      },
+      {
+       "ru": "Нет"
+      },
+      {
+       "ru": "Считает как 0.5"
+      },
+      {
+       "ru": "Ошибка"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "<code>COUNT(колонка)</code> пропускает NULL. Все строки считает только <code>COUNT(*)</code>."
+     }
+    },
+    {
+     "q": {
+      "ru": "Где выполняется подзапрос <code>WHERE price > (SELECT AVG(price)…)</code>?"
+     },
+     "options": [
+      {
+       "ru": "После внешнего"
+      },
+      {
+       "ru": "Внутри скобок, его результат подставляется в условие"
+      },
+      {
+       "ru": "Параллельно"
+      },
+      {
+       "ru": "Не выполняется"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Подзапрос вычисляется, и его результат (число) подставляется в сравнение."
+     }
+    },
+    {
+     "q": {
+      "ru": "Коррелированный подзапрос — это…"
+     },
+     "options": [
+      {
+       "ru": "Подзапрос с JOIN"
+      },
+      {
+       "ru": "Подзапрос, ссылающийся на строку внешнего запроса"
+      },
+      {
+       "ru": "Два подзапроса"
+      },
+      {
+       "ru": "Подзапрос с GROUP BY"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Он использует значения текущей строки внешнего запроса и выполняется для каждой строки."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "title": {
+      "ru": "Статистика по категориям"
+     },
+     "brief": {
+      "ru": "JOIN + GROUP BY"
+     },
+     "desc": {
+      "ru": "<p>Для каждой категории выведи её название (псевдоним <code>category</code>), число товаров (псевдоним <code>products_cnt</code>) и среднюю цену (псевдоним <code>avg_price</code>).</p>"
+     },
+     "starter": "-- JOIN + GROUP BY c.name\n",
+     "hint": {
+      "ru": "SELECT c.name AS category, COUNT(*) …, AVG(p.price) … FROM products JOIN categories … GROUP BY c.name"
+     },
+     "kind": "sql",
+     "solution": "SELECT c.name AS category, COUNT(*) AS products_cnt, AVG(p.price) AS avg_price FROM products AS p JOIN categories AS c ON p.category_id = c.id GROUP BY c.name;"
+    },
+    {
+     "id": "t2",
+     "title": {
+      "ru": "Крупные заказы"
+     },
+     "brief": {
+      "ru": "GROUP BY + HAVING"
+     },
+     "desc": {
+      "ru": "<p>Выведи <code>order_id</code> и сумму заказа (qty × unit_price, псевдоним <code>total</code>) только для заказов на сумму больше 500. Таблица — <code>order_items</code>.</p>"
+     },
+     "starter": "SELECT order_id, SUM(qty * unit_price) AS total\nFROM order_items\n-- GROUP BY + HAVING\n",
+     "hint": {
+      "ru": "GROUP BY order_id HAVING SUM(qty * unit_price) > 500"
+     },
+     "kind": "sql",
+     "solution": "SELECT order_id, SUM(qty * unit_price) AS total FROM order_items GROUP BY order_id HAVING SUM(qty * unit_price) > 500;"
+    },
+    {
+     "id": "t3",
+     "title": {
+      "ru": "Дороже среднего"
+     },
+     "brief": {
+      "ru": "Подзапрос"
+     },
+     "desc": {
+      "ru": "<p>Выведи <code>name</code> и <code>price</code> товаров, чья цена выше средней цены всех товаров.</p>"
+     },
+     "starter": "-- подзапрос: (SELECT AVG(price) FROM products)\n",
+     "hint": {
+      "ru": "WHERE price > (SELECT AVG(price) FROM products)"
+     },
+     "kind": "sql",
+     "solution": "SELECT name, price FROM products WHERE price > (SELECT AVG(price) FROM products);"
+    }
+   ],
+   "exam": {
+    "time": 600,
+    "questions": [
+     {
+      "q": {
+       "ru": "Каким запросом посчитать сумму зарплат сотрудников?"
+      },
+      "options": [
+       {
+        "ru": "SELECT COUNT(salary)…"
+       },
+       {
+        "ru": "SELECT SUM(salary) FROM employees"
+       },
+       {
+        "ru": "SELECT AVG(salary)…"
+       },
+       {
+        "ru": "SELECT TOTAL salary"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "Можно ли написать WHERE COUNT(*) > 5?"
+      },
+      "options": [
+       {
+        "ru": "Да"
+       },
+       {
+        "ru": "Нет — агрегаты фильтруются в HAVING"
+       },
+       {
+        "ru": "Да, но только с JOIN"
+       },
+       {
+        "ru": "Только в SQL Server"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "GROUP BY city даст по одной строке на…"
+      },
+      "options": [
+       {
+        "ru": "Каждую строку таблицы"
+       },
+       {
+        "ru": "Каждый уникальный город"
+       },
+       {
+        "ru": "Каждую колонку"
+       },
+       {
+        "ru": "Каждый NULL"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "Что вернёт подзапрос <code>SELECT customer_id FROM orders</code> для IN?"
+      },
+      "options": [
+       {
+        "ru": "Одно число"
+       },
+       {
+        "ru": "Список значений"
+       },
+       {
+        "ru": "Таблицу целиком"
+       },
+       {
+        "ru": "Ошибку"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "Порядок выполнения запроса?"
+      },
+      "options": [
+       {
+        "ru": "SELECT → FROM → WHERE"
+       },
+       {
+        "ru": "FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY"
+       },
+       {
+        "ru": "WHERE → FROM → SELECT"
+       },
+       {
+        "ru": "Сверху вниз"
+       }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "title": {
+       "ru": "Заказы по клиентам"
+      },
+      "desc": {
+       "ru": "<p>Для каждого клиента, у которого есть заказы, выведи имя (псевдоним <code>customer</code>) и количество его заказов (псевдоним <code>orders_cnt</code>). Используй JOIN и GROUP BY.</p>"
+      },
+      "starter": "",
+      "kind": "sql",
+      "solution": "SELECT cu.name AS customer, COUNT(*) AS orders_cnt FROM customers AS cu JOIN orders AS o ON o.customer_id = cu.id GROUP BY cu.name;"
+     }
+    ]
+   },
+   "sqlModule": true
+  },
+  {
+   "id": "sa-03",
+   "legacyId": "s06",
+   "title": {
+    "ru": "CTE и оконные функции"
+   },
+   "tagline": {
+    "ru": "WITH, ROW_NUMBER, RANK, LAG · Week 4"
+   },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": {
+      "ru": "CTE — общее табличное выражение"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><code>WITH имя AS (запрос)</code> создаёт временный именованный результат — <b>CTE</b> (Common Table Expression). Это способ разбить сложный запрос на понятные шаги:</p>"
+       }
+      },
+      {
+       "type": "sqlrun",
+       "lang": "sql",
+       "code": "WITH order_totals AS (\n    SELECT order_id, SUM(qty * unit_price) AS total\n    FROM order_items\n    GROUP BY order_id\n)\nSELECT order_id, total\nFROM order_totals\nWHERE total > 800;"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Сначала считаем суммы заказов (CTE), потом фильтруем результат как обычную таблицу. Week 4 у ментора сравнивает CTE с временными таблицами (<code>#temp</code>) и табличными переменными (<code>@table</code>) — CTE живёт только внутри одного запроса.</p>"
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": {
+      "ru": "Оконные функции: OVER"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><b>Оконные функции</b> — как агрегаты, но НЕ сворачивают строки: каждая строка остаётся, а рядом появляется вычисление «по окну». Ключевое слово — <code>OVER</code>:</p>"
+       }
+      },
+      {
+       "type": "sqlrun",
+       "lang": "sql",
+       "code": "SELECT name, city, salary,\n       AVG(salary) OVER (PARTITION BY city) AS avg_city_salary\nFROM employees;"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><code>PARTITION BY city</code> делит строки на окна по городам — и у каждого сотрудника видно среднее ЕГО города. GROUP BY схлопнул бы всё до одной строки на город, а окно сохраняет детали. Это тема №1 собеседований по SQL!</p>"
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": {
+      "ru": "ROW_NUMBER, RANK, DENSE_RANK"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Функции нумерации расставляют строки по порядку внутри окна:</p>"
+       }
+      },
+      {
+       "type": "sqlrun",
+       "lang": "sql",
+       "code": "SELECT name, price,\n  ROW_NUMBER() OVER (ORDER BY price DESC) AS row_num,\n  RANK()       OVER (ORDER BY price DESC) AS rnk,\n  DENSE_RANK() OVER (ORDER BY price DESC) AS dense_rnk\nFROM products\nLIMIT 8;"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Разница видна на одинаковых значениях: <code>ROW_NUMBER</code> всегда 1,2,3…; <code>RANK</code> даёт одинаковым одно место и «дырку» после (1,2,2,4); <code>DENSE_RANK</code> — без дырок (1,2,2,3). Вопрос про их разницу — стандарт собеседования (и отдельное видео Week 4).</p>"
+       }
+      }
+     ]
+    },
+    {
+     "id": "l4",
+     "title": {
+      "ru": "LAG и LEAD — сосед по строке"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><code>LAG(x)</code> — значение из предыдущей строки окна, <code>LEAD(x)</code> — из следующей. Так сравнивают «с прошлым периодом»:</p>"
+       }
+      },
+      {
+       "type": "sqlrun",
+       "lang": "sql",
+       "code": "SELECT id, order_date,\n       LAG(order_date) OVER (ORDER BY order_date) AS prev_date\nFROM orders\nLIMIT 8;"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Типичная рабочая задача: «на сколько выросли продажи по сравнению с прошлым месяцем» — это LAG. Без оконных функций пришлось бы писать сложный self-join.</p>"
+       }
+      }
+     ]
+    },
+    {
+     "id": "l5",
+     "title": {
+      "ru": "Нарастающий итог (running total)"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Агрегат + <code>OVER (ORDER BY …)</code> = нарастающий итог. Классика отчётности:</p>"
+       }
+      },
+      {
+       "type": "sqlrun",
+       "lang": "sql",
+       "code": "WITH daily AS (\n    SELECT o.order_date, SUM(oi.qty * oi.unit_price) AS day_total\n    FROM orders AS o\n    JOIN order_items AS oi ON oi.order_id = o.id\n    GROUP BY o.order_date\n)\nSELECT order_date, day_total,\n       SUM(day_total) OVER (ORDER BY order_date) AS running_total\nFROM daily\nLIMIT 10;"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Это финальная тема программы Week 4: CTE + оконные функции вместе. После этого модуля ты готов к SQL Practice Problems и настоящим собеседованиям по SQL. 🎓</p>"
+       }
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": {
+      "ru": "Что такое CTE?"
+     },
+     "options": [
+      {
+       "ru": "Постоянная таблица"
+      },
+      {
+       "ru": "Именованный временный результат внутри запроса (WITH … AS)"
+      },
+      {
+       "ru": "Индекс"
+      },
+      {
+       "ru": "Хранимая процедура"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "<code>WITH имя AS (…)</code> — временный результат, живущий только в этом запросе."
+     }
+    },
+    {
+     "q": {
+      "ru": "Чем оконная функция отличается от GROUP BY?"
+     },
+     "options": [
+      {
+       "ru": "Ничем"
+      },
+      {
+       "ru": "Окно не схлопывает строки — каждая строка остаётся"
+      },
+      {
+       "ru": "Окно быстрее"
+      },
+      {
+       "ru": "Окно работает без таблиц"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "GROUP BY сворачивает группу в одну строку, OVER добавляет вычисление к каждой строке."
+     }
+    },
+    {
+     "q": {
+      "ru": "Цены: 100, 90, 90, 80. Что даст RANK() по убыванию?"
+     },
+     "options": [
+      {
+       "ru": "1, 2, 3, 4"
+      },
+      {
+       "ru": "1, 2, 2, 4"
+      },
+      {
+       "ru": "1, 2, 2, 3"
+      },
+      {
+       "ru": "4, 3, 2, 1"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "RANK даёт одинаковым значениям одно место и пропускает следующее: 1, 2, 2, 4."
+     }
+    },
+    {
+     "q": {
+      "ru": "А DENSE_RANK на тех же данных?"
+     },
+     "options": [
+      {
+       "ru": "1, 2, 3, 4"
+      },
+      {
+       "ru": "1, 2, 2, 4"
+      },
+      {
+       "ru": "1, 2, 2, 3"
+      },
+      {
+       "ru": "1, 1, 2, 3"
+      }
+     ],
+     "a": 2,
+     "explain": {
+      "ru": "DENSE_RANK не оставляет дырок: 1, 2, 2, 3."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что вернёт LAG(price) для первой строки окна?"
+     },
+     "options": [
+      {
+       "ru": "0"
+      },
+      {
+       "ru": "Последнее значение"
+      },
+      {
+       "ru": "NULL"
+      },
+      {
+       "ru": "Ошибку"
+      }
+     ],
+     "a": 2,
+     "explain": {
+      "ru": "У первой строки нет предыдущей — LAG вернёт NULL (или значение по умолчанию, если задать)."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что делает PARTITION BY внутри OVER?"
+     },
+     "options": [
+      {
+       "ru": "Сортирует строки"
+      },
+      {
+       "ru": "Делит строки на независимые окна"
+      },
+      {
+       "ru": "Удаляет дубликаты"
+      },
+      {
+       "ru": "Создаёт таблицу"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "PARTITION BY — «раздели на группы-окна»: расчёт идёт отдельно внутри каждого окна."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "title": {
+      "ru": "Дорогие заказы через CTE"
+     },
+     "brief": {
+      "ru": "WITH … AS"
+     },
+     "desc": {
+      "ru": "<p>Через CTE с именем <code>totals</code> посчитай сумму каждого заказа из <code>order_items</code> (колонки <code>order_id</code>, <code>total</code> = SUM(qty*unit_price)), затем выведи <code>order_id</code> и <code>total</code> заказов с суммой больше 900.</p>"
+     },
+     "starter": "WITH totals AS (\n    -- SELECT order_id, SUM(...) AS total ...\n)\nSELECT order_id, total\nFROM totals\n-- условие\n",
+     "hint": {
+      "ru": "Внутри CTE: SELECT order_id, SUM(qty * unit_price) AS total FROM order_items GROUP BY order_id. Снаружи: WHERE total > 900."
+     },
+     "kind": "sql",
+     "solution": "WITH totals AS (SELECT order_id, SUM(qty * unit_price) AS total FROM order_items GROUP BY order_id) SELECT order_id, total FROM totals WHERE total > 900;"
+    },
+    {
+     "id": "t2",
+     "title": {
+      "ru": "Номер в своей категории"
+     },
+     "brief": {
+      "ru": "ROW_NUMBER + PARTITION BY"
+     },
+     "desc": {
+      "ru": "<p>Выведи <code>name</code>, <code>category_id</code>, <code>price</code> и номер товара по убыванию цены внутри его категории (псевдоним <code>rn</code>, ROW_NUMBER).</p>"
+     },
+     "starter": "-- ROW_NUMBER() OVER (PARTITION BY ... ORDER BY ... DESC)\n",
+     "hint": {
+      "ru": "ROW_NUMBER() OVER (PARTITION BY category_id ORDER BY price DESC) AS rn"
+     },
+     "kind": "sql",
+     "solution": "SELECT name, category_id, price, ROW_NUMBER() OVER (PARTITION BY category_id ORDER BY price DESC) AS rn FROM products;"
+    },
+    {
+     "id": "t3",
+     "title": {
+      "ru": "Зарплата и место в рейтинге"
+     },
+     "brief": {
+      "ru": "DENSE_RANK"
+     },
+     "desc": {
+      "ru": "<p>Выведи <code>name</code>, <code>salary</code> и место сотрудника по зарплате от большей к меньшей без пропусков мест (псевдоним <code>place</code>, DENSE_RANK).</p>"
+     },
+     "starter": "-- DENSE_RANK() OVER (ORDER BY ...)\n",
+     "hint": {
+      "ru": "DENSE_RANK() OVER (ORDER BY salary DESC) AS place"
+     },
+     "kind": "sql",
+     "solution": "SELECT name, salary, DENSE_RANK() OVER (ORDER BY salary DESC) AS place FROM employees;"
+    }
+   ],
+   "exam": {
+    "time": 600,
+    "questions": [
+     {
+      "q": {
+       "ru": "Где живёт CTE?"
+      },
+      "options": [
+       {
+        "ru": "В базе навсегда"
+       },
+       {
+        "ru": "Только внутри одного запроса"
+       },
+       {
+        "ru": "В отдельном файле"
+       },
+       {
+        "ru": "В памяти сервера сутки"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "SUM(x) OVER (ORDER BY d) — это…"
+      },
+      "options": [
+       {
+        "ru": "Обычная сумма"
+       },
+       {
+        "ru": "Нарастающий итог"
+       },
+       {
+        "ru": "Средняя"
+       },
+       {
+        "ru": "Ошибка"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "Какая функция даёт значение следующей строки?"
+      },
+      "options": [
+       {
+        "ru": "LAG"
+       },
+       {
+        "ru": "LEAD"
+       },
+       {
+        "ru": "NEXT"
+       },
+       {
+        "ru": "ROW_NUMBER"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "ROW_NUMBER при одинаковых значениях…"
+      },
+      "options": [
+       {
+        "ru": "Даёт одинаковые номера"
+       },
+       {
+        "ru": "Всё равно нумерует подряд: 1,2,3"
+       },
+       {
+        "ru": "Пропускает"
+       },
+       {
+        "ru": "Ошибка"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "В T-SQL временная таблица создаётся как…"
+      },
+      "options": [
+       {
+        "ru": "WITH t AS"
+       },
+       {
+        "ru": "CREATE TABLE #t"
+       },
+       {
+        "ru": "DECLARE @t"
+       },
+       {
+        "ru": "TEMP TABLE t"
+       }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "title": {
+       "ru": "Рейтинг товаров по цене"
+      },
+      "desc": {
+       "ru": "<p>Выведи <code>name</code>, <code>price</code> и место товара по цене от дорогих к дешёвым с пропусками мест при равенстве (псевдоним <code>rnk</code>, RANK).</p>"
+      },
+      "starter": "",
+      "kind": "sql",
+      "solution": "SELECT name, price, RANK() OVER (ORDER BY price DESC) AS rnk FROM products;"
+     }
+    ]
+   },
+   "sqlModule": true
+  }
+ ]
+}

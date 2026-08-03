@@ -1,0 +1,161 @@
+{
+ "id": "security-intro",
+ "schema": 2,
+ "modules": [
+  {
+   "id": "se-01",
+   "title": { "ru": "Основы безопасности для разработчика", "uz": "Dasturchi uchun xavfsizlik asoslari", "en": "Security fundamentals for developers" },
+   "tagline": { "ru": "Триада CIA, хеширование паролей и защита от инъекций", "uz": "CIA triadasi, parollarni xeshlash va in'ektsiyalardan himoya", "en": "The CIA triad, password hashing and injection defence" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "Триада CIA: три опоры безопасности", "uz": "CIA triadasi: xavfsizlikning uch ustuni", "en": "The CIA triad: three pillars of security" },
+     "blocks": [
+      { "type": "text", "html": {
+        "ru": "<p>Безопасность стоит на трёх свойствах данных:</p><ul><li><b>Confidentiality</b> (конфиденциальность) — данные видит только тот, кому положено</li><li><b>Integrity</b> (целостность) — данные не изменены незаметно</li><li><b>Availability</b> (доступность) — система работает, когда нужна</li></ul>",
+        "uz": "<p>Xavfsizlik ma'lumotlarning uchta xususiyatiga tayanadi:</p><ul><li><b>Confidentiality</b> (maxfiylik) — ma'lumotni faqat ruxsat berilgan kishi ko'radi</li><li><b>Integrity</b> (yaxlitlik) — ma'lumot sezdirmasdan o'zgartirilmagan</li><li><b>Availability</b> (mavjudlik) — tizim kerak bo'lganda ishlaydi</li></ul>",
+        "en": "<p>Security rests on three properties of data:</p><ul><li><b>Confidentiality</b> — only authorised people can see it</li><li><b>Integrity</b> — it hasn't been altered unnoticed</li><li><b>Availability</b> — the system works when needed</li></ul>" } },
+      { "type": "note", "kind": "note", "html": {
+        "ru": "Любая мера безопасности защищает одно или несколько из этих свойств. Спрашивай себя: «что именно я защищаю — тайну, точность или работоспособность?»",
+        "uz": "Har qanday xavfsizlik chorasi shu xususiyatlardan birini yoki bir nechtasini himoya qiladi. O'zingizdan so'rang: «men aynan nimani himoya qilyapman — sirni, aniqlikni yoki ishlashni?»",
+        "en": "Every security measure protects one or more of these. Ask yourself: «what am I actually protecting — secrecy, accuracy or uptime?»" } },
+      { "type": "match",
+        "pairs": [
+          { "left": { "ru": "Шифрование трафика (HTTPS)", "uz": "Trafikni shifrlash (HTTPS)", "en": "Traffic encryption (HTTPS)" }, "right": { "ru": "Конфиденциальность", "uz": "Maxfiylik", "en": "Confidentiality" } },
+          { "left": { "ru": "Контрольная сумма файла", "uz": "Fayl nazorat summasi", "en": "File checksum" }, "right": { "ru": "Целостность", "uz": "Yaxlitlik", "en": "Integrity" } },
+          { "left": { "ru": "Резервные копии и мониторинг", "uz": "Zaxira nusxalar va monitoring", "en": "Backups and monitoring" }, "right": { "ru": "Доступность", "uz": "Mavjudlik", "en": "Availability" } }
+        ] }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "Пароли: почему их нельзя хранить текстом", "uz": "Parollar: nega ularni matn ko'rinishida saqlash mumkin emas", "en": "Passwords: why you never store them as text" },
+     "blocks": [
+      { "type": "text", "html": {
+        "ru": "<p><b>Хеш-функция</b> превращает пароль в необратимую строку. Проверить пароль можно, а восстановить — нет. Если база утечёт, злоумышленник получит бесполезные хеши.</p>",
+        "uz": "<p><b>Xesh-funksiya</b> parolni qaytarib bo'lmaydigan satrga aylantiradi. Parolni tekshirish mumkin, tiklash esa yo'q. Baza sizib chiqsa, buzg'unchi foydasiz xeshlarni oladi.</p>",
+        "en": "<p>A <b>hash function</b> turns a password into an irreversible string. You can verify a password but never recover it. If the database leaks, an attacker gets useless hashes.</p>" } },
+      { "type": "run", "lang": "python", "code": "import hashlib\n\npassword = 'python123'\nsimple = hashlib.sha256(password.encode()).hexdigest()\nprint('Хеш:', simple)\nprint('Тот же пароль даёт тот же хеш:', hashlib.sha256(password.encode()).hexdigest() == simple)\nprint('Другой пароль - совсем другой хеш:')\nprint(hashlib.sha256('python124'.encode()).hexdigest())" },
+      { "type": "note", "kind": "trap", "html": {
+        "ru": "Голый SHA-256 для паролей <b>недостаточен</b>: он быстрый, и его перебирают миллиардами в секунду. В бою нужны медленные функции с солью: <code>bcrypt</code>, <code>argon2</code>, <code>scrypt</code> или <code>werkzeug.security</code> (его и использует API этого сайта).",
+        "uz": "Parollar uchun sof SHA-256 <b>yetarli emas</b>: u tez va sekundiga milliardlab urinish bilan tanlanadi. Amalda tuz bilan sekin funksiyalar kerak: <code>bcrypt</code>, <code>argon2</code>, <code>scrypt</code> yoki <code>werkzeug.security</code> (bu sayt API'si shuni ishlatadi).",
+        "en": "Plain SHA-256 is <b>not enough</b> for passwords: it's fast and can be brute-forced billions of times per second. Production needs slow, salted functions: <code>bcrypt</code>, <code>argon2</code>, <code>scrypt</code> or <code>werkzeug.security</code> (which this site's API uses)." } },
+      { "type": "checkpoint",
+        "q": { "ru": "Пользователь забыл пароль. Может ли правильно спроектированный сервис прислать ему старый пароль письмом?", "uz": "Foydalanuvchi parolni unutdi. To'g'ri loyihalangan xizmat unga eski parolni xat orqali yubora oladimi?", "en": "A user forgot their password. Can a properly designed service email them the old one?" },
+        "options": [
+          { "ru": "Да, он хранится в базе", "uz": "Ha, u bazada saqlanadi", "en": "Yes, it's stored in the database" },
+          { "ru": "Нет — хранится только хеш, пароль восстановить невозможно", "uz": "Yo'q — faqat xesh saqlanadi, parolni tiklab bo'lmaydi", "en": "No — only a hash is stored, the password cannot be recovered" },
+          { "ru": "Да, если расшифровать хеш", "uz": "Ha, xeshni deshifrlash orqali", "en": "Yes, by decrypting the hash" },
+          { "ru": "Только администратор может", "uz": "Faqat administrator qila oladi", "en": "Only an administrator can" }
+        ], "a": 1,
+        "explain": { "ru": "Хеш необратим. Поэтому нормальные сервисы присылают <b>ссылку на сброс</b>, а не старый пароль. Если сервис прислал тебе твой пароль — беги оттуда.", "uz": "Xesh qaytarilmaydi. Shuning uchun yaxshi xizmatlar eski parolni emas, <b>tiklash havolasini</b> yuboradi. Agar xizmat parolingizni yuborsa — u yerdan keting.", "en": "Hashes are irreversible, so proper services send a <b>reset link</b>, never the old password. If a service emails you your password — run." } }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "SQL-инъекции и как их закрыть", "uz": "SQL-in'ektsiyalar va ularni yopish", "en": "SQL injection and how to close it" },
+     "blocks": [
+      { "type": "text", "html": {
+        "ru": "<p><b>SQL-инъекция</b> случается, когда пользовательский ввод склеивают со строкой запроса. Тогда ввод перестаёт быть данными и становится кодом.</p>",
+        "uz": "<p><b>SQL-in'ektsiya</b> foydalanuvchi kiritgan ma'lumot so'rov satriga yopishtirilganda yuz beradi. Shunda kiritilgan ma'lumot ma'lumot bo'lishdan to'xtab, kodga aylanadi.</p>",
+        "en": "<p><b>SQL injection</b> happens when user input is glued into a query string. At that moment the input stops being data and becomes code.</p>" } },
+      { "type": "code", "lang": "python", "code": "# ОПАСНО - так писать нельзя\nlogin = \"admin' --\"\nquery = \"SELECT * FROM users WHERE name = '\" + login + \"'\"\nprint(query)\n# SELECT * FROM users WHERE name = 'admin' --'\n# Всё после -- становится комментарием: проверка пароля исчезает!" },
+      { "type": "code", "lang": "python", "code": "# БЕЗОПАСНО - параметризованный запрос\ncursor.execute(\"SELECT * FROM users WHERE name = ?\", (login,))\n# Драйвер передаёт значение отдельно от текста запроса,\n# поэтому ввод НИКОГДА не станет кодом." },
+      { "type": "findbug",
+        "lines": [
+          "user_id = request.args.get('id')",
+          "query = f\"SELECT * FROM orders WHERE user_id = {user_id}\"",
+          "rows = cursor.execute(query).fetchall()",
+          "return json.dumps(rows)"
+        ],
+        "bugLine": 1,
+        "explain": { "ru": "Строка 2 склеивает ввод пользователя с SQL через f-строку — это открытая SQL-инъекция. Правильно: <code>cursor.execute(\"SELECT * FROM orders WHERE user_id = ?\", (user_id,))</code>.", "uz": "2-qator foydalanuvchi kiritganini f-satr orqali SQL bilan yopishtiradi — bu ochiq SQL-in'ektsiya. To'g'risi: <code>cursor.execute(\"SELECT * FROM orders WHERE user_id = ?\", (user_id,))</code>.", "en": "Line 2 concatenates user input into SQL via an f-string — an open injection hole. Correct: <code>cursor.execute(\"SELECT * FROM orders WHERE user_id = ?\", (user_id,))</code>." } },
+      { "type": "text", "html": {
+        "ru": "<p>Тот же принцип защищает от XSS: любой пользовательский текст, попадающий в HTML, нужно <b>экранировать</b>. Данные — это данные, они не должны исполняться.</p>",
+        "uz": "<p>Xuddi shu tamoyil XSS'dan himoya qiladi: HTML'ga tushadigan har qanday foydalanuvchi matnini <b>ekranlash</b> kerak. Ma'lumot — bu ma'lumot, u bajarilmasligi kerak.</p>",
+        "en": "<p>The same principle stops XSS: any user text that reaches HTML must be <b>escaped</b>. Data is data — it must never execute.</p>" } },
+      { "type": "order",
+        "steps": [
+          { "ru": "Никогда не склеивать ввод с запросом", "uz": "Kiritilgan ma'lumotni so'rov bilan hech qachon yopishtirmaslik", "en": "Never concatenate input into a query" },
+          { "ru": "Использовать параметризованные запросы", "uz": "Parametrlangan so'rovlardan foydalanish", "en": "Use parameterised queries" },
+          { "ru": "Проверять и ограничивать входные данные", "uz": "Kiruvchi ma'lumotlarni tekshirish va cheklash", "en": "Validate and constrain the input" },
+          { "ru": "Давать приложению минимальные права в БД", "uz": "Ilovaga bazada minimal huquqlar berish", "en": "Give the app minimal database privileges" },
+          { "ru": "Логировать подозрительные запросы", "uz": "Shubhali so'rovlarni jurnalga yozish", "en": "Log suspicious requests" }
+        ] },
+      { "type": "summary", "items": [
+        { "ru": "CIA: конфиденциальность, целостность, доступность", "uz": "CIA: maxfiylik, yaxlitlik, mavjudlik", "en": "CIA: confidentiality, integrity, availability" },
+        { "ru": "Пароли — только хеш, и только медленной функцией с солью", "uz": "Parollar — faqat xesh, faqat tuzli sekin funksiya bilan", "en": "Passwords — hashed only, with a slow salted function" },
+        { "ru": "Параметризованные запросы закрывают SQL-инъекции", "uz": "Parametrlangan so'rovlar SQL-in'ektsiyalarni yopadi", "en": "Parameterised queries close SQL injection" },
+        { "ru": "Секреты — в переменных окружения, не в коде и не в git", "uz": "Sirlar — muhit o'zgaruvchilarida, kodda va git'da emas", "en": "Secrets live in environment variables, not in code or git" }
+      ] }
+     ]
+    }
+   ],
+   "quiz": [
+    { "q": { "ru": "Что означает буква C в триаде CIA?", "uz": "CIA triadasidagi C harfi nimani anglatadi?", "en": "What does C stand for in the CIA triad?" },
+      "options": [{ "ru": "Control", "uz": "Control", "en": "Control" }, { "ru": "Confidentiality", "uz": "Confidentiality", "en": "Confidentiality" }, { "ru": "Cryptography", "uz": "Cryptography", "en": "Cryptography" }, { "ru": "Compliance", "uz": "Compliance", "en": "Compliance" }], "a": 1,
+      "explain": { "ru": "Confidentiality — конфиденциальность: данные доступны только тем, кому положено.", "uz": "Confidentiality — maxfiylik: ma'lumot faqat ruxsat berilganlarga ochiq.", "en": "Confidentiality — only authorised parties can access the data." } },
+    { "q": { "ru": "Почему нельзя хранить пароли в открытом виде?", "uz": "Nega parollarni ochiq holda saqlash mumkin emas?", "en": "Why must passwords never be stored in plain text?" },
+      "options": [{ "ru": "Занимают много места", "uz": "Ko'p joy egallaydi", "en": "They take up space" }, { "ru": "При утечке базы злоумышленник получит все пароли", "uz": "Baza sizib chiqsa, buzg'unchi barcha parollarni oladi", "en": "A database leak hands the attacker every password" }, { "ru": "Так медленнее", "uz": "Shunday sekinroq", "en": "It's slower" }, { "ru": "Это разрешено", "uz": "Bu ruxsat etilgan", "en": "It is allowed" }], "a": 1,
+      "explain": { "ru": "Люди повторяют пароли на разных сайтах, поэтому утечка одного сервиса компрометирует остальные.", "uz": "Odamlar parollarni turli saytlarda takrorlaydi, shuning uchun bitta xizmat sizishi qolganlarini xavf ostiga qo'yadi.", "en": "People reuse passwords, so one leak compromises their other accounts too." } },
+    { "q": { "ru": "Какой запрос защищён от SQL-инъекции?", "uz": "Qaysi so'rov SQL-in'ektsiyadan himoyalangan?", "en": "Which query is safe from SQL injection?" },
+      "options": [{ "ru": "execute(\"... WHERE id = \" + user_id)", "uz": "execute(\"... WHERE id = \" + user_id)", "en": "execute(\"... WHERE id = \" + user_id)" }, { "ru": "execute(\"... WHERE id = ?\", (user_id,))", "uz": "execute(\"... WHERE id = ?\", (user_id,))", "en": "execute(\"... WHERE id = ?\", (user_id,))" }, { "ru": "execute(f\"... WHERE id = {user_id}\")", "uz": "execute(f\"... WHERE id = {user_id}\")", "en": "execute(f\"... WHERE id = {user_id}\")" }, { "ru": "Все одинаково безопасны", "uz": "Hammasi bir xil xavfsiz", "en": "All are equally safe" }], "a": 1,
+      "explain": { "ru": "Только параметризованный запрос передаёт значение отдельно от текста SQL.", "uz": "Faqat parametrlangan so'rov qiymatni SQL matnidan alohida uzatadi.", "en": "Only a parameterised query passes the value separately from the SQL text." } },
+    { "q": { "ru": "Что такое «соль» (salt) при хешировании?", "uz": "Xeshlashda «tuz» (salt) nima?", "en": "What is a «salt» in hashing?" },
+      "options": [{ "ru": "Случайная добавка к паролю перед хешированием", "uz": "Xeshlashdan oldin parolga qo'shiladigan tasodifiy qo'shimcha", "en": "Random data added to a password before hashing" }, { "ru": "Алгоритм шифрования", "uz": "Shifrlash algoritmi", "en": "An encryption algorithm" }, { "ru": "Тип базы данных", "uz": "Ma'lumotlar bazasi turi", "en": "A database type" }, { "ru": "Пароль администратора", "uz": "Administrator paroli", "en": "The admin password" }], "a": 0,
+      "explain": { "ru": "Соль делает хеши разными даже у одинаковых паролей и обесценивает готовые радужные таблицы.", "uz": "Tuz bir xil parollarda ham xeshlarni turlicha qiladi va tayyor rangin jadvallarni foydasiz qiladi.", "en": "A salt makes identical passwords hash differently and defeats precomputed rainbow tables." } },
+    { "q": { "ru": "Где правильно хранить пароль от базы данных?", "uz": "Ma'lumotlar bazasi parolini qayerda saqlash to'g'ri?", "en": "Where should a database password live?" },
+      "options": [{ "ru": "В коде — так удобнее", "uz": "Kodda — shunday qulayroq", "en": "In the code — it's convenient" }, { "ru": "В переменной окружения вне репозитория", "uz": "Repozitoriydan tashqaridagi muhit o'zgaruvchisida", "en": "In an environment variable outside the repository" }, { "ru": "В комментарии рядом с кодом", "uz": "Kod yonidagi izohda", "en": "In a comment next to the code" }, { "ru": "В README проекта", "uz": "Loyiha README faylida", "en": "In the project README" }], "a": 1,
+      "explain": { "ru": "Секрет в git остаётся в истории навсегда, даже если удалить его следующим коммитом.", "uz": "Git'dagi sir tarixda abadiy qoladi, keyingi commit'da o'chirsangiz ham.", "en": "A secret committed to git stays in history forever, even if the next commit removes it." } },
+    { "q": { "ru": "Что защищает от XSS?", "uz": "XSS'dan nima himoya qiladi?", "en": "What protects against XSS?" },
+      "options": [{ "ru": "Экранирование пользовательского текста в HTML", "uz": "Foydalanuvchi matnini HTML'da ekranlash", "en": "Escaping user text rendered into HTML" }, { "ru": "Длинные пароли", "uz": "Uzun parollar", "en": "Long passwords" }, { "ru": "Резервные копии", "uz": "Zaxira nusxalar", "en": "Backups" }, { "ru": "Быстрый сервер", "uz": "Tez server", "en": "A fast server" }], "a": 0,
+      "explain": { "ru": "XSS — тот же класс ошибки, что инъекция: данные не должны исполняться как код.", "uz": "XSS — in'ektsiya bilan bir xil sinf xatosi: ma'lumot kod sifatida bajarilmasligi kerak.", "en": "XSS is the same class of bug as injection: data must never execute as code." } }
+   ],
+   "tasks": [
+    { "id": "t1", "kind": "python",
+      "title": { "ru": "Хешируем пароль", "uz": "Parolni xeshlaymiz", "en": "Hash a password" },
+      "brief": { "ru": "hashlib и необратимость", "uz": "hashlib va qaytarilmaslik", "en": "hashlib and irreversibility" },
+      "desc": { "ru": "<p>Напиши функцию <code>hash_password(password)</code>, возвращающую SHA-256 хеш в hex-виде.</p><p><i>Учебный пример: в реальном проекте нужны bcrypt или argon2.</i></p>", "uz": "<p><code>hash_password(password)</code> funksiyasini yozing: SHA-256 xeshni hex ko'rinishida qaytarsin.</p><p><i>O'quv misoli: haqiqiy loyihada bcrypt yoki argon2 kerak.</i></p>", "en": "<p>Write <code>hash_password(password)</code> returning a SHA-256 hash in hex.</p><p><i>Teaching example: real projects need bcrypt or argon2.</i></p>" },
+      "starter": "import hashlib\n\ndef hash_password(password):\n    pass\n\nprint(hash_password('python123'))\n",
+      "tests": "import hashlib as _h\n_expected = _h.sha256('python123'.encode()).hexdigest()\nassert hash_password('python123') == _expected, 'Должен возвращаться sha256 hexdigest'\nassert hash_password('a') != hash_password('b'), 'Разные пароли - разные хеши'\nassert len(hash_password('x')) == 64, 'SHA-256 в hex - это 64 символа'",
+      "hint": { "ru": "return hashlib.sha256(password.encode()).hexdigest()", "uz": "return hashlib.sha256(password.encode()).hexdigest()", "en": "return hashlib.sha256(password.encode()).hexdigest()" } },
+    { "id": "t2", "kind": "python",
+      "title": { "ru": "Проверка пароля", "uz": "Parolni tekshirish", "en": "Verify a password" },
+      "brief": { "ru": "Сравнение хешей", "uz": "Xeshlarni solishtirish", "en": "Comparing hashes" },
+      "desc": { "ru": "<p>Напиши функцию <code>verify(password, stored_hash)</code>: вернуть <code>True</code>, если хеш пароля совпадает с сохранённым. Расшифровывать ничего нельзя — только хешировать и сравнивать.</p>", "uz": "<p><code>verify(password, stored_hash)</code> funksiyasini yozing: parol xeshi saqlangani bilan mos kelsa <code>True</code> qaytaring. Hech narsani deshifrlash mumkin emas — faqat xeshlab solishtirish.</p>", "en": "<p>Write <code>verify(password, stored_hash)</code>: return <code>True</code> when the password's hash matches the stored one. Nothing gets decrypted — you hash and compare.</p>" },
+      "starter": "import hashlib\n\ndef hash_password(password):\n    return hashlib.sha256(password.encode()).hexdigest()\n\ndef verify(password, stored_hash):\n    pass\n\nstored = hash_password('secret1')\nprint(verify('secret1', stored))\nprint(verify('wrong', stored))\n",
+      "tests": "_s = hash_password('secret1')\nassert verify('secret1', _s) is True, 'Верный пароль должен дать True'\nassert verify('wrong', _s) is False, 'Неверный пароль должен дать False'\nassert verify('', _s) is False, 'Пустой пароль - False'",
+      "hint": { "ru": "return hash_password(password) == stored_hash", "uz": "return hash_password(password) == stored_hash", "en": "return hash_password(password) == stored_hash" } },
+    { "id": "t3", "kind": "python",
+      "title": { "ru": "Детектор опасного запроса", "uz": "Xavfli so'rov detektori", "en": "Dangerous query detector" },
+      "brief": { "ru": "Распознать инъекцию", "uz": "In'ektsiyani aniqlash", "en": "Spot the injection" },
+      "desc": { "ru": "<p>Напиши функцию <code>is_dangerous(query)</code>: вернуть <code>True</code>, если в строке запроса есть признаки инъекции — комментарий <code>--</code>, <code>DROP</code> или <code>OR '1'='1'</code> (регистр не важен).</p>", "uz": "<p><code>is_dangerous(query)</code> funksiyasini yozing: so'rovda in'ektsiya belgilari bo'lsa <code>True</code> qaytaring — <code>--</code> izohi, <code>DROP</code> yoki <code>OR '1'='1'</code> (registr muhim emas).</p>", "en": "<p>Write <code>is_dangerous(query)</code>: return <code>True</code> if the query shows injection signs — a <code>--</code> comment, <code>DROP</code>, or <code>OR '1'='1'</code> (case-insensitive).</p>" },
+      "starter": "def is_dangerous(query):\n    # приведи к нижнему регистру и поищи подозрительные фрагменты\n    pass\n\nprint(is_dangerous(\"SELECT * FROM users WHERE name = 'admin' --'\"))\nprint(is_dangerous(\"SELECT * FROM users WHERE id = ?\"))\n",
+      "tests": "assert is_dangerous(\"SELECT * FROM users WHERE name = 'admin' --'\") is True, 'Комментарий -- это признак инъекции'\nassert is_dangerous(\"SELECT * FROM users WHERE id = ?\") is False, 'Параметризованный запрос безопасен'\nassert is_dangerous(\"'; DROP TABLE users; --\") is True, 'DROP - опасно'\nassert is_dangerous(\"SELECT 1 WHERE 'a' OR '1'='1'\") is True, \"OR '1'='1' - классика инъекции\"\nassert is_dangerous(\"select name from products\") is False, 'Обычный запрос безопасен'",
+      "hint": { "ru": "q = query.lower(); return '--' in q or 'drop' in q or \"or '1'='1'\" in q", "uz": "q = query.lower(); return '--' in q or 'drop' in q or \"or '1'='1'\" in q", "en": "q = query.lower(); return '--' in q or 'drop' in q or \"or '1'='1'\" in q" } }
+   ],
+   "exam": {
+    "time": 420,
+    "questions": [
+     { "q": { "ru": "Integrity в триаде CIA — это про…", "uz": "CIA triadasidagi Integrity — bu…", "en": "Integrity in the CIA triad is about…" },
+       "options": [{ "ru": "Скорость", "uz": "Tezlik", "en": "Speed" }, { "ru": "Неизменность данных", "uz": "Ma'lumot o'zgarmasligi", "en": "Data being unaltered" }, { "ru": "Резервные копии", "uz": "Zaxira nusxalar", "en": "Backups" }, { "ru": "Шифрование диска", "uz": "Diskni shifrlash", "en": "Disk encryption" }], "a": 1 },
+     { "q": { "ru": "Хеш-функция…", "uz": "Xesh-funksiya…", "en": "A hash function is…" },
+       "options": [{ "ru": "Обратима с ключом", "uz": "Kalit bilan qaytariladi", "en": "Reversible with a key" }, { "ru": "Необратима", "uz": "Qaytarilmaydi", "en": "Irreversible" }, { "ru": "Всегда даёт разный результат", "uz": "Har doim turli natija beradi", "en": "Always gives a different result" }, { "ru": "Это шифрование", "uz": "Bu shifrlash", "en": "The same as encryption" }], "a": 1 },
+     { "q": { "ru": "Что делает <code>' OR '1'='1</code> в уязвимом запросе?", "uz": "Zaif so'rovda <code>' OR '1'='1</code> nima qiladi?", "en": "What does <code>' OR '1'='1</code> do in a vulnerable query?" },
+       "options": [{ "ru": "Ничего", "uz": "Hech narsa", "en": "Nothing" }, { "ru": "Делает условие всегда истинным", "uz": "Shartni har doim rost qiladi", "en": "Makes the condition always true" }, { "ru": "Удаляет таблицу", "uz": "Jadvalni o'chiradi", "en": "Drops the table" }, { "ru": "Ускоряет запрос", "uz": "So'rovni tezlashtiradi", "en": "Speeds up the query" }], "a": 1 },
+     { "q": { "ru": "Минимальные права приложения в БД — это принцип…", "uz": "Ilovaning bazadagi minimal huquqlari — bu tamoyil…", "en": "Giving an app minimal DB rights is the principle of…" },
+       "options": [{ "ru": "Наименьших привилегий", "uz": "Eng kam imtiyozlar", "en": "Least privilege" }, { "ru": "Глубокой обороны", "uz": "Chuqur mudofaa", "en": "Defence in depth" }, { "ru": "Нулевого доверия", "uz": "Nol ishonch", "en": "Zero trust" }, { "ru": "Открытого кода", "uz": "Ochiq kod", "en": "Open source" }], "a": 0 },
+     { "q": { "ru": "Секрет случайно попал в git и был удалён следующим коммитом. Он в безопасности?", "uz": "Sir tasodifan git'ga tushdi va keyingi commit'da o'chirildi. U xavfsizmi?", "en": "A secret was committed to git and removed in the next commit. Is it safe?" },
+       "options": [{ "ru": "Да, удалён же", "uz": "Ha, o'chirilgan-ku", "en": "Yes, it was deleted" }, { "ru": "Нет — он остался в истории, ключ надо менять", "uz": "Yo'q — u tarixda qoldi, kalitni almashtirish kerak", "en": "No — it remains in history; rotate the key" }, { "ru": "Да, если репозиторий приватный", "uz": "Ha, agar repozitoriy private bo'lsa", "en": "Yes, if the repo is private" }, { "ru": "Зависит от языка", "uz": "Tilga bog'liq", "en": "Depends on the language" }], "a": 1 }
+    ],
+    "tasks": [
+     { "kind": "python",
+       "title": { "ru": "Безопасный конструктор запроса", "uz": "Xavfsiz so'rov konstruktori", "en": "Safe query builder" },
+       "desc": { "ru": "<p>Напиши функцию <code>build_query(table, column)</code>, которая возвращает строку вида <code>SELECT * FROM users WHERE id = ?</code>, но <b>только если</b> имя таблицы и колонки состоят из букв, цифр и <code>_</code>. Иначе вернуть <code>None</code>.</p><p>Это приём белого списка: имена таблиц нельзя передать параметром, поэтому их проверяют строго.</p>", "uz": "<p><code>build_query(table, column)</code> funksiyasini yozing: <code>SELECT * FROM users WHERE id = ?</code> ko'rinishidagi satrni qaytarsin, lekin <b>faqat</b> jadval va ustun nomi harflar, raqamlar va <code>_</code> dan iborat bo'lsa. Aks holda <code>None</code>.</p><p>Bu oq ro'yxat usuli: jadval nomlarini parametr sifatida uzatib bo'lmaydi, shuning uchun ular qat'iy tekshiriladi.</p>", "en": "<p>Write <code>build_query(table, column)</code> returning a string like <code>SELECT * FROM users WHERE id = ?</code>, but <b>only if</b> the table and column names contain just letters, digits and <code>_</code>. Otherwise return <code>None</code>.</p><p>This is the allow-list technique: identifiers can't be passed as parameters, so they must be validated strictly.</p>" },
+       "starter": "def build_query(table, column):\n    # подсказка: str.isalnum() и проверка символов\n    pass\n\nprint(build_query('users', 'id'))\nprint(build_query('users; DROP TABLE x', 'id'))\n",
+       "tests": "assert build_query('users', 'id') == 'SELECT * FROM users WHERE id = ?', 'Нормальные имена -> корректный запрос'\nassert build_query('users; DROP TABLE x', 'id') is None, 'Опасное имя таблицы -> None'\nassert build_query('users', \"id' OR '1'='1\") is None, 'Опасное имя колонки -> None'\nassert build_query('order_items', 'user_id') == 'SELECT * FROM order_items WHERE user_id = ?', 'Подчёркивания разрешены'" }
+    ]
+   }
+  }
+ ]
+}

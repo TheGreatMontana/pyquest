@@ -1,0 +1,1305 @@
+{
+ "id": "python-advanced",
+ "schema": 2,
+ "modules": [
+  {
+   "id": "pa-01",
+   "legacyId": "m09",
+   "title": {
+    "ru": "Классы и ООП"
+   },
+   "tagline": {
+    "ru": "Классы, объекты, __init__ и наследование"
+   },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": {
+      "ru": "🏗️ Класс — чертёж, объект — изделие"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><b>Класс</b> — это чертёж (шаблон), а <b>объект</b> — конкретная вещь, созданная по чертежу. Один класс «Машина» — тысячи разных машин:</p>"
+       }
+      },
+      {
+       "type": "run",
+       "lang": "python",
+       "code": "class Dog:\n    def bark(self):\n        print('Гав-гав!')\n\nrex = Dog()    # создали объект\nbobik = Dog()  # и ещё один\nrex.bark()\nbobik.bark()"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Функция внутри класса называется <b>методом</b>. Вызывается через точку: <code>объект.метод()</code>. Ты уже пользовался методами: <code>list.append()</code>, <code>str.upper()</code> — всё это ООП!</p>"
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": {
+      "ru": "⚙️ __init__ и self"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><code>__init__</code> — специальный метод, который выполняется при создании объекта. В нём задают <b>атрибуты</b> — переменные объекта:</p>"
+       }
+      },
+      {
+       "type": "run",
+       "lang": "python",
+       "code": "class Player:\n    def __init__(self, name, level):\n        self.name = name\n        self.level = level\n\np1 = Player('Азиз', 7)\np2 = Player('Тимур', 3)\nprint(p1.name, '-', p1.level)\nprint(p2.name, '-', p2.level)"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><code>self</code> — это «я сам», ссылка на конкретный объект. <code>self.name = name</code> означает: «запиши имя в ЭТОТ объект». Поэтому у p1 и p2 разные имена.</p>"
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": {
+      "ru": "🎮 Методы работают с атрибутами"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Методы через <code>self</code> читают и меняют атрибуты своего объекта:</p>"
+       }
+      },
+      {
+       "type": "run",
+       "lang": "python",
+       "code": "class Player:\n    def __init__(self, name):\n        self.name = name\n        self.hp = 100\n\n    def take_damage(self, dmg):\n        self.hp -= dmg\n        if self.hp <= 0:\n            print(f'{self.name} пал в бою 💀')\n        else:\n            print(f'{self.name}: осталось {self.hp} HP')\n\nhero = Player('Азиз')\nhero.take_damage(30)\nhero.take_damage(80)"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Заметь: при вызове <code>hero.take_damage(30)</code> параметр <code>self</code> подставляется автоматически — передаёшь только урон.</p>"
+       }
+      }
+     ]
+    },
+    {
+     "id": "l4",
+     "title": {
+      "ru": "👨‍👦 Наследование"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Класс может <b>наследовать</b> другой: взять всё его содержимое и добавить своё. Родитель в скобках:</p>"
+       }
+      },
+      {
+       "type": "run",
+       "lang": "python",
+       "code": "class Animal:\n    def __init__(self, name):\n        self.name = name\n\n    def eat(self):\n        print(f'{self.name} ест')\n\nclass Cat(Animal):  # Cat наследует Animal\n    def meow(self):\n        print(f'{self.name}: мяу!')\n\nbarsik = Cat('Барсик')\nbarsik.eat()   # метод родителя работает!\nbarsik.meow()  # и свой тоже"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Наследование экономит код: общее — в родителе, особенное — в наследниках.</p>"
+       }
+      }
+     ]
+    },
+    {
+     "id": "l5",
+     "title": {
+      "ru": "🔁 Переопределение и super()"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Наследник может <b>переопределить</b> метод родителя — заменить своим. А <code>super()</code> вызывает родительскую версию:</p>"
+       }
+      },
+      {
+       "type": "run",
+       "lang": "python",
+       "code": "class Enemy:\n    def __init__(self, hp):\n        self.hp = hp\n\n    def info(self):\n        print(f'Враг: {self.hp} HP')\n\nclass Boss(Enemy):\n    def __init__(self, hp, phase):\n        super().__init__(hp)   # вызвали __init__ родителя\n        self.phase = phase\n\n    def info(self):           # переопределили\n        print(f'БОСС: {self.hp} HP, фаза {self.phase} 👹')\n\nEnemy(50).info()\nBoss(500, 2).info()"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>ООП — это способ держать данные и действия над ними вместе. Большие проекты почти всегда построены на классах.</p>"
+       }
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": {
+      "ru": "Каким словом создаётся класс?"
+     },
+     "options": [
+      {
+       "ru": "def"
+      },
+      {
+       "ru": "class"
+      },
+      {
+       "ru": "object"
+      },
+      {
+       "ru": "new"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Классы объявляются словом <code>class</code>."
+     }
+    },
+    {
+     "q": {
+      "ru": "Когда вызывается __init__?"
+     },
+     "options": [
+      {
+       "ru": "При каждом вызове метода"
+      },
+      {
+       "ru": "При создании объекта"
+      },
+      {
+       "ru": "При удалении объекта"
+      },
+      {
+       "ru": "Никогда сам"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "<code>__init__</code> срабатывает автоматически в момент создания объекта: <code>Player(...)</code>."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что такое self?"
+     },
+     "options": [
+      {
+       "ru": "Название класса"
+      },
+      {
+       "ru": "Ссылка на сам объект"
+      },
+      {
+       "ru": "Специальная переменная Python"
+      },
+      {
+       "ru": "Родительский класс"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "<code>self</code> — ссылка на конкретный объект, с которым работает метод."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что выведет код?"
+     },
+     "options": [
+      {
+       "ru": "90"
+      },
+      {
+       "ru": "120"
+      },
+      {
+       "ru": "90 120"
+      },
+      {
+       "ru": "Ошибку"
+      }
+     ],
+     "a": 0,
+     "code": "class Car:\n    def __init__(self, speed):\n        self.speed = speed\n\na = Car(90)\nb = Car(120)\nprint(a.speed)",
+     "explain": {
+      "ru": "У каждого объекта свои атрибуты: у <code>a</code> скорость 90."
+     }
+    },
+    {
+     "q": {
+      "ru": "Как создать класс Cat, наследующий Animal?"
+     },
+     "options": [
+      {
+       "ru": "class Cat -> Animal:"
+      },
+      {
+       "ru": "class Cat(Animal):"
+      },
+      {
+       "ru": "class Animal(Cat):"
+      },
+      {
+       "ru": "class Cat extends Animal:"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Родитель указывается в скобках: <code>class Cat(Animal):</code>."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что делает super()?"
+     },
+     "options": [
+      {
+       "ru": "Создаёт супер-объект"
+      },
+      {
+       "ru": "Обращается к родительскому классу"
+      },
+      {
+       "ru": "Ускоряет код"
+      },
+      {
+       "ru": "Удаляет класс"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "<code>super()</code> даёт доступ к методам родителя, например <code>super().__init__()</code>."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что выведет код?"
+     },
+     "options": [
+      {
+       "ru": "A"
+      },
+      {
+       "ru": "B"
+      },
+      {
+       "ru": "A и B"
+      },
+      {
+       "ru": "Ошибку"
+      }
+     ],
+     "a": 1,
+     "code": "class A:\n    def hi(self):\n        print('A')\n\nclass B(A):\n    def hi(self):\n        print('B')\n\nB().hi()",
+     "explain": {
+      "ru": "Метод переопределён в наследнике — выполняется версия класса B."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "title": {
+      "ru": "Класс Hero"
+     },
+     "brief": {
+      "ru": "__init__ и атрибуты"
+     },
+     "desc": {
+      "ru": "<p>Создай класс <code>Hero</code>: в <code>__init__</code> принимает <code>name</code> и <code>power</code>, сохраняет их в атрибуты. Создай героя <code>Hero(\"Азиз\", 95)</code> и выведи: <code>Азиз: сила 95</code></p>"
+     },
+     "starter": "class Hero:\n    def __init__(self, name, power):\n        # сохрани в self\n        pass\n\nh = Hero(\"Азиз\", 95)\n# выведи f-строку с атрибутами\n",
+     "hint": {
+      "ru": "self.name = name и self.power = power, потом print(f\"{h.name}: сила {h.power}\")"
+     },
+     "kind": "python",
+     "tests": "assert h.name == 'Азиз', 'Атрибут h.name должен быть: Азиз (self.name = name)'\nassert h.power == 95, 'Атрибут h.power должен быть 95'\nassert 'Азиз: сила 95' in _stdout, 'Выведи: Азиз: сила 95'"
+    },
+    {
+     "id": "t2",
+     "title": {
+      "ru": "Копилка"
+     },
+     "brief": {
+      "ru": "Методы меняют состояние"
+     },
+     "desc": {
+      "ru": "<p>Создай класс <code>Bank</code>: начальный баланс 0, метод <code>add(amount)</code> увеличивает баланс, метод <code>show()</code> возвращает строку <code>Баланс: X</code>. Добавь 150 и 50, выведи результат <code>show()</code>.</p>"
+     },
+     "starter": "class Bank:\n    def __init__(self):\n        self.balance = 0\n\n    def add(self, amount):\n        pass\n\n    def show(self):\n        pass\n\nb = Bank()\nb.add(150)\nb.add(50)\nprint(b.show())\n",
+     "hint": {
+      "ru": "В add: self.balance += amount. В show: return f\"Баланс: {self.balance}\""
+     },
+     "kind": "python",
+     "tests": "assert b.balance == 200, 'После add(150) и add(50) баланс должен быть 200'\nassert b.show() == 'Баланс: 200', 'show() должен ВОЗВРАЩАТЬ строку: Баланс: 200'\nassert 'Баланс: 200' in _stdout, 'Выведи print(b.show())'"
+    },
+    {
+     "id": "t3",
+     "title": {
+      "ru": "Боевые классы"
+     },
+     "brief": {
+      "ru": "Наследование"
+     },
+     "desc": {
+      "ru": "<p>Дан класс <code>Unit</code>. Создай класс <code>Archer</code> (наследует Unit) с методом <code>shoot()</code>, который возвращает <code>name стреляет!</code>. Создай лучника <code>Archer(\"Леголас\")</code>, вызови <code>info()</code> (родительский!) и выведи <code>shoot()</code>.</p>"
+     },
+     "starter": "class Unit:\n    def __init__(self, name):\n        self.name = name\n\n    def info(self):\n        print(f\"Юнит: {self.name}\")\n\n# создай класс Archer(Unit) с методом shoot\n\na = Archer(\"Леголас\")\na.info()\nprint(a.shoot())\n",
+     "hint": {
+      "ru": "class Archer(Unit): и внутри def shoot(self): return f\"{self.name} стреляет!\" — __init__ писать не надо, он унаследуется."
+     },
+     "kind": "python",
+     "tests": "assert isinstance(a, Unit), 'Archer должен наследовать Unit: class Archer(Unit):'\nassert a.shoot() == 'Леголас стреляет!', 'shoot() должен вернуть: Леголас стреляет!'\nassert 'Юнит: Леголас' in _stdout, 'Вызови a.info() - метод достанется от родителя'"
+    }
+   ],
+   "exam": {
+    "time": 600,
+    "questions": [
+     {
+      "q": {
+       "ru": "Что выведет код?"
+      },
+      "options": [
+       {
+        "ru": "5"
+       },
+       {
+        "ru": "10"
+       },
+       {
+        "ru": "size"
+       },
+       {
+        "ru": "Ошибку"
+       }
+      ],
+      "a": 1,
+      "code": "class Box:\n    def __init__(self, size):\n        self.size = size * 2\n\nb = Box(5)\nprint(b.size)"
+     },
+     {
+      "q": {
+       "ru": "Первый параметр любого метода?"
+      },
+      "options": [
+       {
+        "ru": "this"
+       },
+       {
+        "ru": "self"
+       },
+       {
+        "ru": "obj"
+       },
+       {
+        "ru": "me"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "Что выведет код?"
+      },
+      "options": [
+       {
+        "ru": "0"
+       },
+       {
+        "ru": "1"
+       },
+       {
+        "ru": "3"
+       },
+       {
+        "ru": "Ошибку"
+       }
+      ],
+      "a": 2,
+      "code": "class Counter:\n    def __init__(self):\n        self.n = 0\n\n    def up(self):\n        self.n += 1\n\nc = Counter()\nc.up()\nc.up()\nc.up()\nprint(c.n)"
+     },
+     {
+      "q": {
+       "ru": "Объекты p1 = Player(\"A\") и p2 = Player(\"B\") имеют…"
+      },
+      "options": [
+       {
+        "ru": "Общие атрибуты"
+       },
+       {
+        "ru": "Каждый свои атрибуты"
+       },
+       {
+        "ru": "Только p1 имеет атрибуты"
+       },
+       {
+        "ru": "Ошибка — нельзя два объекта"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "Что выведет код?"
+      },
+      "options": [
+       {
+        "ru": "Ошибку"
+       },
+       {
+        "ru": "None"
+       },
+       {
+        "ru": "едет"
+       },
+       {
+        "ru": "go"
+       }
+      ],
+      "a": 2,
+      "code": "class A:\n    def go(self):\n        return 'едет'\n\nclass B(A):\n    pass\n\nprint(B().go())"
+     },
+     {
+      "q": {
+       "ru": "Зачем нужен super().__init__(...)?"
+      },
+      "options": [
+       {
+        "ru": "Создать новый класс"
+       },
+       {
+        "ru": "Вызвать конструктор родителя"
+       },
+       {
+        "ru": "Удалить родителя"
+       },
+       {
+        "ru": "Это синтаксическая ошибка"
+       }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "title": {
+       "ru": "RPG-инвентарь"
+      },
+      "desc": {
+       "ru": "<p>Создай класс <code>Inventory</code>: в <code>__init__</code> — пустой список <code>self.items</code>; метод <code>add(item)</code> добавляет предмет; метод <code>count()</code> возвращает количество. Добавь «меч» и «щит», выведи: <code>Предметов: 2</code></p>"
+      },
+      "starter": "class Inventory:\n    pass  # напиши класс\n\ninv = Inventory()\ninv.add(\"меч\")\ninv.add(\"щит\")\nprint(f\"Предметов: {inv.count()}\")\n",
+      "kind": "python",
+      "tests": "assert inv.items == ['меч', 'щит'], 'В items должны быть меч и щит. Сейчас: ' + str(getattr(inv, 'items', 'нет атрибута'))\nassert inv.count() == 2, 'count() должен вернуть 2'\nassert 'Предметов: 2' in _stdout, 'Вывод должен быть: Предметов: 2'"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pa-02",
+   "legacyId": "m10",
+   "title": {
+    "ru": "Работа с файлами"
+   },
+   "tagline": {
+    "ru": "Чтение и запись файлов, with open"
+   },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": {
+      "ru": "💾 Зачем программе файлы"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Все переменные исчезают, когда программа завершилась. Чтобы данные жили дальше — их сохраняют в <b>файлы</b>: настройки, сохранения игр, логи, отчёты.</p>"
+       }
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Открывает файл функция <code>open(имя, режим)</code>. Главные режимы:</p>"
+       }
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<ul><li><code>\"r\"</code> — чтение (read)</li><li><code>\"w\"</code> — запись с нуля (write, старое стирается!)</li><li><code>\"a\"</code> — дозапись в конец (append)</li></ul>"
+       }
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>👉 Здесь, в браузере, файлы создаются в виртуальном диске — всё работает по-настоящему, пробуй смело!</p>"
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": {
+      "ru": "✍️ Запись: with open"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Файл нужно закрывать после работы. Конструкция <code>with</code> делает это автоматически — всегда пиши только так:</p>"
+       }
+      },
+      {
+       "type": "run",
+       "lang": "python",
+       "code": "with open('hello.txt', 'w') as f:\n    f.write('Первая строка\\n')\n    f.write('Вторая строка\\n')\nprint('Файл записан!')"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><code>as f</code> — переменная файла. <code>\\n</code> — символ переноса строки: <code>write</code> сам переносы не добавляет, в отличие от print.</p>"
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": {
+      "ru": "📖 Чтение файла"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Три способа прочитать:</p>"
+       }
+      },
+      {
+       "type": "run",
+       "lang": "python",
+       "code": "with open('data.txt', 'w') as f:\n    f.write('яблоко\\nбанан\\nвишня\\n')\n\n# 1) весь файл одной строкой\nwith open('data.txt', 'r') as f:\n    text = f.read()\nprint(text)\n\n# 2) списком строк\nwith open('data.txt', 'r') as f:\n    lines = f.readlines()\nprint(lines)"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Способ 3 — самый ходовой — циклом:</p>"
+       }
+      },
+      {
+       "type": "run",
+       "lang": "python",
+       "code": "with open('data.txt', 'w') as f:\n    f.write('яблоко\\nбанан\\nвишня\\n')\n\nwith open('data.txt', 'r') as f:\n    for line in f:\n        print('Фрукт:', line.strip())"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><code>.strip()</code> обрезает невидимый <code>\\n</code> в конце каждой строки — иначе будут лишние пустые строки.</p>"
+       }
+      }
+     ]
+    },
+    {
+     "id": "l4",
+     "title": {
+      "ru": "➕ Дозапись и обработка ошибок"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Режим <code>\"a\"</code> добавляет в конец, не стирая старое, — так ведут логи:</p>"
+       }
+      },
+      {
+       "type": "run",
+       "lang": "python",
+       "code": "with open('log.txt', 'w') as f:\n    f.write('игра началась\\n')\nwith open('log.txt', 'a') as f:\n    f.write('уровень пройден\\n')\nwith open('log.txt') as f:\n    print(f.read())"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Чтение несуществующего файла роняет программу. Спасает <code>try/except</code>:</p>"
+       }
+      },
+      {
+       "type": "run",
+       "lang": "python",
+       "code": "try:\n    with open('net_takogo.txt') as f:\n        print(f.read())\nexcept FileNotFoundError:\n    print('Файла нет - но программа жива!')"
+      }
+     ]
+    },
+    {
+     "id": "l5",
+     "title": {
+      "ru": "🧮 Обработка данных из файла"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Классическая задача: прочитать данные, разобрать, посчитать:</p>"
+       }
+      },
+      {
+       "type": "run",
+       "lang": "python",
+       "code": "with open('scores.txt', 'w') as f:\n    f.write('aziz 300\\ntimur 150\\nsara 420\\n')\n\ntotal = 0\nwith open('scores.txt') as f:\n    for line in f:\n        name, score = line.split()   # разбить по пробелу\n        total += int(score)          # строку - в число!\n        print(f'{name}: {score}')\nprint(f'Сумма: {total}')"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><code>split()</code> режет строку на список по пробелам. Не забывай <code>int()</code> — из файла всё приходит строками. Это последний модуль теории — дальше финальный босс! 🏆</p>"
+       }
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": {
+      "ru": "Какой режим открывает файл на чтение?"
+     },
+     "options": [
+      {
+       "ru": "\"w\""
+      },
+      {
+       "ru": "\"r\""
+      },
+      {
+       "ru": "\"a\""
+      },
+      {
+       "ru": "\"x\""
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "<code>\"r\"</code> — read, чтение. Он же используется по умолчанию."
+     }
+    },
+    {
+     "q": {
+      "ru": "Чем опасен режим \"w\"?"
+     },
+     "options": [
+      {
+       "ru": "Ничем"
+      },
+      {
+       "ru": "Он стирает старое содержимое файла"
+      },
+      {
+       "ru": "Он не создаёт файл"
+      },
+      {
+       "ru": "Файл нельзя будет открыть"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "<code>\"w\"</code> пишет с нуля: старое содержимое пропадает. Для добавления есть <code>\"a\"</code>."
+     }
+    },
+    {
+     "q": {
+      "ru": "Зачем нужен with при работе с файлами?"
+     },
+     "options": [
+      {
+       "ru": "Для красоты"
+      },
+      {
+       "ru": "Автоматически закрывает файл"
+      },
+      {
+       "ru": "Ускоряет чтение"
+      },
+      {
+       "ru": "Шифрует данные"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "<code>with</code> гарантированно закроет файл, даже если случится ошибка."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что вернёт f.read()?"
+     },
+     "options": [
+      {
+       "ru": "Список строк"
+      },
+      {
+       "ru": "Весь файл одной строкой"
+      },
+      {
+       "ru": "Первую строку"
+      },
+      {
+       "ru": "Количество строк"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "<code>read()</code> — весь файл одной строкой, <code>readlines()</code> — список строк."
+     }
+    },
+    {
+     "q": {
+      "ru": "Зачем .strip() при чтении строк файла?"
+     },
+     "options": [
+      {
+       "ru": "Удалить цифры"
+      },
+      {
+       "ru": "Обрезать \\n и пробелы по краям"
+      },
+      {
+       "ru": "Разбить на слова"
+      },
+      {
+       "ru": "Перевести в нижний регистр"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Каждая строка файла кончается невидимым <code>\\n</code> — <code>strip()</code> его убирает."
+     }
+    },
+    {
+     "q": {
+      "ru": "Какая ошибка возникнет при чтении несуществующего файла?"
+     },
+     "options": [
+      {
+       "ru": "KeyError"
+      },
+      {
+       "ru": "ValueError"
+      },
+      {
+       "ru": "FileNotFoundError"
+      },
+      {
+       "ru": "TypeError"
+      }
+     ],
+     "a": 2,
+     "explain": {
+      "ru": "Нет файла — <code>FileNotFoundError</code>. Ловится через <code>try/except</code>."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что сделает <code>\"aziz 300\".split()</code>?"
+     },
+     "options": [
+      {
+       "ru": "['aziz 300']"
+      },
+      {
+       "ru": "['aziz', '300']"
+      },
+      {
+       "ru": "['a','z','i','z']"
+      },
+      {
+       "ru": "Ошибку"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "<code>split()</code> без аргументов режет строку по пробелам: <code>['aziz', '300']</code>."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "title": {
+      "ru": "Дневник героя"
+     },
+     "brief": {
+      "ru": "Запись в файл"
+     },
+     "desc": {
+      "ru": "<p>Запиши в файл <code>diary.txt</code> две строки:</p><pre class=\"code\">День 13: изучаю файлы\nЗавтра финальный босс</pre><p>Потом прочитай файл и выведи его содержимое.</p>"
+     },
+     "starter": "# запиши через with open('diary.txt', 'w')\n# прочитай и выведи\n",
+     "hint": {
+      "ru": "f.write('День 13: изучаю файлы\\n') и f.write('Завтра финальный босс\\n'), потом открой в режиме 'r' и print(f.read())."
+     },
+     "kind": "python",
+     "tests": "with open('diary.txt') as _f:\n    _content = _f.read()\nassert 'День 13: изучаю файлы' in _content, 'В файле нет строки: День 13: изучаю файлы'\nassert 'Завтра финальный босс' in _content, 'В файле нет строки: Завтра финальный босс'\nassert 'День 13' in _stdout, 'Прочитай файл и выведи через print'"
+    },
+    {
+     "id": "t2",
+     "title": {
+      "ru": "Список покупок"
+     },
+     "brief": {
+      "ru": "Запись списка + чтение циклом"
+     },
+     "desc": {
+      "ru": "<p>Дан список покупок. Запиши каждый элемент в файл <code>shop.txt</code> отдельной строкой. Потом прочитай файл и выведи каждую строку с номером:</p><pre class=\"code\">1. хлеб\n2. молоко\n3. плов</pre>"
+     },
+     "starter": "items = ['хлеб', 'молоко', 'плов']\n# запиши в shop.txt, потом прочитай с номерами\n",
+     "hint": {
+      "ru": "Запись: for item in items: f.write(item + \"\\n\"). Чтение: for i, line in enumerate(f, 1): print(f\"{i}. {line.strip()}\")"
+     },
+     "kind": "python",
+     "tests": "with open('shop.txt') as _f:\n    _lines = [l.strip() for l in _f if l.strip()]\nassert _lines == ['хлеб', 'молоко', 'плов'], 'В файле должно быть 3 строки: хлеб, молоко, плов. Сейчас: ' + str(_lines)\nassert '1. хлеб' in _stdout, 'Вывод: 1. хлеб'\nassert '2. молоко' in _stdout, 'Вывод: 2. молоко'\nassert '3. плов' in _stdout, 'Вывод: 3. плов'"
+    },
+    {
+     "id": "t3",
+     "title": {
+      "ru": "Подсчёт очков из файла"
+     },
+     "brief": {
+      "ru": "split + int + сумма"
+     },
+     "desc": {
+      "ru": "<p>В файле <code>results.txt</code> лежат результаты (он уже создан стартовым кодом). Прочитай его и выведи: <code>Общий счёт: 870</code></p>"
+     },
+     "starter": "with open('results.txt', 'w') as f:\n    f.write('level1 250\\nlevel2 300\\nlevel3 320\\n')\n\n# прочитай файл, сложи числа, выведи 'Общий счёт: 870'\n",
+     "hint": {
+      "ru": "total = 0, потом for line in f: name, score = line.split(), total += int(score). В конце print(f\"Общий счёт: {total}\")"
+     },
+     "kind": "python",
+     "tests": "assert 'Общий счёт: 870' in _stdout, 'Ожидался вывод: Общий счёт: 870. Разбирай строки через split() и складывай int(score)'"
+    }
+   ],
+   "exam": {
+    "time": 600,
+    "questions": [
+     {
+      "q": {
+       "ru": "Как правильно открыть файл на дозапись?"
+      },
+      "options": [
+       {
+        "ru": "open('f.txt', 'r')"
+       },
+       {
+        "ru": "open('f.txt', 'w')"
+       },
+       {
+        "ru": "open('f.txt', 'a')"
+       },
+       {
+        "ru": "open('f.txt', 'add')"
+       }
+      ],
+      "a": 2
+     },
+     {
+      "q": {
+       "ru": "Что выведет код?"
+      },
+      "options": [
+       {
+        "ru": "AB"
+       },
+       {
+        "ru": "A"
+       },
+       {
+        "ru": "B"
+       },
+       {
+        "ru": "BA"
+       }
+      ],
+      "a": 2,
+      "code": "with open('t.txt', 'w') as f:\n    f.write('A')\nwith open('t.txt', 'w') as f:\n    f.write('B')\nwith open('t.txt') as f:\n    print(f.read())"
+     },
+     {
+      "q": {
+       "ru": "Файл содержит «5\\n10\\n». Что вернёт readlines()?"
+      },
+      "options": [
+       {
+        "ru": "['5', '10']"
+       },
+       {
+        "ru": "['5\\n', '10\\n']"
+       },
+       {
+        "ru": "'5 10'"
+       },
+       {
+        "ru": "[5, 10]"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "Что делает f.write(42)?"
+      },
+      "options": [
+       {
+        "ru": "Запишет 42"
+       },
+       {
+        "ru": "Запишет \"42\""
+       },
+       {
+        "ru": "Ошибку — write принимает только строки"
+       },
+       {
+        "ru": "Ничего"
+       }
+      ],
+      "a": 2
+     },
+     {
+      "q": {
+       "ru": "Как поймать ошибку отсутствующего файла?"
+      },
+      "options": [
+       {
+        "ru": "if file.exists:"
+       },
+       {
+        "ru": "try/except FileNotFoundError"
+       },
+       {
+        "ru": "with open safe"
+       },
+       {
+        "ru": "Никак"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "Что выведет код?"
+      },
+      "options": [
+       {
+        "ru": "991"
+       },
+       {
+        "ru": "100"
+       },
+       {
+        "ru": "Ошибку"
+       },
+       {
+        "ru": "sara1"
+       }
+      ],
+      "a": 1,
+      "code": "line = 'sara 99'\nname, score = line.split()\nprint(int(score) + 1)"
+     }
+    ],
+    "tasks": [
+     {
+      "title": {
+       "ru": "Лог сервера"
+      },
+      "desc": {
+       "ru": "<p>Стартовый код создаёт лог. Прочитай его, посчитай сколько строк содержат слово <code>ERROR</code> и выведи: <code>Ошибок: 2</code></p>"
+      },
+      "starter": "with open('server.log', 'w') as f:\n    f.write('INFO старт\\nERROR сбой сети\\nINFO работаем\\nERROR диск полон\\nINFO стоп\\n')\n\n# посчитай строки с ERROR\n",
+      "kind": "python",
+      "tests": "assert 'Ошибок: 2' in _stdout, 'Ожидался вывод: Ошибок: 2. Считай: if \\'ERROR\\' in line'"
+     }
+    ]
+   }
+  }
+ ],
+ "finalExam": {
+  "legacyId": "final",
+  "time": 1800,
+  "questions": [
+   {
+    "q": {
+     "ru": "Что выведет код?"
+    },
+    "options": [
+     {
+      "ru": "32"
+     },
+     {
+      "ru": "5"
+     },
+     {
+      "ru": "Ошибку"
+     },
+     {
+      "ru": "'5'"
+     }
+    ],
+    "a": 1,
+    "code": "x = '3'\ny = int(x) + 2\nprint(y)"
+   },
+   {
+    "q": {
+     "ru": "Что выведет код?"
+    },
+    "options": [
+     {
+      "ru": "[1, 2, 3]"
+     },
+     {
+      "ru": "[2, 3, 4]"
+     },
+     {
+      "ru": "[2, 3, 4, 5]"
+     },
+     {
+      "ru": "[1, 2, 3, 4]"
+     }
+    ],
+    "a": 1,
+    "code": "a = [1, 2, 3, 4, 5]\nprint(a[1:4])"
+   },
+   {
+    "q": {
+     "ru": "Что выведет код?"
+    },
+    "options": [
+     {
+      "ru": "15"
+     },
+     {
+      "ru": "10"
+     },
+     {
+      "ru": "5"
+     },
+     {
+      "ru": "4"
+     }
+    ],
+    "a": 1,
+    "code": "s = 0\nfor i in range(1, 5):\n    s += i\nprint(s)"
+   },
+   {
+    "q": {
+     "ru": "Что выведет код?"
+    },
+    "options": [
+     {
+      "ru": "делится"
+     },
+     {
+      "ru": "нет"
+     },
+     {
+      "ru": "Ошибку"
+     },
+     {
+      "ru": "Ничего"
+     }
+    ],
+    "a": 0,
+    "code": "n = 12\nif n % 3 == 0 and n % 4 == 0:\n    print('делится')\nelse:\n    print('нет')"
+   },
+   {
+    "q": {
+     "ru": "Что выведет код?"
+    },
+    "options": [
+     {
+      "ru": "150"
+     },
+     {
+      "ru": "110"
+     },
+     {
+      "ru": "90"
+     },
+     {
+      "ru": "Ошибку"
+     }
+    ],
+    "a": 1,
+    "code": "d = {'hp': 100}\nd['hp'] -= 40\nd['mp'] = 50\nprint(d['hp'] + d['mp'])"
+   },
+   {
+    "q": {
+     "ru": "Что выведет код?"
+    },
+    "options": [
+     {
+      "ru": "9"
+     },
+     {
+      "ru": "18"
+     },
+     {
+      "ru": "27"
+     },
+     {
+      "ru": "Бесконечный цикл"
+     }
+    ],
+    "a": 2,
+    "code": "n = 1\nwhile n < 20:\n    n *= 3\nprint(n)"
+   },
+   {
+    "q": {
+     "ru": "Что выведет код?"
+    },
+    "options": [
+     {
+      "ru": "6"
+     },
+     {
+      "ru": "9"
+     },
+     {
+      "ru": "5"
+     },
+     {
+      "ru": "Ошибку"
+     }
+    ],
+    "a": 1,
+    "code": "def f(x, y=2):\n    return x ** y\n\nprint(f(3))"
+   },
+   {
+    "q": {
+     "ru": "Что выведет код?"
+    },
+    "options": [
+     {
+      "ru": "7"
+     },
+     {
+      "ru": "70"
+     },
+     {
+      "ru": "n"
+     },
+     {
+      "ru": "Ошибку"
+     }
+    ],
+    "a": 1,
+    "code": "class P:\n    def __init__(self, n):\n        self.n = n * 10\n\nprint(P(7).n)"
+   },
+   {
+    "q": {
+     "ru": "Какой режим open() ДОБАВЛЯЕТ строки в конец файла?"
+    },
+    "options": [
+     {
+      "ru": "\"r\""
+     },
+     {
+      "ru": "\"w\""
+     },
+     {
+      "ru": "\"a\""
+     },
+     {
+      "ru": "\"x\""
+     }
+    ],
+    "a": 2
+   },
+   {
+    "q": {
+     "ru": "Что выведет код?"
+    },
+    "options": [
+     {
+      "ru": "3 2"
+     },
+     {
+      "ru": "2 3"
+     },
+     {
+      "ru": "3 py"
+     },
+     {
+      "ru": "Ошибку"
+     }
+    ],
+    "a": 0,
+    "code": "words = ['py', 'квест', 'финал']\nprint(len(words), len(words[0]))"
+   },
+   {
+    "q": {
+     "ru": "Что выведет код?"
+    },
+    "options": [
+     {
+      "ru": "[5, 8]"
+     },
+     {
+      "ru": "[12, 20]"
+     },
+     {
+      "ru": "[20]"
+     },
+     {
+      "ru": "[5, 12, 8, 20]"
+     }
+    ],
+    "a": 1,
+    "code": "res = []\nfor n in [5, 12, 8, 20]:\n    if n > 9:\n        res.append(n)\nprint(res)"
+   },
+   {
+    "q": {
+     "ru": "Что выведет код?"
+    },
+    "options": [
+     {
+      "ru": "60"
+     },
+     {
+      "ru": "40"
+     },
+     {
+      "ru": "80"
+     },
+     {
+      "ru": "90"
+     }
+    ],
+    "a": 1,
+    "code": "def mystery(lst):\n    return lst[-1] + lst[0]\n\nprint(mystery([10, 50, 30]))"
+   }
+  ],
+  "tasks": [
+   {
+    "title": {
+     "ru": "FizzBuzz — легендарная задача с собеседований"
+    },
+    "desc": {
+     "ru": "<p>Выведи числа от 1 до 15, но: если число делится на 3 — вместо него <code>Fizz</code>, если на 5 — <code>Buzz</code>, если и на 3 и на 5 — <code>FizzBuzz</code>.</p><pre class=\"code\">1\n2\nFizz\n4\nBuzz\n...\n14\nFizzBuzz</pre>"
+    },
+    "starter": "# Цикл по range(1, 16). Проверяй сначала деление на 15!\n",
+    "kind": "python",
+    "tests": "lines = [l.strip() for l in _stdout.strip().splitlines()]\nexpected = ['1','2','Fizz','4','Buzz','Fizz','7','8','Fizz','Buzz','11','Fizz','13','14','FizzBuzz']\nassert lines == expected, 'Проверь порядок условий: сначала n % 15 == 0, потом % 3, потом % 5. Получилось: ' + str(lines[:5]) + '...'"
+   },
+   {
+    "title": {
+     "ru": "Итоговый босс: система игроков"
+    },
+    "desc": {
+     "ru": "<p>Напиши класс <code>Player</code>: <code>__init__(name)</code> задаёт имя и <code>self.xp = 0</code>; метод <code>train(points)</code> прибавляет XP; метод <code>rank()</code> возвращает <code>\"Мастер\"</code> при XP ≥ 100, иначе <code>\"Новичок\"</code>.</p><p>Создай игрока <code>Player(\"Азиз\")</code>, вызови <code>train(60)</code> дважды и выведи: <code>Азиз - Мастер</code></p>"
+    },
+    "starter": "class Player:\n    pass  # твой код\n\np = Player(\"Азиз\")\np.train(60)\np.train(60)\nprint(f\"{p.name} - {p.rank()}\")\n",
+    "kind": "python",
+    "tests": "assert p.name == 'Азиз', 'Атрибут name должен быть: Азиз'\nassert p.xp == 120, 'После двух train(60) должно быть 120 XP'\nassert p.rank() == 'Мастер', 'rank() при 120 XP должен вернуть: Мастер'\n_p2 = Player('Тест')\nassert _p2.rank() == 'Новичок', 'rank() при 0 XP должен вернуть: Новичок'\nassert 'Азиз - Мастер' in _stdout, 'Вывод: Азиз - Мастер'"
+   }
+  ]
+ }
+}
