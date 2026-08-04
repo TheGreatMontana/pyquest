@@ -572,6 +572,609 @@
      }
     ]
    }
+  },
+  {
+   "id": "cs-02",
+   "title": {
+    "ru": "Grid и адаптивность",
+    "uz": "Grid va moslashuvchanlik",
+    "en": "Grid and responsiveness"
+   },
+   "tagline": {
+    "ru": "Сетки, медиазапросы и плавные состояния",
+    "uz": "To'rlar, media so'rovlar va silliq holatlar",
+    "en": "Grids, media queries and smooth states"
+   },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": {
+      "ru": "CSS Grid: сетка в две координаты",
+      "uz": "CSS Grid: ikki koordinatali to'r",
+      "en": "CSS Grid: a two-axis layout"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Flexbox раскладывает элементы вдоль одной линии. Grid работает сразу по двум: строки и колонки. Когда нужна именно сетка — карточки, галерея, макет страницы — берут grid.</p><ul><li><code>display: grid</code> включает режим</li><li><code>grid-template-columns</code> задаёт колонки</li><li><code>gap</code> — расстояние между ячейками</li></ul><p>Единица <code>fr</code> — доля свободного места. <code>1fr 1fr 1fr</code> означает три равные колонки.</p>",
+        "uz": "<p>Flexbox elementlarni bitta chiziq bo'ylab joylaydi. Grid esa ikki yo'nalishda ishlaydi: qatorlar va ustunlar. Aynan to'r kerak bo'lganda — kartochkalar, galereya, sahifa maketi — grid olinadi.</p><ul><li><code>display: grid</code> rejimni yoqadi</li><li><code>grid-template-columns</code> ustunlarni beradi</li><li><code>gap</code> — katakchalar orasidagi masofa</li></ul><p><code>fr</code> birligi — bo'sh joyning ulushi. <code>1fr 1fr 1fr</code> uchta teng ustun degani.</p>",
+        "en": "<p>Flexbox lays items out along one line. Grid works on two at once: rows and columns. When you need an actual grid — cards, a gallery, a page layout — reach for grid.</p><ul><li><code>display: grid</code> turns the mode on</li><li><code>grid-template-columns</code> defines the columns</li><li><code>gap</code> is the spacing between cells</li></ul><p>The <code>fr</code> unit is a share of the free space. <code>1fr 1fr 1fr</code> means three equal columns.</p>"
+       }
+      },
+      {
+       "type": "webrun",
+       "kind": "css",
+       "html": "<div class=\"grid\">\n  <div class=\"cell\">1</div>\n  <div class=\"cell\">2</div>\n  <div class=\"cell\">3</div>\n  <div class=\"cell wide\">4 — занимает две колонки</div>\n  <div class=\"cell\">5</div>\n</div>",
+       "code": ".grid {\n  display: grid;\n  grid-template-columns: 1fr 1fr 1fr;\n  gap: 10px;\n}\n\n.cell {\n  background: #e0f2fe;\n  border: 1px solid #38bdf8;\n  padding: 18px;\n  border-radius: 8px;\n  font-family: system-ui, sans-serif;\n}\n\n.wide {\n  grid-column: span 2;   /* ячейка на две колонки */\n  background: #bae6fd;\n}"
+      },
+      {
+       "type": "note",
+       "kind": "tip",
+       "html": {
+        "ru": "Запись <code>repeat(3, 1fr)</code> — то же самое, что <code>1fr 1fr 1fr</code>, только короче. Для галереи с неизвестным числом карточек удобно <code>repeat(auto-fill, minmax(200px, 1fr))</code>: колонки появляются сами по ширине экрана.",
+        "uz": "<code>repeat(3, 1fr)</code> yozuvi <code>1fr 1fr 1fr</code> bilan bir xil, faqat qisqaroq. Kartochkalar soni noma'lum galereya uchun <code>repeat(auto-fill, minmax(200px, 1fr))</code> qulay: ustunlar ekran kengligiga qarab o'zi paydo bo'ladi.",
+        "en": "<code>repeat(3, 1fr)</code> is the same as <code>1fr 1fr 1fr</code>, only shorter. For a gallery with an unknown number of cards, <code>repeat(auto-fill, minmax(200px, 1fr))</code> is handy: the columns appear on their own based on screen width."
+       }
+      },
+      {
+       "type": "checkpoint",
+       "q": {
+        "ru": "Что означает <code>1fr</code>?",
+        "uz": "<code>1fr</code> nimani anglatadi?",
+        "en": "What does <code>1fr</code> mean?"
+       },
+       "options": [
+        {
+         "ru": "Один пиксель",
+         "uz": "Bitta piksel",
+         "en": "One pixel"
+        },
+        {
+         "ru": "Одну долю свободного места",
+         "uz": "Bo'sh joyning bir ulushini",
+         "en": "One share of the free space"
+        },
+        {
+         "ru": "Один процент",
+         "uz": "Bir foiz",
+         "en": "One percent"
+        }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Если колонок <code>1fr 2fr</code>, вторая будет вдвое шире первой — независимо от размера экрана.",
+        "uz": "Ustunlar <code>1fr 2fr</code> bo'lsa, ikkinchisi birinchisidan ikki barobar keng bo'ladi — ekran o'lchamidan qat'i nazar.",
+        "en": "With columns <code>1fr 2fr</code>, the second is twice as wide as the first — regardless of screen size."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": {
+      "ru": "Медиазапросы",
+      "uz": "Media so'rovlar",
+      "en": "Media queries"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Медиазапрос включает часть стилей при условии — обычно по ширине экрана:</p><pre><code>@media (min-width: 768px) { ... }</code></pre><p>Правильный порядок — <b>сначала мобильные</b>: базовые стили пишутся для узкого экрана, а медиазапросы <i>добавляют</i> то, что нужно на широком. Так проще: мобильная вёрстка обычно проще, а не наоборот.</p>",
+        "uz": "<p>Media so'rov uslublarning bir qismini shart bo'yicha yoqadi — odatda ekran kengligi bo'yicha:</p><pre><code>@media (min-width: 768px) { ... }</code></pre><p>To'g'ri tartib — <b>avval mobil</b>: asosiy uslublar tor ekran uchun yoziladi, media so'rovlar esa keng ekranda kerak bo'lganini <i>qo'shadi</i>. Shunday osonroq: mobil joylashuv odatda soddaroq, teskarisi emas.</p>",
+        "en": "<p>A media query enables part of the styles under a condition — usually screen width:</p><pre><code>@media (min-width: 768px) { ... }</code></pre><p>The right order is <b>mobile first</b>: base styles are written for a narrow screen, and media queries <i>add</i> what is needed on a wide one. It is simpler this way: the mobile layout is usually the simpler one.</p>"
+       }
+      },
+      {
+       "type": "webrun",
+       "kind": "css",
+       "html": "<div class=\"cards\">\n  <div class=\"card\">Первая</div>\n  <div class=\"card\">Вторая</div>\n  <div class=\"card\">Третья</div>\n</div>\n<p class=\"hint\">Сузь окно — карточки встанут в колонку.</p>",
+       "code": "/* база — для узкого экрана */\n.cards {\n  display: grid;\n  grid-template-columns: 1fr;\n  gap: 10px;\n}\n\n/* добавляем на широком */\n@media (min-width: 700px) {\n  .cards { grid-template-columns: repeat(3, 1fr); }\n}\n\n.card {\n  background: #dcfce7;\n  border: 1px solid #22c55e;\n  padding: 16px;\n  border-radius: 8px;\n  font-family: system-ui, sans-serif;\n}\n.hint { font: 14px system-ui; color: #64748b; }"
+      },
+      {
+       "type": "predict",
+       "lang": "css",
+       "code": ".box { color: red; }\n\n@media (min-width: 600px) {\n  .box { color: blue; }\n}",
+       "options": [
+        {
+         "ru": "На экране 400px текст синий",
+         "uz": "400px ekranda matn ko'k",
+         "en": "On a 400px screen the text is blue"
+        },
+        {
+         "ru": "На экране 400px текст красный, на 800px — синий",
+         "uz": "400px da qizil, 800px da ko'k",
+         "en": "Red on a 400px screen, blue on 800px"
+        },
+        {
+         "ru": "Текст всегда красный",
+         "uz": "Matn doim qizil",
+         "en": "The text is always red"
+        }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "<code>min-width: 600px</code> — «от 600 и шире». На 400px запрос не срабатывает, остаётся базовый красный.",
+        "uz": "<code>min-width: 600px</code> — «600 dan keng». 400px da so'rov ishlamaydi, asosiy qizil qoladi.",
+        "en": "<code>min-width: 600px</code> means “600 and up”. At 400px the query does not apply and the base red stays."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": {
+      "ru": "Переменные, тени и переходы",
+      "uz": "O'zgaruvchilar, soyalar va o'tishlar",
+      "en": "Variables, shadows and transitions"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>CSS-переменные объявляют в <code>:root</code> и используют через <code>var()</code>. Меняешь одно значение — меняется вся тема.</p><p><code>transition</code> делает изменение плавным: браузер сам анимирует переход между состояниями. Это единственная строка, отличающая «дёргается» от «живое».</p>",
+        "uz": "<p>CSS o'zgaruvchilari <code>:root</code> da e'lon qilinadi va <code>var()</code> orqali ishlatiladi. Bitta qiymatni o'zgartirasiz — butun mavzu o'zgaradi.</p><p><code>transition</code> o'zgarishni silliq qiladi: brauzer holatlar orasidagi o'tishni o'zi animatsiya qiladi. Bu «sakraydi» va «tirik» o'rtasidagi yagona qator.</p>",
+        "en": "<p>CSS variables are declared in <code>:root</code> and used through <code>var()</code>. Change one value and the whole theme changes.</p><p><code>transition</code> makes a change smooth: the browser animates between states for you. It is the single line separating “jumpy” from “alive”.</p>"
+       }
+      },
+      {
+       "type": "webrun",
+       "kind": "css",
+       "html": "<button class=\"btn\">Наведи на меня</button>\n<div class=\"panel\">Карточка с тенью</div>",
+       "code": ":root {\n  --brand: #2563eb;\n  --radius: 10px;\n}\n\n.btn {\n  background: var(--brand);\n  color: #fff;\n  border: 0;\n  padding: 12px 20px;\n  border-radius: var(--radius);\n  font: 15px system-ui;\n  cursor: pointer;\n  transition: background .2s, transform .2s;\n}\n\n.btn:hover {\n  background: #1d4ed8;\n  transform: translateY(-2px);\n}\n\n.panel {\n  margin-top: 16px;\n  padding: 18px;\n  border-radius: var(--radius);\n  background: #fff;\n  box-shadow: 0 4px 14px rgba(15, 23, 42, .12);\n  font: 15px system-ui;\n}"
+      },
+      {
+       "type": "note",
+       "kind": "trap",
+       "html": {
+        "ru": "Анимировать стоит <code>transform</code> и <code>opacity</code> — их браузер считает дёшево. Анимация <code>width</code>, <code>top</code> или <code>margin</code> заставляет пересчитывать раскладку каждый кадр, и на слабом телефоне это заметно тормозит.",
+        "uz": "<code>transform</code> va <code>opacity</code> ni animatsiya qilish ma'qul — brauzer ularni arzon hisoblaydi. <code>width</code>, <code>top</code> yoki <code>margin</code> animatsiyasi har kadrda joylashuvni qayta hisoblashga majbur qiladi va kuchsiz telefonda sezilarli sekinlashadi.",
+        "en": "Animate <code>transform</code> and <code>opacity</code> — the browser computes them cheaply. Animating <code>width</code>, <code>top</code> or <code>margin</code> forces a layout recalculation every frame, which visibly lags on a weak phone."
+       }
+      },
+      {
+       "type": "summary",
+       "items": [
+        {
+         "ru": "Grid — сетка по строкам и колонкам, fr делит свободное место",
+         "uz": "Grid — qatorlar va ustunlar bo'yicha to'r, fr bo'sh joyni bo'ladi",
+         "en": "Grid lays out rows and columns; fr divides the free space"
+        },
+        {
+         "ru": "Сначала мобильные: медиазапрос добавляет, а не отменяет",
+         "uz": "Avval mobil: media so'rov qo'shadi, bekor qilmaydi",
+         "en": "Mobile first: a media query adds rather than undoes"
+        },
+        {
+         "ru": "Переменные в :root меняют тему одной правкой",
+         "uz": ":root dagi o'zgaruvchilar mavzuni bitta tahrir bilan o'zgartiradi",
+         "en": "Variables in :root change the theme with one edit"
+        },
+        {
+         "ru": "Анимируй transform и opacity, а не размеры",
+         "uz": "O'lchamlarni emas, transform va opacity ni animatsiya qiling",
+         "en": "Animate transform and opacity, not sizes"
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": {
+      "ru": "Чем grid отличается от flexbox?",
+      "uz": "Grid flexbox dan nimasi bilan farq qiladi?",
+      "en": "How does grid differ from flexbox?"
+     },
+     "options": [
+      {
+       "ru": "Ничем, это синонимы",
+       "uz": "Hech nimasi bilan, sinonim",
+       "en": "In no way, they are synonyms"
+      },
+      {
+       "ru": "Grid работает по двум осям, flex — по одной",
+       "uz": "Grid ikki o'q bo'yicha, flex bitta o'q bo'yicha ishlaydi",
+       "en": "Grid works on two axes, flex on one"
+      },
+      {
+       "ru": "Grid работает только в Chrome",
+       "uz": "Grid faqat Chrome da ishlaydi",
+       "en": "Grid only works in Chrome"
+      },
+      {
+       "ru": "Flex новее",
+       "uz": "Flex yangiroq",
+       "en": "Flex is newer"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Строка кнопок — flex. Сетка карточек или макет страницы — grid.",
+      "uz": "Tugmalar qatori — flex. Kartochkalar to'ri yoki sahifa maketi — grid.",
+      "en": "A row of buttons is flex. A card grid or a page layout is grid."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что задаёт <code>grid-template-columns: repeat(4, 1fr)</code>?",
+      "uz": "<code>grid-template-columns: repeat(4, 1fr)</code> nimani beradi?",
+      "en": "What does <code>grid-template-columns: repeat(4, 1fr)</code> set?"
+     },
+     "options": [
+      {
+       "ru": "Четыре строки",
+       "uz": "To'rtta qator",
+       "en": "Four rows"
+      },
+      {
+       "ru": "Четыре равные колонки",
+       "uz": "To'rtta teng ustun",
+       "en": "Four equal columns"
+      },
+      {
+       "ru": "Отступ в 4 пикселя",
+       "uz": "4 pikselli chekinish",
+       "en": "A 4-pixel gap"
+      },
+      {
+       "ru": "Ширину 4rem",
+       "uz": "4rem kenglik",
+       "en": "A width of 4rem"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Строки задаёт <code>grid-template-rows</code>, а <code>1fr</code> делит место поровну.",
+      "uz": "Qatorlarni <code>grid-template-rows</code> beradi, <code>1fr</code> esa joyni teng bo'ladi.",
+      "en": "Rows are set by <code>grid-template-rows</code>, and <code>1fr</code> splits the space evenly."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что означает подход «сначала мобильные»?",
+      "uz": "«Avval mobil» yondashuvi nimani anglatadi?",
+      "en": "What does “mobile first” mean?"
+     },
+     "options": [
+      {
+       "ru": "Сайт работает только на телефонах",
+       "uz": "Sayt faqat telefonlarda ishlaydi",
+       "en": "The site only works on phones"
+      },
+      {
+       "ru": "Базовые стили — для узкого экрана, медиазапросы добавляют для широкого",
+       "uz": "Asosiy uslublar tor ekran uchun, media so'rovlar keng uchun qo'shadi",
+       "en": "Base styles target narrow screens; media queries add for wide ones"
+      },
+      {
+       "ru": "Сначала верстают десктоп",
+       "uz": "Avval desktop qilinadi",
+       "en": "You build the desktop layout first"
+      },
+      {
+       "ru": "Это про скорость загрузки",
+       "uz": "Bu yuklash tezligi haqida",
+       "en": "It is about load speed"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "С <code>min-width</code> стили накапливаются вверх. С <code>max-width</code> пришлось бы отменять уже написанное.",
+      "uz": "<code>min-width</code> bilan uslublar yuqoriga to'planadi. <code>max-width</code> bilan yozilganini bekor qilishga to'g'ri kelardi.",
+      "en": "With <code>min-width</code> styles accumulate upwards. With <code>max-width</code> you would be undoing what you already wrote."
+     }
+    },
+    {
+     "q": {
+      "ru": "Как обратиться к переменной <code>--brand</code>?",
+      "uz": "<code>--brand</code> o'zgaruvchisiga qanday murojaat qilinadi?",
+      "en": "How do you reference the variable <code>--brand</code>?"
+     },
+     "options": [
+      {
+       "ru": "$brand",
+       "uz": "$brand",
+       "en": "$brand"
+      },
+      {
+       "ru": "var(--brand)",
+       "uz": "var(--brand)",
+       "en": "var(--brand)"
+      },
+      {
+       "ru": "@brand",
+       "uz": "@brand",
+       "en": "@brand"
+      },
+      {
+       "ru": "brand()",
+       "uz": "brand()",
+       "en": "brand()"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Через <code>$</code> переменные пишут в Sass — это другой инструмент. В чистом CSS только <code>var()</code>.",
+      "uz": "<code>$</code> orqali o'zgaruvchilar Sass da yoziladi — bu boshqa vosita. Sof CSS da faqat <code>var()</code>.",
+      "en": "The <code>$</code> form belongs to Sass, a different tool. Plain CSS has only <code>var()</code>."
+     }
+    },
+    {
+     "q": {
+      "ru": "Какие свойства дешевле всего анимировать?",
+      "uz": "Qaysi xossalarni animatsiya qilish eng arzon?",
+      "en": "Which properties are cheapest to animate?"
+     },
+     "options": [
+      {
+       "ru": "width и height",
+       "uz": "width va height",
+       "en": "width and height"
+      },
+      {
+       "ru": "transform и opacity",
+       "uz": "transform va opacity",
+       "en": "transform and opacity"
+      },
+      {
+       "ru": "margin и padding",
+       "uz": "margin va padding",
+       "en": "margin and padding"
+      },
+      {
+       "ru": "top и left",
+       "uz": "top va left",
+       "en": "top and left"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Они не меняют раскладку, поэтому браузер обходится без пересчёта геометрии страницы.",
+      "uz": "Ular joylashuvni o'zgartirmaydi, shuning uchun brauzer sahifa geometriyasini qayta hisoblamaydi.",
+      "en": "They do not change the layout, so the browser skips recomputing page geometry."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что делает <code>grid-column: span 2</code> у ячейки?",
+      "uz": "Katakchadagi <code>grid-column: span 2</code> nima qiladi?",
+      "en": "What does <code>grid-column: span 2</code> do to a cell?"
+     },
+     "options": [
+      {
+       "ru": "Сдвигает её на две колонки вправо",
+       "uz": "Uni ikki ustun o'ngga suradi",
+       "en": "Moves it two columns to the right"
+      },
+      {
+       "ru": "Растягивает её на две колонки",
+       "uz": "Uni ikki ustunga cho'zadi",
+       "en": "Stretches it across two columns"
+      },
+      {
+       "ru": "Делает две копии",
+       "uz": "Ikkita nusxa qiladi",
+       "en": "Makes two copies"
+      },
+      {
+       "ru": "Ничего",
+       "uz": "Hech nima",
+       "en": "Nothing"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Так делают широкие карточки внутри обычной сетки — например, баннер на всю ширину.",
+      "uz": "Oddiy to'r ichida keng kartochkalar shunday qilinadi — masalan, butun kenglikdagi banner.",
+      "en": "This is how you make wide cards inside a regular grid — a full-width banner, for instance."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "css",
+     "title": {
+      "ru": "Сетка из трёх колонок",
+      "uz": "Uch ustunli to'r",
+      "en": "A three-column grid"
+     },
+     "brief": {
+      "ru": "display: grid",
+      "uz": "display: grid",
+      "en": "display: grid"
+     },
+     "desc": {
+      "ru": "<p>Сделай <code>.gallery</code> сеткой из трёх равных колонок с расстоянием <code>12px</code> между ячейками.</p>",
+      "uz": "<p><code>.gallery</code> ni katakchalar orasida <code>12px</code> masofali uchta teng ustunli to'r qiling.</p>",
+      "en": "<p>Make <code>.gallery</code> a grid of three equal columns with <code>12px</code> between cells.</p>"
+     },
+     "html": "<div class=\"gallery\">\n  <div>1</div><div>2</div><div>3</div><div>4</div>\n</div>",
+     "starter": ".gallery {\n  \n}\n",
+     "tests": "const g = $('.gallery');\nassert(g, 'Не найден .gallery');\nequal(style(g, 'display'), 'grid', 'display');\nconst cols = style(g, 'grid-template-columns').split(' ').filter(Boolean);\nequal(cols.length, 3, 'Количество колонок');\nassert(style(g, 'gap').indexOf('12px') === 0, 'gap должен быть 12px, а сейчас: ' + style(g, 'gap'));",
+     "hint": {
+      "ru": "<code>display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;</code>",
+      "uz": "<code>display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;</code>",
+      "en": "<code>display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;</code>"
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "css",
+     "title": {
+      "ru": "Тема на переменных",
+      "uz": "O'zgaruvchilardagi mavzu",
+      "en": "A themed component"
+     },
+     "brief": {
+      "ru": ":root и var()",
+      "uz": ":root va var()",
+      "en": ":root and var()"
+     },
+     "desc": {
+      "ru": "<p>Объяви в <code>:root</code> переменную <code>--main</code> со значением <code>#16a34a</code> и примени её как <code>background</code> для <code>.tag</code>. Цвет текста — <code>white</code>.</p>",
+      "uz": "<p><code>:root</code> da <code>--main</code> o'zgaruvchisini <code>#16a34a</code> qiymati bilan e'lon qiling va uni <code>.tag</code> uchun <code>background</code> sifatida qo'llang. Matn rangi — <code>white</code>.</p>",
+      "en": "<p>Declare a variable <code>--main</code> with the value <code>#16a34a</code> in <code>:root</code> and apply it as the <code>background</code> of <code>.tag</code>. Text colour — <code>white</code>.</p>"
+     },
+     "html": "<span class=\"tag\">Новинка</span>",
+     "starter": ":root {\n  \n}\n\n.tag {\n  \n}\n",
+     "tests": "const t = $('.tag');\nassert(t, 'Не найден .tag');\nequal(style(t, 'background-color'), 'rgb(22, 163, 74)', 'Фон должен прийти из переменной');\nequal(style(t, 'color'), 'rgb(255, 255, 255)', 'Цвет текста');\nconst rootVar = getComputedStyle(document.documentElement).getPropertyValue('--main').trim();\nassert(rootVar.length > 0, 'Переменная --main должна быть объявлена в :root');",
+     "hint": {
+      "ru": "<code>:root { --main: #16a34a; }</code>, затем <code>.tag { background: var(--main); color: white; }</code>",
+      "uz": "<code>:root { --main: #16a34a; }</code>, keyin <code>.tag { background: var(--main); color: white; }</code>",
+      "en": "<code>:root { --main: #16a34a; }</code>, then <code>.tag { background: var(--main); color: white; }</code>"
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "css",
+     "title": {
+      "ru": "Плавная кнопка",
+      "uz": "Silliq tugma",
+      "en": "A smooth button"
+     },
+     "brief": {
+      "ru": "transition",
+      "uz": "transition",
+      "en": "transition"
+     },
+     "desc": {
+      "ru": "<p>Оформи <code>.cta</code>: фон <code>#7c3aed</code>, скругление <code>8px</code>, и плавный переход длительностью <code>0.3s</code> для всех свойств (<code>transition: all 0.3s</code>).</p>",
+      "uz": "<p><code>.cta</code> ni bezang: fon <code>#7c3aed</code>, yumaloqlash <code>8px</code> va barcha xossalar uchun <code>0.3s</code> davomiylikdagi silliq o'tish (<code>transition: all 0.3s</code>).</p>",
+      "en": "<p>Style <code>.cta</code>: background <code>#7c3aed</code>, radius <code>8px</code>, and a smooth <code>0.3s</code> transition for all properties (<code>transition: all 0.3s</code>).</p>"
+     },
+     "html": "<button class=\"cta\">Начать</button>",
+     "starter": ".cta {\n  \n}\n",
+     "tests": "const c = $('.cta');\nassert(c, 'Не найден .cta');\nequal(style(c, 'background-color'), 'rgb(124, 58, 237)', 'Фон');\nequal(style(c, 'border-top-left-radius'), '8px', 'Скругление');\nequal(style(c, 'transition-duration'), '0.3s', 'Длительность перехода');\nequal(style(c, 'transition-property'), 'all', 'Переход применён ко всем свойствам');",
+     "hint": {
+      "ru": "Три строки: <code>background</code>, <code>border-radius</code> и <code>transition: all 0.3s;</code>",
+      "uz": "Uch qator: <code>background</code>, <code>border-radius</code> va <code>transition: all 0.3s;</code>",
+      "en": "Three lines: <code>background</code>, <code>border-radius</code> and <code>transition: all 0.3s;</code>"
+     }
+    }
+   ],
+   "exam": {
+    "time": 420,
+    "questions": [
+     {
+      "q": {
+       "ru": "Какой запрос сработает на экране 1024px?",
+       "uz": "1024px ekranda qaysi so'rov ishlaydi?",
+       "en": "Which query applies on a 1024px screen?"
+      },
+      "options": [
+       {
+        "ru": "@media (max-width: 600px)",
+        "uz": "@media (max-width: 600px)",
+        "en": "@media (max-width: 600px)"
+       },
+       {
+        "ru": "@media (min-width: 768px)",
+        "uz": "@media (min-width: 768px)",
+        "en": "@media (min-width: 768px)"
+       },
+       {
+        "ru": "@media (max-width: 320px)",
+        "uz": "@media (max-width: 320px)",
+        "en": "@media (max-width: 320px)"
+       },
+       {
+        "ru": "Ни один",
+        "uz": "Hech qaysi",
+        "en": "None"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "Где объявляют глобальные CSS-переменные?",
+       "uz": "Global CSS o'zgaruvchilari qayerda e'lon qilinadi?",
+       "en": "Where are global CSS variables declared?"
+      },
+      "options": [
+       {
+        "ru": "В body",
+        "uz": "body da",
+        "en": "In body"
+       },
+       {
+        "ru": "В :root",
+        "uz": ":root da",
+        "en": "In :root"
+       },
+       {
+        "ru": "В head",
+        "uz": "head da",
+        "en": "In head"
+       },
+       {
+        "ru": "В @media",
+        "uz": "@media da",
+        "en": "In @media"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "Что делает <code>gap</code> в grid?",
+       "uz": "Grid dagi <code>gap</code> nima qiladi?",
+       "en": "What does <code>gap</code> do in grid?"
+      },
+      "options": [
+       {
+        "ru": "Отступ снаружи сетки",
+        "uz": "To'rdan tashqaridagi chekinish",
+        "en": "Spacing outside the grid"
+       },
+       {
+        "ru": "Расстояние между ячейками",
+        "uz": "Katakchalar orasidagi masofa",
+        "en": "The spacing between cells"
+       },
+       {
+        "ru": "Ширину колонки",
+        "uz": "Ustun kengligi",
+        "en": "The column width"
+       },
+       {
+        "ru": "Высоту строки",
+        "uz": "Qator balandligi",
+        "en": "The row height"
+       }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "css",
+      "title": {
+       "ru": "Адаптивная сетка",
+       "uz": "Moslashuvchan to'r",
+       "en": "A responsive grid"
+      },
+      "desc": {
+       "ru": "<p>Сделай <code>.list</code> сеткой: одна колонка по умолчанию, а начиная с ширины <code>600px</code> — две колонки. Расстояние между ячейками <code>16px</code>.</p><p>Проверка идёт на широком окне, поэтому колонок должно оказаться две.</p>",
+       "uz": "<p><code>.list</code> ni to'r qiling: sukut bo'yicha bitta ustun, <code>600px</code> kenglikdan boshlab — ikkita ustun. Katakchalar orasidagi masofa <code>16px</code>.</p><p>Tekshiruv keng oynada o'tadi, shuning uchun ustunlar ikkita bo'lishi kerak.</p>",
+       "en": "<p>Make <code>.list</code> a grid: one column by default, and from <code>600px</code> wide — two columns. Cell spacing <code>16px</code>.</p><p>The check runs on a wide window, so there should be two columns.</p>"
+      },
+      "html": "<div class=\"list\">\n  <div>Один</div><div>Два</div><div>Три</div><div>Четыре</div>\n</div>",
+      "starter": ".list {\n  \n}\n",
+      "tests": "const l = $('.list');\nassert(l, 'Не найден .list');\nequal(style(l, 'display'), 'grid', 'display');\nassert(style(l, 'gap').indexOf('16px') === 0, 'gap должен быть 16px, а сейчас: ' + style(l, 'gap'));\nconst cols = style(l, 'grid-template-columns').split(' ').filter(Boolean);\nequal(cols.length, 2, 'На широком экране должно быть две колонки');",
+      "hint": {
+       "ru": "Базово <code>grid-template-columns: 1fr</code>, а внутри <code>@media (min-width: 600px)</code> — <code>repeat(2, 1fr)</code>.",
+       "uz": "Asosda <code>grid-template-columns: 1fr</code>, <code>@media (min-width: 600px)</code> ichida esa — <code>repeat(2, 1fr)</code>.",
+       "en": "Base <code>grid-template-columns: 1fr</code>, and inside <code>@media (min-width: 600px)</code> — <code>repeat(2, 1fr)</code>."
+      }
+     }
+    ]
+   }
   }
  ]
 }

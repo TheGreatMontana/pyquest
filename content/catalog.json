@@ -235,6 +235,14 @@
     "uz": "Asinxron JavaScript",
     "en": "Asynchronous JavaScript"
    }
+  },
+  {
+   "id": "css-responsive",
+   "title": {
+    "ru": "Адаптивная вёрстка",
+    "uz": "Moslashuvchan belgilash",
+    "en": "Responsive layout"
+   }
   }
  ],
  "courses": [
@@ -702,15 +710,16 @@
    "color": "#2563eb",
    "level": "beginner",
    "status": "full",
-   "estimatedHours": 20,
+   "estimatedHours": 24,
    "requires": [
     "html-semantics"
    ],
    "grants": [
-    "css-layout"
+    "css-layout",
+    "css-responsive"
    ],
    "legacyIds": [],
-   "moduleCount": 1,
+   "moduleCount": 2,
    "runner": "css"
   },
   {
