@@ -243,6 +243,14 @@
     "uz": "Moslashuvchan belgilash",
     "en": "Responsive layout"
    }
+  },
+  {
+   "id": "html-forms",
+   "title": {
+    "ru": "Формы и доступность",
+    "uz": "Formalar va qulaylik",
+    "en": "Forms and accessibility"
+   }
   }
  ],
  "courses": [
@@ -685,13 +693,14 @@
    "color": "#f97316",
    "level": "beginner",
    "status": "full",
-   "estimatedHours": 18,
+   "estimatedHours": 22,
    "requires": [],
    "grants": [
-    "html-semantics"
+    "html-semantics",
+    "html-forms"
    ],
    "legacyIds": [],
-   "moduleCount": 1,
+   "moduleCount": 2,
    "runner": "html"
   },
   {

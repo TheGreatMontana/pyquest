@@ -712,6 +712,609 @@
      }
     ]
    }
+  },
+  {
+   "id": "ht-02",
+   "title": {
+    "ru": "Формы, таблицы и доступность",
+    "uz": "Formalar, jadvallar va qulaylik",
+    "en": "Forms, tables and accessibility"
+   },
+   "tagline": {
+    "ru": "Ввод данных, табличные данные и вёрстка для всех",
+    "uz": "Ma'lumot kiritish, jadval ma'lumotlari va hamma uchun belgilash",
+    "en": "Data entry, tabular data and markup for everyone"
+   },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": {
+      "ru": "Форма и поля ввода",
+      "uz": "Forma va kiritish maydonlari",
+      "en": "Forms and inputs"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Форма — способ собрать данные от человека. Основные элементы: <code>&lt;form&gt;</code>, <code>&lt;input&gt;</code>, <code>&lt;textarea&gt;</code>, <code>&lt;select&gt;</code>, <code>&lt;button&gt;</code>.</p><p>У <code>&lt;input&gt;</code> есть <code>type</code>, и это не мелочь: <code>email</code> подскажет телефону показать клавиатуру с собачкой, <code>number</code> — цифровую, <code>date</code> откроет календарь. Браузер бесплатно даёт проверку и удобство — надо только выбрать правильный тип.</p>",
+        "uz": "<p>Forma — odamdan ma'lumot yig'ish usuli. Asosiy elementlar: <code>&lt;form&gt;</code>, <code>&lt;input&gt;</code>, <code>&lt;textarea&gt;</code>, <code>&lt;select&gt;</code>, <code>&lt;button&gt;</code>.</p><p><code>&lt;input&gt;</code> da <code>type</code> bor va bu arzimas narsa emas: <code>email</code> telefonga @ belgili klaviatura ko'rsatishni aytadi, <code>number</code> — raqamli, <code>date</code> taqvim ochadi. Brauzer tekshiruv va qulaylikni bepul beradi — faqat to'g'ri turni tanlash kerak.</p>",
+        "en": "<p>A form is how you collect data from a person. The main elements are <code>&lt;form&gt;</code>, <code>&lt;input&gt;</code>, <code>&lt;textarea&gt;</code>, <code>&lt;select&gt;</code>, <code>&lt;button&gt;</code>.</p><p><code>&lt;input&gt;</code> has a <code>type</code>, and it is not a detail: <code>email</code> tells a phone to show the keyboard with @, <code>number</code> a numeric one, <code>date</code> opens a calendar. The browser gives you validation and convenience for free — you just pick the right type.</p>"
+       }
+      },
+      {
+       "type": "webrun",
+       "kind": "html",
+       "code": "<form>\n  <label for=\"name\">Имя</label>\n  <input id=\"name\" type=\"text\" placeholder=\"Азиз\">\n\n  <label for=\"mail\">Почта</label>\n  <input id=\"mail\" type=\"email\" required>\n\n  <label for=\"lvl\">Уровень</label>\n  <select id=\"lvl\">\n    <option>Новичок</option>\n    <option>Средний</option>\n  </select>\n\n  <label for=\"about\">О себе</label>\n  <textarea id=\"about\" rows=\"3\"></textarea>\n\n  <button type=\"submit\">Отправить</button>\n</form>"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Ключевая деталь — <code>&lt;label&gt;</code> с атрибутом <code>for</code>, равным <code>id</code> поля. Тогда:</p><ul><li>клик по подписи ставит курсор в поле — попасть пальцем проще</li><li>скринридер объявляет, что именно вводят</li></ul><p>Без связи <code>for</code> ↔ <code>id</code> поле для незрячего человека остаётся безымянным.</p>",
+        "uz": "<p>Asosiy tafsilot — maydon <code>id</code> siga teng <code>for</code> atributli <code>&lt;label&gt;</code>. Shunda:</p><ul><li>yozuvga bosish kursorni maydonga qo'yadi — barmoq bilan tegish osonroq</li><li>skrinrider nima kiritilayotganini e'lon qiladi</li></ul><p><code>for</code> ↔ <code>id</code> bog'lanishisiz maydon ko'zi ojiz odam uchun nomsiz qoladi.</p>",
+        "en": "<p>The key detail is a <code>&lt;label&gt;</code> whose <code>for</code> matches the field's <code>id</code>. Then:</p><ul><li>clicking the caption focuses the field — easier to hit with a finger</li><li>a screen reader announces what is being entered</li></ul><p>Without the <code>for</code> ↔ <code>id</code> link, the field stays nameless for a blind user.</p>"
+       }
+      },
+      {
+       "type": "findbug",
+       "lines": [
+        "<label>Почта</label>",
+        "<input type=\"email\" id=\"mail\">",
+        "<button>Отправить</button>"
+       ],
+       "bugLine": 0,
+       "explain": {
+        "ru": "У подписи нет <code>for=\"mail\"</code>, поэтому она не связана с полем: клик по ней ничего не делает, а скринридер не назовёт поле.",
+        "uz": "Yozuvda <code>for=\"mail\"</code> yo'q, shuning uchun u maydon bilan bog'lanmagan: unga bosish hech nima qilmaydi, skrinrider esa maydonni nomlamaydi.",
+        "en": "The label has no <code>for=\"mail\"</code>, so it is not tied to the field: clicking it does nothing and a screen reader will not name the field."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": {
+      "ru": "Таблицы",
+      "uz": "Jadvallar",
+      "en": "Tables"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Таблица нужна для <b>табличных данных</b> — там, где есть строки и столбцы со смыслом. Верстать таблицами макет страницы перестали лет двадцать назад: для этого есть flex и grid.</p><p>Структура: <code>&lt;table&gt;</code> → <code>&lt;thead&gt;</code> с шапкой из <code>&lt;th&gt;</code> и <code>&lt;tbody&gt;</code> со строками <code>&lt;tr&gt;</code> и ячейками <code>&lt;td&gt;</code>.</p>",
+        "uz": "<p>Jadval <b>jadval ma'lumotlari</b> uchun kerak — ma'noli qator va ustunlar bo'lgan joyda. Sahifa maketini jadval bilan qilish yigirma yil oldin to'xtagan: buning uchun flex va grid bor.</p><p>Tuzilishi: <code>&lt;table&gt;</code> → <code>&lt;th&gt;</code> lardan iborat shapkali <code>&lt;thead&gt;</code> va <code>&lt;tr&gt;</code> qatorlari hamda <code>&lt;td&gt;</code> katakchalari bilan <code>&lt;tbody&gt;</code>.</p>",
+        "en": "<p>A table is for <b>tabular data</b> — where rows and columns carry meaning. Laying out a page with tables stopped about twenty years ago: flex and grid exist for that.</p><p>The structure: <code>&lt;table&gt;</code> → <code>&lt;thead&gt;</code> with a header of <code>&lt;th&gt;</code>, and <code>&lt;tbody&gt;</code> with <code>&lt;tr&gt;</code> rows and <code>&lt;td&gt;</code> cells.</p>"
+       }
+      },
+      {
+       "type": "webrun",
+       "kind": "html",
+       "code": "<table>\n  <caption>Прогресс по курсам</caption>\n  <thead>\n    <tr>\n      <th>Курс</th>\n      <th>Модулей</th>\n      <th>Готово</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr><td>HTML</td><td>2</td><td>50%</td></tr>\n    <tr><td>CSS</td><td>2</td><td>0%</td></tr>\n    <tr><td>JavaScript</td><td>4</td><td>25%</td></tr>\n  </tbody>\n</table>"
+      },
+      {
+       "type": "note",
+       "kind": "tip",
+       "html": {
+        "ru": "<code>&lt;th&gt;</code> — не просто жирный текст. Скринридер, читая ячейку, называет заголовок её столбца: «Модулей: 4». С <code>&lt;td&gt;</code> вместо <code>&lt;th&gt;</code> человек услышит просто «4» и потеряет смысл.",
+        "uz": "<code>&lt;th&gt;</code> — shunchaki qalin matn emas. Skrinrider katakchani o'qiyotganda uning ustuni sarlavhasini aytadi: «Modullar: 4». <code>&lt;th&gt;</code> o'rniga <code>&lt;td&gt;</code> bo'lsa, odam faqat «4» ni eshitadi va ma'noni yo'qotadi.",
+        "en": "<code>&lt;th&gt;</code> is not just bold text. When reading a cell, a screen reader names its column header: “Modules: 4”. With <code>&lt;td&gt;</code> instead of <code>&lt;th&gt;</code> the person hears just “4” and loses the meaning."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": {
+      "ru": "Доступность без лишних усилий",
+      "uz": "Ortiqcha kuchsiz qulaylik",
+      "en": "Accessibility without extra effort"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Доступность — не отдельная работа в конце, а следствие правильных тегов. Большую часть даёт сам HTML:</p><ul><li><code>&lt;button&gt;</code> вместо <code>&lt;div onclick&gt;</code> — работает с клавиатуры и объявляется как кнопка</li><li><code>alt</code> у картинок, <code>label</code> у полей</li><li>заголовки по порядку, без перескоков</li><li><code>lang</code> у страницы — синтезатор речи выберет правильное произношение</li></ul><p>Там, где семантики не хватает, помогают атрибуты <code>aria-*</code>. Но правило простое: <b>сначала правильный тег, aria — только если иначе никак</b>.</p>",
+        "uz": "<p>Qulaylik — oxirida qilinadigan alohida ish emas, balki to'g'ri teglar natijasi. Katta qismini HTML ning o'zi beradi:</p><ul><li><code>&lt;div onclick&gt;</code> o'rniga <code>&lt;button&gt;</code> — klaviaturadan ishlaydi va tugma deb e'lon qilinadi</li><li>rasmlarda <code>alt</code>, maydonlarda <code>label</code></li><li>sarlavhalar tartib bilan, sakramasdan</li><li>sahifada <code>lang</code> — nutq sintezatori to'g'ri talaffuzni tanlaydi</li></ul><p>Semantika yetmagan joyda <code>aria-*</code> atributlari yordam beradi. Lekin qoida oddiy: <b>avval to'g'ri teg, aria — faqat boshqa iloji bo'lmasa</b>.</p>",
+        "en": "<p>Accessibility is not a separate job at the end — it follows from the right tags. HTML itself gives you most of it:</p><ul><li><code>&lt;button&gt;</code> instead of <code>&lt;div onclick&gt;</code> — works from the keyboard and is announced as a button</li><li><code>alt</code> on images, <code>label</code> on fields</li><li>headings in order, without skipping</li><li><code>lang</code> on the page — the speech synthesiser picks the right pronunciation</li></ul><p>Where semantics fall short, <code>aria-*</code> attributes help. But the rule is simple: <b>the right tag first, aria only when there is no other way</b>.</p>"
+       }
+      },
+      {
+       "type": "webrun",
+       "kind": "html",
+       "code": "<h2>Так правильно</h2>\n<button onclick=\"alert('работает')\">Настоящая кнопка</button>\n<p>Её видно с клавиатуры: нажми Tab, потом Enter.</p>\n\n<h2>Так неправильно</h2>\n<div onclick=\"alert('тоже кликается')\" style=\"cursor:pointer;color:#2563eb\">\n  Кнопка из div\n</div>\n<p>Мышью работает, с клавиатуры — нет.</p>"
+      },
+      {
+       "type": "match",
+       "pairs": [
+        {
+         "left": {
+          "ru": "alt",
+          "uz": "alt",
+          "en": "alt"
+         },
+         "right": {
+          "ru": "Описание картинки для тех, кто её не видит",
+          "uz": "Rasmni ko'rmaydiganlar uchun tavsif",
+          "en": "Description of an image for those who cannot see it"
+         }
+        },
+        {
+         "left": {
+          "ru": "label for",
+          "uz": "label for",
+          "en": "label for"
+         },
+         "right": {
+          "ru": "Связывает подпись с полем ввода",
+          "uz": "Yozuvni kiritish maydoni bilan bog'laydi",
+          "en": "Links a caption to an input field"
+         }
+        },
+        {
+         "left": {
+          "ru": "th",
+          "uz": "th",
+          "en": "th"
+         },
+         "right": {
+          "ru": "Заголовок столбца или строки таблицы",
+          "uz": "Jadval ustuni yoki qatori sarlavhasi",
+          "en": "A table column or row header"
+         }
+        },
+        {
+         "left": {
+          "ru": "lang",
+          "uz": "lang",
+          "en": "lang"
+         },
+         "right": {
+          "ru": "Язык страницы для синтезатора речи",
+          "uz": "Nutq sintezatori uchun sahifa tili",
+          "en": "The page language for a speech synthesiser"
+         }
+        }
+       ]
+      },
+      {
+       "type": "summary",
+       "items": [
+        {
+         "ru": "type у input даёт проверку и удобную клавиатуру бесплатно",
+         "uz": "input dagi type tekshiruv va qulay klaviaturani bepul beradi",
+         "en": "The input type gives validation and a convenient keyboard for free"
+        },
+        {
+         "ru": "label for связан с id — иначе поле безымянное",
+         "uz": "label for id bilan bog'lanadi — aks holda maydon nomsiz",
+         "en": "label for links to id — otherwise the field is nameless"
+        },
+        {
+         "ru": "Таблица — для данных, а не для макета",
+         "uz": "Jadval — ma'lumot uchun, maket uchun emas",
+         "en": "A table is for data, not for layout"
+        },
+        {
+         "ru": "Сначала правильный тег, aria — только если иначе никак",
+         "uz": "Avval to'g'ri teg, aria — faqat boshqa iloji bo'lmasa",
+         "en": "The right tag first; aria only when there is no other way"
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": {
+      "ru": "Зачем у <code>&lt;label&gt;</code> атрибут <code>for</code>?",
+      "uz": "<code>&lt;label&gt;</code> da <code>for</code> atributi nima uchun?",
+      "en": "Why does <code>&lt;label&gt;</code> have a <code>for</code> attribute?"
+     },
+     "options": [
+      {
+       "ru": "Задаёт ширину подписи",
+       "uz": "Yozuv kengligini beradi",
+       "en": "It sets the caption width"
+      },
+      {
+       "ru": "Связывает подпись с полем по его id",
+       "uz": "Yozuvni maydon bilan uning id si orqali bog'laydi",
+       "en": "It links the caption to a field by its id"
+      },
+      {
+       "ru": "Делает поле обязательным",
+       "uz": "Maydonni majburiy qiladi",
+       "en": "It makes the field required"
+      },
+      {
+       "ru": "Ничего не делает",
+       "uz": "Hech nima qilmaydi",
+       "en": "Nothing"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Клик по подписи ставит курсор в поле, а скринридер называет поле по этой подписи.",
+      "uz": "Yozuvga bosish kursorni maydonga qo'yadi, skrinrider esa maydonni shu yozuv bilan nomlaydi.",
+      "en": "Clicking the caption focuses the field, and a screen reader names the field by that caption."
+     }
+    },
+    {
+     "q": {
+      "ru": "Какой <code>type</code> подойдёт для адреса почты?",
+      "uz": "Pochta manzili uchun qaysi <code>type</code> mos?",
+      "en": "Which <code>type</code> suits an email address?"
+     },
+     "options": [
+      {
+       "ru": "text",
+       "uz": "text",
+       "en": "text"
+      },
+      {
+       "ru": "email",
+       "uz": "email",
+       "en": "email"
+      },
+      {
+       "ru": "mail",
+       "uz": "mail",
+       "en": "mail"
+      },
+      {
+       "ru": "address",
+       "uz": "address",
+       "en": "address"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Браузер сам проверит формат и покажет на телефоне клавиатуру с символом @.",
+      "uz": "Brauzer formatni o'zi tekshiradi va telefonda @ belgili klaviatura ko'rsatadi.",
+      "en": "The browser validates the format itself and shows a keyboard with @ on a phone."
+     }
+    },
+    {
+     "q": {
+      "ru": "Для чего <b>не</b> нужна таблица?",
+      "uz": "Jadval nima uchun kerak <b>emas</b>?",
+      "en": "What is a table <b>not</b> for?"
+     },
+     "options": [
+      {
+       "ru": "Для расписания",
+       "uz": "Jadval uchun",
+       "en": "A schedule"
+      },
+      {
+       "ru": "Для макета страницы",
+       "uz": "Sahifa maketi uchun",
+       "en": "A page layout"
+      },
+      {
+       "ru": "Для отчёта с числами",
+       "uz": "Raqamli hisobot uchun",
+       "en": "A numeric report"
+      },
+      {
+       "ru": "Для сравнения тарифов",
+       "uz": "Tariflarni solishtirish uchun",
+       "en": "Comparing plans"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Макет верстают через flex и grid. Таблица предназначена для данных со строками и столбцами.",
+      "uz": "Maket flex va grid bilan qilinadi. Jadval qator va ustunli ma'lumotlar uchun.",
+      "en": "Layout is done with flex and grid. A table is meant for data with rows and columns."
+     }
+    },
+    {
+     "q": {
+      "ru": "Чем <code>&lt;th&gt;</code> лучше жирного <code>&lt;td&gt;</code>?",
+      "uz": "<code>&lt;th&gt;</code> qalin <code>&lt;td&gt;</code> dan nimasi bilan yaxshi?",
+      "en": "Why is <code>&lt;th&gt;</code> better than a bold <code>&lt;td&gt;</code>?"
+     },
+     "options": [
+      {
+       "ru": "Он рисуется быстрее",
+       "uz": "U tezroq chiziladi",
+       "en": "It renders faster"
+      },
+      {
+       "ru": "Скринридер называет им столбец при чтении каждой ячейки",
+       "uz": "Skrinrider har bir katakchani o'qiyotganda u bilan ustunni nomlaydi",
+       "en": "A screen reader uses it to name the column when reading each cell"
+      },
+      {
+       "ru": "Он всегда по центру",
+       "uz": "U doim markazda",
+       "en": "It is always centred"
+      },
+      {
+       "ru": "Разницы нет",
+       "uz": "Farqi yo'q",
+       "en": "There is no difference"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Жирность — это внешний вид, её даёт CSS. <code>&lt;th&gt;</code> несёт смысл «это заголовок».",
+      "uz": "Qalinlik — tashqi ko'rinish, uni CSS beradi. <code>&lt;th&gt;</code> «bu sarlavha» degan ma'noni tashiydi.",
+      "en": "Boldness is appearance, and CSS provides it. <code>&lt;th&gt;</code> carries the meaning “this is a header”."
+     }
+    },
+    {
+     "q": {
+      "ru": "Почему <code>&lt;div onclick&gt;</code> хуже <code>&lt;button&gt;</code>?",
+      "uz": "Nega <code>&lt;div onclick&gt;</code> <code>&lt;button&gt;</code> dan yomonroq?",
+      "en": "Why is <code>&lt;div onclick&gt;</code> worse than <code>&lt;button&gt;</code>?"
+     },
+     "options": [
+      {
+       "ru": "Работает медленнее",
+       "uz": "Sekinroq ishlaydi",
+       "en": "It works slower"
+      },
+      {
+       "ru": "Недоступен с клавиатуры и не объявляется как кнопка",
+       "uz": "Klaviaturadan foydalanib bo'lmaydi va tugma deb e'lon qilinmaydi",
+       "en": "It is unreachable from the keyboard and is not announced as a button"
+      },
+      {
+       "ru": "Не поддерживается браузерами",
+       "uz": "Brauzerlar qo'llab-quvvatlamaydi",
+       "en": "Browsers do not support it"
+      },
+      {
+       "ru": "Нельзя стилизовать",
+       "uz": "Uslub berib bo'lmaydi",
+       "en": "It cannot be styled"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Мышью такой «кнопкой» пользоваться можно, а клавишей Tab до неё не добраться. Для многих людей это значит «кнопки нет».",
+      "uz": "Sichqoncha bilan bunday «tugma» dan foydalanish mumkin, lekin Tab bilan unga yetib bo'lmaydi. Ko'p odamlar uchun bu «tugma yo'q» degani.",
+      "en": "You can use such a “button” with a mouse, but Tab never reaches it. For many people that means the button does not exist."
+     }
+    },
+    {
+     "q": {
+      "ru": "Когда уместны атрибуты <code>aria-*</code>?",
+      "uz": "<code>aria-*</code> atributlari qachon o'rinli?",
+      "en": "When are <code>aria-*</code> attributes appropriate?"
+     },
+     "options": [
+      {
+       "ru": "Всегда, на каждом теге",
+       "uz": "Doim, har bir tegda",
+       "en": "Always, on every tag"
+      },
+      {
+       "ru": "Когда подходящего семантического тега нет",
+       "uz": "Mos semantik teg bo'lmaganda",
+       "en": "When there is no suitable semantic tag"
+      },
+      {
+       "ru": "Только в формах",
+       "uz": "Faqat formalarda",
+       "en": "Only in forms"
+      },
+      {
+       "ru": "Никогда",
+       "uz": "Hech qachon",
+       "en": "Never"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Лишний <code>aria-*</code> на теге, который и так всё сообщает, только мешает — он может перебить правильное поведение.",
+      "uz": "O'zi hammasini bildiradigan tegdagi ortiqcha <code>aria-*</code> faqat xalaqit beradi — u to'g'ri xatti-harakatni bosib qo'yishi mumkin.",
+      "en": "A redundant <code>aria-*</code> on a tag that already says everything only gets in the way — it can override correct behaviour."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "html",
+     "title": {
+      "ru": "Форма подписки",
+      "uz": "Obuna formasi",
+      "en": "A subscription form"
+     },
+     "brief": {
+      "ru": "form, label, input",
+      "uz": "form, label, input",
+      "en": "form, label, input"
+     },
+     "desc": {
+      "ru": "<p>Собери <code>&lt;form&gt;</code>: поле с <code>id=\"mail\"</code> и <code>type=\"email\"</code>, связанную с ним подпись <code>&lt;label for=\"mail\"&gt;</code> и кнопку отправки.</p>",
+      "uz": "<p><code>&lt;form&gt;</code> tuzing: <code>id=\"mail\"</code> va <code>type=\"email\"</code> li maydon, u bilan bog'langan <code>&lt;label for=\"mail\"&gt;</code> yozuvi va yuborish tugmasi.</p>",
+      "en": "<p>Build a <code>&lt;form&gt;</code>: a field with <code>id=\"mail\"</code> and <code>type=\"email\"</code>, a matching <code>&lt;label for=\"mail\"&gt;</code>, and a submit button.</p>"
+     },
+     "starter": "<form>\n  \n</form>\n",
+     "tests": "assert($('form'), 'Нет тега <form>');\nconst inp = $('form input#mail');\nassert(inp, 'Нужно поле с id=\"mail\"');\nequal(inp.getAttribute('type'), 'email', 'Тип поля');\nconst lab = $('form label');\nassert(lab, 'Не хватает подписи <label>');\nequal(lab.getAttribute('for'), 'mail', 'label должен быть связан с полем через for');\nassert($('form button') || $('form input[type=\"submit\"]'), 'Нужна кнопка отправки');",
+     "hint": {
+      "ru": "<code>&lt;label for=\"mail\"&gt;Почта&lt;/label&gt;</code>, затем <code>&lt;input id=\"mail\" type=\"email\"&gt;</code> и <code>&lt;button&gt;</code>.",
+      "uz": "<code>&lt;label for=\"mail\"&gt;Pochta&lt;/label&gt;</code>, keyin <code>&lt;input id=\"mail\" type=\"email\"&gt;</code> va <code>&lt;button&gt;</code>.",
+      "en": "<code>&lt;label for=\"mail\"&gt;Email&lt;/label&gt;</code>, then <code>&lt;input id=\"mail\" type=\"email\"&gt;</code> and <code>&lt;button&gt;</code>."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "html",
+     "title": {
+      "ru": "Таблица результатов",
+      "uz": "Natijalar jadvali",
+      "en": "A results table"
+     },
+     "brief": {
+      "ru": "table, thead, th",
+      "uz": "table, thead, th",
+      "en": "table, thead, th"
+     },
+     "desc": {
+      "ru": "<p>Сделай таблицу: <code>&lt;thead&gt;</code> с двумя заголовками <code>&lt;th&gt;</code> и <code>&lt;tbody&gt;</code> с двумя строками по две ячейки <code>&lt;td&gt;</code>.</p>",
+      "uz": "<p>Jadval tuzing: ikkita <code>&lt;th&gt;</code> sarlavhali <code>&lt;thead&gt;</code> va har birida ikkita <code>&lt;td&gt;</code> bo'lgan ikkita qatorli <code>&lt;tbody&gt;</code>.</p>",
+      "en": "<p>Build a table: a <code>&lt;thead&gt;</code> with two <code>&lt;th&gt;</code> headers and a <code>&lt;tbody&gt;</code> with two rows of two <code>&lt;td&gt;</code> cells.</p>"
+     },
+     "starter": "<table>\n  \n</table>\n",
+     "tests": "assert($('table'), 'Нет тега <table>');\nassert($('table thead'), 'Нужен <thead>');\nequal($$('table thead th').length, 2, 'Заголовков в шапке');\nassert($('table tbody'), 'Нужен <tbody>');\nequal($$('table tbody tr').length, 2, 'Строк в теле таблицы');\nequal($$('table tbody td').length, 4, 'Всего ячеек в теле (2 строки × 2)');",
+     "hint": {
+      "ru": "Шапка: <code>&lt;thead&gt;&lt;tr&gt;&lt;th&gt;…&lt;/th&gt;&lt;th&gt;…&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;</code>. Тело: две строки <code>&lt;tr&gt;</code> по два <code>&lt;td&gt;</code>.",
+      "uz": "Shapka: <code>&lt;thead&gt;&lt;tr&gt;&lt;th&gt;…&lt;/th&gt;&lt;th&gt;…&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;</code>. Tanasi: har birida ikkita <code>&lt;td&gt;</code> bo'lgan ikkita <code>&lt;tr&gt;</code>.",
+      "en": "Header: <code>&lt;thead&gt;&lt;tr&gt;&lt;th&gt;…&lt;/th&gt;&lt;th&gt;…&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;</code>. Body: two <code>&lt;tr&gt;</code> rows with two <code>&lt;td&gt;</code> each."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "html",
+     "title": {
+      "ru": "Доступная карточка",
+      "uz": "Qulay kartochka",
+      "en": "An accessible card"
+     },
+     "brief": {
+      "ru": "button, alt, заголовки",
+      "uz": "button, alt, sarlavhalar",
+      "en": "button, alt, headings"
+     },
+     "desc": {
+      "ru": "<p>Собери <code>&lt;article&gt;</code>: заголовок <code>&lt;h2&gt;</code>, картинка с непустым <code>alt</code> и настоящая <code>&lt;button&gt;</code> (а не div) с текстом.</p>",
+      "uz": "<p><code>&lt;article&gt;</code> tuzing: <code>&lt;h2&gt;</code> sarlavha, bo'sh bo'lmagan <code>alt</code> li rasm va matnli haqiqiy <code>&lt;button&gt;</code> (div emas).</p>",
+      "en": "<p>Build an <code>&lt;article&gt;</code>: an <code>&lt;h2&gt;</code> heading, an image with a non-empty <code>alt</code>, and a real <code>&lt;button&gt;</code> (not a div) with text.</p>"
+     },
+     "starter": "<article>\n  \n</article>\n",
+     "tests": "assert($('article'), 'Нет <article>');\nassert($('article h2'), 'Нужен заголовок <h2>');\nconst img = $('article img');\nassert(img, 'Нужна картинка <img>');\nassert((img.getAttribute('alt') || '').trim().length > 0, 'У картинки должен быть непустой alt');\nconst btn = $('article button');\nassert(btn, 'Нужна настоящая кнопка <button>, а не div');\nassert(text(btn).length > 0, 'У кнопки должен быть текст');",
+     "hint": {
+      "ru": "Кнопка обязательно тегом <code>&lt;button&gt;</code> — тогда она работает с клавиатуры.",
+      "uz": "Tugma albatta <code>&lt;button&gt;</code> tegi bilan — shunda u klaviaturadan ishlaydi.",
+      "en": "The button must be a <code>&lt;button&gt;</code> tag — then it works from the keyboard."
+     }
+    }
+   ],
+   "exam": {
+    "time": 420,
+    "questions": [
+     {
+      "q": {
+       "ru": "Что связывает подпись с полем ввода?",
+       "uz": "Yozuvni kiritish maydoni bilan nima bog'laydi?",
+       "en": "What links a caption to an input field?"
+      },
+      "options": [
+       {
+        "ru": "class",
+        "uz": "class",
+        "en": "class"
+       },
+       {
+        "ru": "for и id",
+        "uz": "for va id",
+        "en": "for and id"
+       },
+       {
+        "ru": "name",
+        "uz": "name",
+        "en": "name"
+       },
+       {
+        "ru": "title",
+        "uz": "title",
+        "en": "title"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "Где живёт шапка таблицы?",
+       "uz": "Jadval shapkasi qayerda?",
+       "en": "Where does a table header live?"
+      },
+      "options": [
+       {
+        "ru": "В <tbody>",
+        "uz": "<tbody> da",
+        "en": "In <tbody>"
+       },
+       {
+        "ru": "В <thead>",
+        "uz": "<thead> da",
+        "en": "In <thead>"
+       },
+       {
+        "ru": "В <caption>",
+        "uz": "<caption> da",
+        "en": "In <caption>"
+       },
+       {
+        "ru": "В <header>",
+        "uz": "<header> da",
+        "en": "In <header>"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "Главное правило доступности?",
+       "uz": "Qulaylikning asosiy qoidasi?",
+       "en": "The main rule of accessibility?"
+      },
+      "options": [
+       {
+        "ru": "Добавлять aria-* везде",
+        "uz": "Hamma joyga aria-* qo'shish",
+        "en": "Add aria-* everywhere"
+       },
+       {
+        "ru": "Сначала правильный тег, aria — только при необходимости",
+        "uz": "Avval to'g'ri teg, aria — faqat zarur bo'lganda",
+        "en": "The right tag first; aria only when needed"
+       },
+       {
+        "ru": "Использовать только div",
+        "uz": "Faqat div ishlatish",
+        "en": "Use only div"
+       },
+       {
+        "ru": "Ставить крупный шрифт",
+        "uz": "Katta shrift qo'yish",
+        "en": "Use a large font"
+       }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "html",
+      "title": {
+       "ru": "Форма обратной связи",
+       "uz": "Aloqa formasi",
+       "en": "A feedback form"
+      },
+      "desc": {
+       "ru": "<p>Собери форму с тремя связанными парами подпись-поле: имя (<code>id=\"nm\"</code>, тип text), почта (<code>id=\"em\"</code>, тип email) и сообщение (<code>&lt;textarea id=\"msg\"&gt;</code>). Плюс кнопка отправки.</p>",
+       "uz": "<p>Uchta bog'langan yozuv-maydon juftligi bilan forma tuzing: ism (<code>id=\"nm\"</code>, text turi), pochta (<code>id=\"em\"</code>, email turi) va xabar (<code>&lt;textarea id=\"msg\"&gt;</code>). Yana yuborish tugmasi.</p>",
+       "en": "<p>Build a form with three linked caption-field pairs: name (<code>id=\"nm\"</code>, type text), email (<code>id=\"em\"</code>, type email) and message (<code>&lt;textarea id=\"msg\"&gt;</code>). Plus a submit button.</p>"
+      },
+      "starter": "<form>\n  \n</form>\n",
+      "tests": "assert($('form'), 'Нет <form>');\nequal($$('form label').length, 3, 'Подписей должно быть три');\nconst nm = $('#nm'), em = $('#em'), msg = $('#msg');\nassert(nm && em, 'Нужны поля с id nm и em');\nequal(em.getAttribute('type'), 'email', 'Тип поля почты');\nassert(msg && msg.tagName.toLowerCase() === 'textarea', 'Сообщение должно быть <textarea id=\"msg\">');\nconst fors = $$('form label').map(l => l.getAttribute('for')).sort();\nequal(fors, ['em', 'msg', 'nm'], 'Каждая подпись связана со своим полем через for');\nassert($('form button') || $('form input[type=\"submit\"]'), 'Нужна кнопка отправки');",
+      "hint": {
+       "ru": "У каждой подписи свой <code>for</code>: nm, em и msg — ровно те же значения, что в id полей.",
+       "uz": "Har bir yozuvda o'z <code>for</code> i: nm, em va msg — maydonlar id si bilan bir xil qiymatlar.",
+       "en": "Each label has its own <code>for</code>: nm, em and msg — exactly the values used in the field ids."
+      }
+     }
+    ]
+   }
   }
  ]
 }
