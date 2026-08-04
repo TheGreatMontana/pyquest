@@ -78,6 +78,7 @@ node tools/check-sql.js        # SQL выполняется на реально�
 python tools/check-tasks.py    # каждая задача решаема эталонным решением
 node tools/check-ui.mjs        # миграция прогресса, граф, XP, языки
 node tools/check-screens.mjs   # все экраны рендерятся
+node tools/check-mentor.mjs    # подсказки и разбор ошибок наставника
 ```
 
 ### Добавить контент

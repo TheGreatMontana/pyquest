@@ -4,14 +4,12 @@
   "nav.catalog": "Paths",
   "nav.roadmap": "Roadmap",
   "nav.practice": "Practice",
-
   "topbar.streak": "Streak: days in a row",
   "topbar.xp": "Experience",
   "topbar.rank": "Rank",
   "topbar.account": "Your account",
   "topbar.logout": "Sign out",
   "topbar.language": "Interface language",
-
   "auth.subtitle": "Your account keeps progress on the server — learn from any device.",
   "auth.login": "Sign in",
   "auth.register": "Sign up",
@@ -28,7 +26,6 @@
   "auth.welcome": "Hi, {name}! Your progress syncs automatically.",
   "auth.expired": "Session expired — please sign in again",
   "auth.offline": "No server connection — progress is saved locally",
-
   "dash.kicker": "Your path · week {week} of {total}",
   "dash.title": "Learn to code for real",
   "dash.subtitle": "Interactive courses with Python and SQL trainers right in your browser: theory, auto-checked tasks and exams.",
@@ -52,7 +49,6 @@
   "dash.statTasks": "tasks solved",
   "dash.statExams": "exams passed",
   "dash.statCourses": "courses finished",
-
   "catalog.title": "Learning paths",
   "catalog.subtitle": "Pick a whole profession or a single skill. Courses are reused: Python you finish counts across every path.",
   "catalog.allCourses": "All courses",
@@ -62,7 +58,6 @@
   "catalog.statusPlanned": "In development",
   "catalog.plannedNote": "This path is in development: the roadmap is available, lessons are coming.",
   "catalog.open": "Open",
-
   "domain.path": "Career path",
   "domain.stage": "Stage {n}",
   "domain.stages": "stages",
@@ -70,7 +65,6 @@
   "domain.hours": "≈ {n} h",
   "domain.externalStage": "This stage is studied outside the platform — materials are in the Roadmap section.",
   "domain.progress": "Path progress",
-
   "course.modules": "modules",
   "course.level": "Level",
   "course.level.beginner": "Beginner",
@@ -86,7 +80,6 @@
   "course.lockedHint": "We recommend finishing first: {list}. You can still open this course.",
   "course.assess": "Check your level",
   "course.assessHint": "Already know some of this? Take a short test to find your starting module.",
-
   "module.theory": "Theory",
   "module.quiz": "Quiz",
   "module.tasks": "Tasks",
@@ -94,7 +87,6 @@
   "module.of": "module {n} of {total}",
   "module.back": "To course",
   "module.backToMap": "Course map",
-
   "lesson.next": "Next",
   "lesson.prev": "Back",
   "lesson.finish": "Finish theory",
@@ -103,7 +95,6 @@
   "lesson.runSql": "Run query",
   "lesson.running": "Running…",
   "lesson.noOutput": "(the program printed nothing)",
-
   "block.predict": "What will this code print?",
   "block.predictCheck": "Check my guess",
   "block.predictReal": "Run it and see the real output",
@@ -121,7 +112,6 @@
   "block.note": "Important",
   "block.tip": "Tip",
   "block.trap": "Common mistake",
-
   "quiz.question": "Question {n}/{total}",
   "quiz.correct": "Correct.",
   "quiz.wrong": "Not quite.",
@@ -134,7 +124,6 @@
   "quiz.perfect": "Perfect. You've mastered this material.",
   "quiz.passed": "Quiz passed — on to the tasks.",
   "quiz.failed": "You need 70%. Review the theory and try again.",
-
   "task.run": "Run",
   "task.runSql": "Execute",
   "task.check": "Check",
@@ -146,7 +135,6 @@
   "task.allSolved": "All module tasks solved — head to the exam",
   "task.notePython": "Real Python runs right in your browser — write code and run it.",
   "task.noteSql": "Queries run against the practice store database in your browser.",
-
   "exam.title": "Module exam",
   "exam.titleFinal": "Final exam",
   "exam.info": "{questions} questions + {tasks} coding tasks · {minutes} minutes · pass mark 70%",
@@ -172,7 +160,6 @@
   "exam.taskFailed": "Not accepted",
   "exam.taskTimeout": "time ran out — task not submitted",
   "exam.taskAdvice": "Practise similar tasks in the Tasks tab — hints are available there.",
-
   "assess.title": "Level assessment: {course}",
   "assess.intro": "10 quick questions will show what you already know. Foundational modules stay available either way.",
   "assess.start": "Start test",
@@ -186,25 +173,21 @@
   "assess.recommendAll": "We suggest taking the course from the start — a solid foundation pays off",
   "assess.goToModule": "Go to module",
   "assess.startFromBegin": "Start from the beginning",
-
   "status.completed": "Completed",
   "status.inProgress": "In progress",
   "status.available": "Available",
   "status.locked": "Preparation needed",
   "status.recommended": "Recommended",
-
   "practice.title": "Practice",
   "practice.subtitle": "Mixed tasks from every course — the best way to make knowledge stick.",
   "practice.random": "Random task",
   "practice.empty": "Complete at least one lesson to unlock practice.",
-
   "roadmap.title": "Data Engineer roadmap",
   "roadmap.subtitle": "Everything your mentor mapped out — materials beyond this platform. Tick items off as you go.",
   "roadmap.onSite": "Covered on this site",
   "roadmap.playlists": "Playlists from the chat",
   "roadmap.filesNote": "Books and exercise files are in your ChatExport_2026-07-27/files folder.",
   "roadmap.open": "open",
-
   "cert.title": "Certificate",
   "cert.namePrompt": "Enter your name — it will appear on the certificate:",
   "cert.namePlaceholder": "First Last",
@@ -212,7 +195,6 @@
   "cert.download": "Download PNG",
   "cert.line1": "certifies that",
   "cert.line2": "has successfully completed the programme",
-
   "common.back": "Back",
   "common.of": "of",
   "common.xp": "XP",
@@ -225,6 +207,37 @@
   "common.notFound": "Not found",
   "common.contentMissing": "Content for this section isn't ready yet. We mark unfinished parts honestly instead of showing empty shells.",
   "common.translationMissing": "Translation for this section is in progress — showing the Russian original.",
-
-  "footer.text": "PyQuest — an interactive IT learning platform"
+  "footer.text": "PyQuest — an interactive IT learning platform",
+  "mentor.title": "Mentor",
+  "mentor.hint": "Hint",
+  "mentor.nextHint": "Another hint",
+  "mentor.hintLevel": "Hint {n} of {total}",
+  "mentor.noMoreHints": "No hints left — the rest is on you. You can do this!",
+  "mentor.dirPython": "Where to start: re-read the task and decide what the program receives as input and what it must print. Then break the task into steps and write them as comments — the code goes on top of them.",
+  "mentor.dirSql": "Where to start: decide which tables hold the data, which rows to keep (WHERE) and which columns to show. Build complex queries piece by piece, checking each with the Execute button.",
+  "mentor.backToTheory": "Stuck? Go back to the Theory tab of this module — there is a worked example of the same idea.",
+  "mentor.notConfigured": "The AI mentor is not connected. Author hints and error explanations are available.",
+  "mentor.whatWrong": "What went wrong",
+  "mentor.err.indent": "An indentation problem. In Python indentation is part of the syntax: the body of if, for, while and functions must be indented (4 spaces) relative to the line ending in a colon.",
+  "mentor.err.syntax": "A syntax error — Python could not parse the line. Common causes: a missing colon after if/for/def, an unclosed bracket or quote, or = used instead of == in a condition.",
+  "mentor.err.name": "The variable «{name}» is not defined. Either the name has a typo, or it is created later than it is used, or it only exists inside another function.",
+  "mentor.err.concat": "You cannot join a string with a number. Convert the number with str(x) or use an f-string: f\"text {x}\".",
+  "mentor.err.strMath": "You are doing maths on a string. It probably came from input() — wrap it in int() or float().",
+  "mentor.err.subscript": "An object of type «{name}» cannot be indexed. Square brackets work with lists, strings and dictionaries — check what the variable actually holds.",
+  "mentor.err.index": "You accessed an index that does not exist. Remember: indexes start at 0 and the last element is len(list) - 1 or [-1].",
+  "mentor.err.key": "That key is not in the dictionary. Check the spelling or use d.get(key, default) so the program does not crash.",
+  "mentor.err.zero": "Division by zero. Add a check: only divide when the divisor is not zero.",
+  "mentor.err.int": "int() could not turn the string into a number: it contains non-digit characters or stray spaces. Check what actually arrives as input.",
+  "mentor.err.attr": "An object of type «{name}» has no such method or attribute. Check the method name and the variable type.",
+  "mentor.err.recursion": "Recursion went too deep. The base case is probably never reached, so the function calls itself forever — check the stopping condition.",
+  "mentor.err.args": "The function is missing arguments. Compare how many parameters def declares with how many you pass at the call site.",
+  "mentor.err.unbound": "The variable is used before it is assigned inside this function. Initialise it before the loop or condition.",
+  "mentor.err.generic": "Read the last line of the error — it names the error type and describes it. The line above points to the line in your code where the problem started.",
+  "mentor.sql.noTable": "There is no table «{name}» in the database. Available: categories, products, customers, orders, order_items, employees.",
+  "mentor.sql.noColumn": "There is no column «{name}». Check the spelling or run SELECT * FROM table to see the available columns.",
+  "mentor.sql.syntax": "Syntax error near «{name}». Check the order of the clauses: SELECT → FROM → WHERE → GROUP BY → HAVING → ORDER BY.",
+  "mentor.sql.ambiguous": "The column name exists in several tables — qualify it, e.g. p.name instead of name.",
+  "mentor.sql.aggregate": "An aggregate function is misused. COUNT/SUM/AVG cannot be filtered in WHERE — use HAVING after GROUP BY.",
+  "mentor.sql.unique": "A uniqueness constraint failed: such a record already exists.",
+  "mentor.err.compare": "You cannot compare values of different types (a string with a number, for example). One of them probably came from input() — convert it with int()."
 }

@@ -95,13 +95,30 @@ curl -s -o /dev/null -w "%{http_code}\n" https://wedding.azizbek-azimov.uz/
 
 ## 7. Бэкап данных
 
-```bash
-# ручной бэкап БД перед рискованными изменениями
-ssh root@37.27.15.73 "mkdir -p /opt/pyquest-api/backups && \
-  cp /opt/pyquest-api/pyquest.db /opt/pyquest-api/backups/pyquest-$(date +%Y%m%d-%H%M%S).db"
+**Автоматически:** скрипт `deploy/backup-db.sh` стоит на сервере в `/opt/pyquest-api/` и запускается по cron ежедневно в 4:00:
+
+```
+0 4 * * * /opt/pyquest-api/backup-db.sh
 ```
 
-Автоматических бэкапов пока нет — при росте числа пользователей стоит добавить ежедневный cron с выгрузкой за пределы сервера.
+Что он делает: горячую копию SQLite (метод `Connection.backup` штатного Python — безопасно для работающей базы), проверку читаемости копии, сжатие gzip, ротацию 14 последних, запись в `/var/log/pyquest-backup.log`.
+
+```bash
+# посмотреть журнал и список копий
+ssh root@37.27.15.73 "tail -5 /var/log/pyquest-backup.log && ls -la /opt/pyquest-api/backups/"
+
+# ручной бэкап перед рискованными изменениями
+ssh root@37.27.15.73 "/opt/pyquest-api/backup-db.sh"
+
+# восстановление из копии
+ssh root@37.27.15.73 "systemctl stop pyquest-api && \
+  gunzip -c /opt/pyquest-api/backups/pyquest-ГГГГММДД-ЧЧММСС.db.gz > /opt/pyquest-api/pyquest.db && \
+  chown www-data:www-data /opt/pyquest-api/pyquest.db && systemctl start pyquest-api"
+```
+
+**Осталось на будущее:** копии лежат на том же сервере. При росте числа пользователей стоит выгружать их наружу (в объектное хранилище или на другую машину) — тогда бэкап переживёт и потерю самого сервера.
+
+> Примечание: `sqlite3` как утилита на сервере не установлена — `apt` заблокирован конфликтом зависимостей стороннего проекта (wazuh). Трогать чужие пакеты я не стал, поэтому скрипт использует Python, который и так есть.
 
 ## 8. Локальная разработка
 

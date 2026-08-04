@@ -4,14 +4,12 @@
   "nav.catalog": "Yo'nalishlar",
   "nav.roadmap": "Roadmap",
   "nav.practice": "Amaliyot",
-
   "topbar.streak": "Strik: ketma-ket kunlar",
   "topbar.xp": "Tajriba",
   "topbar.rank": "Daraja",
   "topbar.account": "Sizning akkauntingiz",
   "topbar.logout": "Akkauntdan chiqish",
   "topbar.language": "Interfeys tili",
-
   "auth.subtitle": "Akkaunt taraqqiyotingizni serverda saqlaydi — istalgan qurilmadan o'rganing.",
   "auth.login": "Kirish",
   "auth.register": "Ro'yxatdan o'tish",
@@ -28,7 +26,6 @@
   "auth.welcome": "Salom, {name}! Taraqqiyot avtomatik sinxronlanadi.",
   "auth.expired": "Sessiya tugadi — qaytadan kiring",
   "auth.offline": "Server bilan aloqa yo'q — taraqqiyot lokal saqlanmoqda",
-
   "dash.kicker": "Sizning yo'lingiz · {total} hafta ichidan {week}-hafta",
   "dash.title": "Dasturlashni haqiqiy o'rganing",
   "dash.subtitle": "Brauzerdagi Python va SQL trenajyorlari bilan interaktiv kurslar: nazariya, avto-tekshiruvli masalalar va imtihonlar.",
@@ -52,7 +49,6 @@
   "dash.statTasks": "masala yechildi",
   "dash.statExams": "imtihon topshirildi",
   "dash.statCourses": "kurs tugatildi",
-
   "catalog.title": "O'quv yo'nalishlari",
   "catalog.subtitle": "To'liq kasbni yoki alohida ko'nikmani tanlang. Kurslar qayta ishlatiladi: o'tilgan Python barcha yo'nalishlarda hisobga olinadi.",
   "catalog.allCourses": "Barcha kurslar",
@@ -62,7 +58,6 @@
   "catalog.statusPlanned": "Ishlanmoqda",
   "catalog.plannedNote": "Yo'nalish ishlanmoqda: roadmap mavjud, darslar keyinroq qo'shiladi.",
   "catalog.open": "Ochish",
-
   "domain.path": "Karyera yo'li",
   "domain.stage": "{n}-bosqich",
   "domain.stages": "bosqich",
@@ -70,7 +65,6 @@
   "domain.hours": "≈ {n} soat",
   "domain.externalStage": "Bu bosqich platformadan tashqarida o'rganiladi — materiallar «Roadmap» bo'limida.",
   "domain.progress": "Yo'nalish taraqqiyoti",
-
   "course.modules": "modul",
   "course.level": "Daraja",
   "course.level.beginner": "Boshlang'ich",
@@ -86,7 +80,6 @@
   "course.lockedHint": "Avval quyidagilarni o'tish tavsiya etiladi: {list}. Kursni baribir ochish mumkin.",
   "course.assess": "Darajani tekshirish",
   "course.assessHint": "Allaqachon bilasizmi? Qisqa testdan o'ting va qaysi moduldan boshlashni biling.",
-
   "module.theory": "Nazariya",
   "module.quiz": "Viktorina",
   "module.tasks": "Masalalar",
@@ -94,7 +87,6 @@
   "module.of": "{total} moduldan {n}-si",
   "module.back": "Kursga",
   "module.backToMap": "Kurs xaritasi",
-
   "lesson.next": "Keyingi",
   "lesson.prev": "Orqaga",
   "lesson.finish": "Nazariyani tugatish",
@@ -103,7 +95,6 @@
   "lesson.runSql": "So'rovni bajarish",
   "lesson.running": "Bajarilmoqda…",
   "lesson.noOutput": "(dastur hech narsa chiqarmadi)",
-
   "block.predict": "Bu kod nima chiqaradi?",
   "block.predictCheck": "Taxminni tekshirish",
   "block.predictReal": "Ishga tushirib, haqiqiy natijani ko'rish",
@@ -121,7 +112,6 @@
   "block.note": "Muhim",
   "block.tip": "Maslahat",
   "block.trap": "Keng tarqalgan xato",
-
   "quiz.question": "{total} savoldan {n}-si",
   "quiz.correct": "To'g'ri.",
   "quiz.wrong": "Unchalik emas.",
@@ -134,7 +124,6 @@
   "quiz.perfect": "Mukammal. Material to'liq o'zlashtirildi.",
   "quiz.passed": "Viktorina o'tildi — masalalarga o'tish mumkin.",
   "quiz.failed": "70% kerak. Nazariyaga qayting va yana urinib ko'ring.",
-
   "task.run": "Ishga tushirish",
   "task.runSql": "Bajarish",
   "task.check": "Tekshirish",
@@ -146,7 +135,6 @@
   "task.allSolved": "Modulning barcha masalalari yechildi — imtihonga o'ting",
   "task.notePython": "Haqiqiy Python to'g'ridan-to'g'ri brauzerda ishlaydi — kod yozing va ishga tushiring.",
   "task.noteSql": "So'rovlar brauzerdagi o'quv do'kon bazasida bajariladi.",
-
   "exam.title": "Modul imtihoni",
   "exam.titleFinal": "Yakuniy imtihon",
   "exam.info": "{questions} savol + {tasks} amaliy masala · {minutes} daqiqa · o'tish bali 70%",
@@ -172,7 +160,6 @@
   "exam.taskFailed": "Hisobga olinmadi",
   "exam.taskTimeout": "vaqt tugadi — masala topshirilmadi",
   "exam.taskAdvice": "«Masalalar» bo'limida shunga o'xshash masalalarni mashq qiling — u yerda maslahatlar bor.",
-
   "assess.title": "Daraja baholash: {course}",
   "assess.intro": "10 ta qisqa savol nimani bilishingizni ko'rsatadi. Asosiy modullar baribir ochiq qoladi.",
   "assess.start": "Testni boshlash",
@@ -186,25 +173,21 @@
   "assess.recommendAll": "Kursni boshidan o'tishni tavsiya qilamiz — shunda poydevor mustahkam bo'ladi",
   "assess.goToModule": "Modulga o'tish",
   "assess.startFromBegin": "Boshidan boshlash",
-
   "status.completed": "Tugatildi",
   "status.inProgress": "Jarayonda",
   "status.available": "Mavjud",
   "status.locked": "Tayyorgarlik kerak",
   "status.recommended": "Tavsiya etiladi",
-
   "practice.title": "Amaliyot",
   "practice.subtitle": "Barcha kurslardan aralash masalalar — materialni mustahkamlashning eng yaxshi usuli.",
   "practice.random": "Tasodifiy masala",
   "practice.empty": "Amaliyotni ochish uchun kamida bitta darsni o'ting.",
-
   "roadmap.title": "Data Engineer roadmapi",
   "roadmap.subtitle": "Mentoringiz belgilagan hamma narsa — platformadan tashqaridagi materiallar. O'rganish davomida belgilang.",
   "roadmap.onSite": "Shu saytda o'tiladi",
   "roadmap.playlists": "Yozishmalardagi pleylistlar",
   "roadmap.filesNote": "Kitoblar va mashq fayllari ChatExport_2026-07-27/files papkangizda.",
   "roadmap.open": "ochish",
-
   "cert.title": "Sertifikat",
   "cert.namePrompt": "Ismingizni kiriting — u sertifikatda chiqadi:",
   "cert.namePlaceholder": "Ism Familiya",
@@ -212,7 +195,6 @@
   "cert.download": "PNG yuklab olish",
   "cert.line1": "quyidagini tasdiqlaydi:",
   "cert.line2": "dasturni muvaffaqiyatli tamomladi",
-
   "common.back": "Orqaga",
   "common.of": "dan",
   "common.xp": "XP",
@@ -225,6 +207,37 @@
   "common.notFound": "Topilmadi",
   "common.contentMissing": "Bu bo'lim kontenti hali tayyor emas. Biz tugallanmagan qismlarni halol belgilaymiz.",
   "common.translationMissing": "Bu bo'lim tarjimasi tayyorlanmoqda — ruscha original ko'rsatilmoqda.",
-
-  "footer.text": "PyQuest — interaktiv IT o'quv platformasi"
+  "footer.text": "PyQuest — interaktiv IT o'quv platformasi",
+  "mentor.title": "Murabbiy",
+  "mentor.hint": "Maslahat",
+  "mentor.nextHint": "Yana maslahat",
+  "mentor.hintLevel": "{total} dan {n}-maslahat",
+  "mentor.noMoreHints": "Maslahatlar tugadi — endi o'zingiz. Siz uddalaysiz!",
+  "mentor.dirPython": "Nimadan boshlash: shartni qayta o'qing va dastur kirishda nima olishi, chiqishda nima berishi kerakligini aniqlang. So'ng masalani qadamlarga bo'lib, izohlar bilan yozing — kod ular ustiga yoziladi.",
+  "mentor.dirSql": "Nimadan boshlash: qaysi jadvallardan ma'lumot kerakligini, qaysi qatorlarni tanlashni (WHERE) va qaysi ustunlarni ko'rsatishni aniqlang. Murakkab so'rovni qismlarga bo'lib, har birini «Bajarish» tugmasi bilan tekshiring.",
+  "mentor.backToTheory": "Qotib qolsangiz — shu modulning «Nazariya» bo'limiga qayting: u yerda shunga o'xshash misol tahlil qilingan.",
+  "mentor.notConfigured": "AI-murabbiy ulanmagan. Masala muallifining maslahatlari va xatolar tahlili mavjud.",
+  "mentor.whatWrong": "Nima noto'g'ri ketdi",
+  "mentor.err.indent": "Otstuplar bilan muammo. Python'da otstup — sintaksisning qismi: if, for, while va funksiya tanasi ikki nuqtali qatordan o'ngga (4 probel) surilgan bo'lishi kerak.",
+  "mentor.err.syntax": "Sintaksis xatosi — Python qatorni tushunmadi. Sabablari: if/for/def oxirida ikki nuqta yo'q, qavs yoki qo'shtirnoq yopilmagan, shartda == o'rniga = ishlatilgan.",
+  "mentor.err.name": "«{name}» o'zgaruvchisi aniqlanmagan. Yo nomda xato, yo u ishlatilgan joydan pastda yaratilgan, yo faqat boshqa funksiya ichida mavjud.",
+  "mentor.err.concat": "Satrni son bilan yopishtirib bo'lmaydi. Sonni str(x) bilan satrga aylantiring yoki f-satrdan foydalaning: f\"matn {x}\".",
+  "mentor.err.strMath": "Siz satr bilan hisoblashga urinyapsiz. Ehtimol qiymat input() dan kelgan — uni int() yoki float() ga o'rang.",
+  "mentor.err.subscript": "«{name}» turidagi obyektga indeks bo'yicha murojaat qilib bo'lmaydi. Kvadrat qavslar ro'yxat, satr va lug'atlar bilan ishlaydi — o'zgaruvchida nima borligini tekshiring.",
+  "mentor.err.index": "Mavjud bo'lmagan indeksga murojaat. Esda tuting: indekslar 0 dan boshlanadi, oxirgi element — len(list) - 1 yoki [-1].",
+  "mentor.err.key": "Lug'atda bunday kalit yo'q. Yozilishini tekshiring yoki dastur yiqilmasligi uchun d.get(key, standart_qiymat) dan foydalaning.",
+  "mentor.err.zero": "Nolga bo'lish. Tekshiruv qo'shing: bo'luvchi nolga teng bo'lmagandagina hisoblang.",
+  "mentor.err.int": "int() satrni songa aylantira olmadi: u yerda raqam bo'lmagan belgilar yoki ortiqcha probellar bor. Kirishga nima kelayotganini tekshiring.",
+  "mentor.err.attr": "«{name}» turidagi obyektda bunday metod yoki atribut yo'q. Metod nomini va o'zgaruvchi turini tekshiring.",
+  "mentor.err.recursion": "Rekursiya juda chuqur. Ehtimol bazaviy holat ishlamayapti va funksiya o'zini cheksiz chaqiryapti — to'xtash shartini tekshiring.",
+  "mentor.err.args": "Funksiyaga argumentlar yetishmayapti. def da nechta parametr e'lon qilinganini va chaqiruvda nechtasini uzatayotganingizni solishtiring.",
+  "mentor.err.unbound": "O'zgaruvchi shu funksiya ichida qiymat berilishidan oldin ishlatilyapti. Uni sikl yoki shartdan oldin ishga tushiring.",
+  "mentor.err.generic": "Xatoning oxirgi qatorini o'qing — u yerda xato turi va tavsifi bor. Yuqoridagi qatorda kodingizdagi muammo boshlangan qator raqami ko'rsatilgan.",
+  "mentor.sql.noTable": "Bazada «{name}» jadvali yo'q. Mavjud: categories, products, customers, orders, order_items, employees.",
+  "mentor.sql.noColumn": "«{name}» ustuni yo'q. Yozilishini tekshiring yoki mavjud ustunlarni ko'rish uchun SELECT * FROM jadval bajaring.",
+  "mentor.sql.syntax": "«{name}» yonida sintaksis xatosi. So'rov qismlari tartibini tekshiring: SELECT → FROM → WHERE → GROUP BY → HAVING → ORDER BY.",
+  "mentor.sql.ambiguous": "Ustun nomi bir nechta jadvalda uchraydi — qaysinisidan ekanini ko'rsating: masalan name o'rniga p.name.",
+  "mentor.sql.aggregate": "Agregat funksiya noto'g'ri ishlatilgan. COUNT/SUM/AVG ni WHERE da filtrlab bo'lmaydi — buning uchun GROUP BY dan keyin HAVING bor.",
+  "mentor.sql.unique": "Yagonalik cheklovi buzildi: bunday yozuv allaqachon mavjud.",
+  "mentor.err.compare": "Turli turdagi qiymatlarni solishtirib bo'lmaydi (masalan satrni son bilan). Ehtimol qiymatlardan biri input() dan kelgan — uni int() bilan songa aylantiring."
 }

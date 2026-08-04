@@ -26,8 +26,17 @@ const read = (p) => JSON.parse(fs.readFileSync(p, 'utf8').replace(/^﻿/, ''));
 /* ---------- мультиязычные поля ---------- */
 const LANGS = ['ru', 'uz', 'en'];
 const coverage = { ru: 0, uz: 0, en: 0, total: 0 };
+const perCourse = {};                 // courseId -> { total, uz, en }
 
-function checkMl(field, where, required) {
+/**
+ * Переводы живут двумя способами: прямо в поле ({ru,uz,en}) и в оверлее курса
+ * (content/courses/<id>.<lang>.json, плоские пути). Покрытие обязано учитывать оба,
+ * иначе метрика врёт: заголовки, переведённые оверлеем, считались бы непереведёнными.
+ */
+let overlayCtx = null;                // { courseId, uz: Set, en: Set }
+let mlPath = null;                    // путь текущего поля в терминах оверлея
+
+function checkMl(field, where, required, overlayKey) {
   if (field === undefined || field === null) {
     if (required) err(where + ': отсутствует обязательное поле');
     return;
@@ -35,8 +44,19 @@ function checkMl(field, where, required) {
   if (typeof field === 'string') { warn(where + ': строка вместо мультиязычного поля'); return; }
   if (typeof field !== 'object') { err(where + ': поле должно быть объектом { ru, uz, en }'); return; }
   if (!field.ru && !field.en) err(where + ': нет ни ru, ни en — нечего показать');
+
   coverage.total++;
-  LANGS.forEach(l => { if (field[l]) coverage[l]++; });
+  const c = overlayCtx && overlayCtx.courseId;
+  if (c) { perCourse[c] = perCourse[c] || { total: 0, uz: 0, en: 0 }; perCourse[c].total++; }
+
+  LANGS.forEach(l => {
+    const inField = !!field[l];
+    const inOverlay = l !== 'ru' && overlayCtx && overlayKey && overlayCtx[l] && overlayCtx[l].has(overlayKey);
+    if (inField || inOverlay) {
+      coverage[l]++;
+      if (c && l !== 'ru') perCourse[c][l]++;
+    }
+  });
 }
 
 /* ---------- каталог ---------- */
@@ -112,25 +132,26 @@ const BLOCK_TYPES = ['text', 'code', 'run', 'sqlrun', 'note', 'predict', 'findbu
 const stats = { courses: 0, modules: 0, lessons: 0, blocks: 0, interactive: 0, quiz: 0, tasks: 0, exams: 0 };
 const legacyTargets = new Set(Object.values(catalog.legacyMap || {}));
 
-function checkQuiz(list, where, needExplain) {
+function checkQuiz(list, where, needExplain, oKey) {
   (list || []).forEach((q, i) => {
     const w = where + '.q' + i;
-    checkMl(q.q, w, true);
+    const ok = oKey ? oKey + '.' + i : null;
+    checkMl(q.q, w, true, ok && ok + '.q');
     if (!Array.isArray(q.options) || q.options.length < 2) err(w + ': мало вариантов');
-    else q.options.forEach((o, oi) => checkMl(o, w + '.option' + oi, true));
+    else q.options.forEach((o, oi) => checkMl(o, w + '.option' + oi, true, ok && ok + '.options.' + oi));
     if (typeof q.a !== 'number' || q.a < 0 || q.a >= (q.options || []).length) err(w + ': неверный индекс ответа');
     if (needExplain && !q.explain) warn(w + ': нет объяснения');
-    if (q.explain) checkMl(q.explain, w + '.explain');
+    if (q.explain) checkMl(q.explain, w + '.explain', false, ok && ok + '.explain');
     if (q.code && !q.broken) pySnippets.push({ name: w, code: q.code, compileOnly: true, sql: false });
     stats.quiz++;
   });
 }
 
-function checkTask(task, where, sqlModule) {
-  checkMl(task.title, where + '.title', true);
-  checkMl(task.desc, where + '.desc', true);
-  if (task.brief) checkMl(task.brief, where + '.brief');
-  if (task.hint) checkMl(task.hint, where + '.hint');
+function checkTask(task, where, sqlModule, oKey) {
+  checkMl(task.title, where + '.title', true, oKey && oKey + '.title');
+  checkMl(task.desc, where + '.desc', true, oKey && oKey + '.desc');
+  if (task.brief) checkMl(task.brief, where + '.brief', false, oKey && oKey + '.brief');
+  if (task.hint) checkMl(task.hint, where + '.hint', false, oKey && oKey + '.hint');
   if (task.starter === undefined) err(where + ': нет starter');
   if (task.kind === 'sql') {
     if (!task.solution) err(where + ': SQL-задача без solution');
@@ -144,13 +165,14 @@ function checkTask(task, where, sqlModule) {
   stats.tasks++;
 }
 
-function checkBlocks(blocks, where) {
+function checkBlocks(blocks, where, oKey) {
   (blocks || []).forEach((b, i) => {
     const w = where + '.b' + i;
+    const ok = oKey ? oKey + '.blocks.' + i : null;
     stats.blocks++;
     if (!BLOCK_TYPES.includes(b.type)) { err(w + ': неизвестный тип блока ' + b.type); return; }
     switch (b.type) {
-      case 'text': case 'note': checkMl(b.html, w + '.html', true); break;
+      case 'text': case 'note': checkMl(b.html, w + '.html', true, ok && ok + '.html'); break;
       case 'code': if (!b.code) err(w + ': нет кода'); break;
       case 'run': pySnippets.push({ name: w, code: b.code, exec: true }); break;
       case 'sqlrun': sqlItems.push({ name: w, sql: b.code, expectRows: false }); break;
@@ -198,6 +220,19 @@ catalog.courses.forEach(meta => {
   }
   const course = read(file);
   stats.courses++;
+
+  /* Оверлеи переводов этого курса — их ключи участвуют в подсчёте покрытия */
+  overlayCtx = { courseId: meta.id, uz: new Set(), en: new Set() };
+  ['uz', 'en'].forEach(l => {
+    const of = path.join(CONTENT, 'courses', meta.id + '.' + l + '.json');
+    if (!fs.existsSync(of)) return;
+    const overlay = read(of);
+    Object.keys(overlay).forEach(k => {
+      if (!String(overlay[k]).trim()) warn('overlay ' + meta.id + '.' + l + ': пустой перевод ключа ' + k);
+      overlayCtx[l].add(k);
+    });
+  });
+
   if (course.id !== meta.id) err('course ' + meta.id + ': id внутри файла не совпадает');
   if (!Array.isArray(course.modules) || !course.modules.length) { err('course ' + meta.id + ': нет модулей'); return; }
   if (course.modules.length !== meta.moduleCount) err('course ' + meta.id + ': moduleCount=' + meta.moduleCount + ', а модулей ' + course.modules.length);
@@ -208,39 +243,53 @@ catalog.courses.forEach(meta => {
     stats.modules++;
     if (ids.has(m.id)) err(w + ': дубль id модуля');
     ids.add(m.id);
-    checkMl(m.title, w + '.title', true);
-    checkMl(m.tagline, w + '.tagline', true);
+    checkMl(m.title, w + '.title', true, m.id + '.title');
+    checkMl(m.tagline, w + '.tagline', true, m.id + '.tagline');
     if (m.legacyId && !legacyTargets.has(meta.id + '/' + m.id))
       err(w + ': legacyId ' + m.legacyId + ' не отражён в catalog.legacyMap');
 
     if (!m.lessons || !m.lessons.length) err(w + ': нет уроков');
-    (m.lessons || []).forEach(l => {
+    (m.lessons || []).forEach((l, li) => {
       stats.lessons++;
-      checkMl(l.title, w + '/' + l.id + '.title', true);
-      checkBlocks(l.blocks, w + '/' + l.id);
+      const lKey = m.id + '.lessons.' + li;
+      checkMl(l.title, w + '/' + l.id + '.title', true, lKey + '.title');
+      checkBlocks(l.blocks, w + '/' + l.id, lKey);
     });
-    checkQuiz(m.quiz, w + '.quiz', true);
+    checkQuiz(m.quiz, w + '.quiz', true, m.id + '.quiz');
     if (!m.tasks || m.tasks.length < 1) err(w + ': нет задач');
     const taskIds = new Set();
-    (m.tasks || []).forEach(task => {
+    (m.tasks || []).forEach((task, ti) => {
       if (taskIds.has(task.id)) err(w + ': дубль id задачи ' + task.id);
       taskIds.add(task.id);
-      checkTask(task, w + '.task[' + task.id + ']', m.sqlModule);
+      checkTask(task, w + '.task[' + task.id + ']', m.sqlModule, m.id + '.tasks.' + ti);
     });
     if (!m.exam) err(w + ': нет экзамена');
     else {
       stats.exams++;
       if (!m.exam.time) err(w + '.exam: нет времени');
-      checkQuiz(m.exam.questions, w + '.exam', false);
-      (m.exam.tasks || []).forEach((task, ti) => checkTask(task, w + '.exam.task' + ti, m.sqlModule));
+      checkQuiz(m.exam.questions, w + '.exam', false, m.id + '.exam.questions');
+      (m.exam.tasks || []).forEach((task, ti) => checkTask(task, w + '.exam.task' + ti, m.sqlModule, m.id + '.exam.tasks.' + ti));
     }
   });
 
   if (course.finalExam) {
     stats.exams++;
-    checkQuiz(course.finalExam.questions, meta.id + '.final', false);
-    (course.finalExam.tasks || []).forEach((task, ti) => checkTask(task, meta.id + '.final.task' + ti, false));
+    checkQuiz(course.finalExam.questions, meta.id + '.final', false, 'finalExam.questions');
+    (course.finalExam.tasks || []).forEach((task, ti) => checkTask(task, meta.id + '.final.task' + ti, false, 'finalExam.tasks.' + ti));
   }
+
+  /* Оверлей ссылается на несуществующее поле — типичная опечатка при переводе */
+  ['uz', 'en'].forEach(l => {
+    overlayCtx[l].forEach(k => {
+      const parts = k.split('.');
+      let node = course.modules.find(x => x.id === parts[0]) || course[parts[0]];
+      for (let i = 1; i < parts.length && node; i++) {
+        node = Array.isArray(node) ? node[+parts[i]] : node[parts[i]];
+      }
+      if (node === undefined) warn('overlay ' + meta.id + '.' + l + ': ключ «' + k + '» не находит поля в курсе');
+    });
+  });
+  overlayCtx = null;
 });
 
 /* ---------- словари интерфейса ---------- */
@@ -270,10 +319,15 @@ fs.copyFileSync(path.join(CONTENT, 'sql', 'store-db.sql'), path.join(OUT, 'seed.
 console.log('=== КОНТЕНТ ===');
 console.table([stats]);
 console.log('Python-фрагментов:', pySnippets.length, '| SQL-фрагментов:', sqlItems.length);
-console.log('\n=== ПОКРЫТИЕ ПЕРЕВОДАМИ (поля контента) ===');
+console.log('\n=== ПОКРЫТИЕ ПЕРЕВОДАМИ (поля + оверлеи) ===');
 LANGS.forEach(l => {
   const pct = coverage.total ? Math.round(coverage[l] / coverage.total * 100) : 0;
   console.log('  ' + l + ': ' + coverage[l] + '/' + coverage.total + ' (' + pct + '%)');
+});
+console.log('\n  по курсам (uz / en):');
+Object.entries(perCourse).forEach(([id, c]) => {
+  const p = (n) => c.total ? Math.round(n / c.total * 100) + '%' : '—';
+  console.log('   ' + id.padEnd(22) + p(c.uz).padStart(4) + ' / ' + p(c.en).padStart(4) + '   (' + c.total + ' полей)');
 });
 
 if (warnings.length) {

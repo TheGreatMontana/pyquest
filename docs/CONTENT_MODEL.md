@@ -136,4 +136,5 @@ node tools/check-sql.js       # выполнение SQL на реальном �
 python tools/check-tasks.py   # эталонные решения проходят автотесты
 node tools/check-ui.mjs       # логика: миграция, граф, XP, языки
 node tools/check-screens.mjs  # рендеринг всех экранов
+node tools/check-mentor.mjs   # подсказки и разбор ошибок наставника
 ```

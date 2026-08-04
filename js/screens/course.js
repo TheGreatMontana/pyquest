@@ -6,6 +6,7 @@ import { state, mod, persist } from '../core/state.js';
 import { courseStatus, courseProgress, isModuleComplete, STATUS } from '../core/graph.js';
 import { awardTheory, awardQuiz, awardTask, noteLanguage } from '../core/gamification.js';
 import { renderBlocks, bindBlocks, setBlockContext, needsRunner } from '../blocks.js';
+import { hintLevels, explainError } from '../core/mentor.js';
 
 /* ---------- раннеры для блоков и задач ---------- */
 const runners = {
@@ -259,10 +260,10 @@ function renderTask(root, courseId, course, m, taskId) {
     '<div class="task-actions">' +
     '<button class="btn blue" id="run-btn">' + ic('play') + ' ' + esc(t(isSql ? 'task.runSql' : 'task.run')) + '</button>' +
     '<button class="btn" id="check-btn">' + ic('check') + ' ' + esc(t('task.check')) + '</button>' +
-    (task.hint ? '<button class="btn secondary small" id="hint-btn">' + esc(t('task.hint')) + '</button>' : '') +
+    '<button class="btn secondary small" id="hint-btn">' + ic('info') + ' ' + esc(t('mentor.hint')) + '</button>' +
     '<button class="btn secondary small" id="reset-btn">' + esc(t('task.reset')) + '</button>' +
     '<span class="py-loading" id="py-status" role="status"></span></div>' +
-    (task.hint ? '<div class="hint-box" id="hint" hidden>' + tr(task.hint) + '</div>' : '') +
+    '<div class="hint-box" id="hint" hidden></div>' +
     '<div class="run-out" id="out" role="log">' + esc(t('task.output')) + '</div></section>';
 
   const ed = root.querySelector('#ed');
@@ -270,11 +271,32 @@ function renderTask(root, courseId, course, m, taskId) {
   const status = root.querySelector('#py-status');
   bindEditor(ed, saveKey);
 
-  const hintBtn = root.querySelector('#hint-btn');
-  if (hintBtn) hintBtn.addEventListener('click', () => {
-    const h = root.querySelector('#hint');
-    h.hidden = !h.hidden;
+  /* Прогрессивные подсказки: от направления мысли к скелету решения.
+     Готовый ответ не выдаётся — цель научить, а не закрыть задачу. */
+  const levels = hintLevels(task);
+  let hintIdx = -1;
+  const hintBox = root.querySelector('#hint');
+  root.querySelector('#hint-btn').addEventListener('click', () => {
+    if (hintIdx >= levels.length - 1) {
+      hintBox.hidden = false;
+      hintBox.innerHTML += '<p class="hint-final">' + esc(t('mentor.noMoreHints')) + '</p>';
+      root.querySelector('#hint-btn').disabled = true;
+      return;
+    }
+    hintIdx++;
+    const h = levels[hintIdx];
+    const body = h.kind === 'skeleton' ? codeBlock(h.code, isSql ? 'sql' : 'python') : '<p>' + tr(h.text) + '</p>';
+    hintBox.hidden = false;
+    hintBox.innerHTML += '<div class="hint-step"><b>' + esc(t('mentor.hintLevel', { n: hintIdx + 1, total: levels.length })) + '</b>' + body + '</div>';
+    root.querySelector('#hint-btn').innerHTML = ic('info') + ' ' + esc(t('mentor.nextHint'));
+    announce(t('mentor.hintLevel', { n: hintIdx + 1, total: levels.length }));
   });
+
+  /** Понятное объяснение ошибки под техническим текстом исключения. */
+  function mentorNote(message, kind) {
+    const ex = explainError(message, kind);
+    return '<div class="mentor-note">' + ic('info') + ' <b>' + esc(t('mentor.whatWrong')) + ':</b> ' + esc(ex.text) + '</div>';
+  }
   root.querySelector('#reset-btn').addEventListener('click', () => {
     ed.value = task.starter;
     localStorage.removeItem(saveKey);
@@ -294,19 +316,27 @@ function renderTask(root, courseId, course, m, taskId) {
         if (!withCheck) {
           const res = await window.SqlRunner.run(ed.value, s => { status.textContent = s; });
           status.textContent = '';
-          out.innerHTML = res.error ? '<span class="err">' + esc(res.error) + '</span>' : window.SqlRunner.tableHtml(res.result);
+          out.innerHTML = res.error
+            ? '<span class="err">' + esc(res.error) + '</span>' + mentorNote(res.error, 'sql')
+            : window.SqlRunner.tableHtml(res.result);
         } else {
           const res = await window.SqlRunner.check(ed.value, task, s => { status.textContent = s; });
           status.textContent = '';
           let html = res.result ? window.SqlRunner.tableHtml(res.result) : '';
           if (res.ok) { html += '<p class="ok">' + ic('check') + ' ' + esc(t('task.solved')) + '</p>'; solved(); }
-          else html += '<p class="err">' + esc(res.message) + '</p>';
+          else {
+            html += '<p class="err">' + esc(res.message) + '</p>';
+            if (/Ошибка SQL/.test(res.message)) html += mentorNote(res.message, 'sql');
+          }
           out.innerHTML = html;
         }
       } else {
         const res = await window.PyRunner.run(ed.value, withCheck ? task.tests : '', task.stdin || [], s => { status.textContent = s; });
         status.textContent = '';
-        if (res.err) { out.innerHTML = '<span class="err">' + esc(res.err) + '</span>'; return; }
+        if (res.err) {
+          out.innerHTML = '<span class="err">' + esc(res.err) + '</span>' + mentorNote(res.err, 'python');
+          return;
+        }
         let html = esc(res.out || t('lesson.noOutput'));
         if (withCheck) {
           if (res.test_err) html += '\n<span class="err">✗ ' + esc(res.test_err) + '</span>';
