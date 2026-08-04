@@ -1,5 +1,5 @@
 /** dashboard.js — персональный дашборд: что делать прямо сейчас, прогресс, диагностика. */
-import { t, tr, formatDate } from '../core/i18n.js';
+import { t, tr, formatDate, plural } from '../core/i18n.js';
 import { esc, ic, progressBar, statusBadge } from '../ui.js';
 import { getCatalog, courseMeta, domain, pathCourses } from '../core/content.js';
 import { state } from '../core/state.js';
@@ -52,21 +52,32 @@ export function renderDashboard(root) {
         '<div class="cc-head"><span class="cc-glyph">' + ic(meta.glyph || 'code') + '</span>' +
         statusBadge(cs.status) + '</div>' +
         '<h4>' + esc(tr(meta.title)) + '</h4>' +
-        '<p>' + esc(tr(meta.description)).slice(0, 90) + '…</p>' +
-        progressBar(p.pct) +
-        '<span class="cc-meta">' + p.done + '/' + p.total + ' ' + esc(t('course.modules')) + ' · ' + esc(t('domain.hours', { n: meta.estimatedHours })) + '</span>' +
+        /* Обрезает CSS по строкам: slice рубил посреди слова и мог разрезать
+           HTML-сущность пополам, превратив её в мусор вроде «&am» */
+        '<p class="clamp-2">' + esc(tr(meta.description)) + '</p>' +
+        /* Нулевая полоса читалась как случайная чёрточка под текстом */
+        (p.pct > 0 ? progressBar(p.pct) : '') +
+        '<span class="cc-meta">' + p.done + ' / ' + esc(plural(p.total, 'course.modules')) + ' · ' + esc(t('domain.hours', { n: meta.estimatedHours })) + '</span>' +
         '</a>';
     });
   }
 
-  /* Достижения */
-  const achHtml = cat.achievements.map(a => {
+  /* Достижения.
+     Пятнадцать одинаковых серых карточек внизу дашборда были просто шумом.
+     Показываем полученные и ближайшие три, остальные — по кнопке. */
+  const achCard = (a) => {
     const un = (S.ach || []).includes(a.id);
     return '<div class="ach ' + (un ? 'unlocked' : 'locked') + '" title="' + esc(tr(a.desc)) + '">' +
       '<span class="ico" aria-hidden="true">' + a.icon + '</span>' +
       '<b>' + esc(tr(a.title)) + '</b><span class="desc">' + esc(tr(a.desc)) + '</span>' +
       '<span class="sr-only">' + (un ? t('status.completed') : t('status.locked')) + '</span></div>';
-  }).join('');
+  };
+  const earned = cat.achievements.filter(a => (S.ach || []).includes(a.id));
+  const rest = cat.achievements.filter(a => !(S.ach || []).includes(a.id));
+  const shown = earned.concat(rest.slice(0, Math.max(3, 6 - earned.length)));
+  const hidden = rest.slice(shown.length - earned.length);
+  const achHtml = shown.map(achCard).join('') ;
+  const achHidden = hidden.map(achCard).join('');
 
   /* План недели ментора */
   const planHtml = cat.mentorPlan.weeks.map(p => {
@@ -156,5 +167,21 @@ export function renderDashboard(root) {
     /* Достижения */
     '<h2 class="section-title">' + ic('trophy') + ' ' + esc(t('dash.achievements')) +
     ' <small>' + (S.ach || []).length + ' / ' + cat.achievements.length + '</small></h2>' +
-    '<div class="ach-grid">' + achHtml + '</div>';
+    '<div class="ach-grid">' + achHtml + '</div>' +
+    (achHidden
+      ? '<div class="ach-grid" id="ach-rest" hidden>' + achHidden + '</div>' +
+        '<button class="btn secondary small ach-toggle" id="ach-more" aria-expanded="false">' +
+        esc(t('dash.achShowAll', { n: hidden.length })) + '</button>'
+      : '');
+
+  const moreBtn = root.querySelector('#ach-more');
+  if (moreBtn) {
+    moreBtn.addEventListener('click', () => {
+      const box = root.querySelector('#ach-rest');
+      const open = box.hidden;
+      box.hidden = !open;
+      moreBtn.setAttribute('aria-expanded', String(open));
+      moreBtn.textContent = open ? t('dash.achHide') : t('dash.achShowAll', { n: hidden.length });
+    });
+  }
 }

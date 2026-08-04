@@ -75,6 +75,30 @@ export function t(key, params) {
 }
 
 /** Мультиязычное поле контента: tr({ ru: '…', en: '…' }) */
+/**
+ * Число со словом в правильной форме: «1 модуль», «2 модуля», «5 модулей».
+ * В словаре лежат ключи <key>.one / .few / .many; русский берёт все три,
+ * английский — one и many, узбекский обходится одной формой.
+ */
+export function plural(n, key) {
+  const abs = Math.abs(n) % 100;
+  const last = abs % 10;
+  let form;
+  if (getLang() === 'ru') {
+    if (abs > 10 && abs < 20) form = 'many';
+    else if (last === 1) form = 'one';
+    else if (last >= 2 && last <= 4) form = 'few';
+    else form = 'many';
+  } else {
+    form = n === 1 ? 'one' : 'many';
+  }
+  let word = dict[key + '.' + form];
+  if (word === undefined) word = dict[key + '.many'];           // узбекский: одна форма
+  if (word === undefined) word = (loaded.ru || {})[key + '.' + form];
+  if (word === undefined) word = t(key);                        // словарь ещё не пополнен
+  return n + ' ' + word;
+}
+
 export function tr(field) {
   if (field === null || field === undefined) return '';
   if (typeof field === 'string') return field;      // старый формат — не ломаемся

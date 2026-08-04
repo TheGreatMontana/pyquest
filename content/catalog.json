@@ -484,9 +484,7 @@
    "level": "beginner",
    "status": "starter",
    "estimatedHours": 6,
-   "requires": [
-    "python-syntax"
-   ],
+   "requires": [],
    "grants": [
     "security-basics"
    ],
@@ -560,12 +558,10 @@
    },
    "glyph": "cpu",
    "color": "#94a3b8",
-   "level": "intermediate",
+   "level": "beginner",
    "status": "full",
    "estimatedHours": 12,
-   "requires": [
-    "python-control-flow"
-   ],
+   "requires": [],
    "grants": [
     "c-memory",
     "static-typing"
@@ -589,7 +585,7 @@
    },
    "glyph": "cpu",
    "color": "#818cf8",
-   "level": "advanced",
+   "level": "intermediate",
    "status": "full",
    "estimatedHours": 14,
    "requires": [
@@ -617,12 +613,10 @@
    },
    "glyph": "layers",
    "color": "#a78bfa",
-   "level": "intermediate",
+   "level": "beginner",
    "status": "full",
    "estimatedHours": 10,
-   "requires": [
-    "python-oop"
-   ],
+   "requires": [],
    "grants": [
     "csharp-basics-skill",
     "static-typing"
@@ -645,12 +639,10 @@
    },
    "glyph": "cup",
    "color": "#f97316",
-   "level": "intermediate",
+   "level": "beginner",
    "status": "full",
    "estimatedHours": 12,
-   "requires": [
-    "python-oop"
-   ],
+   "requires": [],
    "grants": [
     "java-basics-skill",
     "static-typing"

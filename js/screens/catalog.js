@@ -1,5 +1,5 @@
 /** catalog.js — каталог направлений и страница направления (визуальный роадмап пути). */
-import { t, tr } from '../core/i18n.js';
+import { t, tr, plural } from '../core/i18n.js';
 import { esc, ic, progressBar, statusBadge } from '../ui.js';
 import { getCatalog, domain, courseMeta, careerPath, pathCourses, domainsUsingCourse } from '../core/content.js';
 import { state, persist } from '../core/state.js';
@@ -18,14 +18,19 @@ export function renderCatalog(root) {
       '<span class="dc-status">' + esc(statusLabel(d.status)) + '</span>' +
       '<h3>' + esc(tr(d.title)) + '</h3>' +
       '<p>' + esc(tr(d.tagline)) + '</p>' +
-      (pp && pp.total ? progressBar(pp.pct) + '<span class="dc-meta">' + pp.done + '/' + pp.total + ' ' + esc(t('domain.courses')) + '</span>' : '') +
+      (pp && pp.total ? progressBar(pp.pct) + '<span class="dc-meta">' + pp.done + ' / ' + esc(plural(pp.total, 'domain.courses')) + '</span>' : '') +
       '</a>';
   };
 
-  const ordered = cat.domains.slice().sort((a, b) => {
-    const rankOf = x => x.status === 'full' ? 0 : x.status === 'starter' ? 1 : 2;
-    return rankOf(a) - rankOf(b);
-  });
+  /* Направления без контента — компактной строкой отдельно. Раньше девять
+     «в разработке» занимали столько же места, сколько семь работающих,
+     и глаз не понимал, куда идти. */
+  const ready = cat.domains.filter(d => d.status !== 'planned')
+    .sort((a, b) => (a.status === 'full' ? 0 : 1) - (b.status === 'full' ? 0 : 1));
+  const planned = cat.domains.filter(d => d.status === 'planned');
+
+  const plannedChip = (d) => '<a class="domain-chip" href="#/domain/' + d.id + '" style="--tc:' + esc(d.color) + '">' +
+    ic(d.glyph) + '<span>' + esc(tr(d.title)) + '</span></a>';
 
   const courseCard = (c) => {
     const cs = courseStatus(c.id);
@@ -34,15 +39,21 @@ export function renderCatalog(root) {
       '<div class="cc-head"><span class="cc-glyph">' + ic(c.glyph) + '</span>' + statusBadge(cs.status) + '</div>' +
       '<h4>' + esc(tr(c.title)) + '</h4>' +
       '<p>' + esc(tr(c.description)) + '</p>' +
-      progressBar(p.pct) +
-      '<span class="cc-meta">' + esc(t('course.level.' + c.level)) + ' · ' + c.moduleCount + ' ' + esc(t('course.modules')) +
+      /* Полоса прогресса только когда есть чем гордиться: нулевая линия под
+         каждой карточкой читалась как случайная чёрточка */
+      (p.pct > 0 ? progressBar(p.pct) : '') +
+      '<span class="cc-meta">' + esc(t('course.level.' + c.level)) + ' · ' + esc(plural(c.moduleCount, 'course.modules')) +
       ' · ' + esc(t('domain.hours', { n: c.estimatedHours })) + '</span></a>';
   };
 
   root.innerHTML =
     '<div class="page-head"><h1>' + ic('layers') + ' ' + esc(t('catalog.title')) + '</h1>' +
     '<p>' + esc(t('catalog.subtitle')) + '</p></div>' +
-    '<div class="domain-grid">' + ordered.map(domainCard).join('') + '</div>' +
+    '<div class="domain-grid">' + ready.map(domainCard).join('') + '</div>' +
+    (planned.length
+      ? '<div class="planned-row"><span class="planned-label">' + ic('clock') + ' ' + esc(t('catalog.plannedTitle')) + '</span>' +
+        '<div class="planned-chips">' + planned.map(plannedChip).join('') + '</div></div>'
+      : '') +
     '<h2 class="section-title">' + ic('book') + ' ' + esc(t('catalog.allCourses')) +
     ' <small>' + esc(t('catalog.coursesSubtitle')) + '</small></h2>' +
     '<div class="course-grid">' + cat.courses.map(courseCard).join('') + '</div>';
@@ -70,8 +81,8 @@ export function renderDomain(root, domainId) {
         return '<a class="rm-node ' + cs.status + '" href="#/course/' + c.id + '" style="--tc:' + esc(c.color) + '">' +
           '<span class="rmn-glyph">' + ic(c.glyph) + '</span>' +
           '<span class="rmn-body"><b>' + esc(tr(c.title)) + '</b>' +
-          '<span class="rmn-meta">' + esc(t('course.level.' + c.level)) + ' · ' + c.moduleCount + ' ' + esc(t('course.modules')) + ' · ' + esc(t('domain.hours', { n: c.estimatedHours })) + '</span>' +
-          progressBar(p.pct) +
+          '<span class="rmn-meta">' + esc(t('course.level.' + c.level)) + ' · ' + esc(plural(c.moduleCount, 'course.modules')) + ' · ' + esc(t('domain.hours', { n: c.estimatedHours })) + '</span>' +
+          (p.pct > 0 ? progressBar(p.pct) : '') +
           (cs.status === STATUS.LOCKED && missing ? '<span class="rmn-locked">' + ic('lock') + ' ' + esc(t('course.lockedHint', { list: missing })) + '</span>' : '') +
           '</span>' + statusBadge(cs.status) + '</a>';
       }).join('');

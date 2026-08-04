@@ -613,7 +613,7 @@ pre.code code { background: none; padding: 0; color: var(--text); font-size: 1em
 }
 .domain-card h3 { font-size: 1.03rem; margin-bottom: 5px; }
 .domain-card p { color: var(--muted); font-size: .84rem; margin-bottom: 10px; }
-.dc-meta { display: block; margin-top: 6px; font-size: .75rem; color: var(--faint); font-family: var(--mono); }
+.dc-meta { display: block; margin-top: 6px; font-size: .78rem; color: var(--muted); }
 
 /* ===== Карточки курсов ===== */
 .course-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(268px, 1fr)); gap: 12px; }
@@ -629,7 +629,7 @@ pre.code code { background: none; padding: 0; color: var(--text); font-size: 1em
 .cc-glyph .ic { width: 20px; height: 20px; }
 .course-card h4 { font-size: .98rem; margin-bottom: 5px; }
 .course-card p { color: var(--muted); font-size: .82rem; margin-bottom: 10px; line-height: 1.5; }
-.cc-meta { display: block; margin-top: 7px; font-size: .74rem; color: var(--faint); font-family: var(--mono); }
+.cc-meta { display: block; margin-top: 7px; font-size: .78rem; color: var(--muted); }
 
 /* ===== Статус-бейджи (цвет + текст) ===== */
 .status-badge {
@@ -732,7 +732,9 @@ pre.code code { background: none; padding: 0; color: var(--text); font-size: 1em
 .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 8px; }
 .stat-tile {
   background: var(--card); border: 1px solid var(--border); border-radius: 12px;
-  padding: 14px 16px; text-align: center;
+  /* Было 14px 16px: у нового пользователя четыре крупные плитки с нулями
+     занимали целый экран и обещали больше, чем показывали */
+  padding: 10px 12px; text-align: center;
 }
 .stat-tile b { display: block; font-size: 1.5rem; font-family: var(--mono); color: var(--primary); }
 .stat-tile span { color: var(--muted); font-size: .76rem; }
@@ -1117,4 +1119,64 @@ pre.code code { background: none; padding: 0; color: var(--text); font-size: 1em
 }
 @media (max-width: 640px) {
   .web-preview { height: 220px; }
+}
+
+/* ---------- Направления в разработке ---------- */
+/* Девять пустых направлений занимали столько же места, сколько семь рабочих,
+   и глазу было не за что зацепиться. Теперь это одна спокойная строка. */
+.planned-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  margin: 18px 0 6px;
+  padding: 14px 16px;
+  border: 1px dashed var(--line);
+  border-radius: var(--r);
+  background: rgba(148, 163, 184, .04);
+}
+.planned-label {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: .82rem; font-weight: 600; color: var(--faint);
+  white-space: nowrap;
+}
+.planned-label .ic { width: 15px; height: 15px; }
+.planned-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.domain-chip {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 6px 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: .82rem;
+  color: var(--muted);
+  background: var(--panel);
+  transition: color .15s, border-color .15s;
+}
+.domain-chip .ic { width: 14px; height: 14px; color: var(--tc); opacity: .75; }
+.domain-chip:hover { color: var(--text); border-color: var(--tc); }
+
+/* Кнопка «показать остальные достижения» */
+.ach-toggle { margin-top: 12px; }
+
+/* Обрезка описания по строкам — без разрывов посреди слова */
+.clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Атрибут hidden должен побеждать display: grid, иначе «свернуть» ничего не сворачивает */
+.ach-grid[hidden] { display: none; }
+
+/* Панель недели не растягивается под высоту героя: пустой низ выглядел как обрыв */
+.hero { align-items: start; }
+.stat-tile b { font-size: 1.25rem; }
+.stat-tile span { font-size: .78rem; }
+
+@media (max-width: 640px) {
+  /* Подпись раздела переносится под заголовок: рядом она сжималась в столбик слов */
+  .section-title { flex-wrap: wrap; }
+  .section-title small { flex-basis: 100%; margin-left: 0; margin-top: 4px; }
 }
