@@ -704,6 +704,586 @@
      }
     ]
    }
+  },
+  {
+   "id": "cpp-02",
+   "title": {
+    "ru": "Шаблоны, RAII и умные указатели",
+    "uz": "Shablonlar, RAII va aqlli ko'rsatkichlar",
+    "en": "Templates, RAII and smart pointers"
+   },
+   "tagline": {
+    "ru": "То, чем C++ отличается от C по существу",
+    "uz": "C++ ni C dan mohiyatan farqlaydigan narsalar",
+    "en": "What really separates C++ from C"
+   },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": {
+      "ru": "Шаблоны: один код для разных типов",
+      "uz": "Shablonlar: turli turlar uchun bitta kod",
+      "en": "Templates: one body, many types"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>В C функцию «максимум из двух» пришлось бы писать отдельно для <code>int</code>, для <code>double</code>, для строк. В C++ пишут один шаблон, а компилятор порождает нужные версии сам — во время компиляции, без потерь в скорости.</p><p>Именно на шаблонах построен весь STL: <code>vector&lt;int&gt;</code> и <code>vector&lt;string&gt;</code> — два разных типа, сгенерированных из одного описания.</p>",
+        "uz": "<p>C da «ikkitadan maksimum» funksiyasini <code>int</code> uchun, <code>double</code> uchun, satrlar uchun alohida yozishga to'g'ri kelardi. C++ da bitta shablon yoziladi, kompilyator esa kerakli versiyalarni o'zi hosil qiladi — kompilyatsiya vaqtida, tezlikda yo'qotishsiz.</p><p>Butun STL aynan shablonlarga qurilgan: <code>vector&lt;int&gt;</code> va <code>vector&lt;string&gt;</code> — bitta tavsifdan hosil qilingan ikki xil tur.</p>",
+        "en": "<p>In C you would write “max of two” separately for <code>int</code>, for <code>double</code>, for strings. In C++ you write one template and the compiler generates the needed versions itself — at compile time, with no speed penalty.</p><p>Templates are what the whole STL is built on: <code>vector&lt;int&gt;</code> and <code>vector&lt;string&gt;</code> are two distinct types generated from one description.</p>"
+       }
+      },
+      {
+       "type": "cpprun",
+       "code": "#include <iostream>\n#include <string>\n\ntemplate <typename T>\nT maxOf(T a, T b) {\n    return a > b ? a : b;\n}\n\ntemplate <typename T>\nclass Box {\n    T value;\npublic:\n    Box(T v) : value(v) {}\n    T get() const { return value; }\n};\n\nint main() {\n    std::cout << maxOf(3, 9) << std::endl;\n    std::cout << maxOf(2.5, 1.5) << std::endl;\n    std::cout << maxOf(std::string(\"abc\"), std::string(\"xyz\")) << std::endl;\n\n    Box<int> b1(42);\n    Box<std::string> b2(\"текст\");\n    std::cout << b1.get() << \" \" << b2.get() << std::endl;\n    return 0;\n}"
+      },
+      {
+       "type": "note",
+       "kind": "tip",
+       "html": {
+        "ru": "Шаблон — это инструкция для компилятора, а не обычный код. Пока его не использовали с конкретным типом, машинного кода для него не существует. Поэтому шаблоны обычно целиком пишут в заголовочных файлах.",
+        "uz": "Shablon — bu kompilyator uchun ko'rsatma, oddiy kod emas. Uni aniq tur bilan ishlatmaguningizcha, unga mashina kodi mavjud emas. Shuning uchun shablonlar odatda butunlay sarlavha fayllarida yoziladi.",
+        "en": "A template is an instruction to the compiler, not ordinary code. Until it is used with a concrete type, no machine code exists for it. That is why templates are usually written entirely in header files."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": {
+      "ru": "RAII: ресурс живёт, пока живёт объект",
+      "uz": "RAII: resurs obyekt yashaguncha yashaydi",
+      "en": "RAII: the resource lives as long as the object"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>В C после <code>malloc</code> надо не забыть <code>free</code>. А если между ними случится <code>return</code> или исключение — память утечёт. C++ решает это иначе: ресурс захватывают в <b>конструкторе</b> и освобождают в <b>деструкторе</b>.</p><p>Деструктор вызывается автоматически, когда объект выходит из области видимости — при любом выходе, включая исключение. Забыть освободить невозможно. Этот приём и называется RAII.</p>",
+        "uz": "<p>C da <code>malloc</code> dan keyin <code>free</code> ni unutmaslik kerak. Agar ular orasida <code>return</code> yoki istisno bo'lsa — xotira oqib ketadi. C++ buni boshqacha hal qiladi: resurs <b>konstruktorda</b> egallanadi va <b>destruktorda</b> bo'shatiladi.</p><p>Destruktor obyekt ko'rinish sohasidan chiqqanda avtomatik chaqiriladi — har qanday chiqishda, istisno ham kiradi. Bo'shatishni unutish imkonsiz. Bu usul RAII deb ataladi.</p>",
+        "en": "<p>In C you must remember <code>free</code> after <code>malloc</code>. And if a <code>return</code> or an exception happens in between, the memory leaks. C++ solves this differently: the resource is acquired in the <b>constructor</b> and released in the <b>destructor</b>.</p><p>The destructor runs automatically when the object leaves scope — on any exit, exceptions included. Forgetting to release becomes impossible. This idiom is called RAII.</p>"
+       }
+      },
+      {
+       "type": "cpprun",
+       "code": "#include <iostream>\n\nclass Resource {\n    std::string name;\npublic:\n    Resource(std::string n) : name(n) {\n        std::cout << \"захвачен: \" << name << std::endl;\n    }\n    ~Resource() {                                  // деструктор\n        std::cout << \"освобождён: \" << name << std::endl;\n    }\n};\n\nvoid work() {\n    Resource a(\"файл\");\n    {\n        Resource b(\"соединение\");\n        std::cout << \"внутренний блок работает\" << std::endl;\n    }                                              // здесь умирает b\n    std::cout << \"снаружи блока\" << std::endl;\n}                                                  // здесь умирает a\n\nint main() {\n    work();\n    std::cout << \"конец\" << std::endl;\n    return 0;\n}"
+      },
+      {
+       "type": "predict",
+       "lang": "cpp",
+       "code": "#include <iostream>\n\nclass R {\npublic:\n    R()  { std::cout << \"A\"; }\n    ~R() { std::cout << \"B\"; }\n};\n\nint main() {\n    { R x; }\n    std::cout << \"C\";\n}",
+       "options": [
+        {
+         "ru": "ABC",
+         "uz": "ABC",
+         "en": "ABC"
+        },
+        {
+         "ru": "ACB",
+         "uz": "ACB",
+         "en": "ACB"
+        },
+        {
+         "ru": "AB",
+         "uz": "AB",
+         "en": "AB"
+        }
+       ],
+       "a": 0,
+       "explain": {
+        "ru": "Конструктор печатает A, на закрывающей скобке блока объект умирает и деструктор печатает B, и только потом выводится C.",
+        "uz": "Konstruktor A chiqaradi, blok yopilganda obyekt o'ladi va destruktor B chiqaradi, va faqat keyin C chiqadi.",
+        "en": "The constructor prints A; at the block's closing brace the object dies and the destructor prints B; only then C is printed."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": {
+      "ru": "Умные указатели и лямбды",
+      "uz": "Aqlli ko'rsatkichlar va lambdalar",
+      "en": "Smart pointers and lambdas"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>RAII применили к памяти — получились умные указатели:</p><ul><li><code>unique_ptr</code> — единственный владелец. Копировать нельзя, только передать владение. Освобождает память сам</li><li><code>shared_ptr</code> — владельцев несколько, память освобождается, когда уходит последний</li></ul><p>Голый <code>new</code>/<code>delete</code> в современном C++ почти не пишут: это источник утечек и двойного освобождения.</p>",
+        "uz": "<p>RAII xotiraga qo'llanildi — aqlli ko'rsatkichlar paydo bo'ldi:</p><ul><li><code>unique_ptr</code> — yagona egasi. Nusxalab bo'lmaydi, faqat egalikni uzatish mumkin. Xotirani o'zi bo'shatadi</li><li><code>shared_ptr</code> — egalari bir nechta, xotira oxirgisi ketganda bo'shatiladi</li></ul><p>Zamonaviy C++ da yalang'och <code>new</code>/<code>delete</code> deyarli yozilmaydi: bu oqish va ikki marta bo'shatish manbai.</p>",
+        "en": "<p>Apply RAII to memory and you get smart pointers:</p><ul><li><code>unique_ptr</code> — a single owner. It cannot be copied, only moved. It frees the memory itself</li><li><code>shared_ptr</code> — several owners; memory is freed when the last one goes away</li></ul><p>Raw <code>new</code>/<code>delete</code> is barely written in modern C++: it is a source of leaks and double frees.</p>"
+       }
+      },
+      {
+       "type": "cpprun",
+       "code": "#include <iostream>\n#include <memory>\n#include <vector>\n#include <algorithm>\n\nint main() {\n    auto p = std::make_unique<int>(42);\n    std::cout << \"unique_ptr: \" << *p << std::endl;\n    // delete писать не надо — освободится само\n\n    // лямбда — безымянная функция прямо в месте использования\n    std::vector<int> v{5, 2, 9, 1};\n    std::sort(v.begin(), v.end(), [](int a, int b) { return a > b; });\n    for (int x : v) std::cout << x << \" \";\n    std::cout << std::endl;\n\n    int limit = 4;\n    auto big = std::count_if(v.begin(), v.end(), [limit](int x) { return x > limit; });\n    std::cout << \"больше \" << limit << \": \" << big << std::endl;\n    return 0;\n}"
+      },
+      {
+       "type": "code",
+       "lang": "cpp",
+       "code": "auto s1 = std::make_shared<int>(7);\nauto s2 = s1;                      // владельцев стало двое\nstd::cout << *s2 << \", владельцев \" << s1.use_count() << std::endl;"
+      },
+      {
+       "type": "note",
+       "kind": "note",
+       "html": {
+        "ru": "Этот пример не запускается прямо здесь: <code>shared_ptr</code> считает владельцев атомарно, а в нашей браузерной сборке компилятора нет поддержки потоков. На обычном компиляторе он работает как написано.",
+        "uz": "Bu misol shu yerda ishga tushmaydi: <code>shared_ptr</code> egalarni atomar sanaydi, bizning brauzer kompilyatorimizda esa oqimlar qo‘llab-quvvatlanmaydi. Oddiy kompilyatorda u yozilganidek ishlaydi.",
+        "en": "This example does not run here: <code>shared_ptr</code> counts owners atomically, and our in-browser compiler build has no thread support. On an ordinary compiler it works as written."
+       }
+      },
+      {
+       "type": "note",
+       "kind": "trap",
+       "html": {
+        "ru": "В квадратных скобках лямбды указывают, что она захватывает из окружения: <code>[limit]</code> — копию, <code>[&amp;limit]</code> — ссылку. Захват по ссылке опасен, если лямбда переживёт саму переменную: получишь ссылку в никуда.",
+        "uz": "Lambdaning kvadrat qavslarida u atrofdan nimani egallashi ko'rsatiladi: <code>[limit]</code> — nusxani, <code>[&amp;limit]</code> — havolani. Havola bo'yicha egallash xavfli, agar lambda o'zgaruvchidan uzoq yashasa: hech qayerga havola olasiz.",
+        "en": "The square brackets of a lambda say what it captures from the surroundings: <code>[limit]</code> a copy, <code>[&amp;limit]</code> a reference. Capturing by reference is dangerous if the lambda outlives the variable: you get a reference to nowhere."
+       }
+      },
+      {
+       "type": "summary",
+       "items": [
+        {
+         "ru": "Шаблон — один код, из которого компилятор делает версии под типы",
+         "uz": "Shablon — bitta kod, undan kompilyator turlar uchun versiyalar yasaydi",
+         "en": "A template is one body from which the compiler makes per-type versions"
+        },
+        {
+         "ru": "RAII: захват в конструкторе, освобождение в деструкторе",
+         "uz": "RAII: konstruktorda egallash, destruktorda bo'shatish",
+         "en": "RAII: acquire in the constructor, release in the destructor"
+        },
+        {
+         "ru": "unique_ptr — один владелец, shared_ptr — несколько",
+         "uz": "unique_ptr — bitta ega, shared_ptr — bir nechta",
+         "en": "unique_ptr has one owner, shared_ptr several"
+        },
+        {
+         "ru": "Лямбда захватывает по копии [x] или по ссылке [&x]",
+         "uz": "Lambda nusxa [x] yoki havola [&x] bo'yicha egallaydi",
+         "en": "A lambda captures by copy [x] or by reference [&x]"
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": {
+      "ru": "Когда компилятор порождает код шаблона?",
+      "uz": "Kompilyator shablon kodini qachon hosil qiladi?",
+      "en": "When does the compiler generate a template's code?"
+     },
+     "options": [
+      {
+       "ru": "Во время выполнения программы",
+       "uz": "Dastur bajarilishi vaqtida",
+       "en": "While the program runs"
+      },
+      {
+       "ru": "При компиляции, для каждого использованного типа",
+       "uz": "Kompilyatsiyada, har bir ishlatilgan tur uchun",
+       "en": "At compile time, for each type actually used"
+      },
+      {
+       "ru": "Один раз для всех типов",
+       "uz": "Barcha turlar uchun bir marta",
+       "en": "Once for all types"
+      },
+      {
+       "ru": "Никогда",
+       "uz": "Hech qachon",
+       "en": "Never"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Поэтому шаблоны не стоят ничего во время выполнения — вся работа сделана до запуска.",
+      "uz": "Shuning uchun shablonlar bajarilish vaqtida hech nima turmaydi — butun ish ishga tushirishdan oldin bajarilgan.",
+      "en": "That is why templates cost nothing at run time — all the work happened before the program started."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что такое RAII?",
+      "uz": "RAII nima?",
+      "en": "What is RAII?"
+     },
+     "options": [
+      {
+       "ru": "Библиотека для работы с памятью",
+       "uz": "Xotira bilan ishlash kutubxonasi",
+       "en": "A memory-handling library"
+      },
+      {
+       "ru": "Захват ресурса в конструкторе и освобождение в деструкторе",
+       "uz": "Resursni konstruktorda egallash va destruktorda bo'shatish",
+       "en": "Acquiring a resource in the constructor and releasing it in the destructor"
+      },
+      {
+       "ru": "Способ ускорить программу",
+       "uz": "Dasturni tezlashtirish usuli",
+       "en": "A way to speed up a program"
+      },
+      {
+       "ru": "Правило именования классов",
+       "uz": "Sinflarni nomlash qoidasi",
+       "en": "A class naming rule"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Деструктор вызывается при любом выходе из области видимости — забыть освободить ресурс просто нельзя.",
+      "uz": "Destruktor ko'rinish sohasidan har qanday chiqishda chaqiriladi — resursni bo'shatishni unutib bo'lmaydi.",
+      "en": "The destructor runs on any exit from scope — forgetting to release simply is not possible."
+     }
+    },
+    {
+     "q": {
+      "ru": "Чем <code>unique_ptr</code> отличается от <code>shared_ptr</code>?",
+      "uz": "<code>unique_ptr</code> <code>shared_ptr</code> dan nimasi bilan farq qiladi?",
+      "en": "How does <code>unique_ptr</code> differ from <code>shared_ptr</code>?"
+     },
+     "options": [
+      {
+       "ru": "Ничем",
+       "uz": "Hech nimasi bilan",
+       "en": "In no way"
+      },
+      {
+       "ru": "У unique_ptr один владелец, его нельзя скопировать",
+       "uz": "unique_ptr da bitta ega, uni nusxalab bo'lmaydi",
+       "en": "unique_ptr has one owner and cannot be copied"
+      },
+      {
+       "ru": "unique_ptr работает быстрее в сто раз",
+       "uz": "unique_ptr yuz barobar tez ishlaydi",
+       "en": "unique_ptr is a hundred times faster"
+      },
+      {
+       "ru": "shared_ptr не освобождает память",
+       "uz": "shared_ptr xotirani bo'shatmaydi",
+       "en": "shared_ptr never frees memory"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "<code>shared_ptr</code> считает владельцев и освобождает память, когда счётчик доходит до нуля. За это он платит небольшим накладным расходом.",
+      "uz": "<code>shared_ptr</code> egalarni sanaydi va hisoblagich nolga yetganda xotirani bo'shatadi. Buning uchun u kichik qo'shimcha xarajat to'laydi.",
+      "en": "<code>shared_ptr</code> counts owners and frees the memory when the counter reaches zero. It pays a small overhead for that."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что означает <code>[&amp;x]</code> в лямбде?",
+      "uz": "Lambdadagi <code>[&amp;x]</code> nimani anglatadi?",
+      "en": "What does <code>[&amp;x]</code> mean in a lambda?"
+     },
+     "options": [
+      {
+       "ru": "Захват копии x",
+       "uz": "x nusxasini egallash",
+       "en": "Capturing a copy of x"
+      },
+      {
+       "ru": "Захват x по ссылке",
+       "uz": "x ni havola bo'yicha egallash",
+       "en": "Capturing x by reference"
+      },
+      {
+       "ru": "Указатель на лямбду",
+       "uz": "Lambdaga ko'rsatkich",
+       "en": "A pointer to the lambda"
+      },
+      {
+       "ru": "Ничего",
+       "uz": "Hech nima",
+       "en": "Nothing"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Ссылка видит изменения оригинала, но станет висячей, если лямбда переживёт переменную.",
+      "uz": "Havola asl nusxadagi o'zgarishlarni ko'radi, lekin lambda o'zgaruvchidan uzoq yashasa osilib qoladi.",
+      "en": "A reference sees changes to the original, but becomes dangling if the lambda outlives the variable."
+     }
+    },
+    {
+     "q": {
+      "ru": "Когда вызывается деструктор локального объекта?",
+      "uz": "Lokal obyekt destruktori qachon chaqiriladi?",
+      "en": "When is a local object's destructor called?"
+     },
+     "options": [
+      {
+       "ru": "Только если вызвать delete",
+       "uz": "Faqat delete chaqirilganda",
+       "en": "Only if you call delete"
+      },
+      {
+       "ru": "При выходе из области видимости, в том числе при исключении",
+       "uz": "Ko'rinish sohasidan chiqishda, istisnoda ham",
+       "en": "On leaving scope, including via an exception"
+      },
+      {
+       "ru": "В конце программы",
+       "uz": "Dastur oxirida",
+       "en": "At the end of the program"
+      },
+      {
+       "ru": "Никогда",
+       "uz": "Hech qachon",
+       "en": "Never"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Именно это делает RAII надёжным: путь выхода не важен, деструктор отработает в любом случае.",
+      "uz": "Aynan shu RAII ni ishonchli qiladi: chiqish yo'li muhim emas, destruktor har holda ishlaydi.",
+      "en": "This is exactly what makes RAII reliable: the exit path does not matter, the destructor runs regardless."
+     }
+    },
+    {
+     "q": {
+      "ru": "Почему в современном C++ избегают голого <code>new</code>?",
+      "uz": "Nega zamonaviy C++ da yalang'och <code>new</code> dan qochishadi?",
+      "en": "Why does modern C++ avoid raw <code>new</code>?"
+     },
+     "options": [
+      {
+       "ru": "Он устарел и удалён из языка",
+       "uz": "U eskirgan va tildan olib tashlangan",
+       "en": "It is deprecated and removed from the language"
+      },
+      {
+       "ru": "Легко забыть delete: утечки и двойное освобождение",
+       "uz": "delete ni unutish oson: oqish va ikki marta bo'shatish",
+       "en": "It is easy to forget delete: leaks and double frees"
+      },
+      {
+       "ru": "Он медленный",
+       "uz": "U sekin",
+       "en": "It is slow"
+      },
+      {
+       "ru": "Он не работает с классами",
+       "uz": "U sinflar bilan ishlamaydi",
+       "en": "It does not work with classes"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Умный указатель делает то же самое, но освобождение гарантировано языком, а не вниманием программиста.",
+      "uz": "Aqlli ko'rsatkich xuddi shuni qiladi, lekin bo'shatish dasturchining e'tiboriga emas, tilga kafolatlangan.",
+      "en": "A smart pointer does the same thing, but the release is guaranteed by the language rather than by the programmer's attention."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "cpp",
+     "title": {
+      "ru": "Шаблонный минимум",
+      "uz": "Shablonli minimum",
+      "en": "A templated minimum"
+     },
+     "brief": {
+      "ru": "template <typename T>",
+      "uz": "template <typename T>",
+      "en": "template <typename T>"
+     },
+     "desc": {
+      "ru": "<p>Напиши шаблон <code>minOf(a, b)</code>, возвращающий меньшее из двух значений. В <code>main</code> выведи результат для чисел <code>3</code> и <code>9</code>, а затем для <code>2.5</code> и <code>1.5</code>, каждый на своей строке.</p><p>Ожидаемый вывод:<br><code>3</code><br><code>1.5</code></p>",
+      "uz": "<p>Ikkitadan kichigini qaytaradigan <code>minOf(a, b)</code> shablonini yozing. <code>main</code> da <code>3</code> va <code>9</code> uchun, keyin <code>2.5</code> va <code>1.5</code> uchun natijani har biri o'z qatorida chiqaring.</p><p>Kutilgan natija:<br><code>3</code><br><code>1.5</code></p>",
+      "en": "<p>Write a template <code>minOf(a, b)</code> returning the smaller of two values. In <code>main</code>, print the result for <code>3</code> and <code>9</code>, then for <code>2.5</code> and <code>1.5</code>, each on its own line.</p><p>Expected output:<br><code>3</code><br><code>1.5</code></p>"
+     },
+     "starter": "#include <iostream>\n\n// твой шаблон\n\nint main() {\n    std::cout << minOf(3, 9) << std::endl;\n    std::cout << minOf(2.5, 1.5) << std::endl;\n    return 0;\n}\n",
+     "solution": "#include <iostream>\n\ntemplate <typename T>\nT minOf(T a, T b) {\n    return a < b ? a : b;\n}\n\nint main() {\n    std::cout << minOf(3, 9) << std::endl;\n    std::cout << minOf(2.5, 1.5) << std::endl;\n    return 0;\n}\n",
+     "expected": "3\n1.5",
+     "hint": {
+      "ru": "<code>template &lt;typename T&gt;</code> на отдельной строке, ниже — обычная функция, где вместо конкретного типа стоит <code>T</code>.",
+      "uz": "<code>template &lt;typename T&gt;</code> alohida qatorda, pastda — aniq tur o'rniga <code>T</code> turgan oddiy funksiya.",
+      "en": "<code>template &lt;typename T&gt;</code> on its own line, then an ordinary function with <code>T</code> in place of a concrete type."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "cpp",
+     "title": {
+      "ru": "Объект с деструктором",
+      "uz": "Destruktorli obyekt",
+      "en": "An object with a destructor"
+     },
+     "brief": {
+      "ru": "RAII",
+      "uz": "RAII",
+      "en": "RAII"
+     },
+     "desc": {
+      "ru": "<p>Сделай класс <code>Guard</code>: конструктор печатает <code>открыт</code>, деструктор — <code>закрыт</code>. В <code>main</code> создай объект во вложенном блоке, а после блока напечатай <code>дальше</code>.</p><p>Ожидаемый вывод:<br><code>открыт</code><br><code>закрыт</code><br><code>дальше</code></p>",
+      "uz": "<p><code>Guard</code> sinfini yarating: konstruktor <code>открыт</code>, destruktor <code>закрыт</code> chiqaradi. <code>main</code> da obyektni ichki blokda yarating, blokdan keyin <code>дальше</code> chiqaring.</p><p>Kutilgan natija:<br><code>открыт</code><br><code>закрыт</code><br><code>дальше</code></p>",
+      "en": "<p>Create a class <code>Guard</code>: the constructor prints <code>открыт</code>, the destructor prints <code>закрыт</code>. In <code>main</code>, create the object inside a nested block, and print <code>дальше</code> after the block.</p><p>Expected output:<br><code>открыт</code><br><code>закрыт</code><br><code>дальше</code></p>"
+     },
+     "starter": "#include <iostream>\n\n// твой класс Guard\n\nint main() {\n    {\n        // создай объект здесь\n    }\n    std::cout << \"дальше\" << std::endl;\n    return 0;\n}\n",
+     "solution": "#include <iostream>\n\nclass Guard {\npublic:\n    Guard()  { std::cout << \"открыт\" << std::endl; }\n    ~Guard() { std::cout << \"закрыт\" << std::endl; }\n};\n\nint main() {\n    {\n        Guard g;\n    }\n    std::cout << \"дальше\" << std::endl;\n    return 0;\n}\n",
+     "expected": "открыт\nзакрыт\nдальше",
+     "hint": {
+      "ru": "Деструктор — это <code>~Guard()</code>. Он сработает на закрывающей скобке блока, до печати «дальше».",
+      "uz": "Destruktor — bu <code>~Guard()</code>. U blok yopilganda, «дальше» chiqishidan oldin ishlaydi.",
+      "en": "The destructor is <code>~Guard()</code>. It fires at the block's closing brace, before “дальше” is printed."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "cpp",
+     "title": {
+      "ru": "Сортировка лямбдой",
+      "uz": "Lambda bilan saralash",
+      "en": "Sorting with a lambda"
+     },
+     "brief": {
+      "ru": "std::sort и лямбда",
+      "uz": "std::sort va lambda",
+      "en": "std::sort and a lambda"
+     },
+     "desc": {
+      "ru": "<p>Отсортируй вектор <code>{5, 2, 9, 1, 7}</code> по <b>убыванию</b>, передав лямбду в <code>std::sort</code>, и выведи через пробел.</p><p>Ожидаемый вывод: <code>9 7 5 2 1</code></p>",
+      "uz": "<p><code>{5, 2, 9, 1, 7}</code> vektorini <code>std::sort</code> ga lambda uzatib <b>kamayish</b> bo'yicha saralang va bo'sh joy bilan chiqaring.</p><p>Kutilgan natija: <code>9 7 5 2 1</code></p>",
+      "en": "<p>Sort the vector <code>{5, 2, 9, 1, 7}</code> in <b>descending</b> order by passing a lambda to <code>std::sort</code>, and print it space-separated.</p><p>Expected output: <code>9 7 5 2 1</code></p>"
+     },
+     "starter": "#include <iostream>\n#include <vector>\n#include <algorithm>\n\nint main() {\n    std::vector<int> v{5, 2, 9, 1, 7};\n    // отсортируй по убыванию\n    for (int x : v) std::cout << x << \" \";\n    std::cout << std::endl;\n    return 0;\n}\n",
+     "solution": "#include <iostream>\n#include <vector>\n#include <algorithm>\n\nint main() {\n    std::vector<int> v{5, 2, 9, 1, 7};\n    std::sort(v.begin(), v.end(), [](int a, int b) { return a > b; });\n    for (int x : v) std::cout << x << \" \";\n    std::cout << std::endl;\n    return 0;\n}\n",
+     "expected": "9 7 5 2 1",
+     "hint": {
+      "ru": "Третий аргумент <code>std::sort</code> — функция сравнения. Для убывания она должна возвращать <code>a &gt; b</code>.",
+      "uz": "<code>std::sort</code> ning uchinchi argumenti — solishtirish funksiyasi. Kamayish uchun u <code>a &gt; b</code> qaytarishi kerak.",
+      "en": "The third argument to <code>std::sort</code> is the comparison function. For descending order it must return <code>a &gt; b</code>."
+     }
+    }
+   ],
+   "exam": {
+    "time": 480,
+    "questions": [
+     {
+      "q": {
+       "ru": "Шаблон существует в машинном коде до того, как его использовали?",
+       "uz": "Shablon ishlatilishidan oldin mashina kodida mavjudmi?",
+       "en": "Does a template exist in machine code before it is used?"
+      },
+      "options": [
+       {
+        "ru": "Да, всегда",
+        "uz": "Ha, doim",
+        "en": "Yes, always"
+       },
+       {
+        "ru": "Нет, код порождается при использовании с конкретным типом",
+        "uz": "Yo'q, kod aniq tur bilan ishlatilganda hosil qilinadi",
+        "en": "No, the code is generated when used with a concrete type"
+       },
+       {
+        "ru": "Только для int",
+        "uz": "Faqat int uchun",
+        "en": "Only for int"
+       },
+       {
+        "ru": "Только в отладочной сборке",
+        "uz": "Faqat nosozliklarni tuzatish yig'ilishida",
+        "en": "Only in a debug build"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "Что произойдёт при выходе из функции с локальным объектом?",
+       "uz": "Lokal obyektli funksiyadan chiqishda nima bo'ladi?",
+       "en": "What happens when leaving a function that holds a local object?"
+      },
+      "options": [
+       {
+        "ru": "Ничего, память останется занята",
+        "uz": "Hech nima, xotira band qoladi",
+        "en": "Nothing, the memory stays taken"
+       },
+       {
+        "ru": "Вызовется деструктор",
+        "uz": "Destruktor chaqiriladi",
+        "en": "The destructor is called"
+       },
+       {
+        "ru": "Нужно вызвать delete вручную",
+        "uz": "delete ni qo'lda chaqirish kerak",
+        "en": "You must call delete by hand"
+       },
+       {
+        "ru": "Программа завершится",
+        "uz": "Dastur tugaydi",
+        "en": "The program exits"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "Можно ли скопировать <code>unique_ptr</code>?",
+       "uz": "<code>unique_ptr</code> ni nusxalash mumkinmi?",
+       "en": "Can a <code>unique_ptr</code> be copied?"
+      },
+      "options": [
+       {
+        "ru": "Да",
+        "uz": "Ha",
+        "en": "Yes"
+       },
+       {
+        "ru": "Нет, владелец должен остаться один",
+        "uz": "Yo'q, ega bitta qolishi kerak",
+        "en": "No, there must remain a single owner"
+       },
+       {
+        "ru": "Да, но только один раз",
+        "uz": "Ha, lekin faqat bir marta",
+        "en": "Yes, but only once"
+       },
+       {
+        "ru": "Только внутри класса",
+        "uz": "Faqat sinf ichida",
+        "en": "Only inside a class"
+       }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "cpp",
+      "title": {
+       "ru": "Шаблонный контейнер",
+       "uz": "Shablonli konteyner",
+       "en": "A templated container"
+      },
+      "desc": {
+       "ru": "<p>Сделай шаблонный класс <code>Pair</code> с двумя значениями типа <code>T</code>, конструктором и методом <code>sum()</code>, возвращающим их сумму. В <code>main</code> выведи сумму для <code>Pair&lt;int&gt;(3, 4)</code> и для <code>Pair&lt;double&gt;(1.5, 2.5)</code>, каждую на своей строке.</p><p>Ожидаемый вывод:<br><code>7</code><br><code>4</code></p>",
+       "uz": "<p><code>T</code> turidagi ikkita qiymatli, konstruktorli va ularning yig'indisini qaytaradigan <code>sum()</code> metodli <code>Pair</code> shablon sinfini yarating. <code>main</code> da <code>Pair&lt;int&gt;(3, 4)</code> va <code>Pair&lt;double&gt;(1.5, 2.5)</code> uchun yig'indini har biri o'z qatorida chiqaring.</p><p>Kutilgan natija:<br><code>7</code><br><code>4</code></p>",
+       "en": "<p>Create a template class <code>Pair</code> holding two values of type <code>T</code>, with a constructor and a method <code>sum()</code> returning their sum. In <code>main</code>, print the sum for <code>Pair&lt;int&gt;(3, 4)</code> and for <code>Pair&lt;double&gt;(1.5, 2.5)</code>, each on its own line.</p><p>Expected output:<br><code>7</code><br><code>4</code></p>"
+      },
+      "starter": "#include <iostream>\n\n// твой шаблонный класс Pair\n\nint main() {\n    Pair<int> a(3, 4);\n    Pair<double> b(1.5, 2.5);\n    std::cout << a.sum() << std::endl;\n    std::cout << b.sum() << std::endl;\n    return 0;\n}\n",
+      "solution": "#include <iostream>\n\ntemplate <typename T>\nclass Pair {\n    T first, second;\npublic:\n    Pair(T a, T b) : first(a), second(b) {}\n    T sum() const { return first + second; }\n};\n\nint main() {\n    Pair<int> a(3, 4);\n    Pair<double> b(1.5, 2.5);\n    std::cout << a.sum() << std::endl;\n    std::cout << b.sum() << std::endl;\n    return 0;\n}\n",
+      "expected": "7\n4",
+      "hint": {
+       "ru": "Поля объявляй типом <code>T</code>. Список инициализации в конструкторе: <code>Pair(T a, T b) : first(a), second(b) {}</code>.",
+       "uz": "Maydonlarni <code>T</code> turi bilan e'lon qiling. Konstruktordagi initsializatsiya ro'yxati: <code>Pair(T a, T b) : first(a), second(b) {}</code>.",
+       "en": "Declare the fields with type <code>T</code>. Constructor initialiser list: <code>Pair(T a, T b) : first(a), second(b) {}</code>."
+      }
+     }
+    ]
+   }
   }
  ]
 }

@@ -267,6 +267,14 @@
     "uz": "Java kolleksiyalari va interfeyslari",
     "en": "Java collections and interfaces"
    }
+  },
+  {
+   "id": "cpp-templates",
+   "title": {
+    "ru": "Шаблоны и RAII",
+    "uz": "Shablonlar va RAII",
+    "en": "Templates and RAII"
+   }
   }
  ],
  "courses": [
@@ -628,15 +636,16 @@
    "color": "#818cf8",
    "level": "intermediate",
    "status": "full",
-   "estimatedHours": 14,
+   "estimatedHours": 22,
    "requires": [
     "c-memory"
    ],
    "grants": [
-    "cpp-oop"
+    "cpp-oop",
+    "cpp-templates"
    ],
    "legacyIds": [],
-   "moduleCount": 1,
+   "moduleCount": 2,
    "compiled": true,
    "runner": "cpp"
   },
