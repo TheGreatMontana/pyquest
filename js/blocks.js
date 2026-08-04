@@ -27,9 +27,13 @@ export function renderBlock(b, i) {
 
     case 'run':
     case 'jsrun':
+    case 'crun':
+    case 'cpprun':
     case 'sqlrun': {
-      const kind = b.type === 'sqlrun' ? 'sql' : b.type === 'jsrun' ? 'js' : 'py';
-      const lang = b.lang || (kind === 'sql' ? 'sql' : kind === 'js' ? 'javascript' : 'python');
+      const KIND = { sqlrun: 'sql', jsrun: 'js', crun: 'c', cpprun: 'cpp', run: 'py' };
+      const LANG = { sql: 'sql', js: 'javascript', c: 'c', cpp: 'cpp', py: 'python' };
+      const kind = KIND[b.type];
+      const lang = b.lang || LANG[kind];
       return codeBlock(b.code, lang) +
         '<div class="try-box" data-block="' + i + '">' +
         '<button class="btn small blue" data-run="' + kind + '" data-i="' + i + '">' +
@@ -281,6 +285,8 @@ export function needsRunner(blocks) {
   return {
     py: blocks.some(b => b.type === 'run' || (b.type === 'predict' && (!b.lang || b.lang === 'python'))),
     js: blocks.some(b => b.type === 'jsrun' || (b.type === 'predict' && b.lang === 'javascript')),
+    c: blocks.some(b => b.type === 'crun'),
+    cpp: blocks.some(b => b.type === 'cpprun'),
     sql: blocks.some(b => b.type === 'sqlrun'),
   };
 }

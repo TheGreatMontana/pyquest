@@ -19,6 +19,7 @@ const warnings = [];
 const pySnippets = [];
 const sqlItems = [];
 const jsItems = [];
+const clangItems = [];
 const err = (m) => errors.push(m);
 const warn = (m) => warnings.push(m);
 
@@ -129,10 +130,11 @@ Object.entries(catalog.legacyMap || {}).forEach(([legacy, target]) => {
 });
 
 /* ---------- курсы ---------- */
-const BLOCK_TYPES = ['text', 'code', 'run', 'jsrun', 'sqlrun', 'note', 'predict', 'findbug', 'match', 'order', 'checkpoint', 'summary'];
-/* Языки задач: часть исполняется в браузере, часть проверяется сверкой с эталоном */
-const RUNNABLE_KINDS = ['python', 'javascript', 'sql'];
-const COMPILED_KINDS = ['c', 'cpp', 'csharp', 'java'];
+const BLOCK_TYPES = ['text', 'code', 'run', 'jsrun', 'crun', 'cpprun', 'sqlrun', 'note', 'predict', 'findbug', 'match', 'order', 'checkpoint', 'summary'];
+/* Языки задач: исполняемые в браузере и те, для которых рантайма пока нет */
+const RUNNABLE_KINDS = ['python', 'javascript', 'sql', 'c', 'cpp'];
+const CLANG_KINDS = ['c', 'cpp'];              // компилируются clang'ом в браузере
+const COMPILED_KINDS = ['csharp', 'java'];     // рантайма пока нет — сверка с эталоном
 const stats = { courses: 0, modules: 0, lessons: 0, blocks: 0, interactive: 0, quiz: 0, tasks: 0, exams: 0 };
 const legacyTargets = new Set(Object.values(catalog.legacyMap || {}));
 
@@ -170,8 +172,14 @@ function checkTask(task, where, sqlModule, oKey) {
   } else if (task.kind === 'javascript') {
     if (!task.tests) err(where + ': нет тестов');
     else jsItems.push({ name: where, tests: task.tests, starter: task.starter });
+  } else if (CLANG_KINDS.includes(task.kind)) {
+    /* C и C++ компилируются и запускаются по-настоящему: нужен эталон (его прогоняет
+       check-clang.mjs) и ожидаемый вывод, по которому засчитывается решение. */
+    if (!task.solution) err(where + ': задача на ' + task.kind + ' без эталонного решения (solution)');
+    if (task.expected === undefined) err(where + ': задача на ' + task.kind + ' без ожидаемого вывода (expected)');
+    else clangItems.push({ name: where, lang: task.kind, code: task.solution, expected: task.expected });
   } else if (COMPILED_KINDS.includes(task.kind)) {
-    // Компилируемые языки не запускаются в браузере — обязателен эталон для сверки
+    // Рантайма для этих языков пока нет — обязателен эталон для сверки
     if (!task.solution) err(where + ': задача на ' + task.kind + ' без эталонного решения (solution)');
     if (task.tests) warn(where + ': тесты у компилируемой задачи не выполняются, они бесполезны');
   } else err(where + ': неизвестный kind ' + task.kind);
@@ -189,6 +197,8 @@ function checkBlocks(blocks, where, oKey) {
       case 'code': if (!b.code) err(w + ': нет кода'); break;
       case 'run': pySnippets.push({ name: w, code: b.code, exec: true }); break;
       case 'jsrun': jsItems.push({ name: w, code: b.code, exec: true }); break;
+      case 'crun': clangItems.push({ name: w, lang: 'c', code: b.code }); break;
+      case 'cpprun': clangItems.push({ name: w, lang: 'cpp', code: b.code }); break;
       case 'sqlrun': sqlItems.push({ name: w, sql: b.code, expectRows: false }); break;
       case 'predict':
         stats.interactive++;
@@ -199,6 +209,7 @@ function checkBlocks(blocks, where, oKey) {
           const lang = b.lang || 'python';
           if (lang === 'python') pySnippets.push({ name: w, code: b.code, exec: true });
           else if (lang === 'javascript') jsItems.push({ name: w, code: b.code, syntaxOnly: true });
+          else if (CLANG_KINDS.includes(lang)) clangItems.push({ name: w, lang, code: b.code });
           else if (!COMPILED_KINDS.includes(lang)) err(w + ': неизвестный язык predict: ' + lang);
         }
         if (typeof b.a !== 'number' || !b.options || b.a >= b.options.length) err(w + ': неверный ответ predict');
@@ -336,11 +347,13 @@ fs.mkdirSync(OUT, { recursive: true });
 fs.writeFileSync(path.join(OUT, 'py-snippets.json'), JSON.stringify(pySnippets), 'utf8');
 fs.writeFileSync(path.join(OUT, 'sql-items.json'), JSON.stringify(sqlItems), 'utf8');
 fs.writeFileSync(path.join(OUT, 'js-items.json'), JSON.stringify(jsItems), 'utf8');
+fs.writeFileSync(path.join(OUT, 'clang-items.json'), JSON.stringify(clangItems), 'utf8');
 fs.copyFileSync(path.join(CONTENT, 'sql', 'store-db.sql'), path.join(OUT, 'seed.sql'));
 
 console.log('=== КОНТЕНТ ===');
 console.table([stats]);
-console.log('Python-фрагментов:', pySnippets.length, '| JS-фрагментов:', jsItems.length, '| SQL-фрагментов:', sqlItems.length);
+console.log('Python-фрагментов:', pySnippets.length, '| JS-фрагментов:', jsItems.length,
+            '| C/C++-фрагментов:', clangItems.length, '| SQL-фрагментов:', sqlItems.length);
 console.log('\n=== ПОКРЫТИЕ ПЕРЕВОДАМИ (поля + оверлеи) ===');
 LANGS.forEach(l => {
   const pct = coverage.total ? Math.round(coverage[l] / coverage.total * 100) : 0;

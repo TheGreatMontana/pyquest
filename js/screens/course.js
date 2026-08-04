@@ -12,15 +12,27 @@ import { hintLevels, explainError } from '../core/mentor.js';
 const runners = {
   py: async (code, onStatus) => window.PyRunner.run(code, '', [], onStatus),
   js: async (code, onStatus) => window.JsRunner.run(code, '', [], onStatus),
+  c: async (code, onStatus) => window.CRunner.run(code, 'c', '', onStatus),
+  cpp: async (code, onStatus) => window.CRunner.run(code, 'cpp', '', onStatus),
   sql: async (code, onStatus) => {
     const res = await window.SqlRunner.run(code, onStatus);
     return res.error ? { error: res.error } : { html: window.SqlRunner.tableHtml(res.result) };
   },
 };
 
-/** Язык задачи: python | javascript | sql | компилируемые (без запуска). */
-const RUNNABLE = { python: 'py', javascript: 'js', sql: 'sql' };
+/** Язык задачи → ключ раннера. Чего здесь нет — то запускать пока нечем. */
+const RUNNABLE = { python: 'py', javascript: 'js', sql: 'sql', c: 'c', cpp: 'cpp' };
 const LANG_LABEL = { c: 'C', cpp: 'C++', csharp: 'C#', java: 'Java' };
+
+/** Сравнение вывода программы с эталоном: пробелы в конце строк и хвостовые
+ *  переводы строки студента наказывать не за что. */
+export function sameOutput(actual, expected) {
+  const norm = (s) => String(s == null ? '' : s)
+    .replace(/\r\n/g, '\n')
+    .split('\n').map(l => l.replace(/\s+$/, ''))
+    .join('\n').replace(/\n+$/, '');
+  return norm(actual) === norm(expected);
+}
 
 /* ---------- страница курса ---------- */
 export async function renderCourse(root, courseId) {
@@ -368,9 +380,31 @@ function renderTask(root, courseId, course, m, taskId) {
           }
           out.innerHTML = html;
         }
+      } else if (runnerKey === 'c' || runnerKey === 'cpp') {
+        /* C и C++ компилируются настоящим clang прямо в браузере.
+           Проверка — по выводу программы: он и есть результат работы. */
+        const res = await window.CRunner.run(ed.value, runnerKey, '', s => {
+          status.textContent = t('lesson.stage.' + s);
+        });
+        status.textContent = '';
+        if (res.err && !res.out) {
+          out.innerHTML = '<span class="err">' + esc(res.err) + '</span>';
+          return;
+        }
+        let html = esc(res.out || t('lesson.noOutput'));
+        if (res.err) html += '\n<span class="err">' + esc(res.err) + '</span>';
+        if (withCheck && task.expected !== undefined) {
+          if (sameOutput(res.out, task.expected)) {
+            html += '\n<span class="ok">✓ ' + esc(t('task.solved')) + '</span>';
+            solved();
+          } else {
+            html += '\n<span class="err">✗ ' + esc(t('task.wrongOutput')) + '</span>' +
+              '\n<span class="muted-text">' + esc(t('task.expectedOutput')) + '</span>\n' + esc(task.expected);
+          }
+        }
+        out.innerHTML = html;
       } else if (!runnable) {
-        /* Компилируемые языки: запускать в браузере нечем, поэтому предлагаем
-           сверить решение с эталоном и проверить себя честно. */
+        /* Языки, для которых компилятора в браузере пока нет: сверка с эталоном. */
         status.textContent = '';
         out.innerHTML = '<div class="self-check">' +
           '<p>' + esc(t('task.selfCheckHint')) + '</p>' +
