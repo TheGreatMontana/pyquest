@@ -91,15 +91,27 @@
     /* Каждый запуск — своя папка классов, иначе останется класс от прошлой попытки
        и «исправленный» код будет запускаться старым. */
     const dir = '/files/run' + Date.now() + '/';
-    cheerpjAddStringFile('/str/' + cls + '.java', src);
 
-    let build;
-    try {
-      build = await withTimeout(
+    const compile = (source) => {
+      cheerpjAddStringFile('/str/' + cls + '.java', source);
+      return withTimeout(
         capture(() => cheerpjRunMain(
           'org.eclipse.jdt.internal.compiler.batch.Main', ECJ,
           '-1.8', '-nowarn', '-d', dir, '/str/' + cls + '.java')),
         BUILD_MS, 'Компиляция затянулась дольше обычного. Попробуй ещё раз.');
+    };
+
+    let build;
+    try {
+      build = await compile(src);
+
+      /* Сам ecj под CheerpJ изредка падает внутренней ошибкой сканера на
+         вполне корректном коде — воспроизводится на конкретном сочетании
+         пустых строк. Это баг компилятора, а не студента, поэтому молча
+         пробуем ещё раз без пустых строк: код тот же, ошибка уходит. */
+      if (build.rc !== 0 && /ArrayIndexOutOfBounds|Internal compiler error/i.test(build.text)) {
+        build = await compile(src.split('\n').filter(l => l.trim()).join('\n'));
+      }
     } catch (e) {
       return { out: '', err: e.message };
     }

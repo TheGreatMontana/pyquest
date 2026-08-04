@@ -698,6 +698,616 @@
      }
     ]
    }
+  },
+  {
+   "id": "c-02",
+   "title": {
+    "ru": "Строки, массивы и структуры",
+    "uz": "Satrlar, massivlar va strukturalar",
+    "en": "Strings, arrays and structs"
+   },
+   "tagline": {
+    "ru": "Как C хранит текст и как собирать свои типы",
+    "uz": "C matnni qanday saqlaydi va o'z turlaringizni qanday yig'asiz",
+    "en": "How C stores text and how to build your own types"
+   },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": {
+      "ru": "Строка — это массив байтов",
+      "uz": "Satr — bu baytlar massivi",
+      "en": "A string is an array of bytes"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>В Python строка — самостоятельный тип. В C её нет: строка — обычный массив <code>char</code>, в конце которого стоит нулевой байт <code>'\\0'</code>. Именно он говорит функциям, где текст кончился.</p><p>Отсюда всё поведение: <code>strlen</code> считает символы до нуля, а не знает длину заранее; скопировать строку присваиванием нельзя; и места под неё надо выделить с запасом на этот самый ноль.</p>",
+        "uz": "<p>Python da satr — mustaqil tur. C da bunday emas: satr — oddiy <code>char</code> massivi, oxirida nol bayt <code>'\\0'</code> turadi. Aynan u funksiyalarga matn qayerda tugaganini aytadi.</p><p>Butun xatti-harakat shundan: <code>strlen</code> nolgacha belgilarni sanaydi, uzunlikni oldindan bilmaydi; satrni o'zlashtirish bilan nusxalab bo'lmaydi; va unga joyni o'sha nol uchun zaxira bilan ajratish kerak.</p>",
+        "en": "<p>In Python a string is its own type. C has no such thing: a string is a plain <code>char</code> array with a zero byte <code>'\\0'</code> at the end. That byte is what tells functions where the text stops.</p><p>Everything follows from this: <code>strlen</code> counts characters up to the zero rather than knowing the length in advance; you cannot copy a string by assignment; and you must allocate room for that zero too.</p>"
+       }
+      },
+      {
+       "type": "crun",
+       "code": "#include <stdio.h>\n#include <string.h>\n\nint main(void) {\n    char name[20] = \"Азиз\";\n\n    printf(\"текст: %s\\n\", name);\n    printf(\"байт в строке: %zu\\n\", strlen(name));\n    printf(\"размер массива: %zu\\n\", sizeof(name));\n\n    char copy[20];\n    strcpy(copy, name);          // копируем, а не присваиваем\n    strcat(copy, \" учится\");\n    printf(\"%s\\n\", copy);\n\n    printf(\"равны? %d\\n\", strcmp(name, \"Азиз\") == 0);\n    return 0;\n}"
+      },
+      {
+       "type": "note",
+       "kind": "trap",
+       "html": {
+        "ru": "<code>strlen</code> считает <b>байты</b>, а не буквы. Кириллица в UTF-8 занимает по два байта, поэтому «Азиз» — это 8 байт, а не 4. В C нет встроенной работы с Unicode: это делают отдельными библиотеками.",
+        "uz": "<code>strlen</code> harflarni emas, <b>baytlarni</b> sanaydi. Kirill harflari UTF-8 da ikki baytdan joy oladi, shuning uchun «Азиз» — 4 emas, 8 bayt. C da Unicode bilan ishlash o'rnatilgan emas: buni alohida kutubxonalar qiladi.",
+        "en": "<code>strlen</code> counts <b>bytes</b>, not letters. Cyrillic takes two bytes each in UTF-8, so “Азиз” is 8 bytes, not 4. C has no built-in Unicode handling: separate libraries do that."
+       }
+      },
+      {
+       "type": "predict",
+       "lang": "c",
+       "code": "char a[10] = \"abc\";\nprintf(\"%zu %zu\\n\", strlen(a), sizeof(a));",
+       "options": [
+        {
+         "ru": "3 3",
+         "uz": "3 3",
+         "en": "3 3"
+        },
+        {
+         "ru": "3 10",
+         "uz": "3 10",
+         "en": "3 10"
+        },
+        {
+         "ru": "4 10",
+         "uz": "4 10",
+         "en": "4 10"
+        }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "<code>strlen</code> считает символы до нуля — их три. <code>sizeof</code> знает размер самого массива — десять байт, независимо от содержимого.",
+        "uz": "<code>strlen</code> nolgacha belgilarni sanaydi — ular uchta. <code>sizeof</code> massivning o'z o'lchamini biladi — o'n bayt, mazmunidan qat'i nazar.",
+        "en": "<code>strlen</code> counts characters up to the zero — three of them. <code>sizeof</code> knows the array's own size — ten bytes, whatever it holds."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": {
+      "ru": "Массивы и указатели — почти одно и то же",
+      "uz": "Massivlar va ko'rsatkichlar — deyarli bir xil",
+      "en": "Arrays and pointers are nearly the same"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Имя массива в выражении превращается в указатель на его первый элемент. Поэтому <code>arr[i]</code> и <code>*(arr + i)</code> — это буквально одно и то же.</p><p>Важное следствие: при передаче в функцию массив «теряет» размер — приходит только адрес. Поэтому длину всегда передают отдельным параметром.</p>",
+        "uz": "<p>Ifodadagi massiv nomi uning birinchi elementiga ko'rsatkichga aylanadi. Shuning uchun <code>arr[i]</code> va <code>*(arr + i)</code> — tom ma'noda bir xil narsa.</p><p>Muhim natija: funksiyaga uzatilganda massiv o'lchamini «yo'qotadi» — faqat manzil keladi. Shuning uchun uzunlik doim alohida parametr bilan uzatiladi.</p>",
+        "en": "<p>In an expression, an array's name becomes a pointer to its first element. That is why <code>arr[i]</code> and <code>*(arr + i)</code> are literally the same thing.</p><p>An important consequence: when passed to a function an array “loses” its size — only the address arrives. That is why the length is always passed as a separate parameter.</p>"
+       }
+      },
+      {
+       "type": "crun",
+       "code": "#include <stdio.h>\n\nvoid show(int *arr, int n) {   // размер приходится передавать\n    for (int i = 0; i < n; i++) {\n        printf(\"%d \", arr[i]);\n    }\n    printf(\"\\n\");\n}\n\nint main(void) {\n    int data[5] = {10, 20, 30, 40, 50};\n\n    printf(\"через индекс:   %d\\n\", data[2]);\n    printf(\"через указатель: %d\\n\", *(data + 2));\n\n    show(data, 5);\n    return 0;\n}"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>C <b>не проверяет границы</b>. Обращение к <code>data[99]</code> не вызовет ошибку — программа просто прочитает чужую память. Иногда там мусор, иногда чужие данные, иногда всё падает через десять минут в другом месте. Это самая частая причина трудноуловимых багов в C.</p>",
+        "uz": "<p>C <b>chegaralarni tekshirmaydi</b>. <code>data[99]</code> ga murojaat xato bermaydi — dastur shunchaki begona xotirani o'qiydi. Ba'zan u yerda axlat, ba'zan begona ma'lumot, ba'zan hammasi o'n daqiqadan keyin boshqa joyda quladi. Bu C dagi qiyin topiladigan xatolarning eng keng tarqalgan sababi.</p>",
+        "en": "<p>C <b>does not check bounds</b>. Accessing <code>data[99]</code> raises no error — the program simply reads someone else's memory. Sometimes it is garbage, sometimes another variable's data, sometimes everything crashes ten minutes later somewhere else. This is the most common source of hard-to-find bugs in C.</p>"
+       }
+      },
+      {
+       "type": "checkpoint",
+       "q": {
+        "ru": "Что произойдёт при чтении <code>arr[100]</code> из массива на 5 элементов?",
+        "uz": "5 elementli massivdan <code>arr[100]</code> ni o'qishda nima bo'ladi?",
+        "en": "What happens when reading <code>arr[100]</code> from a 5-element array?"
+       },
+       "options": [
+        {
+         "ru": "Программа остановится с понятной ошибкой",
+         "uz": "Dastur tushunarli xato bilan to'xtaydi",
+         "en": "The program stops with a clear error"
+        },
+        {
+         "ru": "Прочитается чужая память, ошибки может и не быть",
+         "uz": "Begona xotira o'qiladi, xato bo'lmasligi ham mumkin",
+         "en": "Someone else's memory is read; there may be no error at all"
+        },
+        {
+         "ru": "Вернётся 0",
+         "uz": "0 qaytadi",
+         "en": "It returns 0"
+        }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Именно поэтому в C так важна дисциплина: за границы массива никто, кроме тебя, не следит.",
+        "uz": "Aynan shuning uchun C da intizom juda muhim: massiv chegaralarini sizdan boshqa hech kim kuzatmaydi.",
+        "en": "This is exactly why discipline matters in C: nobody but you watches the array bounds."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": {
+      "ru": "Структуры: свои типы данных",
+      "uz": "Strukturalar: o'z ma'lumot turlaringiz",
+      "en": "Structs: your own data types"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Структура объединяет несколько значений в один тип — как поля объекта, только без методов. Через <code>typedef</code> ей дают короткое имя.</p><p>К полям обращаются через точку. Если у тебя указатель на структуру — через стрелку <code>-&gt;</code>. Это не два разных механизма: <code>p-&gt;field</code> — просто сокращение для <code>(*p).field</code>.</p>",
+        "uz": "<p>Struktura bir nechta qiymatni bitta turga birlashtiradi — obyekt maydonlari kabi, faqat metodsiz. <code>typedef</code> orqali unga qisqa nom beriladi.</p><p>Maydonlarga nuqta orqali murojaat qilinadi. Agar strukturaga ko'rsatkich bo'lsa — strelka <code>-&gt;</code> orqali. Bu ikki xil mexanizm emas: <code>p-&gt;field</code> — bu <code>(*p).field</code> ning qisqartmasi.</p>",
+        "en": "<p>A struct groups several values into one type — like object fields, only without methods. <code>typedef</code> gives it a short name.</p><p>Fields are accessed with a dot. If you hold a pointer to the struct — with the arrow <code>-&gt;</code>. These are not two mechanisms: <code>p-&gt;field</code> is shorthand for <code>(*p).field</code>.</p>"
+       }
+      },
+      {
+       "type": "crun",
+       "code": "#include <stdio.h>\n#include <string.h>\n\ntypedef struct {\n    char name[20];\n    int  score;\n} Player;\n\nvoid addScore(Player *p, int points) {   // указатель — меняем оригинал\n    p->score += points;                  // то же, что (*p).score\n}\n\nint main(void) {\n    Player hero;\n    strcpy(hero.name, \"Азиз\");\n    hero.score = 100;\n\n    addScore(&hero, 50);\n    printf(\"%s: %d\\n\", hero.name, hero.score);\n\n    Player team[2] = { {\"Али\", 30}, {\"Вали\", 70} };\n    for (int i = 0; i < 2; i++) {\n        printf(\"%s -> %d\\n\", team[i].name, team[i].score);\n    }\n    return 0;\n}"
+      },
+      {
+       "type": "note",
+       "kind": "tip",
+       "html": {
+        "ru": "Структуру передают по значению — она копируется целиком. Для больших структур это дорого, поэтому обычно передают указатель. А если менять её не надо — <code>const Player *p</code>: и дёшево, и компилятор проследит, что оригинал не тронут.",
+        "uz": "Struktura qiymat bo'yicha uzatiladi — u butunlay nusxalanadi. Katta strukturalar uchun bu qimmat, shuning uchun odatda ko'rsatkich uzatiladi. Agar o'zgartirish kerak bo'lmasa — <code>const Player *p</code>: ham arzon, ham kompilyator asl nusxaga tegilmaganini kuzatadi.",
+        "en": "A struct is passed by value — the whole thing is copied. For large structs that is expensive, so a pointer is usually passed instead. And if you do not need to modify it — <code>const Player *p</code>: cheap, and the compiler makes sure the original stays untouched."
+       }
+      },
+      {
+       "type": "summary",
+       "items": [
+        {
+         "ru": "Строка — массив char с нулевым байтом в конце",
+         "uz": "Satr — oxirida nol bayt bo'lgan char massivi",
+         "en": "A string is a char array with a zero byte at the end"
+        },
+        {
+         "ru": "strlen считает байты, sizeof — размер массива",
+         "uz": "strlen baytlarni, sizeof massiv o'lchamini sanaydi",
+         "en": "strlen counts bytes; sizeof gives the array size"
+        },
+        {
+         "ru": "arr[i] — это то же, что *(arr + i)",
+         "uz": "arr[i] — bu *(arr + i) bilan bir xil",
+         "en": "arr[i] is the same as *(arr + i)"
+        },
+        {
+         "ru": "Границы массива не проверяются — следишь только ты",
+         "uz": "Massiv chegaralari tekshirilmaydi — faqat siz kuzatasiz",
+         "en": "Array bounds are not checked — only you watch them"
+        },
+        {
+         "ru": "p->field — сокращение для (*p).field",
+         "uz": "p->field — (*p).field ning qisqartmasi",
+         "en": "p->field is shorthand for (*p).field"
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": {
+      "ru": "Чем в C заканчивается строка?",
+      "uz": "C da satr nima bilan tugaydi?",
+      "en": "How does a string end in C?"
+     },
+     "options": [
+      {
+       "ru": "Пробелом",
+       "uz": "Bo'sh joy bilan",
+       "en": "With a space"
+      },
+      {
+       "ru": "Нулевым байтом '\\0'",
+       "uz": "Nol bayt '\\0' bilan",
+       "en": "With a zero byte '\\0'"
+      },
+      {
+       "ru": "Символом новой строки",
+       "uz": "Yangi qator belgisi bilan",
+       "en": "With a newline"
+      },
+      {
+       "ru": "Ничем, длина хранится отдельно",
+       "uz": "Hech nima bilan, uzunlik alohida saqlanadi",
+       "en": "Nothing; the length is stored separately"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Забыть про этот байт при выделении памяти — классическая ошибка: строке на 5 символов нужно 6 байт.",
+      "uz": "Xotira ajratishda bu baytni unutish — klassik xato: 5 belgili satrga 6 bayt kerak.",
+      "en": "Forgetting that byte when allocating is a classic bug: a 5-character string needs 6 bytes."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что вернёт <code>strlen(\"Азиз\")</code> в UTF-8?",
+      "uz": "UTF-8 da <code>strlen(\"Азиз\")</code> nima qaytaradi?",
+      "en": "What does <code>strlen(\"Азиз\")</code> return in UTF-8?"
+     },
+     "options": [
+      {
+       "ru": "4",
+       "uz": "4",
+       "en": "4"
+      },
+      {
+       "ru": "8",
+       "uz": "8",
+       "en": "8"
+      },
+      {
+       "ru": "1",
+       "uz": "1",
+       "en": "1"
+      },
+      {
+       "ru": "Ошибку",
+       "uz": "Xato",
+       "en": "An error"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Считаются байты, а каждая кириллическая буква в UTF-8 занимает два.",
+      "uz": "Baytlar sanaladi, har bir kirill harfi esa UTF-8 da ikkitadan joy oladi.",
+      "en": "Bytes are counted, and each Cyrillic letter takes two of them in UTF-8."
+     }
+    },
+    {
+     "q": {
+      "ru": "Как скопировать одну строку в другую?",
+      "uz": "Bir satrni boshqasiga qanday nusxalash mumkin?",
+      "en": "How do you copy one string into another?"
+     },
+     "options": [
+      {
+       "ru": "b = a;",
+       "uz": "b = a;",
+       "en": "b = a;"
+      },
+      {
+       "ru": "strcpy(b, a);",
+       "uz": "strcpy(b, a);",
+       "en": "strcpy(b, a);"
+      },
+      {
+       "ru": "b == a;",
+       "uz": "b == a;",
+       "en": "b == a;"
+      },
+      {
+       "ru": "copy(a, b);",
+       "uz": "copy(a, b);",
+       "en": "copy(a, b);"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Присваивание скопировало бы только адрес, и обе переменные указывали бы на одну память.",
+      "uz": "O'zlashtirish faqat manzilni nusxalardi va ikkala o'zgaruvchi bitta xotiraga ishora qilardi.",
+      "en": "Assignment would copy only the address, and both variables would point at the same memory."
+     }
+    },
+    {
+     "q": {
+      "ru": "Чему равно <code>*(arr + 3)</code>?",
+      "uz": "<code>*(arr + 3)</code> nimaga teng?",
+      "en": "What does <code>*(arr + 3)</code> equal?"
+     },
+     "options": [
+      {
+       "ru": "arr[4]",
+       "uz": "arr[4]",
+       "en": "arr[4]"
+      },
+      {
+       "ru": "arr[3]",
+       "uz": "arr[3]",
+       "en": "arr[3]"
+      },
+      {
+       "ru": "Адресу массива",
+       "uz": "Massiv manziliga",
+       "en": "The array's address"
+      },
+      {
+       "ru": "Размеру массива",
+       "uz": "Massiv o'lchamiga",
+       "en": "The array's size"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Индексация в C — просто удобная запись для арифметики указателей.",
+      "uz": "C dagi indekslash — ko'rsatkichlar arifmetikasi uchun qulay yozuv, xolos.",
+      "en": "Indexing in C is just convenient notation for pointer arithmetic."
+     }
+    },
+    {
+     "q": {
+      "ru": "Почему длину массива передают в функцию отдельно?",
+      "uz": "Nega massiv uzunligi funksiyaga alohida uzatiladi?",
+      "en": "Why is an array's length passed to a function separately?"
+     },
+     "options": [
+      {
+       "ru": "Так принято для красоты",
+       "uz": "Chiroylik uchun shunday qabul qilingan",
+       "en": "It is a stylistic convention"
+      },
+      {
+       "ru": "При передаче остаётся только адрес, размер теряется",
+       "uz": "Uzatishda faqat manzil qoladi, o'lcham yo'qoladi",
+       "en": "Only the address survives the call; the size is lost"
+      },
+      {
+       "ru": "Чтобы работало быстрее",
+       "uz": "Tezroq ishlashi uchun",
+       "en": "To make it faster"
+      },
+      {
+       "ru": "Это требование компилятора",
+       "uz": "Bu kompilyator talabi",
+       "en": "The compiler requires it"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Внутри функции <code>sizeof(arr)</code> даст размер указателя, а не массива — обычно 4 или 8 байт.",
+      "uz": "Funksiya ichida <code>sizeof(arr)</code> massiv emas, ko'rsatkich o'lchamini beradi — odatda 4 yoki 8 bayt.",
+      "en": "Inside the function <code>sizeof(arr)</code> gives the pointer's size, not the array's — usually 4 or 8 bytes."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что означает <code>p->score</code>?",
+      "uz": "<code>p->score</code> nimani anglatadi?",
+      "en": "What does <code>p->score</code> mean?"
+     },
+     "options": [
+      {
+       "ru": "Копию поля score",
+       "uz": "score maydonining nusxasini",
+       "en": "A copy of the score field"
+      },
+      {
+       "ru": "То же, что (*p).score",
+       "uz": "(*p).score bilan bir xil narsani",
+       "en": "The same as (*p).score"
+      },
+      {
+       "ru": "Адрес поля score",
+       "uz": "score maydonining manzilini",
+       "en": "The address of the score field"
+      },
+      {
+       "ru": "Метод структуры",
+       "uz": "Struktura metodini",
+       "en": "A struct method"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Стрелка — просто короткая запись: сначала разыменовать указатель, потом взять поле.",
+      "uz": "Strelka — shunchaki qisqa yozuv: avval ko'rsatkichni ochish, keyin maydonni olish.",
+      "en": "The arrow is just shorthand: dereference the pointer, then take the field."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "c",
+     "title": {
+      "ru": "Длина строки вручную",
+      "uz": "Satr uzunligini qo'lda",
+      "en": "String length by hand"
+     },
+     "brief": {
+      "ru": "Цикл до нулевого байта",
+      "uz": "Nol baytgacha sikl",
+      "en": "Loop to the zero byte"
+     },
+     "desc": {
+      "ru": "<p>Напиши функцию <code>my_strlen(const char *s)</code>, которая считает длину строки сама, без <code>string.h</code>. В <code>main</code> выведи длину строки <code>\"hello\"</code>.</p><p>Ожидаемый вывод: <code>5</code></p>",
+      "uz": "<p><code>string.h</code> siz satr uzunligini o'zi sanaydigan <code>my_strlen(const char *s)</code> funksiyasini yozing. <code>main</code> da <code>\"hello\"</code> satri uzunligini chiqaring.</p><p>Kutilgan natija: <code>5</code></p>",
+      "en": "<p>Write <code>my_strlen(const char *s)</code> that computes the length itself, without <code>string.h</code>. In <code>main</code>, print the length of <code>\"hello\"</code>.</p><p>Expected output: <code>5</code></p>"
+     },
+     "starter": "#include <stdio.h>\n\nint my_strlen(const char *s) {\n    /* твой код */\n    return 0;\n}\n\nint main(void) {\n    printf(\"%d\\n\", my_strlen(\"hello\"));\n    return 0;\n}\n",
+     "solution": "#include <stdio.h>\n\nint my_strlen(const char *s) {\n    int n = 0;\n    while (s[n] != '\\0') {   // идём, пока не встретим нулевой байт\n        n++;\n    }\n    return n;\n}\n\nint main(void) {\n    printf(\"%d\\n\", my_strlen(\"hello\"));\n    return 0;\n}\n",
+     "expected": "5",
+     "hint": {
+      "ru": "Заведи счётчик и двигайся по индексам, пока <code>s[n]</code> не станет <code>'\\0'</code>.",
+      "uz": "Hisoblagich yarating va <code>s[n]</code> <code>'\\0'</code> bo'lgunicha indekslar bo'ylab yuring.",
+      "en": "Keep a counter and advance through indices until <code>s[n]</code> is <code>'\\0'</code>."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "c",
+     "title": {
+      "ru": "Разворот массива",
+      "uz": "Massivni teskari qilish",
+      "en": "Reverse an array"
+     },
+     "brief": {
+      "ru": "Два индекса навстречу",
+      "uz": "Ikki indeks qarama-qarshi",
+      "en": "Two indices moving inward"
+     },
+     "desc": {
+      "ru": "<p>Функция <code>reverse(int *arr, int n)</code> переворачивает массив на месте, без второго массива. В <code>main</code> разверни <code>{1, 2, 3, 4, 5}</code> и выведи через пробел.</p><p>Ожидаемый вывод: <code>5 4 3 2 1</code></p>",
+      "uz": "<p><code>reverse(int *arr, int n)</code> funksiyasi massivni ikkinchi massivsiz, joyida ag'daradi. <code>main</code> da <code>{1, 2, 3, 4, 5}</code> ni ag'daring va bo'sh joy bilan chiqaring.</p><p>Kutilgan natija: <code>5 4 3 2 1</code></p>",
+      "en": "<p><code>reverse(int *arr, int n)</code> reverses the array in place, without a second array. In <code>main</code>, reverse <code>{1, 2, 3, 4, 5}</code> and print it space-separated.</p><p>Expected output: <code>5 4 3 2 1</code></p>"
+     },
+     "starter": "#include <stdio.h>\n\nvoid reverse(int *arr, int n) {\n    /* твой код */\n}\n\nint main(void) {\n    int data[5] = {1, 2, 3, 4, 5};\n    reverse(data, 5);\n    for (int i = 0; i < 5; i++) {\n        printf(\"%d \", data[i]);\n    }\n    printf(\"\\n\");\n    return 0;\n}\n",
+     "solution": "#include <stdio.h>\n\nvoid reverse(int *arr, int n) {\n    int left = 0, right = n - 1;\n    while (left < right) {          // идём навстречу друг другу\n        int tmp = arr[left];\n        arr[left] = arr[right];\n        arr[right] = tmp;\n        left++;\n        right--;\n    }\n}\n\nint main(void) {\n    int data[5] = {1, 2, 3, 4, 5};\n    reverse(data, 5);\n    for (int i = 0; i < 5; i++) {\n        printf(\"%d \", data[i]);\n    }\n    printf(\"\\n\");\n    return 0;\n}\n",
+     "expected": "5 4 3 2 1",
+     "hint": {
+      "ru": "Два индекса: один с начала, второй с конца. Меняй местами и сдвигай навстречу, пока не встретятся.",
+      "uz": "Ikki indeks: biri boshidan, ikkinchisi oxiridan. O'rnini almashtiring va uchrashgunicha bir-biriga suring.",
+      "en": "Two indices: one from the start, one from the end. Swap and move them towards each other until they meet."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "c",
+     "title": {
+      "ru": "Лучший игрок",
+      "uz": "Eng yaxshi o'yinchi",
+      "en": "The top player"
+     },
+     "brief": {
+      "ru": "Структуры и массив структур",
+      "uz": "Strukturalar va strukturalar massivi",
+      "en": "Structs and an array of structs"
+     },
+     "desc": {
+      "ru": "<p>Опиши структуру <code>Player</code> с полями <code>name</code> (строка до 20 байт) и <code>score</code>. Функция <code>best(const Player *arr, int n)</code> возвращает индекс игрока с наибольшим счётом.</p><p>В <code>main</code> заведи трёх игроков — <code>{\"Али\", 30}</code>, <code>{\"Вали\", 70}</code>, <code>{\"Гани\", 50}</code> — и выведи имя и счёт лучшего.</p><p>Ожидаемый вывод: <code>Вали 70</code></p>",
+      "uz": "<p><code>name</code> (20 baytgacha satr) va <code>score</code> maydonli <code>Player</code> strukturasini tasvirlang. <code>best(const Player *arr, int n)</code> funksiyasi eng yuqori hisobli o'yinchi indeksini qaytaradi.</p><p><code>main</code> da uchta o'yinchi yarating — <code>{\"Али\", 30}</code>, <code>{\"Вали\", 70}</code>, <code>{\"Гани\", 50}</code> — va eng yaxshisining ismi va hisobini chiqaring.</p><p>Kutilgan natija: <code>Вали 70</code></p>",
+      "en": "<p>Define a struct <code>Player</code> with fields <code>name</code> (a string up to 20 bytes) and <code>score</code>. The function <code>best(const Player *arr, int n)</code> returns the index of the highest-scoring player.</p><p>In <code>main</code>, create three players — <code>{\"Али\", 30}</code>, <code>{\"Вали\", 70}</code>, <code>{\"Гани\", 50}</code> — and print the best one's name and score.</p><p>Expected output: <code>Вали 70</code></p>"
+     },
+     "starter": "#include <stdio.h>\n\ntypedef struct {\n    char name[20];\n    int  score;\n} Player;\n\nint best(const Player *arr, int n) {\n    /* твой код */\n    return 0;\n}\n\nint main(void) {\n    Player team[3] = { {\"Али\", 30}, {\"Вали\", 70}, {\"Гани\", 50} };\n    int i = best(team, 3);\n    printf(\"%s %d\\n\", team[i].name, team[i].score);\n    return 0;\n}\n",
+     "solution": "#include <stdio.h>\n\ntypedef struct {\n    char name[20];\n    int  score;\n} Player;\n\nint best(const Player *arr, int n) {\n    int top = 0;                       // начинаем с первого, а не с нуля-счёта\n    for (int i = 1; i < n; i++) {\n        if (arr[i].score > arr[top].score) {\n            top = i;\n        }\n    }\n    return top;\n}\n\nint main(void) {\n    Player team[3] = { {\"Али\", 30}, {\"Вали\", 70}, {\"Гани\", 50} };\n    int i = best(team, 3);\n    printf(\"%s %d\\n\", team[i].name, team[i].score);\n    return 0;\n}\n",
+     "expected": "Вали 70",
+     "hint": {
+      "ru": "Запомни индекс лучшего, а не сам счёт: по индексу потом достанешь и имя.",
+      "uz": "Hisobning o'zini emas, eng yaxshisining indeksini eslab qoling: indeks orqali keyin ismni ham olasiz.",
+      "en": "Remember the index of the best, not the score itself: the index gives you the name too."
+     }
+    }
+   ],
+   "exam": {
+    "time": 480,
+    "questions": [
+     {
+      "q": {
+       "ru": "Сколько байт нужно под строку из 5 символов ASCII?",
+       "uz": "5 ta ASCII belgili satr uchun necha bayt kerak?",
+       "en": "How many bytes are needed for a 5-character ASCII string?"
+      },
+      "options": [
+       {
+        "ru": "5",
+        "uz": "5",
+        "en": "5"
+       },
+       {
+        "ru": "6",
+        "uz": "6",
+        "en": "6"
+       },
+       {
+        "ru": "4",
+        "uz": "4",
+        "en": "4"
+       },
+       {
+        "ru": "10",
+        "uz": "10",
+        "en": "10"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "Что даст <code>sizeof(arr)</code> внутри функции, куда массив передан параметром?",
+       "uz": "Massiv parametr sifatida uzatilgan funksiya ichida <code>sizeof(arr)</code> nima beradi?",
+       "en": "What does <code>sizeof(arr)</code> give inside a function the array was passed to?"
+      },
+      "options": [
+       {
+        "ru": "Размер всего массива",
+        "uz": "Butun massiv o'lchamini",
+        "en": "The size of the whole array"
+       },
+       {
+        "ru": "Размер указателя",
+        "uz": "Ko'rsatkich o'lchamini",
+        "en": "The size of a pointer"
+       },
+       {
+        "ru": "Количество элементов",
+        "uz": "Elementlar sonini",
+        "en": "The number of elements"
+       },
+       {
+        "ru": "Ноль",
+        "uz": "Nolni",
+        "en": "Zero"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "Зачем структуру передают через <code>const Player *</code>?",
+       "uz": "Nega struktura <code>const Player *</code> orqali uzatiladi?",
+       "en": "Why pass a struct as <code>const Player *</code>?"
+      },
+      "options": [
+       {
+        "ru": "Иначе не скомпилируется",
+        "uz": "Aks holda kompilyatsiya bo'lmaydi",
+        "en": "It would not compile otherwise"
+       },
+       {
+        "ru": "Без копирования и с гарантией, что оригинал не изменят",
+        "uz": "Nusxalashsiz va asl nusxa o'zgarmasligi kafolati bilan",
+        "en": "No copying, plus a guarantee the original is not modified"
+       },
+       {
+        "ru": "Так короче писать",
+        "uz": "Shunday yozish qisqaroq",
+        "en": "It is shorter to type"
+       },
+       {
+        "ru": "Чтобы работал printf",
+        "uz": "printf ishlashi uchun",
+        "en": "To make printf work"
+       }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "c",
+      "title": {
+       "ru": "Подсчёт слов",
+       "uz": "So'zlarni sanash",
+       "en": "Counting words"
+      },
+      "desc": {
+       "ru": "<p>Функция <code>count_words(const char *s)</code> возвращает количество слов в строке. Слова разделены пробелами; подряд идущие пробелы не должны считаться за отдельные слова.</p><p>В <code>main</code> посчитай слова в <code>\"c is  a  language\"</code>.</p><p>Ожидаемый вывод: <code>4</code></p>",
+       "uz": "<p><code>count_words(const char *s)</code> funksiyasi satrdagi so'zlar sonini qaytaradi. So'zlar bo'sh joy bilan ajratilgan; ketma-ket bo'sh joylar alohida so'z deb sanalmasligi kerak.</p><p><code>main</code> da <code>\"c is  a  language\"</code> dagi so'zlarni sanang.</p><p>Kutilgan natija: <code>4</code></p>",
+       "en": "<p><code>count_words(const char *s)</code> returns the number of words in a string. Words are separated by spaces; consecutive spaces must not count as separate words.</p><p>In <code>main</code>, count the words in <code>\"c is  a  language\"</code>.</p><p>Expected output: <code>4</code></p>"
+      },
+      "starter": "#include <stdio.h>\n\nint count_words(const char *s) {\n    /* твой код */\n    return 0;\n}\n\nint main(void) {\n    printf(\"%d\\n\", count_words(\"c is  a  language\"));\n    return 0;\n}\n",
+      "solution": "#include <stdio.h>\n\nint count_words(const char *s) {\n    int words = 0;\n    int inside = 0;                  // находимся ли сейчас внутри слова\n    for (int i = 0; s[i] != '\\0'; i++) {\n        if (s[i] == ' ') {\n            inside = 0;\n        } else if (!inside) {        // начало нового слова\n            inside = 1;\n            words++;\n        }\n    }\n    return words;\n}\n\nint main(void) {\n    printf(\"%d\\n\", count_words(\"c is  a  language\"));\n    return 0;\n}\n",
+      "expected": "4",
+      "hint": {
+       "ru": "Считай не пробелы, а переходы «пробел → буква». Держи флаг «я внутри слова».",
+       "uz": "Bo'sh joylarni emas, «bo'sh joy → harf» o'tishlarini sanang. «So'z ichidaman» bayrog'ini ushlang.",
+       "en": "Count transitions from space to letter, not the spaces. Keep a flag for “I am inside a word”."
+      }
+     }
+    ]
+   }
   }
  ]
 }

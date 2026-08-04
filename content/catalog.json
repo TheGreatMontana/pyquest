@@ -251,6 +251,22 @@
     "uz": "Formalar va qulaylik",
     "en": "Forms and accessibility"
    }
+  },
+  {
+   "id": "c-strings",
+   "title": {
+    "ru": "Строки и структуры C",
+    "uz": "C satrlari va strukturalari",
+    "en": "C strings and structs"
+   }
+  },
+  {
+   "id": "java-collections",
+   "title": {
+    "ru": "Коллекции и интерфейсы Java",
+    "uz": "Java kolleksiyalari va interfeyslari",
+    "en": "Java collections and interfaces"
+   }
   }
  ],
  "courses": [
@@ -585,14 +601,14 @@
    "color": "#94a3b8",
    "level": "beginner",
    "status": "full",
-   "estimatedHours": 12,
+   "estimatedHours": 20,
    "requires": [],
    "grants": [
     "c-memory",
-    "static-typing"
+    "c-strings"
    ],
    "legacyIds": [],
-   "moduleCount": 1,
+   "moduleCount": 2,
    "compiled": true,
    "runner": "c"
   },
@@ -666,14 +682,14 @@
    "color": "#f97316",
    "level": "beginner",
    "status": "full",
-   "estimatedHours": 12,
+   "estimatedHours": 20,
    "requires": [],
    "grants": [
     "java-basics-skill",
-    "static-typing"
+    "java-collections"
    ],
    "legacyIds": [],
-   "moduleCount": 1,
+   "moduleCount": 2,
    "compiled": true,
    "runner": "java"
   },

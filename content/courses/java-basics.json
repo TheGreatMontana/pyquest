@@ -671,6 +671,608 @@
      }
     ]
    }
+  },
+  {
+   "id": "jv-02",
+   "title": {
+    "ru": "Коллекции, интерфейсы и исключения",
+    "uz": "Kolleksiyalar, interfeyslar va istisnolar",
+    "en": "Collections, interfaces and exceptions"
+   },
+   "tagline": {
+    "ru": "Как Java хранит наборы данных и договаривается о поведении",
+    "uz": "Java ma'lumot to'plamlarini qanday saqlaydi va xatti-harakat haqida qanday kelishadi",
+    "en": "How Java stores collections and agrees on behaviour"
+   },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": {
+      "ru": "List, Map, Set",
+      "uz": "List, Map, Set",
+      "en": "List, Map, Set"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Массив в Java фиксированной длины. Для настоящей работы берут коллекции:</p><ul><li><code>List</code> — упорядоченный список с повторами (<code>ArrayList</code>). Аналог списка Python</li><li><code>Map</code> — пары ключ-значение (<code>HashMap</code>). Аналог словаря</li><li><code>Set</code> — множество без повторов (<code>HashSet</code>)</li></ul><p>Обрати внимание: слева пишут интерфейс (<code>List</code>), справа реализацию (<code>ArrayList</code>). Так принято — код зависит от того, <i>что</i> умеет коллекция, а не от того, <i>как</i> она устроена внутри.</p>",
+        "uz": "<p>Java dagi massiv qat'iy uzunlikda. Haqiqiy ish uchun kolleksiyalar olinadi:</p><ul><li><code>List</code> — takrorlar bilan tartiblangan ro'yxat (<code>ArrayList</code>). Python ro'yxatining analogi</li><li><code>Map</code> — kalit-qiymat juftliklari (<code>HashMap</code>). Lug'at analogi</li><li><code>Set</code> — takrorsiz to'plam (<code>HashSet</code>)</li></ul><p>E'tibor bering: chapda interfeys (<code>List</code>), o'ngda amalga oshirish (<code>ArrayList</code>) yoziladi. Shunday qabul qilingan — kod kolleksiya ichi <i>qanday</i> tuzilganiga emas, <i>nima</i> qila olishiga bog'liq.</p>",
+        "en": "<p>Arrays in Java have a fixed length. Real work uses collections:</p><ul><li><code>List</code> — an ordered list allowing duplicates (<code>ArrayList</code>). The analogue of a Python list</li><li><code>Map</code> — key-value pairs (<code>HashMap</code>). The analogue of a dict</li><li><code>Set</code> — a set without duplicates (<code>HashSet</code>)</li></ul><p>Note the convention: the interface (<code>List</code>) on the left, the implementation (<code>ArrayList</code>) on the right. Your code then depends on <i>what</i> the collection can do, not on <i>how</i> it works inside.</p>"
+       }
+      },
+      {
+       "type": "javarun",
+       "code": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        List<String> langs = new ArrayList<>();\n        langs.add(\"Java\");\n        langs.add(\"SQL\");\n        langs.add(\"Java\");                 // повтор разрешён\n        System.out.println(langs + \" размер \" + langs.size());\n\n        Map<String, Integer> scores = new HashMap<>();\n        scores.put(\"Азиз\", 100);\n        scores.put(\"Али\", 70);\n        scores.put(\"Азиз\", 120);           // тот же ключ — значение заменилось\n        System.out.println(scores.get(\"Азиз\") + \" ключей: \" + scores.size());\n\n        Set<String> unique = new HashSet<>(langs);\n        System.out.println(\"без повторов: \" + unique.size());\n    }\n}"
+      },
+      {
+       "type": "note",
+       "kind": "tip",
+       "html": {
+        "ru": "<code>HashMap</code> не хранит порядок вставки — при печати ключи могут идти как угодно. Нужен порядок — бери <code>LinkedHashMap</code> (порядок добавления) или <code>TreeMap</code> (сортировка по ключу).",
+        "uz": "<code>HashMap</code> qo'shish tartibini saqlamaydi — chop etishda kalitlar istalgan tartibda bo'lishi mumkin. Tartib kerak bo'lsa — <code>LinkedHashMap</code> (qo'shish tartibi) yoki <code>TreeMap</code> (kalit bo'yicha saralash) oling.",
+        "en": "<code>HashMap</code> does not keep insertion order — when printed, keys may appear in any order. If you need order, use <code>LinkedHashMap</code> (insertion order) or <code>TreeMap</code> (sorted by key)."
+       }
+      },
+      {
+       "type": "checkpoint",
+       "q": {
+        "ru": "Что произойдёт при <code>map.put(\"a\", 1)</code> и затем <code>map.put(\"a\", 2)</code>?",
+        "uz": "<code>map.put(\"a\", 1)</code> va keyin <code>map.put(\"a\", 2)</code> da nima bo'ladi?",
+        "en": "What happens with <code>map.put(\"a\", 1)</code> then <code>map.put(\"a\", 2)</code>?"
+       },
+       "options": [
+        {
+         "ru": "В карте будет два элемента",
+         "uz": "Xaritada ikkita element bo'ladi",
+         "en": "The map will hold two entries"
+        },
+        {
+         "ru": "Один элемент со значением 2",
+         "uz": "Qiymati 2 bo'lgan bitta element",
+         "en": "One entry with the value 2"
+        },
+        {
+         "ru": "Ошибка: ключ занят",
+         "uz": "Xato: kalit band",
+         "en": "An error: the key is taken"
+        }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Ключ в <code>Map</code> уникален. Повторный <code>put</code> заменяет значение и возвращает старое.",
+        "uz": "<code>Map</code> dagi kalit noyob. Takroriy <code>put</code> qiymatni almashtiradi va eskisini qaytaradi.",
+        "en": "A key in a <code>Map</code> is unique. A repeated <code>put</code> replaces the value and returns the old one."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": {
+      "ru": "Интерфейсы: договор о поведении",
+      "uz": "Interfeyslar: xatti-harakat shartnomasi",
+      "en": "Interfaces: a contract for behaviour"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Интерфейс перечисляет, <b>что</b> объект умеет, ничего не говоря о том, <b>как</b>. Класс объявляет <code>implements</code> и обязуется эти методы предоставить — компилятор проверит.</p><p>Зачем: код можно писать против интерфейса и не знать о конкретных классах. Появится новая реализация — старый код продолжит работать без единой правки.</p><p>Наследование (<code>extends</code>) в Java одиночное: у класса один родитель. А интерфейсов можно реализовать сколько угодно.</p>",
+        "uz": "<p>Interfeys obyekt <b>nima</b> qila olishini sanaydi, <b>qanday</b> qilishini aytmaydi. Sinf <code>implements</code> e'lon qiladi va bu metodlarni berishga majbur bo'ladi — kompilyator tekshiradi.</p><p>Nima uchun: kodni interfeysga qarshi yozib, aniq sinflarni bilmaslik mumkin. Yangi amalga oshirish paydo bo'lsa — eski kod bitta ham tahrirsiz ishlashda davom etadi.</p><p>Java da meros (<code>extends</code>) yakka: sinfda bitta ota-ona. Interfeyslarni esa xohlagancha amalga oshirish mumkin.</p>",
+        "en": "<p>An interface lists <b>what</b> an object can do, saying nothing about <b>how</b>. A class declares <code>implements</code> and commits to providing those methods — the compiler checks it.</p><p>Why: you can write code against the interface without knowing the concrete classes. When a new implementation appears, the old code keeps working without a single edit.</p><p>Inheritance (<code>extends</code>) in Java is single: a class has one parent. Interfaces, however, can be implemented in any number.</p>"
+       }
+      },
+      {
+       "type": "javarun",
+       "code": "import java.util.*;\n\ninterface Shape {\n    double area();                  // только объявление, без тела\n    String name();\n}\n\nclass Circle implements Shape {\n    private final double r;\n    Circle(double r) { this.r = r; }\n    public double area() { return Math.PI * r * r; }\n    public String name() { return \"круг\"; }\n}\n\nclass Square implements Shape {\n    private final double side;\n    Square(double side) { this.side = side; }\n    public double area() { return side * side; }\n    public String name() { return \"квадрат\"; }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        List<Shape> shapes = Arrays.asList(new Circle(1), new Square(3));\n        for (Shape s : shapes) {\n            System.out.printf(\"%s: %.2f%n\", s.name(), s.area());\n        }\n    }\n}"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Заметь: цикл не знает, круг перед ним или квадрат. Он работает с типом <code>Shape</code>, а нужный метод выбирается сам во время выполнения. Это <b>полиморфизм</b> — то, ради чего интерфейсы и придуманы.</p>",
+        "uz": "<p>E'tibor bering: sikl oldida doira yoki kvadrat borligini bilmaydi. U <code>Shape</code> turi bilan ishlaydi, kerakli metod esa bajarilish vaqtida o'zi tanlanadi. Bu <b>polimorfizm</b> — interfeyslar aynan shuning uchun o'ylab topilgan.</p>",
+        "en": "<p>Notice: the loop has no idea whether it holds a circle or a square. It works with the type <code>Shape</code>, and the right method is picked at run time. That is <b>polymorphism</b> — the very reason interfaces exist.</p>"
+       }
+      },
+      {
+       "type": "order",
+       "steps": [
+        {
+         "ru": "Объявляем интерфейс с нужными методами",
+         "uz": "Kerakli metodlar bilan interfeys e'lon qilamiz",
+         "en": "Declare an interface with the required methods"
+        },
+        {
+         "ru": "Классы объявляют implements и реализуют эти методы",
+         "uz": "Sinflar implements e'lon qiladi va bu metodlarni amalga oshiradi",
+         "en": "Classes declare implements and provide those methods"
+        },
+        {
+         "ru": "Складываем разные объекты в коллекцию типа интерфейса",
+         "uz": "Turli obyektlarni interfeys turidagi kolleksiyaga solamiz",
+         "en": "Put different objects into a collection typed by the interface"
+        },
+        {
+         "ru": "Во время выполнения вызывается метод конкретного класса",
+         "uz": "Bajarilish vaqtida aniq sinf metodi chaqiriladi",
+         "en": "At run time the concrete class's method is called"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": {
+      "ru": "Исключения",
+      "uz": "Istisnolar",
+      "en": "Exceptions"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Ошибку в Java не возвращают кодом — её <b>бросают</b>. Обработка идёт через <code>try/catch/finally</code>.</p><p>Особенность Java: исключения бывают <b>проверяемые</b> и нет. Проверяемое (например, <code>IOException</code>) компилятор заставит либо поймать, либо объявить через <code>throws</code>. Непроверяемое (<code>NullPointerException</code>, деление на ноль) можно не ловить — но оно уронит программу.</p>",
+        "uz": "<p>Java da xato kod bilan qaytarilmaydi — u <b>uloqtiriladi</b>. Qayta ishlash <code>try/catch/finally</code> orqali boradi.</p><p>Java xususiyati: istisnolar <b>tekshiriladigan</b> va tekshirilmaydigan bo'ladi. Tekshiriladiganini (masalan, <code>IOException</code>) kompilyator yo tutishga, yo <code>throws</code> orqali e'lon qilishga majbur qiladi. Tekshirilmaydiganini (<code>NullPointerException</code>, nolga bo'lish) tutmasa ham bo'ladi — lekin u dasturni qulatadi.</p>",
+        "en": "<p>In Java an error is not returned as a code — it is <b>thrown</b>. Handling goes through <code>try/catch/finally</code>.</p><p>A Java specialty: exceptions are either <b>checked</b> or not. A checked one (say <code>IOException</code>) forces you to either catch it or declare it with <code>throws</code>. An unchecked one (<code>NullPointerException</code>, division by zero) need not be caught — but it will crash the program.</p>"
+       }
+      },
+      {
+       "type": "javarun",
+       "code": "public class Main {\n    static int divide(int a, int b) {\n        if (b == 0) {\n            throw new IllegalArgumentException(\"делить на ноль нельзя\");\n        }\n        return a / b;\n    }\n\n    public static void main(String[] args) {\n        System.out.println(divide(10, 2));\n\n        try {\n            System.out.println(divide(5, 0));\n        } catch (IllegalArgumentException e) {\n            System.out.println(\"поймали: \" + e.getMessage());\n        } finally {\n            System.out.println(\"finally выполняется всегда\");\n        }\n\n        System.out.println(\"программа продолжает работу\");\n    }\n}"
+      },
+      {
+       "type": "note",
+       "kind": "trap",
+       "html": {
+        "ru": "Пустой <code>catch (Exception e) {}</code> — худшее, что можно сделать: ошибка происходит, но никто о ней не узнаёт, и программа продолжает работать с испорченными данными. Если поймал — либо обработай, либо хотя бы сообщи.",
+        "uz": "Bo'sh <code>catch (Exception e) {}</code> — qilish mumkin bo'lgan eng yomon narsa: xato sodir bo'ladi, lekin hech kim bilmaydi va dastur buzilgan ma'lumot bilan ishlashda davom etadi. Tutgan bo'lsangiz — yo qayta ishlang, yo hech bo'lmasa xabar bering.",
+        "en": "An empty <code>catch (Exception e) {}</code> is the worst thing you can write: the error happens, nobody learns about it, and the program keeps running on broken data. If you catch it — handle it, or at least report it."
+       }
+      },
+      {
+       "type": "summary",
+       "items": [
+        {
+         "ru": "List — порядок и повторы, Map — ключ-значение, Set — без повторов",
+         "uz": "List — tartib va takrorlar, Map — kalit-qiymat, Set — takrorsiz",
+         "en": "List keeps order and duplicates, Map is key-value, Set has no duplicates"
+        },
+        {
+         "ru": "Слева интерфейс, справа реализация: List<String> x = new ArrayList<>()",
+         "uz": "Chapda interfeys, o'ngda amalga oshirish: List<String> x = new ArrayList<>()",
+         "en": "Interface on the left, implementation on the right: List<String> x = new ArrayList<>()"
+        },
+        {
+         "ru": "Интерфейс говорит что, класс — как; выбор метода происходит при выполнении",
+         "uz": "Interfeys nimani, sinf qanday qilishni aytadi; metod tanlovi bajarilishda bo'ladi",
+         "en": "The interface says what, the class says how; the method is chosen at run time"
+        },
+        {
+         "ru": "Пустой catch прячет ошибку — так делать нельзя",
+         "uz": "Bo'sh catch xatoni yashiradi — bunday qilib bo'lmaydi",
+         "en": "An empty catch hides the error — never do that"
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": {
+      "ru": "Какая коллекция не допускает повторов?",
+      "uz": "Qaysi kolleksiya takrorlarga yo'l qo'ymaydi?",
+      "en": "Which collection disallows duplicates?"
+     },
+     "options": [
+      {
+       "ru": "List",
+       "uz": "List",
+       "en": "List"
+      },
+      {
+       "ru": "Set",
+       "uz": "Set",
+       "en": "Set"
+      },
+      {
+       "ru": "ArrayList",
+       "uz": "ArrayList",
+       "en": "ArrayList"
+      },
+      {
+       "ru": "Массив",
+       "uz": "Massiv",
+       "en": "An array"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "<code>Set</code> хранит только уникальные элементы. Добавление существующего просто ничего не меняет.",
+      "uz": "<code>Set</code> faqat noyob elementlarni saqlaydi. Mavjudini qo'shish hech nimani o'zgartirmaydi.",
+      "en": "A <code>Set</code> holds only unique elements. Adding an existing one simply changes nothing."
+     }
+    },
+    {
+     "q": {
+      "ru": "Почему пишут <code>List&lt;String&gt; x = new ArrayList&lt;&gt;()</code>, а не <code>ArrayList&lt;String&gt; x</code>?",
+      "uz": "Nega <code>ArrayList&lt;String&gt; x</code> emas, <code>List&lt;String&gt; x = new ArrayList&lt;&gt;()</code> yoziladi?",
+      "en": "Why write <code>List&lt;String&gt; x = new ArrayList&lt;&gt;()</code> rather than <code>ArrayList&lt;String&gt; x</code>?"
+     },
+     "options": [
+      {
+       "ru": "Так быстрее работает",
+       "uz": "Shunday tezroq ishlaydi",
+       "en": "It runs faster"
+      },
+      {
+       "ru": "Код зависит от возможностей, а не от реализации — её можно заменить",
+       "uz": "Kod amalga oshirishga emas, imkoniyatlarga bog'liq — uni almashtirish mumkin",
+       "en": "The code depends on capabilities, not the implementation — which can be swapped"
+      },
+      {
+       "ru": "ArrayList устарел",
+       "uz": "ArrayList eskirgan",
+       "en": "ArrayList is deprecated"
+      },
+      {
+       "ru": "Только так компилируется",
+       "uz": "Faqat shunday kompilyatsiya bo'ladi",
+       "en": "Only this compiles"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Захочешь <code>LinkedList</code> — поменяешь одну строку, остальной код не заметит.",
+      "uz": "<code>LinkedList</code> xohlasangiz — bitta qatorni o'zgartirasiz, qolgan kod sezmaydi.",
+      "en": "Want a <code>LinkedList</code>? Change one line and the rest of the code will not notice."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что делает <code>implements</code>?",
+      "uz": "<code>implements</code> nima qiladi?",
+      "en": "What does <code>implements</code> do?"
+     },
+     "options": [
+      {
+       "ru": "Наследует поля другого класса",
+       "uz": "Boshqa sinf maydonlarini meros qiladi",
+       "en": "Inherits another class's fields"
+      },
+      {
+       "ru": "Обязывает класс предоставить методы интерфейса",
+       "uz": "Sinfni interfeys metodlarini berishga majbur qiladi",
+       "en": "Obliges the class to provide the interface's methods"
+      },
+      {
+       "ru": "Создаёт объект",
+       "uz": "Obyekt yaratadi",
+       "en": "Creates an object"
+      },
+      {
+       "ru": "Импортирует пакет",
+       "uz": "Paketni import qiladi",
+       "en": "Imports a package"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Если метод не реализован, программа не скомпилируется — договор проверяется на этапе сборки.",
+      "uz": "Metod amalga oshirilmasa, dastur kompilyatsiya bo'lmaydi — shartnoma yig'ish bosqichida tekshiriladi.",
+      "en": "If a method is missing, the program will not compile — the contract is checked at build time."
+     }
+    },
+    {
+     "q": {
+      "ru": "Сколько классов-родителей может быть у класса в Java?",
+      "uz": "Java da sinfning nechta ota-ona sinfi bo'lishi mumkin?",
+      "en": "How many parent classes can a Java class have?"
+     },
+     "options": [
+      {
+       "ru": "Сколько угодно",
+       "uz": "Xohlagancha",
+       "en": "Any number"
+      },
+      {
+       "ru": "Один",
+       "uz": "Bitta",
+       "en": "One"
+      },
+      {
+       "ru": "Два",
+       "uz": "Ikkita",
+       "en": "Two"
+      },
+      {
+       "ru": "Ни одного",
+       "uz": "Bitta ham",
+       "en": "None"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Наследование одиночное — это осознанное решение авторов языка. Множественность дают интерфейсы.",
+      "uz": "Meros yakka — bu til mualliflarining ongli qarori. Ko'plikni interfeyslar beradi.",
+      "en": "Inheritance is single by design. Interfaces provide the multiplicity instead."
+     }
+    },
+    {
+     "q": {
+      "ru": "Когда выполняется блок <code>finally</code>?",
+      "uz": "<code>finally</code> bloki qachon bajariladi?",
+      "en": "When does a <code>finally</code> block run?"
+     },
+     "options": [
+      {
+       "ru": "Только при ошибке",
+       "uz": "Faqat xatoda",
+       "en": "Only on error"
+      },
+      {
+       "ru": "Всегда — и при ошибке, и без неё",
+       "uz": "Doim — xatoda ham, xatosiz ham",
+       "en": "Always — with or without an error"
+      },
+      {
+       "ru": "Только без ошибки",
+       "uz": "Faqat xatosiz",
+       "en": "Only without an error"
+      },
+      {
+       "ru": "Никогда",
+       "uz": "Hech qachon",
+       "en": "Never"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Поэтому в <code>finally</code> закрывают файлы и соединения — их надо освободить в любом случае.",
+      "uz": "Shuning uchun <code>finally</code> da fayl va ulanishlar yopiladi — ularni har holda bo'shatish kerak.",
+      "en": "That is why files and connections are closed in <code>finally</code> — they must be released either way."
+     }
+    },
+    {
+     "q": {
+      "ru": "Чем плох пустой <code>catch (Exception e) {}</code>?",
+      "uz": "Bo'sh <code>catch (Exception e) {}</code> nimasi bilan yomon?",
+      "en": "What is wrong with an empty <code>catch (Exception e) {}</code>?"
+     },
+     "options": [
+      {
+       "ru": "Ничем, это нормально",
+       "uz": "Hech nimasi, bu normal",
+       "en": "Nothing, it is fine"
+      },
+      {
+       "ru": "Ошибка происходит, но остаётся незамеченной",
+       "uz": "Xato sodir bo'ladi, lekin sezilmay qoladi",
+       "en": "The error happens but goes unnoticed"
+      },
+      {
+       "ru": "Он замедляет программу",
+       "uz": "U dasturni sekinlashtiradi",
+       "en": "It slows the program down"
+      },
+      {
+       "ru": "Он не компилируется",
+       "uz": "U kompilyatsiya bo'lmaydi",
+       "en": "It does not compile"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Программа поедет дальше с неверными данными, а причину искать будут в другом месте и через неделю.",
+      "uz": "Dastur noto'g'ri ma'lumot bilan davom etadi, sababni esa bir haftadan keyin boshqa joydan qidirishadi.",
+      "en": "The program carries on with bad data, and the cause gets hunted somewhere else a week later."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "java",
+     "title": {
+      "ru": "Уникальные слова",
+      "uz": "Noyob so'zlar",
+      "en": "Unique words"
+     },
+     "brief": {
+      "ru": "Set",
+      "uz": "Set",
+      "en": "Set"
+     },
+     "desc": {
+      "ru": "<p>Метод <code>countUnique(String[] words)</code> возвращает количество различных слов. В <code>main</code> посчитай для <code>{\"java\", \"sql\", \"java\", \"c\"}</code>.</p><p>Ожидаемый вывод: <code>3</code></p>",
+      "uz": "<p><code>countUnique(String[] words)</code> metodi turli so'zlar sonini qaytaradi. <code>main</code> da <code>{\"java\", \"sql\", \"java\", \"c\"}</code> uchun sanang.</p><p>Kutilgan natija: <code>3</code></p>",
+      "en": "<p>The method <code>countUnique(String[] words)</code> returns the number of distinct words. In <code>main</code>, count them for <code>{\"java\", \"sql\", \"java\", \"c\"}</code>.</p><p>Expected output: <code>3</code></p>"
+     },
+     "starter": "import java.util.*;\n\npublic class Main {\n    static int countUnique(String[] words) {\n        // твой код\n        return 0;\n    }\n\n    public static void main(String[] args) {\n        System.out.println(countUnique(new String[]{\"java\", \"sql\", \"java\", \"c\"}));\n    }\n}\n",
+     "solution": "import java.util.*;\n\npublic class Main {\n    static int countUnique(String[] words) {\n        Set<String> seen = new HashSet<>();\n        for (String w : words) {\n            seen.add(w);          // повтор просто не добавится\n        }\n        return seen.size();\n    }\n\n    public static void main(String[] args) {\n        System.out.println(countUnique(new String[]{\"java\", \"sql\", \"java\", \"c\"}));\n    }\n}\n",
+     "expected": "3",
+     "hint": {
+      "ru": "Сложи всё в <code>HashSet</code> и верни его <code>size()</code> — повторы отсеются сами.",
+      "uz": "Hammasini <code>HashSet</code> ga soling va uning <code>size()</code> ini qaytaring — takrorlar o'zi chiqib ketadi.",
+      "en": "Put everything into a <code>HashSet</code> and return its <code>size()</code> — duplicates drop out by themselves."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "java",
+     "title": {
+      "ru": "Сумма по ключам",
+      "uz": "Kalitlar bo'yicha yig'indi",
+      "en": "Sum by key"
+     },
+     "brief": {
+      "ru": "Map и getOrDefault",
+      "uz": "Map va getOrDefault",
+      "en": "Map and getOrDefault"
+     },
+     "desc": {
+      "ru": "<p>Метод <code>total(Map&lt;String, Integer&gt; scores)</code> возвращает сумму всех значений карты. В <code>main</code> сложи очки трёх игроков: Али 30, Вали 70, Гани 50.</p><p>Ожидаемый вывод: <code>150</code></p>",
+      "uz": "<p><code>total(Map&lt;String, Integer&gt; scores)</code> metodi xaritadagi barcha qiymatlar yig'indisini qaytaradi. <code>main</code> da uch o'yinchi ochkolarini qo'shing: Али 30, Вали 70, Гани 50.</p><p>Kutilgan natija: <code>150</code></p>",
+      "en": "<p>The method <code>total(Map&lt;String, Integer&gt; scores)</code> returns the sum of all values in the map. In <code>main</code>, add up three players: Али 30, Вали 70, Гани 50.</p><p>Expected output: <code>150</code></p>"
+     },
+     "starter": "import java.util.*;\n\npublic class Main {\n    static int total(Map<String, Integer> scores) {\n        // твой код\n        return 0;\n    }\n\n    public static void main(String[] args) {\n        Map<String, Integer> m = new HashMap<>();\n        m.put(\"Али\", 30);\n        m.put(\"Вали\", 70);\n        m.put(\"Гани\", 50);\n        System.out.println(total(m));\n    }\n}\n",
+     "solution": "import java.util.*;\n\npublic class Main {\n    static int total(Map<String, Integer> scores) {\n        int sum = 0;\n        for (int v : scores.values()) {   // перебираем значения, ключи не нужны\n            sum += v;\n        }\n        return sum;\n    }\n\n    public static void main(String[] args) {\n        Map<String, Integer> m = new HashMap<>();\n        m.put(\"Али\", 30);\n        m.put(\"Вали\", 70);\n        m.put(\"Гани\", 50);\n        System.out.println(total(m));\n    }\n}\n",
+     "expected": "150",
+     "hint": {
+      "ru": "<code>scores.values()</code> даёт коллекцию значений — по ней и пройди циклом for-each.",
+      "uz": "<code>scores.values()</code> qiymatlar kolleksiyasini beradi — shu bo'yicha for-each bilan yuring.",
+      "en": "<code>scores.values()</code> gives the collection of values — loop over it with for-each."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "java",
+     "title": {
+      "ru": "Интерфейс площади",
+      "uz": "Yuza interfeysi",
+      "en": "An area interface"
+     },
+     "brief": {
+      "ru": "interface и implements",
+      "uz": "interface va implements",
+      "en": "interface and implements"
+     },
+     "desc": {
+      "ru": "<p>Объяви интерфейс <code>Shape</code> с методом <code>int area()</code>. Сделай два класса: <code>Rect</code> (ширина × высота) и <code>Sq</code> (сторона в квадрате). В <code>main</code> сложи площади прямоугольника 3×4 и квадрата со стороной 5, выведи сумму.</p><p>Ожидаемый вывод: <code>37</code></p>",
+      "uz": "<p><code>int area()</code> metodli <code>Shape</code> interfeysini e'lon qiling. Ikkita sinf yarating: <code>Rect</code> (eni × bo'yi) va <code>Sq</code> (tomon kvadrati). <code>main</code> da 3×4 to'rtburchak va tomoni 5 bo'lgan kvadrat yuzalarini qo'shib, yig'indini chiqaring.</p><p>Kutilgan natija: <code>37</code></p>",
+      "en": "<p>Declare an interface <code>Shape</code> with a method <code>int area()</code>. Create two classes: <code>Rect</code> (width × height) and <code>Sq</code> (side squared). In <code>main</code>, add the areas of a 3×4 rectangle and a square with side 5, and print the sum.</p><p>Expected output: <code>37</code></p>"
+     },
+     "starter": "import java.util.*;\n\ninterface Shape {\n    int area();\n}\n\n// твои классы Rect и Sq\n\npublic class Main {\n    public static void main(String[] args) {\n        // создай фигуры и сложи площади\n    }\n}\n",
+     "solution": "import java.util.*;\n\ninterface Shape {\n    int area();\n}\n\nclass Rect implements Shape {\n    private final int w, h;\n    Rect(int w, int h) { this.w = w; this.h = h; }\n    public int area() { return w * h; }\n}\n\nclass Sq implements Shape {\n    private final int side;\n    Sq(int side) { this.side = side; }\n    public int area() { return side * side; }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        List<Shape> shapes = new ArrayList<>();\n        shapes.add(new Rect(3, 4));\n        shapes.add(new Sq(5));\n\n        int sum = 0;\n        for (Shape s : shapes) {   // цикл не знает, что за фигура перед ним\n            sum += s.area();\n        }\n        System.out.println(sum);\n    }\n}\n",
+     "expected": "37",
+     "hint": {
+      "ru": "3×4 = 12, 5×5 = 25, вместе 37. Сложи фигуры в <code>List&lt;Shape&gt;</code> и пройди циклом.",
+      "uz": "3×4 = 12, 5×5 = 25, birgalikda 37. Shakllarni <code>List&lt;Shape&gt;</code> ga soling va sikl bilan yuring.",
+      "en": "3×4 = 12, 5×5 = 25, together 37. Put the shapes into a <code>List&lt;Shape&gt;</code> and loop over it."
+     }
+    }
+   ],
+   "exam": {
+    "time": 480,
+    "questions": [
+     {
+      "q": {
+       "ru": "Что вернёт <code>map.get(\"нет такого ключа\")</code>?",
+       "uz": "<code>map.get(\"bunday kalit yo'q\")</code> nima qaytaradi?",
+       "en": "What does <code>map.get(\"no such key\")</code> return?"
+      },
+      "options": [
+       {
+        "ru": "0",
+        "uz": "0",
+        "en": "0"
+       },
+       {
+        "ru": "null",
+        "uz": "null",
+        "en": "null"
+       },
+       {
+        "ru": "Пустую строку",
+        "uz": "Bo'sh satrni",
+        "en": "An empty string"
+       },
+       {
+        "ru": "Исключение",
+        "uz": "Istisno",
+        "en": "An exception"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "Сколько интерфейсов может реализовать один класс?",
+       "uz": "Bitta sinf nechta interfeysni amalga oshira oladi?",
+       "en": "How many interfaces can one class implement?"
+      },
+      "options": [
+       {
+        "ru": "Один",
+        "uz": "Bitta",
+        "en": "One"
+       },
+       {
+        "ru": "Сколько угодно",
+        "uz": "Xohlagancha",
+        "en": "Any number"
+       },
+       {
+        "ru": "Ни одного",
+        "uz": "Bitta ham",
+        "en": "None"
+       },
+       {
+        "ru": "Не больше трёх",
+        "uz": "Uchtadan ko'p emas",
+        "en": "No more than three"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "Проверяемое исключение — это то, которое…",
+       "uz": "Tekshiriladigan istisno — bu…",
+       "en": "A checked exception is one that…"
+      },
+      "options": [
+       {
+        "ru": "всегда падает",
+        "uz": "doim quladi",
+        "en": "always crashes"
+       },
+       {
+        "ru": "компилятор требует поймать или объявить",
+        "uz": "kompilyator tutish yoki e'lon qilishni talab qiladi",
+        "en": "the compiler requires you to catch or declare"
+       },
+       {
+        "ru": "происходит только в тестах",
+        "uz": "faqat testlarda sodir bo'ladi",
+        "en": "only occurs in tests"
+       },
+       {
+        "ru": "нельзя поймать",
+        "uz": "tutib bo'lmaydi",
+        "en": "cannot be caught"
+       }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "java",
+      "title": {
+       "ru": "Частота слов",
+       "uz": "So'zlar chastotasi",
+       "en": "Word frequency"
+      },
+      "desc": {
+       "ru": "<p>Метод <code>topWord(String[] words)</code> возвращает слово, которое встречается чаще всех. Если таких несколько, верни любое из них — в тесте данные однозначные.</p><p>В <code>main</code> найди самое частое в <code>{\"java\", \"sql\", \"java\", \"c\", \"java\"}</code>.</p><p>Ожидаемый вывод: <code>java</code></p>",
+       "uz": "<p><code>topWord(String[] words)</code> metodi eng ko'p uchraydigan so'zni qaytaradi. Bunday so'zlar bir nechta bo'lsa, istalganini qaytaring — testda ma'lumot aniq.</p><p><code>main</code> da <code>{\"java\", \"sql\", \"java\", \"c\", \"java\"}</code> dagi eng tez-tez uchraydiganini toping.</p><p>Kutilgan natija: <code>java</code></p>",
+       "en": "<p>The method <code>topWord(String[] words)</code> returns the most frequent word. If several tie, return any of them — the test data is unambiguous.</p><p>In <code>main</code>, find the most frequent in <code>{\"java\", \"sql\", \"java\", \"c\", \"java\"}</code>.</p><p>Expected output: <code>java</code></p>"
+      },
+      "starter": "import java.util.*;\n\npublic class Main {\n    static String topWord(String[] words) {\n        // твой код\n        return \"\";\n    }\n\n    public static void main(String[] args) {\n        System.out.println(topWord(new String[]{\"java\", \"sql\", \"java\", \"c\", \"java\"}));\n    }\n}\n",
+      "solution": "import java.util.*;\n\npublic class Main {\n    static String topWord(String[] words) {\n        Map<String, Integer> counts = new HashMap<>();\n        for (String w : words) {\n            counts.put(w, counts.getOrDefault(w, 0) + 1);\n        }\n\n        String best = \"\";\n        int max = -1;\n        for (Map.Entry<String, Integer> e : counts.entrySet()) {\n            if (e.getValue() > max) {\n                max = e.getValue();\n                best = e.getKey();\n            }\n        }\n        return best;\n    }\n\n    public static void main(String[] args) {\n        System.out.println(topWord(new String[]{\"java\", \"sql\", \"java\", \"c\", \"java\"}));\n    }\n}\n",
+      "expected": "java",
+      "hint": {
+       "ru": "Сначала посчитай встречаемость в <code>HashMap</code> через <code>getOrDefault</code>, потом пройди по <code>entrySet()</code> и найди максимум.",
+       "uz": "Avval <code>getOrDefault</code> orqali <code>HashMap</code> da uchrashini sanang, keyin <code>entrySet()</code> bo'ylab yurib maksimumni toping.",
+       "en": "First count occurrences in a <code>HashMap</code> with <code>getOrDefault</code>, then walk <code>entrySet()</code> and find the maximum."
+      }
+     }
+    ]
+   }
   }
  ]
 }
