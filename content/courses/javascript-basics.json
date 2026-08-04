@@ -1,0 +1,192 @@
+{
+ "id": "javascript-basics",
+ "schema": 2,
+ "modules": [
+  {
+   "id": "js-01",
+   "title": { "ru": "JavaScript: первые шаги", "uz": "JavaScript: birinchi qadamlar", "en": "JavaScript: first steps" },
+   "tagline": { "ru": "Переменные, типы и вывод — язык, который живёт в браузере", "uz": "O'zgaruvchilar, turlar va chiqarish — brauzerda yashaydigan til", "en": "Variables, types and output — the language that lives in the browser" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "Зачем JavaScript, если есть Python", "uz": "Python bo'lsa, JavaScript nima uchun", "en": "Why JavaScript when you have Python" },
+     "blocks": [
+      { "type": "text", "html": {
+        "ru": "<p><b>JavaScript</b> — единственный язык, который браузер понимает без установки. Всё, что на сайте двигается, проверяется и реагирует на клик, написано на нём. Эта платформа — тоже JavaScript.</p><p>Питон ты уже знаешь, поэтому здесь будет быстро: логика та же, отличается синтаксис и пара важных привычек.</p>",
+        "uz": "<p><b>JavaScript</b> — brauzer o'rnatishsiz tushunadigan yagona til. Saytda harakatlanadigan, tekshiriladigan va bosishga javob beradigan hamma narsa unda yozilgan. Bu platforma ham JavaScript.</p><p>Python'ni bilasiz, shuning uchun bu yerda tez bo'ladi: mantiq bir xil, sintaksis va bir nechta muhim odat farq qiladi.</p>",
+        "en": "<p><b>JavaScript</b> is the only language a browser understands without installation. Everything on a page that moves, validates or responds to a click is written in it. This platform is JavaScript too.</p><p>You already know Python, so this will be quick: the logic is the same, the syntax and a couple of habits differ.</p>" } },
+      { "type": "jsrun", "code": "console.log('Привет из браузера!');\nconsole.log('2 + 2 =', 2 + 2);\n\n// Этот код выполняется прямо здесь, по-настоящему" },
+      { "type": "note", "kind": "note", "html": {
+        "ru": "Вместо <code>print()</code> здесь <code>console.log()</code>. Строки заканчиваются точкой с запятой (её можно опускать, но лучше ставить), а блоки кода обрамляются фигурными скобками вместо отступов.",
+        "uz": "<code>print()</code> o'rniga bu yerda <code>console.log()</code>. Qatorlar nuqtali vergul bilan tugaydi (tashlab ketish mumkin, lekin qo'ygan yaxshi), kod bloklari esa otstuplar o'rniga jingalak qavslar bilan o'raladi.",
+        "en": "Instead of <code>print()</code> there is <code>console.log()</code>. Statements end with a semicolon (optional, but better to keep), and code blocks use curly braces instead of indentation." } }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "let, const и типы", "uz": "let, const va turlar", "en": "let, const and types" },
+     "blocks": [
+      { "type": "text", "html": {
+        "ru": "<p>Переменные объявляют двумя словами:</p><ul><li><code>const</code> — значение не будет переприсвоено (используй по умолчанию)</li><li><code>let</code> — значение будет меняться</li></ul><p><code>var</code> — устаревший способ, в новом коде его не пишут.</p>",
+        "uz": "<p>O'zgaruvchilar ikkita so'z bilan e'lon qilinadi:</p><ul><li><code>const</code> — qiymat qayta berilmaydi (sukut bo'yicha ishlating)</li><li><code>let</code> — qiymat o'zgaradi</li></ul><p><code>var</code> — eskirgan usul, yangi kodda yozilmaydi.</p>",
+        "en": "<p>Variables are declared with two keywords:</p><ul><li><code>const</code> — the value will not be reassigned (use it by default)</li><li><code>let</code> — the value will change</li></ul><p><code>var</code> is the legacy way; modern code does not use it.</p>" } },
+      { "type": "jsrun", "code": "const name = 'Азиз';\nlet level = 5;\n\nlevel = level + 1;              // let менять можно\nconsole.log(`${name}, уровень ${level}`);   // шаблонная строка = f-строка Python\n\nconsole.log(typeof name, typeof level, typeof true, typeof undefined);" },
+      { "type": "note", "kind": "tip", "html": {
+        "ru": "Обратные кавычки <code>`</code> дают <b>шаблонную строку</b> — прямой аналог f-строк Python: <code>`Привет, ${name}`</code>.",
+        "uz": "Teskari qo'shtirnoqlar <code>`</code> <b>shablon satr</b> beradi — Python f-satrlarining to'g'ridan-to'g'ri analogi: <code>`Salom, ${name}`</code>.",
+        "en": "Backticks <code>`</code> create a <b>template literal</b> — the direct analogue of Python f-strings: <code>`Hello, ${name}`</code>." } },
+      { "type": "predict", "lang": "javascript",
+        "code": "const x = 5;\nconst y = '5';\nconsole.log(x == y);\nconsole.log(x === y);",
+        "options": [
+          { "ru": "true false", "uz": "true false", "en": "true false" },
+          { "ru": "true true", "uz": "true true", "en": "true true" },
+          { "ru": "false false", "uz": "false false", "en": "false false" },
+          { "ru": "Ошибка", "uz": "Xato", "en": "An error" }
+        ], "a": 0,
+        "explain": { "ru": "<code>==</code> сравнивает с приведением типов и считает 5 и '5' равными. <code>===</code> сравнивает и значение, и тип. <b>Всегда пиши <code>===</code></b> — это одно из главных правил JavaScript.", "uz": "<code>==</code> turlarni keltirib solishtiradi va 5 va '5' ni teng deb hisoblaydi. <code>===</code> qiymatni ham, turni ham solishtiradi. <b>Har doim <code>===</code> yozing</b> — bu JavaScript'ning asosiy qoidalaridan biri.", "en": "<code>==</code> compares with type coercion and considers 5 and '5' equal. <code>===</code> compares value and type. <b>Always write <code>===</code></b> — one of the key rules of JavaScript." } }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "Массивы и объекты", "uz": "Massivlar va obyektlar", "en": "Arrays and objects" },
+     "blocks": [
+      { "type": "text", "html": {
+        "ru": "<p><b>Массив</b> — это список Python, <b>объект</b> — это словарь. Синтаксис почти совпадает:</p>",
+        "uz": "<p><b>Massiv</b> — bu Python ro'yxati, <b>obyekt</b> — bu lug'at. Sintaksis deyarli mos keladi:</p>",
+        "en": "<p>An <b>array</b> is a Python list; an <b>object</b> is a dictionary. The syntax is nearly identical:</p>" } },
+      { "type": "jsrun", "code": "const games = ['CS', 'Dota', 'GTA'];\nconsole.log(games[0], games.length);\ngames.push('Minecraft');       // append в Python\nconsole.log(games);\n\nconst player = { name: 'Азиз', level: 7 };\nconsole.log(player.name);      // точка вместо квадратных скобок\nconsole.log(player['level']);  // но и так тоже можно" },
+      { "type": "jsrun", "code": "const nums = [4, 8, 15, 16, 23, 42];\n\n// Современный JS: методы вместо циклов\nconst doubled = nums.map(n => n * 2);\nconst big = nums.filter(n => n > 15);\nconst total = nums.reduce((sum, n) => sum + n, 0);\n\nconsole.log('map:', doubled);\nconsole.log('filter:', big);\nconsole.log('reduce:', total);" },
+      { "type": "match",
+        "pairs": [
+          { "left": { "ru": "map()", "uz": "map()", "en": "map()" }, "right": { "ru": "Преобразовать каждый элемент", "uz": "Har bir elementni o'zgartirish", "en": "Transform every element" } },
+          { "left": { "ru": "filter()", "uz": "filter()", "en": "filter()" }, "right": { "ru": "Оставить подходящие элементы", "uz": "Mos elementlarni qoldirish", "en": "Keep matching elements" } },
+          { "left": { "ru": "reduce()", "uz": "reduce()", "en": "reduce()" }, "right": { "ru": "Свернуть массив в одно значение", "uz": "Massivni bitta qiymatga yig'ish", "en": "Fold the array into one value" } },
+          { "left": { "ru": "push()", "uz": "push()", "en": "push()" }, "right": { "ru": "Добавить элемент в конец", "uz": "Oxiriga element qo'shish", "en": "Add an element to the end" } }
+        ] }
+     ]
+    },
+    {
+     "id": "l4",
+     "title": { "ru": "Функции и стрелки", "uz": "Funksiyalar va strelkalar", "en": "Functions and arrows" },
+     "blocks": [
+      { "type": "text", "html": {
+        "ru": "<p>Функции объявляют тремя способами. В современном коде чаще всего используют <b>стрелочные</b>:</p>",
+        "uz": "<p>Funksiyalar uch xil usulda e'lon qilinadi. Zamonaviy kodda ko'pincha <b>strelkali</b> funksiyalar ishlatiladi:</p>",
+        "en": "<p>Functions are declared in three ways. Modern code mostly uses <b>arrow functions</b>:</p>" } },
+      { "type": "jsrun", "code": "// Классическая функция\nfunction add(a, b) {\n  return a + b;\n}\n\n// Стрелочная — короче, особенно для однострочников\nconst multiply = (a, b) => a * b;      // return подразумевается\nconst square = n => n * n;             // одна скобка не нужна\n\nconsole.log(add(2, 3), multiply(2, 3), square(5));" },
+      { "type": "findbug",
+        "lines": [
+          "const greet = (name) => {",
+          "  `Привет, ${name}!`",
+          "};",
+          "console.log(greet('Азиз'));"
+        ],
+        "bugLine": 1,
+        "explain": { "ru": "В фигурных скобках <code>return</code> обязателен — без него функция вернёт <code>undefined</code>. Либо пиши <code>return `Привет, ${name}!`</code>, либо убери скобки: <code>name => `Привет, ${name}!`</code>.", "uz": "Jingalak qavslar ichida <code>return</code> majburiy — usiz funksiya <code>undefined</code> qaytaradi. Yo <code>return</code> yozing, yo qavslarni olib tashlang.", "en": "Inside curly braces <code>return</code> is mandatory — without it the function returns <code>undefined</code>. Either write <code>return</code>, or drop the braces." } },
+      { "type": "summary", "items": [
+        { "ru": "console.log вместо print, фигурные скобки вместо отступов", "uz": "print o'rniga console.log, otstuplar o'rniga jingalak qavslar", "en": "console.log instead of print, braces instead of indentation" },
+        { "ru": "const по умолчанию, let — когда значение меняется", "uz": "Sukut bo'yicha const, qiymat o'zgarsa — let", "en": "const by default, let when the value changes" },
+        { "ru": "Всегда === вместо ==, иначе типы приводятся неявно", "uz": "Har doim == o'rniga ===, aks holda turlar bilinmay keltiriladi", "en": "Always === instead of ==, otherwise types coerce silently" },
+        { "ru": "map, filter, reduce заменяют большинство циклов", "uz": "map, filter, reduce ko'p sikllarni almashtiradi", "en": "map, filter and reduce replace most loops" }
+      ] }
+     ]
+    }
+   ],
+   "quiz": [
+    { "q": { "ru": "Чем <code>===</code> отличается от <code>==</code>?", "uz": "<code>===</code> <code>==</code> dan nimasi bilan farq qiladi?", "en": "How does <code>===</code> differ from <code>==</code>?" },
+      "options": [
+        { "ru": "Ничем", "uz": "Hech nimasi bilan", "en": "In no way" },
+        { "ru": "=== сравнивает и значение, и тип, без приведения", "uz": "=== qiymatni ham, turni ham solishtiradi, keltirmasdan", "en": "=== compares value and type, without coercion" },
+        { "ru": "=== работает только с числами", "uz": "=== faqat sonlar bilan ishlaydi", "en": "=== only works with numbers" },
+        { "ru": "== быстрее", "uz": "== tezroq", "en": "== is faster" }
+      ], "a": 1,
+      "explain": { "ru": "<code>'5' == 5</code> даёт true, а <code>'5' === 5</code> — false. В рабочем коде почти всегда нужен <code>===</code>.", "uz": "<code>'5' == 5</code> true beradi, <code>'5' === 5</code> esa false. Ishchi kodda deyarli har doim <code>===</code> kerak.", "en": "<code>'5' == 5</code> is true while <code>'5' === 5</code> is false. Production code almost always wants <code>===</code>." } },
+    { "q": { "ru": "Какое объявление переменной предпочтительно в современном JS?", "uz": "Zamonaviy JS'da qaysi e'lon afzal?", "en": "Which variable declaration is preferred in modern JS?" },
+      "options": [
+        { "ru": "var", "uz": "var", "en": "var" },
+        { "ru": "const, а let — если значение меняется", "uz": "const, let esa — qiymat o'zgarsa", "en": "const, with let when the value changes" },
+        { "ru": "Без ключевого слова", "uz": "Kalit so'zsiz", "en": "No keyword at all" },
+        { "ru": "let всегда", "uz": "Har doim let", "en": "let always" }
+      ], "a": 1,
+      "explain": { "ru": "<code>const</code> по умолчанию делает код предсказуемее: видно, что значение не переприсваивается.", "uz": "<code>const</code> sukut bo'yicha kodni oldindan aytiladigan qiladi: qiymat qayta berilmasligi ko'rinadi.", "en": "<code>const</code> by default makes code more predictable: you can see the binding never changes." } },
+    { "q": { "ru": "Что делает <code>[1,2,3].map(n => n * 2)</code>?", "uz": "<code>[1,2,3].map(n => n * 2)</code> nima qiladi?", "en": "What does <code>[1,2,3].map(n => n * 2)</code> do?" },
+      "options": [
+        { "ru": "Меняет исходный массив", "uz": "Asl massivni o'zgartiradi", "en": "Mutates the original array" },
+        { "ru": "Возвращает новый массив [2,4,6]", "uz": "Yangi [2,4,6] massivini qaytaradi", "en": "Returns a new array [2,4,6]" },
+        { "ru": "Возвращает число 12", "uz": "12 sonini qaytaradi", "en": "Returns the number 12" },
+        { "ru": "Ошибка", "uz": "Xato", "en": "An error" }
+      ], "a": 1,
+      "explain": { "ru": "<code>map</code> не трогает исходный массив, а создаёт новый — это важное свойство.", "uz": "<code>map</code> asl massivga tegmaydi, yangisini yaratadi — bu muhim xususiyat.", "en": "<code>map</code> leaves the original untouched and creates a new array — an important property." } },
+    { "q": { "ru": "Аналог f-строки Python в JavaScript — это…", "uz": "JavaScript'da Python f-satrining analogi — bu…", "en": "The JavaScript analogue of a Python f-string is…" },
+      "options": [
+        { "ru": "Шаблонная строка в обратных кавычках", "uz": "Teskari qo'shtirnoqdagi shablon satr", "en": "A template literal in backticks" },
+        { "ru": "Строка с плюсами", "uz": "Plyusli satr", "en": "A string with pluses" },
+        { "ru": "printf", "uz": "printf", "en": "printf" },
+        { "ru": "Такого нет", "uz": "Bunday narsa yo'q", "en": "There is none" }
+      ], "a": 0,
+      "explain": { "ru": "<code>`Привет, ${name}`</code> — тот же смысл, что <code>f'Привет, {name}'</code>.", "uz": "<code>`Salom, ${name}`</code> — <code>f'Salom, {name}'</code> bilan bir xil ma'no.", "en": "<code>`Hello, ${name}`</code> means the same as <code>f'Hello, {name}'</code>." } },
+    { "q": { "ru": "Функция со скобками <code>{}</code> и без <code>return</code> вернёт…", "uz": "<code>{}</code> qavsli va <code>return</code>siz funksiya nima qaytaradi…", "en": "A function with <code>{}</code> braces and no <code>return</code> returns…" },
+      "options": [
+        { "ru": "Последнее выражение", "uz": "Oxirgi ifodani", "en": "The last expression" },
+        { "ru": "undefined", "uz": "undefined", "en": "undefined" },
+        { "ru": "null", "uz": "null", "en": "null" },
+        { "ru": "Ошибка", "uz": "Xato", "en": "An error" }
+      ], "a": 1,
+      "explain": { "ru": "В JS это <code>undefined</code> (в Python было бы <code>None</code>). Частая ошибка при переходе на стрелочные функции.", "uz": "JS'da bu <code>undefined</code> (Python'da <code>None</code> bo'lardi). Strelkali funksiyalarga o'tishda keng tarqalgan xato.", "en": "In JS that is <code>undefined</code> (Python would say <code>None</code>). A common slip when moving to arrow functions." } },
+    { "q": { "ru": "Как обратиться к полю объекта <code>player = {name: 'Азиз'}</code>?", "uz": "<code>player = {name: 'Азиз'}</code> obyekt maydoniga qanday murojaat qilinadi?", "en": "How do you access a field of <code>player = {name: 'Азиз'}</code>?" },
+      "options": [
+        { "ru": "player.name или player['name']", "uz": "player.name yoki player['name']", "en": "player.name or player['name']" },
+        { "ru": "Только player['name']", "uz": "Faqat player['name']", "en": "Only player['name']" },
+        { "ru": "player->name", "uz": "player->name", "en": "player->name" },
+        { "ru": "player::name", "uz": "player::name", "en": "player::name" }
+      ], "a": 0,
+      "explain": { "ru": "Точка удобнее для известных имён, скобки — когда имя поля лежит в переменной.", "uz": "Nuqta ma'lum nomlar uchun qulay, qavslar esa — maydon nomi o'zgaruvchida bo'lganda.", "en": "Dot notation suits known names; brackets are for when the field name is in a variable." } }
+   ],
+   "tasks": [
+    { "id": "t1", "kind": "javascript",
+      "title": { "ru": "Первый вывод", "uz": "Birinchi chiqarish", "en": "First output" },
+      "brief": { "ru": "console.log и шаблонная строка", "uz": "console.log va shablon satr", "en": "console.log and a template literal" },
+      "desc": { "ru": "<p>Объяви константу <code>name</code> со значением <code>'Азиз'</code> и выведи через шаблонную строку: <code>Привет, Азиз!</code></p>", "uz": "<p><code>name</code> konstantasini <code>'Азиз'</code> qiymati bilan e'lon qiling va shablon satr orqali chiqaring: <code>Привет, Азиз!</code></p>", "en": "<p>Declare a constant <code>name</code> with the value <code>'Азиз'</code> and print with a template literal: <code>Привет, Азиз!</code></p>" },
+      "starter": "// объяви const name и выведи приветствие\n",
+      "tests": "assert(stdout.includes('Привет, Азиз!'), 'Ожидался вывод: Привет, Азиз!');",
+      "hint": { "ru": "const name = 'Азиз'; потом console.log(`Привет, ${name}!`);", "uz": "const name = 'Азиз'; keyin console.log(`Привет, ${name}!`);", "en": "const name = 'Азиз'; then console.log(`Привет, ${name}!`);" } },
+    { "id": "t2", "kind": "javascript",
+      "title": { "ru": "Сумма чётных", "uz": "Juftlar yig'indisi", "en": "Sum of even numbers" },
+      "brief": { "ru": "filter + reduce", "uz": "filter + reduce", "en": "filter + reduce" },
+      "desc": { "ru": "<p>Напиши функцию <code>sumEven(nums)</code>, которая возвращает сумму только чётных чисел массива. Используй <code>filter</code> и <code>reduce</code>.</p>", "uz": "<p><code>sumEven(nums)</code> funksiyasini yozing: massivdagi faqat juft sonlar yig'indisini qaytarsin. <code>filter</code> va <code>reduce</code> ishlating.</p>", "en": "<p>Write <code>sumEven(nums)</code> returning the sum of only the even numbers in the array. Use <code>filter</code> and <code>reduce</code>.</p>" },
+      "starter": "function sumEven(nums) {\n  // filter чётные, потом reduce\n}\n\nconsole.log(sumEven([1, 2, 3, 4, 5, 6]));\n",
+      "tests": "equal(sumEven([1,2,3,4,5,6]), 12, 'Сумма чётных из [1..6]');\nequal(sumEven([]), 0, 'Пустой массив должен дать 0');\nequal(sumEven([1,3,5]), 0, 'Нет чётных - 0');\nequal(sumEven([10]), 10, 'Одно чётное число');",
+      "hint": { "ru": "return nums.filter(n => n % 2 === 0).reduce((s, n) => s + n, 0);", "uz": "return nums.filter(n => n % 2 === 0).reduce((s, n) => s + n, 0);", "en": "return nums.filter(n => n % 2 === 0).reduce((s, n) => s + n, 0);" } },
+    { "id": "t3", "kind": "javascript",
+      "title": { "ru": "Карточка игрока", "uz": "O'yinchi kartochkasi", "en": "Player card" },
+      "brief": { "ru": "Объекты и методы массива", "uz": "Obyektlar va massiv metodlari", "en": "Objects and array methods" },
+      "desc": { "ru": "<p>Напиши функцию <code>topPlayer(players)</code>: принимает массив объектов <code>{name, score}</code> и возвращает <b>имя</b> игрока с наибольшим счётом. Для пустого массива — <code>null</code>.</p>", "uz": "<p><code>topPlayer(players)</code> funksiyasini yozing: <code>{name, score}</code> obyektlar massivini oladi va eng yuqori ballga ega o'yinchining <b>ismini</b> qaytaradi. Bo'sh massiv uchun — <code>null</code>.</p>", "en": "<p>Write <code>topPlayer(players)</code>: it takes an array of <code>{name, score}</code> objects and returns the <b>name</b> of the highest scorer. For an empty array return <code>null</code>.</p>" },
+      "starter": "function topPlayer(players) {\n  \n}\n\nconsole.log(topPlayer([{name: 'Азиз', score: 80}, {name: 'Тимур', score: 95}]));\n",
+      "tests": "equal(topPlayer([{name:'Азиз',score:80},{name:'Тимур',score:95}]), 'Тимур', 'Лучший - Тимур');\nequal(topPlayer([]), null, 'Пустой массив - null');\nequal(topPlayer([{name:'Один',score:1}]), 'Один', 'Единственный игрок');\nequal(topPlayer([{name:'A',score:5},{name:'B',score:5}]), 'A', 'При равенстве - первый');",
+      "hint": { "ru": "if (players.length === 0) return null; потом reduce: players.reduce((best, p) => p.score > best.score ? p : best).name", "uz": "if (players.length === 0) return null; keyin reduce: players.reduce((best, p) => p.score > best.score ? p : best).name", "en": "if (players.length === 0) return null; then reduce: players.reduce((best, p) => p.score > best.score ? p : best).name" } }
+   ],
+   "exam": {
+    "time": 540,
+    "questions": [
+     { "q": { "ru": "Что выведет <code>console.log(typeof [])</code>?", "uz": "<code>console.log(typeof [])</code> nima chiqaradi?", "en": "What does <code>console.log(typeof [])</code> print?" },
+       "options": [{ "ru": "array", "uz": "array", "en": "array" }, { "ru": "object", "uz": "object", "en": "object" }, { "ru": "list", "uz": "list", "en": "list" }, { "ru": "undefined", "uz": "undefined", "en": "undefined" }], "a": 1 },
+     { "q": { "ru": "Массив объявлен через <code>const</code>. Можно ли добавить в него элемент?", "uz": "Massiv <code>const</code> orqali e'lon qilingan. Unga element qo'shish mumkinmi?", "en": "An array is declared with <code>const</code>. Can you add an element?" },
+       "options": [{ "ru": "Нет, const запрещает изменения", "uz": "Yo'q, const o'zgarishlarni taqiqlaydi", "en": "No, const forbids changes" }, { "ru": "Да — const запрещает переприсваивание, а не изменение содержимого", "uz": "Ha — const qayta berishni taqiqlaydi, ichini o'zgartirishni emas", "en": "Yes — const forbids reassignment, not mutation" }, { "ru": "Только через var", "uz": "Faqat var orqali", "en": "Only via var" }, { "ru": "Ошибка", "uz": "Xato", "en": "An error" }], "a": 1 },
+     { "q": { "ru": "Что вернёт <code>[1,2,3].filter(n => n > 5)</code>?", "uz": "<code>[1,2,3].filter(n => n > 5)</code> nima qaytaradi?", "en": "What does <code>[1,2,3].filter(n => n > 5)</code> return?" },
+       "options": [{ "ru": "null", "uz": "null", "en": "null" }, { "ru": "Пустой массив []", "uz": "Bo'sh massiv []", "en": "An empty array []" }, { "ru": "undefined", "uz": "undefined", "en": "undefined" }, { "ru": "Ошибка", "uz": "Xato", "en": "An error" }], "a": 1 },
+     { "q": { "ru": "Стрелочная функция <code>n => n * 2</code> — что она делает с return?", "uz": "<code>n => n * 2</code> strelkali funksiya return bilan nima qiladi?", "en": "The arrow function <code>n => n * 2</code> — what about return?" },
+       "options": [{ "ru": "return подразумевается автоматически", "uz": "return avtomatik nazarda tutiladi", "en": "return is implied automatically" }, { "ru": "Нужно писать return", "uz": "return yozish kerak", "en": "You must write return" }, { "ru": "Она ничего не возвращает", "uz": "U hech narsa qaytarmaydi", "en": "It returns nothing" }, { "ru": "Ошибка синтаксиса", "uz": "Sintaksis xatosi", "en": "A syntax error" }], "a": 0 },
+     { "q": { "ru": "Где выполняется JavaScript без установки?", "uz": "JavaScript o'rnatishsiz qayerda bajariladi?", "en": "Where does JavaScript run without installation?" },
+       "options": [{ "ru": "В браузере", "uz": "Brauzerda", "en": "In the browser" }, { "ru": "Только на сервере", "uz": "Faqat serverda", "en": "Only on a server" }, { "ru": "Нигде", "uz": "Hech qayerda", "en": "Nowhere" }, { "ru": "В базе данных", "uz": "Ma'lumotlar bazasida", "en": "In a database" }], "a": 0 }
+    ],
+    "tasks": [
+     { "kind": "javascript",
+       "title": { "ru": "Подсчёт слов", "uz": "So'zlarni hisoblash", "en": "Word counter" },
+       "desc": { "ru": "<p>Напиши функцию <code>wordCount(text)</code>: принимает строку и возвращает объект «слово → сколько раз». Слова разделены пробелами, регистр приводится к нижнему.</p><p>Для <code>'a b a'</code> → <code>{a: 2, b: 1}</code></p>", "uz": "<p><code>wordCount(text)</code> funksiyasini yozing: satrni oladi va «so'z → necha marta» obyektini qaytaradi. So'zlar probel bilan ajratilgan, registr kichikka keltiriladi.</p><p><code>'a b a'</code> uchun → <code>{a: 2, b: 1}</code></p>", "en": "<p>Write <code>wordCount(text)</code>: it takes a string and returns an object «word → count». Words are space-separated and lowercased.</p><p>For <code>'a b a'</code> → <code>{a: 2, b: 1}</code></p>" },
+       "starter": "function wordCount(text) {\n  \n}\n\nconsole.log(wordCount('JS это JS'));\n",
+       "tests": "equal(wordCount('a b a'), {a: 2, b: 1}, 'Подсчёт слов');\nequal(wordCount(''), {}, 'Пустая строка - пустой объект');\nequal(wordCount('JS js Js'), {js: 3}, 'Регистр не должен влиять');" }
+    ]
+   }
+  }
+ ]
+}

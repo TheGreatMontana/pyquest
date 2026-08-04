@@ -261,5 +261,9 @@
   "bookmark.add": "Add bookmark",
   "bookmark.remove": "Remove bookmark",
   "bookmark.added": "Bookmarked",
-  "bookmark.removed": "Bookmark removed"
+  "bookmark.removed": "Bookmark removed",
+  "task.noRunner": "{lang} code is compiled, so it cannot run directly in the browser. Write your solution here, test it in your own IDE, and «Compare» will show the reference answer.",
+  "task.selfCheck": "Compare with reference",
+  "task.selfCheckHint": "Compare your code with the reference solution. If the logic matches, the task counts. The honesty here is yours alone.",
+  "task.runLocally": "How to run it locally"
 }

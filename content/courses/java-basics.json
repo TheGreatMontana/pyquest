@@ -1,0 +1,167 @@
+{
+ "id": "java-basics",
+ "schema": 2,
+ "modules": [
+  {
+   "id": "jv-01",
+   "title": { "ru": "Java: пиши один раз, запускай везде", "uz": "Java: bir marta yoz, hamma joyda ishlat", "en": "Java: write once, run anywhere" },
+   "tagline": { "ru": "JVM, классы, коллекции и строгая типизация", "uz": "JVM, sinflar, to'plamlar va qat'iy turlash", "en": "The JVM, classes, collections and static typing" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "Что такое JVM и зачем она нужна", "uz": "JVM nima va u nima uchun kerak", "en": "What the JVM is and why it exists" },
+     "blocks": [
+      { "type": "text", "html": {
+        "ru": "<p>Java-код компилируется не в машинный код, а в <b>байт-код</b>, который исполняет <b>JVM</b> (виртуальная машина Java). Отсюда девиз «write once, run anywhere»: один и тот же <code>.class</code>-файл работает на Windows, Linux и Android.</p><p>На Java написаны банковские системы, Android-приложения и большая часть корпоративного бэкенда. Кстати, <b>Apache Spark, Kafka и Hadoop</b> — те самые инструменты Data Engineer — тоже написаны на JVM-языках.</p>",
+        "uz": "<p>Java kodi mashina kodiga emas, <b>bayt-kodga</b> kompilyatsiya qilinadi, uni <b>JVM</b> (Java virtual mashinasi) bajaradi. Shundan «write once, run anywhere» shiori.</p><p>Java'da bank tizimlari, Android ilovalari va korporativ backend'ning katta qismi yozilgan. Aytgancha, <b>Apache Spark, Kafka va Hadoop</b> — Data Engineer vositalari — ham JVM tillarida yozilgan.</p>",
+        "en": "<p>Java compiles not to machine code but to <b>bytecode</b>, executed by the <b>JVM</b> (Java Virtual Machine). Hence «write once, run anywhere»: the same <code>.class</code> file runs on Windows, Linux and Android.</p><p>Banking systems, Android apps and much of enterprise backend are written in Java. Notably <b>Apache Spark, Kafka and Hadoop</b> — the very data-engineering tools — run on JVM languages.</p>" } },
+      { "type": "code", "lang": "java", "code": "public class Main {\n    public static void main(String[] args) {\n        String name = \"Азиз\";\n        int level = 7;\n\n        System.out.println(\"Привет, \" + name + \"! Уровень: \" + level);\n    }\n}" },
+      { "type": "note", "kind": "note", "html": {
+        "ru": "Имя файла обязано совпадать с именем публичного класса: класс <code>Main</code> — файл <code>Main.java</code>. Сборка и запуск: <code>javac Main.java && java Main</code>",
+        "uz": "Fayl nomi ommaviy sinf nomiga mos kelishi shart: <code>Main</code> sinfi — <code>Main.java</code> fayli. Yig'ish va ishga tushirish: <code>javac Main.java && java Main</code>",
+        "en": "The file name must match the public class name: class <code>Main</code> lives in <code>Main.java</code>. Build and run: <code>javac Main.java && java Main</code>" } }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "Классы, поля и инкапсуляция", "uz": "Sinflar, maydonlar va inkapsulyatsiya", "en": "Classes, fields and encapsulation" },
+     "blocks": [
+      { "type": "text", "html": {
+        "ru": "<p>В Java <b>всё живёт внутри классов</b> — свободных функций не существует. Поля обычно делают <code>private</code>, а доступ дают через методы <code>getX()</code> и <code>setX()</code>.</p>",
+        "uz": "<p>Java'da <b>hamma narsa sinflar ichida yashaydi</b> — erkin funksiyalar mavjud emas. Maydonlar odatda <code>private</code> qilinadi, kirish esa <code>getX()</code> va <code>setX()</code> metodlari orqali beriladi.</p>",
+        "en": "<p>In Java <b>everything lives inside classes</b> — there are no free functions. Fields are usually <code>private</code>, with access through <code>getX()</code> and <code>setX()</code> methods.</p>" } },
+      { "type": "code", "lang": "java", "code": "public class Player {\n    private String name;      // скрыто от внешнего кода\n    private int hp;\n\n    public Player(String name, int hp) {\n        this.name = name;     // this отличает поле от параметра\n        this.hp = hp;\n    }\n\n    public void takeDamage(int dmg) {\n        hp = Math.max(0, hp - dmg);\n    }\n\n    public int getHp() { return hp; }\n    public String getName() { return name; }\n}" },
+      { "type": "predict", "lang": "java",
+        "code": "String a = \"hello\";\nString b = \"hello\";\nString c = new String(\"hello\");\nSystem.out.println(a == b);\nSystem.out.println(a.equals(c));",
+        "options": [
+          { "ru": "true true", "uz": "true true", "en": "true true" },
+          { "ru": "false false", "uz": "false false", "en": "false false" },
+          { "ru": "true false", "uz": "true false", "en": "true false" },
+          { "ru": "Ошибка компиляции", "uz": "Kompilyatsiya xatosi", "en": "A compilation error" }
+        ], "a": 0,
+        "explain": { "ru": "Это классическая ловушка Java. <code>==</code> для объектов сравнивает <b>ссылки</b>, а не содержимое. Литералы «hello» и «hello» — один и тот же объект в пуле строк, поэтому <code>a == b</code> даёт true. Но <code>new String(\"hello\")</code> создаёт новый объект: <code>a == c</code> было бы <b>false</b>. <b>Правило: строки сравнивай через <code>.equals()</code></b>, всегда.", "uz": "Bu Java'ning klassik tuzog'i. Obyektlar uchun <code>==</code> mazmunni emas, <b>havolalarni</b> solishtiradi. Qoida: satrlarni har doim <code>.equals()</code> orqali solishtiring.", "en": "The classic Java trap. For objects <code>==</code> compares <b>references</b>, not content. The literals are the same pooled object, so <code>a == b</code> is true — but <code>new String(\"hello\")</code> is a different object, so <code>a == c</code> would be <b>false</b>. Rule: always compare strings with <code>.equals()</code>." } }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "Коллекции: List, Map, Set", "uz": "To'plamlar: List, Map, Set", "en": "Collections: List, Map, Set" },
+     "blocks": [
+      { "type": "text", "html": {
+        "ru": "<p>Коллекции Java — прямые аналоги питоновских структур:</p><ul><li><code>List&lt;T&gt;</code> (обычно <code>ArrayList</code>) — список Python</li><li><code>Map&lt;K,V&gt;</code> (обычно <code>HashMap</code>) — словарь</li><li><code>Set&lt;T&gt;</code> (обычно <code>HashSet</code>) — множество</li></ul><p>Угловые скобки — это <b>дженерики</b>: они говорят компилятору, какой тип лежит внутри, и он проверит это ещё до запуска.</p>",
+        "uz": "<p>Java to'plamlari Python tuzilmalarining to'g'ridan-to'g'ri analoglari:</p><ul><li><code>List&lt;T&gt;</code> — Python ro'yxati</li><li><code>Map&lt;K,V&gt;</code> — lug'at</li><li><code>Set&lt;T&gt;</code> — to'plam</li></ul><p>Burchakli qavslar — bu <b>generiklar</b>: ular kompilyatorga ichida qanday tur yotganini aytadi.</p>",
+        "en": "<p>Java collections map directly onto Python structures:</p><ul><li><code>List&lt;T&gt;</code> (usually <code>ArrayList</code>) — a Python list</li><li><code>Map&lt;K,V&gt;</code> (usually <code>HashMap</code>) — a dictionary</li><li><code>Set&lt;T&gt;</code> (usually <code>HashSet</code>) — a set</li></ul><p>The angle brackets are <b>generics</b>: they tell the compiler what type is inside, and it checks before you ever run the code.</p>" } },
+      { "type": "code", "lang": "java", "code": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        List<String> games = new ArrayList<>();\n        games.add(\"CS\");\n        games.add(\"Dota\");\n        System.out.println(games.get(0) + \", всего: \" + games.size());\n\n        Map<String, Integer> levels = new HashMap<>();\n        levels.put(\"Азиз\", 7);\n        levels.put(\"Тимур\", 4);\n\n        for (Map.Entry<String, Integer> e : levels.entrySet()) {\n            System.out.println(e.getKey() + \": \" + e.getValue());\n        }\n\n        // Современная Java: стримы вместо циклов\n        int sum = games.stream().mapToInt(String::length).sum();\n        System.out.println(\"Сумма длин: \" + sum);\n    }\n}" },
+      { "type": "match",
+        "pairs": [
+          { "left": { "ru": "ArrayList", "uz": "ArrayList", "en": "ArrayList" }, "right": { "ru": "list в Python", "uz": "Python'dagi list", "en": "Python's list" } },
+          { "left": { "ru": "HashMap", "uz": "HashMap", "en": "HashMap" }, "right": { "ru": "dict в Python", "uz": "Python'dagi dict", "en": "Python's dict" } },
+          { "left": { "ru": "HashSet", "uz": "HashSet", "en": "HashSet" }, "right": { "ru": "set в Python", "uz": "Python'dagi set", "en": "Python's set" } },
+          { "left": { "ru": ".equals()", "uz": ".equals()", "en": ".equals()" }, "right": { "ru": "Сравнение содержимого объектов", "uz": "Obyektlar mazmunini solishtirish", "en": "Comparing object content" } }
+        ] },
+      { "type": "summary", "items": [
+        { "ru": "Java компилируется в байт-код, исполняет JVM", "uz": "Java bayt-kodga kompilyatsiya qilinadi, JVM bajaradi", "en": "Java compiles to bytecode, executed by the JVM" },
+        { "ru": "Весь код живёт в классах, свободных функций нет", "uz": "Butun kod sinflarda yashaydi, erkin funksiyalar yo'q", "en": "All code lives in classes; there are no free functions" },
+        { "ru": "Строки и объекты сравнивают .equals(), а не ==", "uz": "Satr va obyektlarni == emas, .equals() bilan solishtiriladi", "en": "Compare strings and objects with .equals(), not ==" },
+        { "ru": "List, Map, Set — те же list, dict, set из Python", "uz": "List, Map, Set — Python'dagi list, dict, set", "en": "List, Map, Set are Python's list, dict and set" }
+      ] }
+     ]
+    }
+   ],
+   "quiz": [
+    { "q": { "ru": "Во что компилируется Java-код?", "uz": "Java kodi nimaga kompilyatsiya qilinadi?", "en": "What does Java code compile to?" },
+      "options": [
+        { "ru": "Сразу в машинный код процессора", "uz": "To'g'ridan-to'g'ri protsessor mashina kodiga", "en": "Straight to processor machine code" },
+        { "ru": "В байт-код, который исполняет JVM", "uz": "JVM bajaradigan bayt-kodga", "en": "To bytecode executed by the JVM" },
+        { "ru": "Ни во что, он интерпретируется построчно", "uz": "Hech nimaga, u qatorma-qator interpretatsiya qilinadi", "en": "Nothing, it is interpreted line by line" },
+        { "ru": "В HTML", "uz": "HTML ga", "en": "To HTML" }
+      ], "a": 1,
+      "explain": { "ru": "Байт-код одинаков на всех платформах — этим и достигается переносимость.", "uz": "Bayt-kod barcha platformalarda bir xil — ko'chuvchanlik shu bilan erishiladi.", "en": "Bytecode is identical on every platform — that is how portability is achieved." } },
+    { "q": { "ru": "Как правильно сравнить две строки в Java?", "uz": "Java'da ikkita satrni qanday to'g'ri solishtirish mumkin?", "en": "How do you correctly compare two strings in Java?" },
+      "options": [
+        { "ru": "a == b", "uz": "a == b", "en": "a == b" },
+        { "ru": "a.equals(b)", "uz": "a.equals(b)", "en": "a.equals(b)" },
+        { "ru": "a === b", "uz": "a === b", "en": "a === b" },
+        { "ru": "compare(a, b)", "uz": "compare(a, b)", "en": "compare(a, b)" }
+      ], "a": 1,
+      "explain": { "ru": "<code>==</code> сравнивает ссылки на объекты, а не содержимое. Это ошибка №1 у новичков в Java.", "uz": "<code>==</code> obyektlarga havolalarni solishtiradi, mazmunni emas. Bu Java'dagi yangi boshlovchilarning №1 xatosi.", "en": "<code>==</code> compares object references, not content. It is the number-one beginner mistake in Java." } },
+    { "q": { "ru": "Что означает <code>&lt;String&gt;</code> в <code>List&lt;String&gt;</code>?", "uz": "<code>List&lt;String&gt;</code> dagi <code>&lt;String&gt;</code> nimani anglatadi?", "en": "What does <code>&lt;String&gt;</code> mean in <code>List&lt;String&gt;</code>?" },
+      "options": [
+        { "ru": "Дженерик: в списке лежат только строки, компилятор это проверит", "uz": "Generik: ro'yxatda faqat satrlar, kompilyator buni tekshiradi", "en": "A generic: the list holds only strings, and the compiler checks it" },
+        { "ru": "Это комментарий", "uz": "Bu izoh", "en": "It is a comment" },
+        { "ru": "Имя переменной", "uz": "O'zgaruvchi nomi", "en": "A variable name" },
+        { "ru": "Размер списка", "uz": "Ro'yxat hajmi", "en": "The list size" }
+      ], "a": 0,
+      "explain": { "ru": "Дженерики ловят ошибки типов на этапе компиляции — в Python такая ошибка всплыла бы только при запуске.", "uz": "Generiklar tur xatolarini kompilyatsiya bosqichida ushlaydi — Python'da bunday xato faqat ishga tushirishda chiqardi.", "en": "Generics catch type errors at compile time — in Python the same bug would only appear at runtime." } },
+    { "q": { "ru": "Почему имя файла должно совпадать с именем класса?", "uz": "Nima uchun fayl nomi sinf nomiga mos kelishi kerak?", "en": "Why must the file name match the class name?" },
+      "options": [
+        { "ru": "Так требует компилятор Java для публичных классов", "uz": "Java kompilyatori ommaviy sinflar uchun shuni talab qiladi", "en": "The Java compiler requires it for public classes" },
+        { "ru": "Для красоты", "uz": "Chiroyli bo'lishi uchun", "en": "For looks" },
+        { "ru": "Это необязательно", "uz": "Bu shart emas", "en": "It is optional" },
+        { "ru": "Чтобы код работал быстрее", "uz": "Kod tezroq ishlashi uchun", "en": "To make the code faster" }
+      ], "a": 0,
+      "explain": { "ru": "Строгое правило языка: <code>public class Main</code> обязан лежать в <code>Main.java</code>.", "uz": "Tilning qat'iy qoidasi: <code>public class Main</code> <code>Main.java</code> da yotishi shart.", "en": "A hard language rule: <code>public class Main</code> must live in <code>Main.java</code>." } },
+    { "q": { "ru": "Какие известные инструменты Data Engineer написаны на JVM?", "uz": "Data Engineer'ning qaysi mashhur vositalari JVM da yozilgan?", "en": "Which well-known data-engineering tools run on the JVM?" },
+      "options": [
+        { "ru": "Apache Spark, Kafka, Hadoop", "uz": "Apache Spark, Kafka, Hadoop", "en": "Apache Spark, Kafka, Hadoop" },
+        { "ru": "Только Excel", "uz": "Faqat Excel", "en": "Only Excel" },
+        { "ru": "Никакие", "uz": "Hech qaysi", "en": "None" },
+        { "ru": "Только SQLite", "uz": "Faqat SQLite", "en": "Only SQLite" }
+      ], "a": 0,
+      "explain": { "ru": "Поэтому знание Java полезно инженеру данных: при разборе ошибок Spark ты будешь видеть стектрейсы JVM.", "uz": "Shuning uchun Java bilish ma'lumot muhandisi uchun foydali: Spark xatolarini tahlil qilishda JVM stektreyslarini ko'rasiz.", "en": "That is why Java knowledge helps a data engineer: debugging Spark means reading JVM stack traces." } },
+    { "q": { "ru": "Есть ли в Java функции вне классов?", "uz": "Java'da sinflardan tashqarida funksiyalar bormi?", "en": "Are there functions outside classes in Java?" },
+      "options": [
+        { "ru": "Да, как в Python", "uz": "Ha, Python'dagi kabi", "en": "Yes, like in Python" },
+        { "ru": "Нет, весь код живёт внутри классов", "uz": "Yo'q, butun kod sinflar ichida yashaydi", "en": "No, all code lives inside classes" },
+        { "ru": "Только в новых версиях", "uz": "Faqat yangi versiyalarda", "en": "Only in newer versions" },
+        { "ru": "Только статические", "uz": "Faqat statiklar", "en": "Only static ones" }
+      ], "a": 1,
+      "explain": { "ru": "Даже точка входа <code>main</code> — это статический метод класса.", "uz": "Hatto kirish nuqtasi <code>main</code> ham sinfning statik metodi.", "en": "Even the entry point <code>main</code> is a static method of a class." } }
+   ],
+   "tasks": [
+    { "id": "t1", "kind": "java",
+      "title": { "ru": "Класс игрока", "uz": "O'yinchi sinfi", "en": "A player class" },
+      "brief": { "ru": "private поля + геттеры", "uz": "private maydonlar + getterlar", "en": "private fields + getters" },
+      "desc": { "ru": "<p>Напиши класс <code>Player</code>: приватные поля <code>name</code> и <code>hp</code>, конструктор, метод <code>takeDamage(int)</code> (hp не уходит ниже нуля) и геттеры.</p>", "uz": "<p><code>Player</code> sinfini yozing: private <code>name</code> va <code>hp</code> maydonlari, konstruktor, <code>takeDamage(int)</code> metodi va getterlar.</p>", "en": "<p>Write a <code>Player</code> class: private <code>name</code> and <code>hp</code> fields, a constructor, a <code>takeDamage(int)</code> method (hp never below zero) and getters.</p>" },
+      "starter": "public class Player {\n    // твой код\n\n    public static void main(String[] args) {\n        Player hero = new Player(\"Азиз\", 100);\n        hero.takeDamage(30);\n        System.out.println(hero.getName() + \": \" + hero.getHp());   // Азиз: 70\n    }\n}\n",
+      "solution": "public class Player {\n    private String name;\n    private int hp;\n\n    public Player(String name, int hp) {\n        this.name = name;      // this отличает поле от параметра с тем же именем\n        this.hp = hp;\n    }\n\n    public void takeDamage(int dmg) {\n        hp = Math.max(0, hp - dmg);   // не уходим в минус\n    }\n\n    public String getName() { return name; }\n    public int getHp() { return hp; }\n\n    public static void main(String[] args) {\n        Player hero = new Player(\"Азиз\", 100);\n        hero.takeDamage(30);\n        System.out.println(hero.getName() + \": \" + hero.getHp());   // Азиз: 70\n    }\n}",
+      "hint": { "ru": "Внутри конструктора пиши this.name = name. В takeDamage: hp = Math.max(0, hp - dmg).", "uz": "Konstruktor ichida this.name = name yozing. takeDamage da: hp = Math.max(0, hp - dmg).", "en": "Inside the constructor write this.name = name. In takeDamage: hp = Math.max(0, hp - dmg)." } },
+    { "id": "t2", "kind": "java",
+      "title": { "ru": "Сумма чётных из списка", "uz": "Ro'yxatdagi juftlar yig'indisi", "en": "Sum of evens from a list" },
+      "brief": { "ru": "List и цикл for-each", "uz": "List va for-each sikli", "en": "List and the for-each loop" },
+      "desc": { "ru": "<p>Напиши метод <code>static int sumEven(List&lt;Integer&gt; nums)</code>, возвращающий сумму чётных элементов.</p>", "uz": "<p><code>static int sumEven(List&lt;Integer&gt; nums)</code> metodini yozing: juft elementlar yig'indisini qaytarsin.</p>", "en": "<p>Write a method <code>static int sumEven(List&lt;Integer&gt; nums)</code> returning the sum of the even elements.</p>" },
+      "starter": "import java.util.*;\n\npublic class Main {\n    static int sumEven(List<Integer> nums) {\n        // твой код\n    }\n\n    public static void main(String[] args) {\n        List<Integer> data = Arrays.asList(1, 2, 3, 4, 5, 6);\n        System.out.println(sumEven(data));   // 12\n    }\n}\n",
+      "solution": "import java.util.*;\n\npublic class Main {\n    static int sumEven(List<Integer> nums) {\n        int total = 0;\n        for (int n : nums) {          // for-each: как for in в Python\n            if (n % 2 == 0) total += n;\n        }\n        return total;\n    }\n\n    public static void main(String[] args) {\n        List<Integer> data = Arrays.asList(1, 2, 3, 4, 5, 6);\n        System.out.println(sumEven(data));   // 12\n    }\n}",
+      "hint": { "ru": "for (int n : nums) { if (n % 2 == 0) total += n; } — for-each работает как for in в Python.", "uz": "for (int n : nums) { if (n % 2 == 0) total += n; }", "en": "for (int n : nums) { if (n % 2 == 0) total += n; } — for-each works like Python's for in." } },
+    { "id": "t3", "kind": "java",
+      "title": { "ru": "Подсчёт слов через HashMap", "uz": "HashMap orqali so'zlarni hisoblash", "en": "Word counting with HashMap" },
+      "brief": { "ru": "Map и getOrDefault", "uz": "Map va getOrDefault", "en": "Map and getOrDefault" },
+      "desc": { "ru": "<p>Напиши метод <code>static Map&lt;String,Integer&gt; countWords(String[] words)</code>, возвращающий, сколько раз встречается каждое слово.</p><p>Подсказка: <code>getOrDefault</code> — это <code>dict.get(key, 0)</code> из Python.</p>", "uz": "<p><code>static Map&lt;String,Integer&gt; countWords(String[] words)</code> metodini yozing: har bir so'z necha marta uchraganini qaytarsin.</p><p>Maslahat: <code>getOrDefault</code> — bu Python'dagi <code>dict.get(key, 0)</code>.</p>", "en": "<p>Write <code>static Map&lt;String,Integer&gt; countWords(String[] words)</code> returning how many times each word occurs.</p><p>Hint: <code>getOrDefault</code> is Python's <code>dict.get(key, 0)</code>.</p>" },
+      "starter": "import java.util.*;\n\npublic class Main {\n    static Map<String, Integer> countWords(String[] words) {\n        // твой код\n    }\n\n    public static void main(String[] args) {\n        System.out.println(countWords(new String[]{\"java\", \"sql\", \"java\"}));\n    }\n}\n",
+      "solution": "import java.util.*;\n\npublic class Main {\n    static Map<String, Integer> countWords(String[] words) {\n        Map<String, Integer> counts = new HashMap<>();\n        for (String w : words) {\n            counts.put(w, counts.getOrDefault(w, 0) + 1);   // как dict.get(w, 0) + 1\n        }\n        return counts;\n    }\n\n    public static void main(String[] args) {\n        System.out.println(countWords(new String[]{\"java\", \"sql\", \"java\"}));\n        // {java=2, sql=1}\n    }\n}",
+      "hint": { "ru": "counts.put(w, counts.getOrDefault(w, 0) + 1) — прямой аналог питоновского counts[w] = counts.get(w, 0) + 1.", "uz": "counts.put(w, counts.getOrDefault(w, 0) + 1)", "en": "counts.put(w, counts.getOrDefault(w, 0) + 1) — the direct analogue of Python's counts[w] = counts.get(w, 0) + 1." } }
+   ],
+   "exam": {
+    "time": 420,
+    "questions": [
+     { "q": { "ru": "Что исполняет байт-код Java?", "uz": "Java bayt-kodini nima bajaradi?", "en": "What executes Java bytecode?" },
+       "options": [{ "ru": "Процессор напрямую", "uz": "Protsessor bevosita", "en": "The processor directly" }, { "ru": "JVM — виртуальная машина Java", "uz": "JVM — Java virtual mashinasi", "en": "The JVM — the Java Virtual Machine" }, { "ru": "Браузер", "uz": "Brauzer", "en": "The browser" }, { "ru": "Операционная система", "uz": "Operatsion tizim", "en": "The operating system" }], "a": 1 },
+     { "q": { "ru": "<code>counts.getOrDefault(w, 0)</code> — аналог чего в Python?", "uz": "<code>counts.getOrDefault(w, 0)</code> Python'da nimaning analogi?", "en": "<code>counts.getOrDefault(w, 0)</code> is the analogue of what in Python?" },
+       "options": [{ "ru": "counts[w]", "uz": "counts[w]", "en": "counts[w]" }, { "ru": "counts.get(w, 0)", "uz": "counts.get(w, 0)", "en": "counts.get(w, 0)" }, { "ru": "len(counts)", "uz": "len(counts)", "en": "len(counts)" }, { "ru": "counts.pop(w)", "uz": "counts.pop(w)", "en": "counts.pop(w)" }], "a": 1 },
+     { "q": { "ru": "Что делает <code>this</code> в конструкторе?", "uz": "Konstruktorda <code>this</code> nima qiladi?", "en": "What does <code>this</code> do in a constructor?" },
+       "options": [{ "ru": "Отличает поле объекта от параметра с тем же именем", "uz": "Obyekt maydonini bir xil nomli parametrdan ajratadi", "en": "Distinguishes the object's field from a parameter of the same name" }, { "ru": "Создаёт новый объект", "uz": "Yangi obyekt yaratadi", "en": "Creates a new object" }, { "ru": "Удаляет объект", "uz": "Obyektni o'chiradi", "en": "Deletes the object" }, { "ru": "Ничего", "uz": "Hech narsa", "en": "Nothing" }], "a": 0 },
+     { "q": { "ru": "<code>\"abc\" == \"abc\"</code> в Java — на что можно полагаться?", "uz": "Java'da <code>\"abc\" == \"abc\"</code> — nimaga tayanish mumkin?", "en": "<code>\"abc\" == \"abc\"</code> in Java — what can you rely on?" },
+       "options": [{ "ru": "Всегда true, можно так сравнивать", "uz": "Har doim true, shunday solishtirish mumkin", "en": "Always true, safe to compare that way" }, { "ru": "Ни на что: == сравнивает ссылки, нужен .equals()", "uz": "Hech nimaga: == havolalarni solishtiradi, .equals() kerak", "en": "Nothing: == compares references, use .equals()" }, { "ru": "Всегда false", "uz": "Har doim false", "en": "Always false" }, { "ru": "Ошибка компиляции", "uz": "Kompilyatsiya xatosi", "en": "A compilation error" }], "a": 1 },
+     { "q": { "ru": "<code>ArrayList</code> — это реализация чего?", "uz": "<code>ArrayList</code> — bu nimaning amalga oshirilishi?", "en": "<code>ArrayList</code> is an implementation of what?" },
+       "options": [{ "ru": "Интерфейса List", "uz": "List interfeysining", "en": "The List interface" }, { "ru": "Класса Map", "uz": "Map sinfining", "en": "The Map class" }, { "ru": "Интерфейса Set", "uz": "Set interfeysining", "en": "The Set interface" }, { "ru": "Это не коллекция", "uz": "Bu to'plam emas", "en": "It is not a collection" }], "a": 0 }
+    ],
+    "tasks": [
+     { "kind": "java",
+       "title": { "ru": "Наследование: Archer расширяет Unit", "uz": "Meros: Archer Unit ni kengaytiradi", "en": "Inheritance: Archer extends Unit" },
+       "desc": { "ru": "<p>Дан класс <code>Unit</code>. Создай класс <code>Archer</code>, наследующий его (<code>extends</code>), с методом <code>shoot()</code>, который печатает <code>«имя стреляет!»</code>. Конструктор должен вызвать родительский через <code>super()</code>.</p>", "uz": "<p><code>Unit</code> sinfi berilgan. Uni meros oluvchi (<code>extends</code>) <code>Archer</code> sinfini <code>shoot()</code> metodi bilan yarating. Konstruktor <code>super()</code> orqali ota-onasini chaqirishi kerak.</p>", "en": "<p>Given a class <code>Unit</code>, create an <code>Archer</code> class that <code>extends</code> it, with a <code>shoot()</code> method printing <code>«name shoots!»</code>. The constructor must call the parent via <code>super()</code>.</p>" },
+       "starter": "class Unit {\n    protected String name;\n\n    public Unit(String name) {\n        this.name = name;\n    }\n\n    public void info() {\n        System.out.println(\"Юнит: \" + name);\n    }\n}\n\n// твой класс Archer\n\npublic class Main {\n    public static void main(String[] args) {\n        Archer a = new Archer(\"Леголас\");\n        a.info();\n        a.shoot();\n    }\n}\n",
+       "solution": "class Unit {\n    protected String name;      // protected: видно наследникам\n\n    public Unit(String name) {\n        this.name = name;\n    }\n\n    public void info() {\n        System.out.println(\"Юнит: \" + name);\n    }\n}\n\nclass Archer extends Unit {\n    public Archer(String name) {\n        super(name);            // вызов конструктора родителя - обязателен первой строкой\n    }\n\n    public void shoot() {\n        System.out.println(name + \" стреляет!\");\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Archer a = new Archer(\"Леголас\");\n        a.info();      // унаследованный метод\n        a.shoot();     // собственный метод\n    }\n}" }
+    ]
+   }
+  }
+ ]
+}

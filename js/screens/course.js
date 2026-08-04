@@ -11,11 +11,16 @@ import { hintLevels, explainError } from '../core/mentor.js';
 /* ---------- раннеры для блоков и задач ---------- */
 const runners = {
   py: async (code, onStatus) => window.PyRunner.run(code, '', [], onStatus),
+  js: async (code, onStatus) => window.JsRunner.run(code, '', [], onStatus),
   sql: async (code, onStatus) => {
     const res = await window.SqlRunner.run(code, onStatus);
     return res.error ? { error: res.error } : { html: window.SqlRunner.tableHtml(res.result) };
   },
 };
+
+/** Язык задачи: python | javascript | sql | компилируемые (без запуска). */
+const RUNNABLE = { python: 'py', javascript: 'js', sql: 'sql' };
+const LANG_LABEL = { c: 'C', cpp: 'C++', csharp: 'C#', java: 'Java' };
 
 /* ---------- страница курса ---------- */
 export async function renderCourse(root, courseId) {
@@ -279,17 +284,20 @@ function renderTask(root, courseId, course, m, taskId) {
   const saveKey = 'pyquest_code_' + courseId + '_' + m.id + '_' + taskId;
   const saved = localStorage.getItem(saveKey);
   const isSql = task.kind === 'sql';
+  const runnerKey = RUNNABLE[task.kind];        // undefined для C/C++/C#/Java — их не запускаем
+  const runnable = !!runnerKey;
 
   root.innerHTML = modHeader(courseId, course, m, 'tasks') +
     '<section class="task-view">' +
     '<a class="back-link" href="#/course/' + courseId + '/module/' + m.id + '/tasks">' + ic('chevron', 'flip') + ' ' + esc(t('task.allTasks')) + '</a>' +
     '<h2>' + (st.tasks[taskId] ? ic('check', 'ok') + ' ' : '') + esc(tr(task.title)) + '</h2>' +
     '<div class="task-desc">' + tr(task.desc) + '</div>' +
+    (runnable ? '' : '<div class="notice small">' + ic('info') + ' ' + esc(t('task.noRunner', { lang: LANG_LABEL[task.kind] || task.kind })) + '</div>') +
     '<label class="sr-only" for="ed">' + esc(t('module.tasks')) + '</label>' +
     '<textarea class="editor" id="ed" spellcheck="false">' + esc(saved !== null ? saved : task.starter) + '</textarea>' +
     '<div class="task-actions">' +
-    '<button class="btn blue" id="run-btn">' + ic('play') + ' ' + esc(t(isSql ? 'task.runSql' : 'task.run')) + '</button>' +
-    '<button class="btn" id="check-btn">' + ic('check') + ' ' + esc(t('task.check')) + '</button>' +
+    (runnable ? '<button class="btn blue" id="run-btn">' + ic('play') + ' ' + esc(t(isSql ? 'task.runSql' : 'task.run')) + '</button>' : '') +
+    '<button class="btn" id="check-btn">' + ic('check') + ' ' + esc(t(runnable ? 'task.check' : 'task.selfCheck')) + '</button>' +
     '<button class="btn secondary small" id="hint-btn">' + ic('info') + ' ' + esc(t('mentor.hint')) + '</button>' +
     '<button class="btn secondary small" id="reset-btn">' + esc(t('task.reset')) + '</button>' +
     '<span class="py-loading" id="py-status" role="status"></span></div>' +
@@ -360,11 +368,22 @@ function renderTask(root, courseId, course, m, taskId) {
           }
           out.innerHTML = html;
         }
+      } else if (!runnable) {
+        /* Компилируемые языки: запускать в браузере нечем, поэтому предлагаем
+           сверить решение с эталоном и проверить себя честно. */
+        status.textContent = '';
+        out.innerHTML = '<div class="self-check">' +
+          '<p>' + esc(t('task.selfCheckHint')) + '</p>' +
+          (task.solution ? codeBlock(task.solution, task.kind) : '') +
+          '</div>';
+        if (withCheck) solved();
       } else {
-        const res = await window.PyRunner.run(ed.value, withCheck ? task.tests : '', task.stdin || [], s => { status.textContent = s; });
+        const runner = runnerKey === 'js' ? window.JsRunner : window.PyRunner;
+        const res = await runner.run(ed.value, withCheck ? task.tests : '', task.stdin || [], s => { status.textContent = s; });
         status.textContent = '';
         if (res.err) {
-          out.innerHTML = '<span class="err">' + esc(res.err) + '</span>' + mentorNote(res.err, 'python');
+          out.innerHTML = '<span class="err">' + esc(res.err) + '</span>' +
+            (runnerKey === 'py' ? mentorNote(res.err, 'python') : '');
           return;
         }
         let html = esc(res.out || t('lesson.noOutput'));
@@ -379,6 +398,7 @@ function renderTask(root, courseId, course, m, taskId) {
       out.innerHTML = '<span class="err">⚠ ' + esc(e.message) + '</span>';
     }
   }
-  root.querySelector('#run-btn').addEventListener('click', () => exec(false));
+  const runBtn = root.querySelector('#run-btn');
+  if (runBtn) runBtn.addEventListener('click', () => exec(false));
   root.querySelector('#check-btn').addEventListener('click', () => exec(true));
 }

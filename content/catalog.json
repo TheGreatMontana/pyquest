@@ -140,6 +140,69 @@
     "uz": "Quvurlar va orkestratsiya",
     "en": "Pipelines and orchestration"
    }
+  },
+  {
+   "id": "js-syntax",
+   "category": "language",
+   "title": {
+    "ru": "Синтаксис JavaScript",
+    "uz": "JavaScript sintaksisi",
+    "en": "JavaScript syntax"
+   }
+  },
+  {
+   "id": "js-collections",
+   "category": "language",
+   "title": {
+    "ru": "Массивы и объекты JS",
+    "uz": "JS massiv va obyektlari",
+    "en": "JS arrays and objects"
+   }
+  },
+  {
+   "id": "c-memory",
+   "category": "language",
+   "title": {
+    "ru": "Память и указатели",
+    "uz": "Xotira va ko'rsatkichlar",
+    "en": "Memory and pointers"
+   }
+  },
+  {
+   "id": "cpp-oop",
+   "category": "language",
+   "title": {
+    "ru": "ООП в C++",
+    "uz": "C++ da OOP",
+    "en": "C++ OOP"
+   }
+  },
+  {
+   "id": "csharp-basics-skill",
+   "category": "language",
+   "title": {
+    "ru": "Основы C# и .NET",
+    "uz": "C# va .NET asoslari",
+    "en": "C# and .NET fundamentals"
+   }
+  },
+  {
+   "id": "java-basics-skill",
+   "category": "language",
+   "title": {
+    "ru": "Основы Java и JVM",
+    "uz": "Java va JVM asoslari",
+    "en": "Java and JVM fundamentals"
+   }
+  },
+  {
+   "id": "static-typing",
+   "category": "cs",
+   "title": {
+    "ru": "Статическая типизация",
+    "uz": "Statik turlash",
+    "en": "Static typing"
+   }
   }
  ],
  "courses": [
@@ -432,6 +495,143 @@
    ],
    "legacyIds": [],
    "moduleCount": 2
+  },
+  {
+   "id": "javascript-basics",
+   "title": {
+    "ru": "JavaScript: основы",
+    "uz": "JavaScript: asoslar",
+    "en": "JavaScript Fundamentals"
+   },
+   "description": {
+    "ru": "Язык браузера: переменные, массивы, объекты, стрелочные функции и методы map/filter/reduce. Код выполняется прямо здесь.",
+    "uz": "Brauzer tili: o'zgaruvchilar, massivlar, obyektlar, strelkali funksiyalar va map/filter/reduce metodlari. Kod shu yerda bajariladi.",
+    "en": "The browser language: variables, arrays, objects, arrow functions and map/filter/reduce. The code runs right here."
+   },
+   "glyph": "code",
+   "color": "#fbbf24",
+   "level": "beginner",
+   "status": "full",
+   "estimatedHours": 10,
+   "requires": [],
+   "grants": [
+    "js-syntax",
+    "js-collections"
+   ],
+   "legacyIds": [],
+   "moduleCount": 1,
+   "runner": "javascript"
+  },
+  {
+   "id": "c-basics",
+   "title": {
+    "ru": "C: основы и память",
+    "uz": "C: asoslar va xotira",
+    "en": "C: fundamentals and memory"
+   },
+   "description": {
+    "ru": "Язык, на котором написаны Linux и сам Python: типы, указатели, ручное управление памятью и компиляция.",
+    "uz": "Linux va Python'ning o'zi yozilgan til: turlar, ko'rsatkichlar, xotirani qo'lda boshqarish va kompilyatsiya.",
+    "en": "The language behind Linux and Python itself: types, pointers, manual memory management and compilation."
+   },
+   "glyph": "cpu",
+   "color": "#94a3b8",
+   "level": "intermediate",
+   "status": "full",
+   "estimatedHours": 12,
+   "requires": [
+    "python-control-flow"
+   ],
+   "grants": [
+    "c-memory",
+    "static-typing"
+   ],
+   "legacyIds": [],
+   "moduleCount": 1,
+   "compiled": true
+  },
+  {
+   "id": "cpp-basics",
+   "title": {
+    "ru": "C++: классы и STL",
+    "uz": "C++: sinflar va STL",
+    "en": "C++: classes and the STL"
+   },
+   "description": {
+    "ru": "C плюс объекты: классы, ссылки, контейнеры STL и умные указатели. Язык игровых движков и высоконагруженных систем.",
+    "uz": "C va obyektlar: sinflar, havolalar, STL konteynerlari va aqlli ko'rsatkichlar. O'yin dvigatellari tili.",
+    "en": "C plus objects: classes, references, STL containers and smart pointers. The language of game engines and high-load systems."
+   },
+   "glyph": "cpu",
+   "color": "#818cf8",
+   "level": "advanced",
+   "status": "full",
+   "estimatedHours": 14,
+   "requires": [
+    "c-memory"
+   ],
+   "grants": [
+    "cpp-oop"
+   ],
+   "legacyIds": [],
+   "moduleCount": 1,
+   "compiled": true
+  },
+  {
+   "id": "csharp-basics",
+   "title": {
+    "ru": "C#: основы и LINQ",
+    "uz": "C#: asoslar va LINQ",
+    "en": "C#: fundamentals and LINQ"
+   },
+   "description": {
+    "ru": "Язык экосистемы Microsoft: свойства, строгая типизация, сборщик мусора и LINQ — SQL прямо внутри кода.",
+    "uz": "Microsoft ekotizimi tili: xususiyatlar, qat'iy turlash, axlat yig'uvchi va LINQ — kod ichidagi SQL.",
+    "en": "The Microsoft ecosystem language: properties, static typing, garbage collection and LINQ — SQL inside your code."
+   },
+   "glyph": "layers",
+   "color": "#a78bfa",
+   "level": "intermediate",
+   "status": "full",
+   "estimatedHours": 10,
+   "requires": [
+    "python-oop"
+   ],
+   "grants": [
+    "csharp-basics-skill",
+    "static-typing"
+   ],
+   "legacyIds": [],
+   "moduleCount": 1,
+   "compiled": true
+  },
+  {
+   "id": "java-basics",
+   "title": {
+    "ru": "Java: основы и JVM",
+    "uz": "Java: asoslar va JVM",
+    "en": "Java: fundamentals and the JVM"
+   },
+   "description": {
+    "ru": "Язык корпоративных систем и Android. JVM, классы, коллекции — а заодно фундамент под Spark, Kafka и Hadoop.",
+    "uz": "Korporativ tizimlar va Android tili. JVM, sinflar, to'plamlar — Spark, Kafka va Hadoop uchun poydevor.",
+    "en": "The language of enterprise systems and Android. The JVM, classes, collections — and the foundation under Spark, Kafka and Hadoop."
+   },
+   "glyph": "cup",
+   "color": "#f97316",
+   "level": "intermediate",
+   "status": "full",
+   "estimatedHours": 12,
+   "requires": [
+    "python-oop"
+   ],
+   "grants": [
+    "java-basics-skill",
+    "static-typing"
+   ],
+   "legacyIds": [],
+   "moduleCount": 1,
+   "compiled": true
   }
  ],
  "careerPaths": [
@@ -536,6 +736,19 @@
      "courses": [
       "algorithms"
      ]
+    },
+    {
+     "id": "be-st5",
+     "title": {
+      "ru": "Второй язык",
+      "uz": "Ikkinchi til",
+      "en": "A second language"
+     },
+     "courses": [
+      "javascript-basics",
+      "java-basics",
+      "csharp-basics"
+     ]
     }
    ]
   },
@@ -613,6 +826,151 @@
       "en": "Databases and injection"
      },
      "courses": [
+      "sql-basics"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "frontend-path",
+   "stages": [
+    {
+     "id": "fe-st1",
+     "title": {
+      "ru": "Язык браузера",
+      "uz": "Brauzer tili",
+      "en": "The browser language"
+     },
+     "courses": [
+      "javascript-basics"
+     ]
+    },
+    {
+     "id": "fe-st2",
+     "title": {
+      "ru": "Как работает веб",
+      "uz": "Veb qanday ishlaydi",
+      "en": "How the web works"
+     },
+     "courses": [
+      "backend-intro"
+     ]
+    },
+    {
+     "id": "fe-st3",
+     "title": {
+      "ru": "Алгоритмы для собеседований",
+      "uz": "Suhbatlar uchun algoritmlar",
+      "en": "Interview algorithms"
+     },
+     "courses": [
+      "algorithms"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fullstack-path",
+   "stages": [
+    {
+     "id": "fs-st1",
+     "title": {
+      "ru": "Фронтенд: JavaScript",
+      "uz": "Frontend: JavaScript",
+      "en": "Frontend: JavaScript"
+     },
+     "courses": [
+      "javascript-basics"
+     ]
+    },
+    {
+     "id": "fs-st2",
+     "title": {
+      "ru": "Бэкенд: Python и API",
+      "uz": "Backend: Python va API",
+      "en": "Backend: Python and APIs"
+     },
+     "courses": [
+      "python-basics",
+      "python-intermediate",
+      "backend-intro"
+     ]
+    },
+    {
+     "id": "fs-st3",
+     "title": {
+      "ru": "Данные",
+      "uz": "Ma'lumotlar",
+      "en": "Data"
+     },
+     "courses": [
+      "sql-basics",
+      "sql-advanced"
+     ]
+    },
+    {
+     "id": "fs-st4",
+     "title": {
+      "ru": "Безопасность и алгоритмы",
+      "uz": "Xavfsizlik va algoritmlar",
+      "en": "Security and algorithms"
+     },
+     "courses": [
+      "security-intro",
+      "algorithms"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "se-path",
+   "stages": [
+    {
+     "id": "se-st1",
+     "title": {
+      "ru": "Первый язык",
+      "uz": "Birinchi til",
+      "en": "Your first language"
+     },
+     "courses": [
+      "python-basics",
+      "python-intermediate",
+      "python-advanced"
+     ]
+    },
+    {
+     "id": "se-st2",
+     "title": {
+      "ru": "Как устроен компьютер: C",
+      "uz": "Kompyuter qanday ishlaydi: C",
+      "en": "How a computer works: C"
+     },
+     "courses": [
+      "c-basics"
+     ]
+    },
+    {
+     "id": "se-st3",
+     "title": {
+      "ru": "Промышленные языки",
+      "uz": "Sanoat tillari",
+      "en": "Industry languages"
+     },
+     "courses": [
+      "cpp-basics",
+      "java-basics",
+      "csharp-basics"
+     ]
+    },
+    {
+     "id": "se-st4",
+     "title": {
+      "ru": "Алгоритмы и данные",
+      "uz": "Algoritmlar va ma'lumotlar",
+      "en": "Algorithms and data"
+     },
+     "courses": [
+      "algorithms",
       "sql-basics"
      ]
     }
@@ -789,7 +1147,7 @@
    "id": "frontend",
    "glyph": "code",
    "color": "#38bdf8",
-   "status": "planned",
+   "status": "starter",
    "title": {
     "ru": "Фронтенд-разработка",
     "uz": "Frontend dasturlash",
@@ -799,13 +1157,14 @@
     "ru": "HTML, CSS, JavaScript и интерфейсы",
     "uz": "HTML, CSS, JavaScript va interfeyslar",
     "en": "HTML, CSS, JavaScript and interfaces"
-   }
+   },
+   "careerPath": "frontend-path"
   },
   {
    "id": "fullstack",
    "glyph": "layers",
    "color": "#34d399",
-   "status": "planned",
+   "status": "starter",
    "title": {
     "ru": "Full-Stack разработка",
     "uz": "Full-Stack dasturlash",
@@ -815,7 +1174,8 @@
     "ru": "Фронтенд и бэкенд в одном пути",
     "uz": "Frontend va backend bir yo'lda",
     "en": "Frontend and backend in one path"
-   }
+   },
+   "careerPath": "fullstack-path"
   },
   {
    "id": "big-data",
@@ -869,7 +1229,7 @@
    "id": "software-engineering",
    "glyph": "code",
    "color": "#a78bfa",
-   "status": "planned",
+   "status": "full",
    "title": {
     "ru": "Основы разработки ПО",
     "uz": "Dasturiy ta'minot asoslari",
@@ -879,7 +1239,8 @@
     "ru": "Git, тестирование, архитектура и код-ревью",
     "uz": "Git, testlash, arxitektura va kod-revyu",
     "en": "Git, testing, architecture and code review"
-   }
+   },
+   "careerPath": "se-path"
   }
  ],
  "legacyMap": {

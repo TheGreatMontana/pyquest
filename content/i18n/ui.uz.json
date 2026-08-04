@@ -261,5 +261,9 @@
   "bookmark.add": "Xatcho'plarga qo'shish",
   "bookmark.remove": "Xatcho'plardan olib tashlash",
   "bookmark.added": "Xatcho'plarga qo'shildi",
-  "bookmark.removed": "Xatcho'plardan olib tashlandi"
+  "bookmark.removed": "Xatcho'plardan olib tashlandi",
+  "task.noRunner": "{lang} kodi kompilyatsiya qilinadi, shuning uchun uni to'g'ridan-to'g'ri brauzerda ishga tushirib bo'lmaydi. Yechimni shu yerda yozing, o'zingizning IDE'ingizda tekshiring, «Solishtirish» tugmasi esa namunani ko'rsatadi.",
+  "task.selfCheck": "Namuna bilan solishtirish",
+  "task.selfCheckHint": "Kodingizni namunaviy yechim bilan solishtiring. Mantiq mos kelsa — masala hisobga olinadi. Bu yerda halollik faqat sizniki.",
+  "task.runLocally": "O'zingizda qanday ishga tushirish"
 }

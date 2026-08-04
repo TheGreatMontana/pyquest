@@ -26,12 +26,16 @@ export function renderBlock(b, i) {
     case 'code': return codeBlock(b.code, b.lang);
 
     case 'run':
-    case 'sqlrun':
-      return codeBlock(b.code, b.lang || (b.type === 'sqlrun' ? 'sql' : 'python')) +
+    case 'jsrun':
+    case 'sqlrun': {
+      const kind = b.type === 'sqlrun' ? 'sql' : b.type === 'jsrun' ? 'js' : 'py';
+      const lang = b.lang || (kind === 'sql' ? 'sql' : kind === 'js' ? 'javascript' : 'python');
+      return codeBlock(b.code, lang) +
         '<div class="try-box" data-block="' + i + '">' +
-        '<button class="btn small blue" data-run="' + (b.type === 'sqlrun' ? 'sql' : 'py') + '" data-i="' + i + '">' +
-        ic('play') + ' ' + esc(t(b.type === 'sqlrun' ? 'lesson.runSql' : 'lesson.run')) + '</button>' +
+        '<button class="btn small blue" data-run="' + kind + '" data-i="' + i + '">' +
+        ic('play') + ' ' + esc(t(kind === 'sql' ? 'lesson.runSql' : 'lesson.run')) + '</button>' +
         '<div class="try-out" hidden></div></div>';
+    }
 
     case 'note': {
       const kind = b.kind || 'note';
@@ -134,12 +138,13 @@ export function bindBlocks(container, blocks, runners) {
       const out = btn.parentElement.querySelector('.try-out');
       out.hidden = false;
       out.textContent = t('lesson.running');
+      const kind = btn.getAttribute('data-run');
       try {
-        if (btn.getAttribute('data-run') === 'sql') {
+        if (kind === 'sql') {
           const res = await runners.sql(b.code, s => { out.textContent = s || '…'; });
           out.innerHTML = res.error ? '<span class="err">' + esc(res.error) + '</span>' : res.html;
         } else {
-          const res = await runners.py(b.code, s => { out.textContent = s || '…'; });
+          const res = await runners[kind](b.code, s => { out.textContent = s || '…'; });
           out.textContent = res.err ? res.err : (res.out || t('lesson.noOutput'));
         }
       } catch (e) { out.textContent = '⚠ ' + e.message; }
@@ -271,10 +276,11 @@ export function bindBlocks(container, blocks, runners) {
   });
 }
 
-/** Есть ли в уроке блоки, требующие Python/SQL — чтобы прогреть раннер заранее. */
+/** Есть ли в уроке блоки, требующие раннера — чтобы прогреть его заранее. */
 export function needsRunner(blocks) {
   return {
     py: blocks.some(b => b.type === 'run' || (b.type === 'predict' && (!b.lang || b.lang === 'python'))),
+    js: blocks.some(b => b.type === 'jsrun' || (b.type === 'predict' && b.lang === 'javascript')),
     sql: blocks.some(b => b.type === 'sqlrun'),
   };
 }

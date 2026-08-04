@@ -1,0 +1,193 @@
+{
+ "id": "c-basics",
+ "schema": 2,
+ "modules": [
+  {
+   "id": "c-01",
+   "title": { "ru": "C: язык, на котором написано всё", "uz": "C: hamma narsa yozilgan til", "en": "C: the language everything is written in" },
+   "tagline": { "ru": "Типы, память, указатели и компиляция", "uz": "Turlar, xotira, ko'rsatkichlar va kompilyatsiya", "en": "Types, memory, pointers and compilation" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "Зачем учить C в 2026 году", "uz": "2026-yilda C ni nima uchun o'rganish kerak", "en": "Why learn C in 2026" },
+     "blocks": [
+      { "type": "text", "html": {
+        "ru": "<p>На C написаны Linux, ядро Windows, сам интерпретатор Python, SQLite и драйверы твоей видеокарты. Это язык, который стоит <b>между программой и железом</b>.</p><p>Учить C стоит не ради работы на C, а ради понимания: что такое память, почему программы падают и откуда берётся производительность.</p>",
+        "uz": "<p>C'da Linux, Windows yadrosi, Python interpretatorining o'zi, SQLite va videokartangiz drayverlari yozilgan. Bu <b>dastur va temir o'rtasida</b> turadigan til.</p><p>C ni C'da ishlash uchun emas, tushunish uchun o'rganish kerak: xotira nima, dasturlar nega yiqiladi va unumdorlik qayerdan keladi.</p>",
+        "en": "<p>Linux, the Windows kernel, the Python interpreter itself, SQLite and your graphics driver are written in C. It is the language that sits <b>between the program and the hardware</b>.</p><p>Learn C not to work in C, but to understand what memory is, why programs crash and where performance comes from.</p>" } },
+      { "type": "code", "lang": "c", "code": "#include <stdio.h>\n\nint main(void) {\n    printf(\"Привет, C!\\n\");\n    return 0;\n}" },
+      { "type": "note", "kind": "note", "html": {
+        "ru": "Ключевое отличие от Python: код на C нужно <b>скомпилировать</b> — превратить в машинные инструкции. Поэтому здесь нет кнопки «Запустить»: компилятор в браузер мы тянуть не стали, честнее собирать у себя. Команда: <code>gcc main.c -o main && ./main</code>",
+        "uz": "Python'dan asosiy farqi: C kodini <b>kompilyatsiya qilish</b> kerak — mashina buyruqlariga aylantirish. Shuning uchun bu yerda «Ishga tushirish» tugmasi yo'q: kompilyatorni brauzerga tortmadik, o'zingizda yig'gan halolroq. Buyruq: <code>gcc main.c -o main && ./main</code>",
+        "en": "The key difference from Python: C code must be <b>compiled</b> into machine instructions. That is why there is no «Run» button here — we did not drag a compiler into the browser; building it locally is more honest. Command: <code>gcc main.c -o main && ./main</code>" } }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "Типы: программист решает всё сам", "uz": "Turlar: dasturchi hammasini o'zi hal qiladi", "en": "Types: the programmer decides everything" },
+     "blocks": [
+      { "type": "text", "html": {
+        "ru": "<p>В Python тип определяется сам. В C <b>ты обязан объявить</b> тип каждой переменной — и от этого зависит, сколько байт займёт значение:</p><ul><li><code>char</code> — 1 байт, символ или маленькое число</li><li><code>int</code> — обычно 4 байта, целое</li><li><code>float</code> / <code>double</code> — 4 / 8 байт, дробное</li></ul>",
+        "uz": "<p>Python'da tur o'zi aniqlanadi. C'da <b>siz har bir o'zgaruvchining turini e'lon qilishingiz shart</b> — qiymat necha bayt egallashi shunga bog'liq:</p><ul><li><code>char</code> — 1 bayt, belgi yoki kichik son</li><li><code>int</code> — odatda 4 bayt, butun</li><li><code>float</code> / <code>double</code> — 4 / 8 bayt, kasrli</li></ul>",
+        "en": "<p>In Python the type is inferred. In C <b>you must declare</b> the type of every variable — and that determines how many bytes the value takes:</p><ul><li><code>char</code> — 1 byte, a character or small number</li><li><code>int</code> — usually 4 bytes, an integer</li><li><code>float</code> / <code>double</code> — 4 / 8 bytes, decimals</li></ul>" } },
+      { "type": "code", "lang": "c", "code": "#include <stdio.h>\n\nint main(void) {\n    int level = 7;\n    double price = 19.99;\n    char grade = 'A';\n\n    printf(\"Уровень: %d\\n\", level);\n    printf(\"Цена: %.2f\\n\", price);\n    printf(\"Оценка: %c\\n\", grade);\n    printf(\"int занимает %zu байт\\n\", sizeof(int));\n    return 0;\n}" },
+      { "type": "note", "kind": "trap", "html": {
+        "ru": "Формат в <code>printf</code> должен совпадать с типом: <code>%d</code> для int, <code>%f</code> для дробных, <code>%c</code> для символа, <code>%s</code> для строки. Ошибёшься — получишь мусор в выводе, и компилятор может даже не предупредить.",
+        "uz": "<code>printf</code> dagi format turga mos kelishi kerak: int uchun <code>%d</code>, kasrlilar uchun <code>%f</code>, belgi uchun <code>%c</code>, satr uchun <code>%s</code>. Xato qilsangiz — chiqishda axlat olasiz, kompilyator ogohlantirmasligi ham mumkin.",
+        "en": "The format in <code>printf</code> must match the type: <code>%d</code> for int, <code>%f</code> for decimals, <code>%c</code> for a character, <code>%s</code> for a string. Get it wrong and you print garbage — the compiler may not even warn you." } },
+      { "type": "predict", "lang": "c",
+        "code": "int a = 7;\nint b = 2;\nprintf(\"%d\\n\", a / b);",
+        "options": [
+          { "ru": "3.5", "uz": "3.5", "en": "3.5" },
+          { "ru": "3", "uz": "3", "en": "3" },
+          { "ru": "4", "uz": "4", "en": "4" },
+          { "ru": "Ошибка компиляции", "uz": "Kompilyatsiya xatosi", "en": "A compilation error" }
+        ], "a": 1,
+        "explain": { "ru": "Деление двух <code>int</code> в C даёт <code>int</code>: дробная часть отбрасывается, как <code>//</code> в Python. Чтобы получить 3.5, нужен хотя бы один операнд типа double: <code>(double)a / b</code>.", "uz": "C'da ikkita <code>int</code> ning bo'linishi <code>int</code> beradi: kasr qismi tashlanadi, Python'dagi <code>//</code> kabi. 3.5 olish uchun kamida bitta operand double bo'lishi kerak: <code>(double)a / b</code>.", "en": "Dividing two <code>int</code>s in C yields an <code>int</code>: the fraction is dropped, like <code>//</code> in Python. To get 3.5 one operand must be a double: <code>(double)a / b</code>." } }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "Указатели — сердце языка", "uz": "Ko'rsatkichlar — tilning yuragi", "en": "Pointers — the heart of the language" },
+     "blocks": [
+      { "type": "text", "html": {
+        "ru": "<p>Каждая переменная лежит по какому-то <b>адресу</b> в памяти. <b>Указатель</b> — это переменная, которая хранит адрес другой переменной.</p><ul><li><code>&x</code> — «взять адрес x»</li><li><code>*p</code> — «значение, лежащее по адресу p»</li></ul><p>Именно указатели позволяют функции изменить переменную вызывающего кода — в Python это происходит незаметно, здесь всё явно.</p>",
+        "uz": "<p>Har bir o'zgaruvchi xotirada qandaydir <b>manzilda</b> yotadi. <b>Ko'rsatkich</b> — bu boshqa o'zgaruvchi manzilini saqlaydigan o'zgaruvchi.</p><ul><li><code>&x</code> — «x manzilini olish»</li><li><code>*p</code> — «p manzilida yotgan qiymat»</li></ul><p>Aynan ko'rsatkichlar funksiyaga chaqiruvchi kodning o'zgaruvchisini o'zgartirishga imkon beradi.</p>",
+        "en": "<p>Every variable lives at some <b>address</b> in memory. A <b>pointer</b> is a variable holding the address of another variable.</p><ul><li><code>&x</code> — «take the address of x»</li><li><code>*p</code> — «the value stored at address p»</li></ul><p>Pointers are what let a function modify the caller's variable — in Python this happens invisibly; here it is explicit.</p>" } },
+      { "type": "code", "lang": "c", "code": "#include <stdio.h>\n\nvoid double_it(int *n) {      // принимаем АДРЕС\n    *n = *n * 2;              // меняем значение по адресу\n}\n\nint main(void) {\n    int score = 21;\n    printf(\"до:    %d\\n\", score);\n\n    double_it(&score);        // передаём адрес переменной\n    printf(\"после: %d\\n\", score);   // 42 — оригинал изменился!\n    return 0;\n}" },
+      { "type": "findbug",
+        "lines": [
+          "int *p;",
+          "*p = 42;",
+          "printf(\"%d\\n\", *p);",
+          "return 0;"
+        ],
+        "bugLine": 1,
+        "explain": { "ru": "Указатель <code>p</code> объявлен, но не инициализирован — он указывает «в никуда». Запись <code>*p = 42</code> в строке 2 портит случайную область памяти: классический segmentation fault. Правильно: сначала <code>int x; p = &x;</code> или выделить память через <code>malloc</code>.", "uz": "<code>p</code> ko'rsatkichi e'lon qilingan, lekin ishga tushirilmagan — u «hech qayerga» ko'rsatadi. 2-qatordagi <code>*p = 42</code> tasodifiy xotira sohasini buzadi: klassik segmentation fault.", "en": "The pointer <code>p</code> is declared but never initialised — it points nowhere. Writing <code>*p = 42</code> on line 2 corrupts random memory: the classic segmentation fault." } }
+     ]
+    },
+    {
+     "id": "l4",
+     "title": { "ru": "Память: выделил — освободи", "uz": "Xotira: ajratdingmi — bo'shat", "en": "Memory: allocate, then free" },
+     "blocks": [
+      { "type": "text", "html": {
+        "ru": "<p>В Python память освобождает сборщик мусора. В C <b>ты сам</b>: <code>malloc</code> выделяет, <code>free</code> возвращает системе. Забыл <code>free</code> — утечка памяти; освободил дважды — падение.</p>",
+        "uz": "<p>Python'da xotirani axlat yig'uvchi bo'shatadi. C'da <b>o'zingiz</b>: <code>malloc</code> ajratadi, <code>free</code> tizimga qaytaradi. <code>free</code> ni unutdingiz — xotira oqishi; ikki marta bo'shatdingiz — yiqilish.</p>",
+        "en": "<p>In Python the garbage collector frees memory. In C <b>you do</b>: <code>malloc</code> allocates, <code>free</code> returns it. Forget <code>free</code> and you leak; free twice and you crash.</p>" } },
+      { "type": "code", "lang": "c", "code": "#include <stdio.h>\n#include <stdlib.h>\n\nint main(void) {\n    int n = 5;\n    int *arr = malloc(n * sizeof(int));   // выделили память под 5 int\n    if (arr == NULL) return 1;            // проверять обязательно!\n\n    for (int i = 0; i < n; i++) arr[i] = i * i;\n    for (int i = 0; i < n; i++) printf(\"%d \", arr[i]);\n    printf(\"\\n\");\n\n    free(arr);                            // вернули память\n    arr = NULL;                           // чтобы не обратиться повторно\n    return 0;\n}" },
+      { "type": "order",
+        "steps": [
+          { "ru": "Объявить указатель нужного типа", "uz": "Kerakli turdagi ko'rsatkichni e'lon qilish", "en": "Declare a pointer of the right type" },
+          { "ru": "Выделить память через malloc", "uz": "malloc orqali xotira ajratish", "en": "Allocate memory with malloc" },
+          { "ru": "Проверить, что malloc не вернул NULL", "uz": "malloc NULL qaytarmaganini tekshirish", "en": "Check that malloc did not return NULL" },
+          { "ru": "Работать с данными", "uz": "Ma'lumot bilan ishlash", "en": "Work with the data" },
+          { "ru": "Освободить память через free", "uz": "free orqali xotirani bo'shatish", "en": "Release memory with free" },
+          { "ru": "Обнулить указатель, чтобы не использовать освобождённое", "uz": "Bo'shatilganini ishlatmaslik uchun ko'rsatkichni nolga tenglash", "en": "Null the pointer so freed memory is not reused" }
+        ] },
+      { "type": "summary", "items": [
+        { "ru": "C компилируется: код превращается в машинные инструкции", "uz": "C kompilyatsiya qilinadi: kod mashina buyruqlariga aylanadi", "en": "C is compiled: code becomes machine instructions" },
+        { "ru": "Тип каждой переменной объявляется явно", "uz": "Har bir o'zgaruvchining turi aniq e'lon qilinadi", "en": "Every variable's type is declared explicitly" },
+        { "ru": "Указатель хранит адрес; & берёт адрес, * читает значение", "uz": "Ko'rsatkich manzilni saqlaydi; & manzilni oladi, * qiymatni o'qiydi", "en": "A pointer stores an address; & takes it, * reads the value" },
+        { "ru": "malloc и free — твоя ответственность, а не сборщика мусора", "uz": "malloc va free — axlat yig'uvchining emas, sizning javobgarligingiz", "en": "malloc and free are your responsibility, not the collector's" }
+      ] }
+     ]
+    }
+   ],
+   "quiz": [
+    { "q": { "ru": "Что делает оператор <code>&</code> перед переменной?", "uz": "O'zgaruvchi oldidagi <code>&</code> operatori nima qiladi?", "en": "What does the <code>&</code> operator before a variable do?" },
+      "options": [
+        { "ru": "Берёт адрес переменной", "uz": "O'zgaruvchi manzilini oladi", "en": "Takes the address of the variable" },
+        { "ru": "Логическое И", "uz": "Mantiqiy VA", "en": "Logical AND" },
+        { "ru": "Копирует значение", "uz": "Qiymatni nusxalaydi", "en": "Copies the value" },
+        { "ru": "Удаляет переменную", "uz": "O'zgaruvchini o'chiradi", "en": "Deletes the variable" }
+      ], "a": 0,
+      "explain": { "ru": "<code>&x</code> — адрес переменной x в памяти. Логическое И — это <code>&&</code>, а одиночный <code>&</code> между числами — побитовое И.", "uz": "<code>&x</code> — x o'zgaruvchisining xotiradagi manzili. Mantiqiy VA — bu <code>&&</code>.", "en": "<code>&x</code> is the memory address of x. Logical AND is <code>&&</code>; a single <code>&</code> between numbers is bitwise AND." } },
+    { "q": { "ru": "Что произойдёт, если забыть <code>free</code> после <code>malloc</code>?", "uz": "<code>malloc</code> dan keyin <code>free</code> unutilsa nima bo'ladi?", "en": "What happens if you forget <code>free</code> after <code>malloc</code>?" },
+      "options": [
+        { "ru": "Ничего, память освободится сама", "uz": "Hech narsa, xotira o'zi bo'shaydi", "en": "Nothing, memory frees itself" },
+        { "ru": "Утечка памяти — программа занимает всё больше места", "uz": "Xotira oqishi — dastur tobora ko'proq joy egallaydi", "en": "A memory leak — the program keeps growing" },
+        { "ru": "Ошибка компиляции", "uz": "Kompilyatsiya xatosi", "en": "A compilation error" },
+        { "ru": "Программа не запустится", "uz": "Dastur ishga tushmaydi", "en": "The program will not start" }
+      ], "a": 1,
+      "explain": { "ru": "В C нет сборщика мусора. Долгоживущий сервер с утечкой рано или поздно съест всю память машины.", "uz": "C'da axlat yig'uvchi yo'q. Oqishi bor uzoq ishlaydigan server ertami-kechmi mashinaning butun xotirasini yeydi.", "en": "C has no garbage collector. A long-running server with a leak will eventually eat all the machine's memory." } },
+    { "q": { "ru": "Чем C принципиально отличается от Python?", "uz": "C Python'dan tubdan nimasi bilan farq qiladi?", "en": "How does C fundamentally differ from Python?" },
+      "options": [
+        { "ru": "Компилируется, типы объявляются явно, памятью управляет программист", "uz": "Kompilyatsiya qilinadi, turlar aniq e'lon qilinadi, xotirani dasturchi boshqaradi", "en": "It is compiled, types are explicit, the programmer manages memory" },
+        { "ru": "Только синтаксисом", "uz": "Faqat sintaksis bilan", "en": "Only in syntax" },
+        { "ru": "C медленнее", "uz": "C sekinroq", "en": "C is slower" },
+        { "ru": "Ничем", "uz": "Hech nimasi bilan", "en": "In no way" }
+      ], "a": 0,
+      "explain": { "ru": "Эти три отличия и дают C скорость — и они же делают его требовательным к аккуратности.", "uz": "Aynan shu uchta farq C ga tezlik beradi — va ular uni ehtiyotkorlikka talabchan qiladi.", "en": "Those three differences give C its speed — and make it unforgiving of carelessness." } },
+    { "q": { "ru": "Что выведет <code>printf(\"%d\", 7 / 2)</code>?", "uz": "<code>printf(\"%d\", 7 / 2)</code> nima chiqaradi?", "en": "What does <code>printf(\"%d\", 7 / 2)</code> print?" },
+      "options": [
+        { "ru": "3.5", "uz": "3.5", "en": "3.5" },
+        { "ru": "3", "uz": "3", "en": "3" },
+        { "ru": "4", "uz": "4", "en": "4" },
+        { "ru": "Ошибка", "uz": "Xato", "en": "An error" }
+      ], "a": 1,
+      "explain": { "ru": "Целочисленное деление: дробная часть отбрасывается.", "uz": "Butun sonli bo'lish: kasr qismi tashlanadi.", "en": "Integer division: the fractional part is dropped." } },
+    { "q": { "ru": "Зачем проверять результат <code>malloc</code> на NULL?", "uz": "Nima uchun <code>malloc</code> natijasini NULL ga tekshirish kerak?", "en": "Why check the result of <code>malloc</code> against NULL?" },
+      "options": [
+        { "ru": "Это необязательно", "uz": "Bu shart emas", "en": "It is optional" },
+        { "ru": "Память могла не выделиться, и запись по NULL уронит программу", "uz": "Xotira ajratilmagan bo'lishi mumkin, NULL ga yozish dasturni yiqitadi", "en": "Allocation may fail, and writing through NULL crashes the program" },
+        { "ru": "Для скорости", "uz": "Tezlik uchun", "en": "For speed" },
+        { "ru": "Так требует стандарт оформления", "uz": "Rasmiylashtirish standarti shuni talab qiladi", "en": "The style guide demands it" }
+      ], "a": 1,
+      "explain": { "ru": "При нехватке памяти <code>malloc</code> возвращает NULL. Без проверки следующая же строка обрушит программу.", "uz": "Xotira yetmasa <code>malloc</code> NULL qaytaradi. Tekshiruvsiz keyingi qator dasturni yiqitadi.", "en": "When memory runs out <code>malloc</code> returns NULL. Without a check the very next line crashes." } },
+    { "q": { "ru": "Что означает <code>*p</code> в выражении справа от <code>=</code>?", "uz": "<code>=</code> ning o'ng tomonidagi <code>*p</code> nimani anglatadi?", "en": "What does <code>*p</code> mean on the right side of <code>=</code>?" },
+      "options": [
+        { "ru": "Адрес переменной p", "uz": "p o'zgaruvchisining manzili", "en": "The address of p" },
+        { "ru": "Значение, хранящееся по адресу p", "uz": "p manzilida saqlanadigan qiymat", "en": "The value stored at address p" },
+        { "ru": "Умножение", "uz": "Ko'paytirish", "en": "Multiplication" },
+        { "ru": "Указатель на указатель", "uz": "Ko'rsatkichga ko'rsatkich", "en": "A pointer to a pointer" }
+      ], "a": 1,
+      "explain": { "ru": "Это разыменование: «дай значение по этому адресу». В объявлении <code>int *p</code> звёздочка значит другое — «p это указатель».", "uz": "Bu razymenovanie: «shu manzildagi qiymatni ber». <code>int *p</code> e'lonida yulduzcha boshqa narsani anglatadi.", "en": "That is dereferencing: «give me the value at this address». In the declaration <code>int *p</code> the star means something else — «p is a pointer»." } }
+   ],
+   "tasks": [
+    { "id": "t1", "kind": "c",
+      "title": { "ru": "Обмен значений через указатели", "uz": "Ko'rsatkichlar orqali qiymat almashish", "en": "Swap values through pointers" },
+      "brief": { "ru": "Классика собеседований по C", "uz": "C bo'yicha suhbatlar klassikasi", "en": "The classic C interview question" },
+      "desc": { "ru": "<p>Напиши функцию <code>swap(int *a, int *b)</code>, которая меняет местами значения двух переменных вызывающего кода.</p><p>Это первое, что спрашивают на собеседовании по C — и первое, где становится ясно, понял ли ты указатели.</p>", "uz": "<p><code>swap(int *a, int *b)</code> funksiyasini yozing: chaqiruvchi kodning ikkita o'zgaruvchisi qiymatlarini almashtirsin.</p><p>Bu C bo'yicha suhbatda birinchi so'raladigan narsa.</p>", "en": "<p>Write a function <code>swap(int *a, int *b)</code> that exchanges the values of two caller variables.</p><p>This is the first thing asked in a C interview — and the first place where it becomes clear whether you understand pointers.</p>" },
+      "starter": "#include <stdio.h>\n\nvoid swap(int *a, int *b) {\n    // твой код\n}\n\nint main(void) {\n    int x = 1, y = 2;\n    swap(&x, &y);\n    printf(\"%d %d\\n\", x, y);   // должно быть: 2 1\n    return 0;\n}\n",
+      "solution": "#include <stdio.h>\n\nvoid swap(int *a, int *b) {\n    int temp = *a;   // сохранили значение по первому адресу\n    *a = *b;         // положили туда значение второго\n    *b = temp;       // а во второй - сохранённое первое\n}\n\nint main(void) {\n    int x = 1, y = 2;\n    swap(&x, &y);\n    printf(\"%d %d\\n\", x, y);   // 2 1\n    return 0;\n}",
+      "hint": { "ru": "Понадобится временная переменная: int temp = *a; затем *a = *b; и *b = temp;", "uz": "Vaqtinchalik o'zgaruvchi kerak bo'ladi: int temp = *a; keyin *a = *b; va *b = temp;", "en": "You need a temporary: int temp = *a; then *a = *b; and *b = temp;" } },
+    { "id": "t2", "kind": "c",
+      "title": { "ru": "Сумма массива", "uz": "Massiv yig'indisi", "en": "Sum of an array" },
+      "brief": { "ru": "Массив и его длина отдельно", "uz": "Massiv va uning uzunligi alohida", "en": "Array and its length travel separately" },
+      "desc": { "ru": "<p>Напиши функцию <code>int sum(int arr[], int n)</code>, возвращающую сумму элементов.</p><p>Важная особенность C: массив <b>не знает своей длины</b>, поэтому её всегда передают вторым аргументом.</p>", "uz": "<p><code>int sum(int arr[], int n)</code> funksiyasini yozing: elementlar yig'indisini qaytarsin.</p><p>C'ning muhim xususiyati: massiv <b>o'z uzunligini bilmaydi</b>, shuning uchun u har doim ikkinchi argument sifatida uzatiladi.</p>", "en": "<p>Write <code>int sum(int arr[], int n)</code> returning the sum of the elements.</p><p>An important C trait: an array <b>does not know its own length</b>, so it is always passed as a second argument.</p>" },
+      "starter": "#include <stdio.h>\n\nint sum(int arr[], int n) {\n    // твой код\n}\n\nint main(void) {\n    int data[] = {4, 8, 15, 16, 23, 42};\n    printf(\"%d\\n\", sum(data, 6));   // 108\n    return 0;\n}\n",
+      "solution": "#include <stdio.h>\n\nint sum(int arr[], int n) {\n    int total = 0;\n    for (int i = 0; i < n; i++) {\n        total += arr[i];\n    }\n    return total;\n}\n\nint main(void) {\n    int data[] = {4, 8, 15, 16, 23, 42};\n    printf(\"%d\\n\", sum(data, 6));   // 108\n    return 0;\n}",
+      "hint": { "ru": "Заведи int total = 0, пройди циклом for от 0 до n-1 и прибавляй arr[i].", "uz": "int total = 0 yarating, 0 dan n-1 gacha for sikli bilan o'ting va arr[i] ni qo'shing.", "en": "Start with int total = 0, loop for from 0 to n-1 and add arr[i]." } },
+    { "id": "t3", "kind": "c",
+      "title": { "ru": "Динамический массив", "uz": "Dinamik massiv", "en": "Dynamic array" },
+      "brief": { "ru": "malloc, работа, free", "uz": "malloc, ish, free", "en": "malloc, work, free" },
+      "desc": { "ru": "<p>Напиши программу, которая выделяет через <code>malloc</code> массив на 10 целых чисел, заполняет его квадратами индексов, печатает и <b>корректно освобождает память</b>.</p><p>Не забудь проверить malloc на NULL — без этого решение не считается правильным.</p>", "uz": "<p><code>malloc</code> orqali 10 ta butun son uchun massiv ajratadigan, uni indekslar kvadratlari bilan to'ldiradigan, chiqaradigan va <b>xotirani to'g'ri bo'shatadigan</b> dastur yozing.</p><p>malloc ni NULL ga tekshirishni unutmang.</p>", "en": "<p>Write a program that allocates an array of 10 integers with <code>malloc</code>, fills it with squares of the indexes, prints it and <b>frees the memory correctly</b>.</p><p>Do not forget the NULL check — without it the solution does not count.</p>" },
+      "starter": "#include <stdio.h>\n#include <stdlib.h>\n\nint main(void) {\n    int n = 10;\n    // выдели память, заполни, напечатай, освободи\n    return 0;\n}\n",
+      "solution": "#include <stdio.h>\n#include <stdlib.h>\n\nint main(void) {\n    int n = 10;\n    int *arr = malloc(n * sizeof(int));\n    if (arr == NULL) {\n        printf(\"Не удалось выделить память\\n\");\n        return 1;\n    }\n\n    for (int i = 0; i < n; i++) {\n        arr[i] = i * i;\n    }\n    for (int i = 0; i < n; i++) {\n        printf(\"%d \", arr[i]);\n    }\n    printf(\"\\n\");\n\n    free(arr);\n    arr = NULL;\n    return 0;\n}",
+      "hint": { "ru": "int *arr = malloc(n * sizeof(int)); проверь на NULL; заполни циклом; напечатай; free(arr); arr = NULL;", "uz": "int *arr = malloc(n * sizeof(int)); NULL ga tekshiring; sikl bilan to'ldiring; chiqaring; free(arr); arr = NULL;", "en": "int *arr = malloc(n * sizeof(int)); check for NULL; fill in a loop; print; free(arr); arr = NULL;" } }
+   ],
+   "exam": {
+    "time": 480,
+    "questions": [
+     { "q": { "ru": "Сколько байт обычно занимает <code>int</code>?", "uz": "<code>int</code> odatda necha bayt egallaydi?", "en": "How many bytes does an <code>int</code> usually take?" },
+       "options": [{ "ru": "1", "uz": "1", "en": "1" }, { "ru": "4", "uz": "4", "en": "4" }, { "ru": "8", "uz": "8", "en": "8" }, { "ru": "Зависит от значения", "uz": "Qiymatga bog'liq", "en": "It depends on the value" }], "a": 1 },
+     { "q": { "ru": "Что такое segmentation fault?", "uz": "Segmentation fault nima?", "en": "What is a segmentation fault?" },
+       "options": [{ "ru": "Ошибка компиляции", "uz": "Kompilyatsiya xatosi", "en": "A compilation error" }, { "ru": "Обращение к памяти, которая программе не принадлежит", "uz": "Dasturga tegishli bo'lmagan xotiraga murojaat", "en": "Accessing memory the program does not own" }, { "ru": "Переполнение переменной", "uz": "O'zgaruvchining to'lib ketishi", "en": "Variable overflow" }, { "ru": "Синтаксическая ошибка", "uz": "Sintaksis xatosi", "en": "A syntax error" }], "a": 1 },
+     { "q": { "ru": "Как передать функции возможность изменить переменную вызывающего кода?", "uz": "Funksiyaga chaqiruvchi kod o'zgaruvchisini o'zgartirish imkonini qanday berish mumkin?", "en": "How do you let a function modify the caller's variable?" },
+       "options": [{ "ru": "Передать сам аргумент", "uz": "Argumentning o'zini uzatish", "en": "Pass the argument itself" }, { "ru": "Передать указатель на переменную", "uz": "O'zgaruvchiga ko'rsatkich uzatish", "en": "Pass a pointer to the variable" }, { "ru": "Объявить переменную глобальной — единственный способ", "uz": "O'zgaruvchini global qilish — yagona usul", "en": "Make the variable global — the only way" }, { "ru": "Это невозможно", "uz": "Bu mumkin emas", "en": "It is impossible" }], "a": 1 },
+     { "q": { "ru": "Массив в C знает свою длину?", "uz": "C'dagi massiv o'z uzunligini biladimi?", "en": "Does a C array know its own length?" },
+       "options": [{ "ru": "Да, через len()", "uz": "Ha, len() orqali", "en": "Yes, via len()" }, { "ru": "Нет, длину передают отдельно", "uz": "Yo'q, uzunlik alohida uzatiladi", "en": "No, the length is passed separately" }, { "ru": "Только динамический", "uz": "Faqat dinamik", "en": "Only a dynamic one" }, { "ru": "Только статический", "uz": "Faqat statik", "en": "Only a static one" }], "a": 1 },
+     { "q": { "ru": "Что делает <code>free(p)</code>?", "uz": "<code>free(p)</code> nima qiladi?", "en": "What does <code>free(p)</code> do?" },
+       "options": [{ "ru": "Обнуляет указатель", "uz": "Ko'rsatkichni nolga tenglaydi", "en": "Sets the pointer to null" }, { "ru": "Возвращает системе память, выделенную malloc", "uz": "malloc ajratgan xotirani tizimga qaytaradi", "en": "Returns memory allocated by malloc to the system" }, { "ru": "Удаляет переменную p", "uz": "p o'zgaruvchisini o'chiradi", "en": "Deletes the variable p" }, { "ru": "Очищает значения массива", "uz": "Massiv qiymatlarini tozalaydi", "en": "Clears the array values" }], "a": 1 }
+    ],
+    "tasks": [
+     { "kind": "c",
+       "title": { "ru": "Максимум в массиве", "uz": "Massivdagi maksimum", "en": "Maximum in an array" },
+       "desc": { "ru": "<p>Напиши функцию <code>int max_of(int arr[], int n)</code>, возвращающую наибольший элемент массива. Считай, что <code>n</code> всегда больше нуля.</p>", "uz": "<p><code>int max_of(int arr[], int n)</code> funksiyasini yozing: massivning eng katta elementini qaytarsin. <code>n</code> har doim noldan katta deb hisoblang.</p>", "en": "<p>Write <code>int max_of(int arr[], int n)</code> returning the largest element. Assume <code>n</code> is always greater than zero.</p>" },
+       "starter": "#include <stdio.h>\n\nint max_of(int arr[], int n) {\n    \n}\n\nint main(void) {\n    int data[] = {3, 17, 8, 42, 5};\n    printf(\"%d\\n\", max_of(data, 5));   // 42\n    return 0;\n}\n",
+       "solution": "#include <stdio.h>\n\nint max_of(int arr[], int n) {\n    int best = arr[0];              // начинаем с первого, а не с нуля:\n    for (int i = 1; i < n; i++) {   // иначе для отрицательных чисел ответ будет неверным\n        if (arr[i] > best) {\n            best = arr[i];\n        }\n    }\n    return best;\n}\n\nint main(void) {\n    int data[] = {3, 17, 8, 42, 5};\n    printf(\"%d\\n\", max_of(data, 5));   // 42\n    return 0;\n}" }
+    ]
+   }
+  }
+ ]
+}

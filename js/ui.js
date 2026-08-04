@@ -42,9 +42,42 @@ export function hlSql(src) {
   });
 }
 
+/** C-подобные языки: JavaScript, C, C++, C#, Java — общий набор правил. */
+export function hlCLike(src, lang) {
+  const s = esc(src);
+  const KW = {
+    javascript: 'const|let|var|function|return|if|else|for|while|do|break|continue|class|extends|new|this|typeof|instanceof|try|catch|finally|throw|switch|case|default|async|await|of|in|delete|null|undefined|true|false|import|export|from',
+    c: 'int|char|float|double|void|long|short|unsigned|signed|const|static|struct|union|enum|typedef|sizeof|return|if|else|for|while|do|break|continue|switch|case|default|goto|NULL|include|define',
+    cpp: 'int|char|float|double|void|long|short|unsigned|bool|auto|const|constexpr|static|class|struct|public|private|protected|virtual|override|template|typename|namespace|using|new|delete|this|nullptr|true|false|return|if|else|for|while|do|break|continue|switch|case|default|try|catch|throw|include',
+    csharp: 'int|string|char|float|double|decimal|bool|var|void|object|const|readonly|static|class|struct|interface|enum|public|private|protected|internal|virtual|override|abstract|sealed|namespace|using|new|this|base|null|true|false|return|if|else|for|foreach|while|do|break|continue|switch|case|default|try|catch|finally|throw|async|await|in|out|get|set',
+    java: 'int|String|char|float|double|boolean|byte|long|short|void|final|static|class|interface|enum|extends|implements|public|private|protected|abstract|synchronized|package|import|new|this|super|null|true|false|return|if|else|for|while|do|break|continue|switch|case|default|try|catch|finally|throw|throws',
+  };
+  const kw = KW[lang] || KW.javascript;
+  const re = new RegExp(
+    '(\\/\\/[^\\n]*|\\/\\*[\\s\\S]*?\\*\\/|#[a-z]+[^\\n]*)' +          // комментарии и директивы
+    '|(`(?:[^`\\\\]|\\\\.)*`|"(?:[^"\\\\\\n]|\\\\.)*"|\'(?:[^\'\\\\\\n]|\\\\.)*\')' +  // строки
+    '|\\b(\\d+(?:\\.\\d+)?[fFlLuU]?)\\b' +                              // числа
+    '|\\b(' + kw + ')\\b' +                                              // ключевые слова
+    '|\\b([A-Za-z_]\\w*)(?=\\s*\\()',                                    // вызовы функций
+    'g');
+  return s.replace(re, (m, com, str, num, k, fn) => {
+    if (com) return '<span class="py-com">' + com + '</span>';
+    if (str) return '<span class="py-str">' + str + '</span>';
+    if (num) return '<span class="py-num">' + num + '</span>';
+    if (k) return '<span class="py-kw">' + k + '</span>';
+    if (fn) return '<span class="py-fn">' + fn + '</span>';
+    return m;
+  });
+}
+
+const C_LIKE = ['javascript', 'js', 'c', 'cpp', 'csharp', 'java'];
+
 export function codeBlock(code, lang) {
-  const body = lang === 'sql' ? hlSql(code) : hlPython(code);
-  return '<pre class="code" tabindex="0"><code>' + body + '</code></pre>';
+  let body;
+  if (lang === 'sql') body = hlSql(code);
+  else if (C_LIKE.includes(lang)) body = hlCLike(code, lang === 'js' ? 'javascript' : lang);
+  else body = hlPython(code);
+  return '<pre class="code" tabindex="0" data-lang="' + esc(lang || 'python') + '"><code>' + body + '</code></pre>';
 }
 
 /* ---------- уведомления ---------- */

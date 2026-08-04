@@ -1,0 +1,177 @@
+{
+ "id": "cpp-basics",
+ "schema": 2,
+ "modules": [
+  {
+   "id": "cpp-01",
+   "title": { "ru": "C++: мощь C плюс объекты", "uz": "C++: C kuchi va obyektlar", "en": "C++: the power of C plus objects" },
+   "tagline": { "ru": "Классы, ссылки, STL и умные указатели", "uz": "Sinflar, havolalar, STL va aqlli ko'rsatkichlar", "en": "Classes, references, the STL and smart pointers" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "Что C++ добавляет к C", "uz": "C++ C ga nima qo'shadi", "en": "What C++ adds to C" },
+     "blocks": [
+      { "type": "text", "html": {
+        "ru": "<p>C++ — это C, к которому добавили классы, шаблоны и огромную стандартную библиотеку, сохранив скорость и контроль над памятью.</p><p>На нём написаны движки игр (Unreal), браузеры (Chrome), базы данных (MySQL) и торговые системы, где важна каждая микросекунда.</p>",
+        "uz": "<p>C++ — bu C ga sinflar, shablonlar va ulkan standart kutubxona qo'shilgani, tezlik va xotira nazorati saqlanib qolgan holda.</p><p>Unda o'yin dvigatellari (Unreal), brauzerlar (Chrome), ma'lumotlar bazalari (MySQL) yozilgan.</p>",
+        "en": "<p>C++ is C with classes, templates and a huge standard library added, while keeping the speed and control over memory.</p><p>Game engines (Unreal), browsers (Chrome), databases (MySQL) and trading systems where every microsecond counts are written in it.</p>" } },
+      { "type": "code", "lang": "cpp", "code": "#include <iostream>\n#include <string>\n\nint main() {\n    std::string name = \"Азиз\";\n    int level = 7;\n\n    std::cout << \"Привет, \" << name << \"! Уровень: \" << level << std::endl;\n    return 0;\n}" },
+      { "type": "note", "kind": "note", "html": {
+        "ru": "Вместо <code>printf</code> здесь <code>std::cout</code> с оператором <code>&lt;&lt;</code> — он сам понимает тип и не требует форматных строк. Строки — полноценный тип <code>std::string</code>, а не массив символов. Сборка: <code>g++ main.cpp -o main && ./main</code>",
+        "uz": "<code>printf</code> o'rniga bu yerda <code>std::cout</code> va <code>&lt;&lt;</code> operatori — u turni o'zi tushunadi. Satrlar — belgilar massivi emas, to'laqonli <code>std::string</code> turi. Yig'ish: <code>g++ main.cpp -o main && ./main</code>",
+        "en": "Instead of <code>printf</code> there is <code>std::cout</code> with the <code>&lt;&lt;</code> operator — it knows the type and needs no format strings. Strings are a real <code>std::string</code> type, not a character array. Build: <code>g++ main.cpp -o main && ./main</code>" } }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "Классы и конструкторы", "uz": "Sinflar va konstruktorlar", "en": "Classes and constructors" },
+     "blocks": [
+      { "type": "text", "html": {
+        "ru": "<p>Класс в C++ — как в Python, но с явным разделением на <b>public</b> (доступно снаружи) и <b>private</b> (только внутри класса). По умолчанию всё private.</p>",
+        "uz": "<p>C++ dagi sinf Python'dagi kabi, lekin <b>public</b> (tashqaridan ochiq) va <b>private</b> (faqat sinf ichida) ga aniq ajratilgan. Sukut bo'yicha hammasi private.</p>",
+        "en": "<p>A class in C++ is like Python's, but with an explicit split into <b>public</b> (visible outside) and <b>private</b> (inside the class only). Everything is private by default.</p>" } },
+      { "type": "code", "lang": "cpp", "code": "#include <iostream>\n#include <string>\n\nclass Player {\nprivate:\n    std::string name;    // скрыто от внешнего кода\n    int hp;\n\npublic:\n    Player(std::string n, int h) : name(n), hp(h) {}   // конструктор\n\n    void takeDamage(int dmg) {\n        hp -= dmg;\n        if (hp < 0) hp = 0;\n    }\n\n    int getHp() const { return hp; }      // const = метод не меняет объект\n    std::string getName() const { return name; }\n};\n\nint main() {\n    Player hero(\"Азиз\", 100);\n    hero.takeDamage(30);\n    std::cout << hero.getName() << \": \" << hero.getHp() << \" HP\" << std::endl;\n    return 0;\n}" },
+      { "type": "checkpoint",
+        "q": { "ru": "Почему поля <code>name</code> и <code>hp</code> сделаны private?", "uz": "Nima uchun <code>name</code> va <code>hp</code> maydonlari private qilingan?", "en": "Why are the fields <code>name</code> and <code>hp</code> private?" },
+        "options": [
+          { "ru": "Так быстрее работает", "uz": "Shunday tezroq ishlaydi", "en": "It runs faster" },
+          { "ru": "Чтобы внешний код не мог сделать hp отрицательным в обход правил", "uz": "Tashqi kod qoidalarni chetlab hp ni manfiy qila olmasligi uchun", "en": "So outside code cannot set hp negative, bypassing the rules" },
+          { "ru": "Это требование компилятора", "uz": "Bu kompilyator talabi", "en": "The compiler requires it" },
+          { "ru": "Чтобы сэкономить память", "uz": "Xotira tejash uchun", "en": "To save memory" }
+        ], "a": 1,
+        "explain": { "ru": "Инкапсуляция: менять hp можно только через <code>takeDamage</code>, где есть проверка на отрицательное значение. Это и есть смысл private — гарантировать, что объект всегда в корректном состоянии.", "uz": "Inkapsulyatsiya: hp ni faqat <code>takeDamage</code> orqali o'zgartirish mumkin, u yerda manfiy qiymat tekshiruvi bor. Private ning ma'nosi shu.", "en": "Encapsulation: hp can only change through <code>takeDamage</code>, which guards against negative values. That is the point of private — the object stays in a valid state." } }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "Ссылки: указатели без боли", "uz": "Havolalar: og'riqsiz ko'rsatkichlar", "en": "References: pointers without the pain" },
+     "blocks": [
+      { "type": "text", "html": {
+        "ru": "<p><b>Ссылка</b> (<code>int&</code>) — это второе имя для существующей переменной. Как указатель, но без звёздочек и без возможности указывать «в никуда».</p><p>Правило: <code>const T&</code> для передачи больших объектов без копирования, <code>T&</code> — когда функция должна изменить аргумент.</p>",
+        "uz": "<p><b>Havola</b> (<code>int&</code>) — mavjud o'zgaruvchi uchun ikkinchi nom. Ko'rsatkich kabi, lekin yulduzchasiz va «hech qayerga» ko'rsata olmaydi.</p><p>Qoida: katta obyektlarni nusxalashsiz uzatish uchun <code>const T&</code>, funksiya argumentni o'zgartirishi kerak bo'lsa — <code>T&</code>.</p>",
+        "en": "<p>A <b>reference</b> (<code>int&</code>) is a second name for an existing variable. Like a pointer, but with no stars and no way to point nowhere.</p><p>Rule: <code>const T&</code> to pass large objects without copying, <code>T&</code> when the function must modify the argument.</p>" } },
+      { "type": "code", "lang": "cpp", "code": "#include <iostream>\n#include <string>\n\nvoid doubleIt(int &n) {          // ссылка вместо указателя\n    n *= 2;                       // никаких звёздочек\n}\n\nvoid printCard(const std::string &name) {   // const& = без копирования, без изменения\n    std::cout << \"Игрок: \" << name << std::endl;\n}\n\nint main() {\n    int score = 21;\n    doubleIt(score);              // не нужно писать &score\n    std::cout << score << std::endl;   // 42\n\n    std::string longName = \"Очень длинное имя игрока\";\n    printCard(longName);          // строка не копируется\n    return 0;\n}" },
+      { "type": "match",
+        "pairs": [
+          { "left": { "ru": "int x", "uz": "int x", "en": "int x" }, "right": { "ru": "Копия значения", "uz": "Qiymat nusxasi", "en": "A copy of the value" } },
+          { "left": { "ru": "int &x", "uz": "int &x", "en": "int &x" }, "right": { "ru": "Ссылка — можно изменить оригинал", "uz": "Havola — asl nusxani o'zgartirish mumkin", "en": "A reference — the original can be changed" } },
+          { "left": { "ru": "const int &x", "uz": "const int &x", "en": "const int &x" }, "right": { "ru": "Без копирования и без изменения", "uz": "Nusxalashsiz va o'zgartirishsiz", "en": "No copying and no modification" } },
+          { "left": { "ru": "int *x", "uz": "int *x", "en": "int *x" }, "right": { "ru": "Указатель — может быть nullptr", "uz": "Ko'rsatkich — nullptr bo'lishi mumkin", "en": "A pointer — can be nullptr" } }
+        ] }
+     ]
+    },
+    {
+     "id": "l4",
+     "title": { "ru": "STL: не изобретай велосипед", "uz": "STL: g'ildirakni qayta ixtiro qilmang", "en": "The STL: do not reinvent the wheel" },
+     "blocks": [
+      { "type": "text", "html": {
+        "ru": "<p><b>STL</b> — стандартная библиотека контейнеров и алгоритмов. Вместо ручных массивов и своих сортировок берут готовое:</p><ul><li><code>std::vector</code> — динамический массив (как список Python)</li><li><code>std::map</code> — упорядоченный словарь</li><li><code>std::unordered_map</code> — хеш-таблица (как dict Python)</li><li><code>std::sort</code>, <code>std::find</code> — проверенные алгоритмы</li></ul>",
+        "uz": "<p><b>STL</b> — konteynerlar va algoritmlarning standart kutubxonasi. Qo'lda massivlar va o'z saralashlari o'rniga tayyorini oladilar:</p><ul><li><code>std::vector</code> — dinamik massiv</li><li><code>std::map</code> — tartiblangan lug'at</li><li><code>std::unordered_map</code> — xesh-jadval</li><li><code>std::sort</code>, <code>std::find</code> — sinalgan algoritmlar</li></ul>",
+        "en": "<p>The <b>STL</b> is the standard library of containers and algorithms. Instead of hand-rolled arrays and sorts you take the ready-made:</p><ul><li><code>std::vector</code> — a dynamic array (like a Python list)</li><li><code>std::map</code> — an ordered dictionary</li><li><code>std::unordered_map</code> — a hash table (like a Python dict)</li><li><code>std::sort</code>, <code>std::find</code> — battle-tested algorithms</li></ul>" } },
+      { "type": "code", "lang": "cpp", "code": "#include <iostream>\n#include <vector>\n#include <map>\n#include <algorithm>\n\nint main() {\n    std::vector<int> scores = {42, 17, 93, 8};\n    scores.push_back(56);\n\n    std::sort(scores.begin(), scores.end());\n    for (int s : scores) std::cout << s << \" \";   // range-based for\n    std::cout << std::endl;\n\n    std::map<std::string, int> levels;\n    levels[\"Азиз\"] = 7;\n    levels[\"Тимур\"] = 4;\n    for (const auto &pair : levels) {\n        std::cout << pair.first << \": \" << pair.second << std::endl;\n    }\n    return 0;\n}" },
+      { "type": "note", "kind": "tip", "html": {
+        "ru": "Про память: в современном C++ вместо <code>new</code>/<code>delete</code> используют <b>умные указатели</b> (<code>std::unique_ptr</code>, <code>std::shared_ptr</code>) — они освобождают память сами, когда объект больше не нужен. Ручной <code>delete</code> в новом коде — почти всегда ошибка.",
+        "uz": "Xotira haqida: zamonaviy C++ da <code>new</code>/<code>delete</code> o'rniga <b>aqlli ko'rsatkichlar</b> ishlatiladi (<code>std::unique_ptr</code>, <code>std::shared_ptr</code>) — ular obyekt kerak bo'lmay qolganda xotirani o'zi bo'shatadi.",
+        "en": "On memory: modern C++ replaces <code>new</code>/<code>delete</code> with <b>smart pointers</b> (<code>std::unique_ptr</code>, <code>std::shared_ptr</code>) that free memory themselves once the object is gone. A manual <code>delete</code> in new code is almost always a bug." } },
+      { "type": "summary", "items": [
+        { "ru": "C++ = C + классы + шаблоны + STL, скорость сохраняется", "uz": "C++ = C + sinflar + shablonlar + STL, tezlik saqlanadi", "en": "C++ = C + classes + templates + STL, speed preserved" },
+        { "ru": "private по умолчанию, public открывает наружу", "uz": "Sukut bo'yicha private, public tashqariga ochadi", "en": "private by default, public exposes to the outside" },
+        { "ru": "Ссылки удобнее указателей и не бывают nullptr", "uz": "Havolalar ko'rsatkichlardan qulay va nullptr bo'lmaydi", "en": "References beat pointers and are never nullptr" },
+        { "ru": "vector и map вместо ручных массивов, умные указатели вместо delete", "uz": "Qo'lda massivlar o'rniga vector va map, delete o'rniga aqlli ko'rsatkichlar", "en": "vector and map instead of raw arrays, smart pointers instead of delete" }
+      ] }
+     ]
+    }
+   ],
+   "quiz": [
+    { "q": { "ru": "Какая видимость у полей класса по умолчанию в C++?", "uz": "C++ da sinf maydonlarining sukut bo'yicha ko'rinishi qanday?", "en": "What is the default visibility of class fields in C++?" },
+      "options": [{ "ru": "public", "uz": "public", "en": "public" }, { "ru": "private", "uz": "private", "en": "private" }, { "ru": "protected", "uz": "protected", "en": "protected" }, { "ru": "Зависит от компилятора", "uz": "Kompilyatorga bog'liq", "en": "It depends on the compiler" }], "a": 1,
+      "explain": { "ru": "У <code>class</code> по умолчанию private, у <code>struct</code> — public. Это единственное отличие между ними в C++.", "uz": "<code>class</code> da sukut bo'yicha private, <code>struct</code> da — public. C++ da ular orasidagi yagona farq shu.", "en": "A <code>class</code> defaults to private, a <code>struct</code> to public. That is the only difference between them in C++." } },
+    { "q": { "ru": "Чем ссылка <code>int&</code> отличается от указателя <code>int*</code>?", "uz": "<code>int&</code> havolasi <code>int*</code> ko'rsatkichidan nimasi bilan farq qiladi?", "en": "How does a reference <code>int&</code> differ from a pointer <code>int*</code>?" },
+      "options": [
+        { "ru": "Ничем", "uz": "Hech nimasi bilan", "en": "In no way" },
+        { "ru": "Ссылка всегда указывает на существующий объект и не может быть nullptr", "uz": "Havola har doim mavjud obyektga ko'rsatadi va nullptr bo'la olmaydi", "en": "A reference always refers to an existing object and cannot be nullptr" },
+        { "ru": "Ссылка работает медленнее", "uz": "Havola sekinroq ishlaydi", "en": "A reference is slower" },
+        { "ru": "Ссылка копирует объект", "uz": "Havola obyektni nusxalaydi", "en": "A reference copies the object" }
+      ], "a": 1,
+      "explain": { "ru": "Ссылку нельзя «переставить» на другой объект и нельзя оставить неинициализированной — поэтому она безопаснее.", "uz": "Havolani boshqa obyektga «ko'chirib» bo'lmaydi va ishga tushirilmagan qoldirib bo'lmaydi — shuning uchun u xavfsizroq.", "en": "A reference cannot be reseated or left uninitialised — which makes it safer." } },
+    { "q": { "ru": "Что такое <code>std::vector</code>?", "uz": "<code>std::vector</code> nima?", "en": "What is <code>std::vector</code>?" },
+      "options": [
+        { "ru": "Математический вектор", "uz": "Matematik vektor", "en": "A mathematical vector" },
+        { "ru": "Динамический массив, который сам управляет памятью", "uz": "Xotirani o'zi boshqaradigan dinamik massiv", "en": "A dynamic array that manages its own memory" },
+        { "ru": "Указатель", "uz": "Ko'rsatkich", "en": "A pointer" },
+        { "ru": "Тип файла", "uz": "Fayl turi", "en": "A file type" }
+      ], "a": 1,
+      "explain": { "ru": "Аналог списка Python: растёт по мере добавления, знает свой размер, освобождает память сам.", "uz": "Python ro'yxatining analogi: qo'shilgan sari o'sadi, hajmini biladi, xotirani o'zi bo'shatadi.", "en": "The analogue of a Python list: it grows as you add, knows its size and frees memory itself." } },
+    { "q": { "ru": "Зачем писать <code>const</code> после метода: <code>int getHp() const</code>?", "uz": "Nima uchun metoddan keyin <code>const</code> yoziladi: <code>int getHp() const</code>?", "en": "Why write <code>const</code> after a method: <code>int getHp() const</code>?" },
+      "options": [
+        { "ru": "Метод обещает не изменять объект", "uz": "Metod obyektni o'zgartirmaslikka va'da beradi", "en": "The method promises not to modify the object" },
+        { "ru": "Метод становится быстрее", "uz": "Metod tezlashadi", "en": "The method becomes faster" },
+        { "ru": "Метод становится приватным", "uz": "Metod private bo'ladi", "en": "The method becomes private" },
+        { "ru": "Это устаревший синтаксис", "uz": "Bu eskirgan sintaksis", "en": "It is legacy syntax" }
+      ], "a": 0,
+      "explain": { "ru": "Компилятор проверит обещание и не даст изменить поля. Такие методы можно вызывать у константных объектов.", "uz": "Kompilyator va'dani tekshiradi va maydonlarni o'zgartirishga ruxsat bermaydi.", "en": "The compiler enforces the promise and forbids changing fields. Such methods can be called on const objects." } },
+    { "q": { "ru": "Что используют вместо ручного <code>delete</code> в современном C++?", "uz": "Zamonaviy C++ da qo'lda <code>delete</code> o'rniga nima ishlatiladi?", "en": "What replaces manual <code>delete</code> in modern C++?" },
+      "options": [
+        { "ru": "Ничего, delete обязателен", "uz": "Hech narsa, delete majburiy", "en": "Nothing, delete is mandatory" },
+        { "ru": "Умные указатели: unique_ptr и shared_ptr", "uz": "Aqlli ko'rsatkichlar: unique_ptr va shared_ptr", "en": "Smart pointers: unique_ptr and shared_ptr" },
+        { "ru": "Сборщик мусора", "uz": "Axlat yig'uvchi", "en": "A garbage collector" },
+        { "ru": "free()", "uz": "free()", "en": "free()" }
+      ], "a": 1,
+      "explain": { "ru": "Умный указатель освобождает память автоматически при выходе из области видимости — утечки становятся почти невозможными.", "uz": "Aqlli ko'rsatkich ko'rinish sohasidan chiqishda xotirani avtomatik bo'shatadi.", "en": "A smart pointer frees memory automatically when it goes out of scope — leaks become nearly impossible." } },
+    { "q": { "ru": "Что делает <code>for (int s : scores)</code>?", "uz": "<code>for (int s : scores)</code> nima qiladi?", "en": "What does <code>for (int s : scores)</code> do?" },
+      "options": [
+        { "ru": "Перебирает элементы контейнера — как for in в Python", "uz": "Konteyner elementlarini aylanib chiqadi — Python'dagi for in kabi", "en": "Iterates the container's elements — like for in in Python" },
+        { "ru": "Считает от 0 до scores", "uz": "0 dan scores gacha sanaydi", "en": "Counts from 0 to scores" },
+        { "ru": "Это ошибка синтаксиса", "uz": "Bu sintaksis xatosi", "en": "It is a syntax error" },
+        { "ru": "Сортирует контейнер", "uz": "Konteynerni saralaydi", "en": "Sorts the container" }
+      ], "a": 0,
+      "explain": { "ru": "Range-based for появился в C++11 и сделал перебор контейнеров таким же простым, как в Python.", "uz": "Range-based for C++11 da paydo bo'ldi va konteynerlarni aylanishni Python'dagidek oddiy qildi.", "en": "The range-based for arrived in C++11 and made iterating containers as simple as in Python." } }
+   ],
+   "tasks": [
+    { "id": "t1", "kind": "cpp",
+      "title": { "ru": "Класс банковского счёта", "uz": "Bank hisobi sinfi", "en": "A bank account class" },
+      "brief": { "ru": "Инкапсуляция на практике", "uz": "Amaliyotda inkapsulyatsiya", "en": "Encapsulation in practice" },
+      "desc": { "ru": "<p>Напиши класс <code>Account</code>: приватное поле <code>balance</code>, конструктор с начальным балансом, методы <code>deposit(int)</code>, <code>withdraw(int)</code> (не уходить в минус!) и <code>getBalance() const</code>.</p>", "uz": "<p><code>Account</code> sinfini yozing: private <code>balance</code> maydoni, boshlang'ich balans bilan konstruktor, <code>deposit(int)</code>, <code>withdraw(int)</code> (minusga ketmaslik!) va <code>getBalance() const</code> metodlari.</p>", "en": "<p>Write an <code>Account</code> class: a private <code>balance</code> field, a constructor with the starting balance, and methods <code>deposit(int)</code>, <code>withdraw(int)</code> (never go negative!) and <code>getBalance() const</code>.</p>" },
+      "starter": "#include <iostream>\n\nclass Account {\n    // твой код\n};\n\nint main() {\n    Account acc(100);\n    acc.deposit(50);\n    acc.withdraw(200);        // не должно уйти в минус\n    std::cout << acc.getBalance() << std::endl;   // 150\n    return 0;\n}\n",
+      "solution": "#include <iostream>\n\nclass Account {\nprivate:\n    int balance;\n\npublic:\n    Account(int start) : balance(start) {}\n\n    void deposit(int amount) {\n        if (amount > 0) balance += amount;\n    }\n\n    void withdraw(int amount) {\n        if (amount > 0 && amount <= balance) {   // защита от ухода в минус\n            balance -= amount;\n        }\n    }\n\n    int getBalance() const { return balance; }\n};\n\nint main() {\n    Account acc(100);\n    acc.deposit(50);\n    acc.withdraw(200);\n    std::cout << acc.getBalance() << std::endl;   // 150\n    return 0;\n}",
+      "hint": { "ru": "Конструктор через список инициализации: Account(int start) : balance(start) {}. В withdraw проверь amount <= balance.", "uz": "Konstruktor initsializatsiya ro'yxati orqali: Account(int start) : balance(start) {}. withdraw da amount <= balance ni tekshiring.", "en": "Constructor with an init list: Account(int start) : balance(start) {}. In withdraw check amount <= balance." } },
+    { "id": "t2", "kind": "cpp",
+      "title": { "ru": "Работа с vector", "uz": "vector bilan ishlash", "en": "Working with vector" },
+      "brief": { "ru": "STL вместо ручных массивов", "uz": "Qo'lda massivlar o'rniga STL", "en": "STL instead of raw arrays" },
+      "desc": { "ru": "<p>Напиши функцию <code>int sumEven(const std::vector&lt;int&gt; &nums)</code>, возвращающую сумму чётных элементов. Обрати внимание на <code>const &</code> — вектор передаётся без копирования.</p>", "uz": "<p><code>int sumEven(const std::vector&lt;int&gt; &nums)</code> funksiyasini yozing: juft elementlar yig'indisini qaytarsin. <code>const &</code> ga e'tibor bering — vektor nusxalashsiz uzatiladi.</p>", "en": "<p>Write <code>int sumEven(const std::vector&lt;int&gt; &nums)</code> returning the sum of the even elements. Note the <code>const &</code> — the vector is passed without copying.</p>" },
+      "starter": "#include <iostream>\n#include <vector>\n\nint sumEven(const std::vector<int> &nums) {\n    // твой код\n}\n\nint main() {\n    std::vector<int> data = {1, 2, 3, 4, 5, 6};\n    std::cout << sumEven(data) << std::endl;   // 12\n    return 0;\n}\n",
+      "solution": "#include <iostream>\n#include <vector>\n\nint sumEven(const std::vector<int> &nums) {\n    int total = 0;\n    for (int n : nums) {          // range-based for: короче и безопаснее\n        if (n % 2 == 0) total += n;\n    }\n    return total;\n}\n\nint main() {\n    std::vector<int> data = {1, 2, 3, 4, 5, 6};\n    std::cout << sumEven(data) << std::endl;   // 12\n    return 0;\n}",
+      "hint": { "ru": "for (int n : nums) { if (n % 2 == 0) total += n; }", "uz": "for (int n : nums) { if (n % 2 == 0) total += n; }", "en": "for (int n : nums) { if (n % 2 == 0) total += n; }" } },
+    { "id": "t3", "kind": "cpp",
+      "title": { "ru": "Подсчёт слов через map", "uz": "map orqali so'zlarni hisoblash", "en": "Word counting with map" },
+      "brief": { "ru": "Ассоциативный контейнер", "uz": "Assotsiativ konteyner", "en": "An associative container" },
+      "desc": { "ru": "<p>Напиши функцию, которая принимает <code>std::vector&lt;std::string&gt;</code> и печатает, сколько раз встретилось каждое слово (в алфавитном порядке — <code>std::map</code> сортирует сам).</p>", "uz": "<p><code>std::vector&lt;std::string&gt;</code> qabul qiladigan va har bir so'z necha marta uchraganini chiqaradigan funksiya yozing (alifbo tartibida — <code>std::map</code> o'zi saralaydi).</p>", "en": "<p>Write a function taking a <code>std::vector&lt;std::string&gt;</code> and printing how many times each word occurs (alphabetically — <code>std::map</code> sorts for you).</p>" },
+      "starter": "#include <iostream>\n#include <vector>\n#include <string>\n#include <map>\n\nvoid countWords(const std::vector<std::string> &words) {\n    // твой код\n}\n\nint main() {\n    countWords({\"cpp\", \"python\", \"cpp\"});\n    return 0;\n}\n",
+      "solution": "#include <iostream>\n#include <vector>\n#include <string>\n#include <map>\n\nvoid countWords(const std::vector<std::string> &words) {\n    std::map<std::string, int> counts;\n    for (const std::string &w : words) {\n        counts[w]++;          // отсутствующий ключ создаётся со значением 0\n    }\n    for (const auto &pair : counts) {\n        std::cout << pair.first << \": \" << pair.second << std::endl;\n    }\n}\n\nint main() {\n    countWords({\"cpp\", \"python\", \"cpp\"});   // cpp: 2, python: 1\n    return 0;\n}",
+      "hint": { "ru": "std::map<std::string,int> counts; потом counts[w]++ — отсутствующий ключ создастся сам со значением 0.", "uz": "std::map<std::string,int> counts; keyin counts[w]++ — yo'q kalit 0 qiymati bilan o'zi yaratiladi.", "en": "std::map<std::string,int> counts; then counts[w]++ — a missing key is created with value 0." } }
+   ],
+   "exam": {
+    "time": 480,
+    "questions": [
+     { "q": { "ru": "Что выводит <code>std::cout</code> без <code>std::endl</code>?", "uz": "<code>std::endl</code> siz <code>std::cout</code> nima chiqaradi?", "en": "What does <code>std::cout</code> do without <code>std::endl</code>?" },
+       "options": [{ "ru": "Ничего", "uz": "Hech narsa", "en": "Nothing" }, { "ru": "Выводит текст без перевода строки", "uz": "Matnni qator ko'chirishsiz chiqaradi", "en": "Prints text without a newline" }, { "ru": "Ошибка", "uz": "Xato", "en": "An error" }, { "ru": "Выводит дважды", "uz": "Ikki marta chiqaradi", "en": "Prints twice" }], "a": 1 },
+     { "q": { "ru": "Разница между class и struct в C++?", "uz": "C++ da class va struct farqi?", "en": "The difference between class and struct in C++?" },
+       "options": [{ "ru": "Только видимость по умолчанию: private против public", "uz": "Faqat sukut bo'yicha ko'rinish: private va public", "en": "Only default visibility: private versus public" }, { "ru": "struct не может иметь методов", "uz": "struct metodlarga ega bo'la olmaydi", "en": "struct cannot have methods" }, { "ru": "class быстрее", "uz": "class tezroq", "en": "class is faster" }, { "ru": "Полностью разные вещи", "uz": "Butunlay boshqa narsalar", "en": "Completely different things" }], "a": 0 },
+     { "q": { "ru": "Зачем передавать большой объект как <code>const T&</code>?", "uz": "Katta obyektni nima uchun <code>const T&</code> sifatida uzatish kerak?", "en": "Why pass a large object as <code>const T&</code>?" },
+       "options": [{ "ru": "Чтобы избежать копирования и запретить изменение", "uz": "Nusxalashdan qochish va o'zgartirishni taqiqlash uchun", "en": "To avoid copying and forbid modification" }, { "ru": "Для красоты", "uz": "Chiroyli bo'lishi uchun", "en": "For looks" }, { "ru": "Так требует стандарт", "uz": "Standart shuni talab qiladi", "en": "The standard demands it" }, { "ru": "Чтобы объект удалился", "uz": "Obyekt o'chishi uchun", "en": "So the object gets deleted" }], "a": 0 },
+     { "q": { "ru": "<code>std::unordered_map</code> — это аналог чего в Python?", "uz": "<code>std::unordered_map</code> Python'da nimaning analogi?", "en": "<code>std::unordered_map</code> is the analogue of what in Python?" },
+       "options": [{ "ru": "list", "uz": "list", "en": "list" }, { "ru": "dict", "uz": "dict", "en": "dict" }, { "ru": "tuple", "uz": "tuple", "en": "tuple" }, { "ru": "set", "uz": "set", "en": "set" }], "a": 1 },
+     { "q": { "ru": "Что произойдёт при выходе <code>std::unique_ptr</code> из области видимости?", "uz": "<code>std::unique_ptr</code> ko'rinish sohasidan chiqsa nima bo'ladi?", "en": "What happens when a <code>std::unique_ptr</code> goes out of scope?" },
+       "options": [{ "ru": "Ничего, нужен delete", "uz": "Hech narsa, delete kerak", "en": "Nothing, you need delete" }, { "ru": "Память освобождается автоматически", "uz": "Xotira avtomatik bo'shaydi", "en": "The memory is freed automatically" }, { "ru": "Утечка памяти", "uz": "Xotira oqishi", "en": "A memory leak" }, { "ru": "Программа падает", "uz": "Dastur yiqiladi", "en": "The program crashes" }], "a": 1 }
+    ],
+    "tasks": [
+     { "kind": "cpp",
+       "title": { "ru": "Класс с наследованием", "uz": "Meros bilan sinf", "en": "A class with inheritance" },
+       "desc": { "ru": "<p>Дан класс <code>Unit</code> с полем <code>name</code> и методом <code>info()</code>. Создай класс <code>Archer</code>, наследующий <code>Unit</code>, с методом <code>shoot()</code>, который печатает <code>«имя стреляет!»</code>.</p>", "uz": "<p><code>name</code> maydoni va <code>info()</code> metodiga ega <code>Unit</code> sinfi berilgan. <code>Unit</code> dan meros oluvchi <code>Archer</code> sinfini <code>shoot()</code> metodi bilan yarating.</p>", "en": "<p>Given a class <code>Unit</code> with a <code>name</code> field and an <code>info()</code> method, create an <code>Archer</code> class inheriting <code>Unit</code>, with a <code>shoot()</code> method printing <code>«name shoots!»</code>.</p>" },
+       "starter": "#include <iostream>\n#include <string>\n\nclass Unit {\nprotected:\n    std::string name;\npublic:\n    Unit(std::string n) : name(n) {}\n    void info() const { std::cout << \"Юнит: \" << name << std::endl; }\n};\n\n// твой класс Archer\n\nint main() {\n    Archer a(\"Леголас\");\n    a.info();\n    a.shoot();\n    return 0;\n}\n",
+       "solution": "#include <iostream>\n#include <string>\n\nclass Unit {\nprotected:                          // protected = видно наследникам, но не снаружи\n    std::string name;\npublic:\n    Unit(std::string n) : name(n) {}\n    void info() const { std::cout << \"Юнит: \" << name << std::endl; }\n};\n\nclass Archer : public Unit {\npublic:\n    Archer(std::string n) : Unit(n) {}      // вызываем конструктор родителя\n\n    void shoot() const {\n        std::cout << name << \" стреляет!\" << std::endl;\n    }\n};\n\nint main() {\n    Archer a(\"Леголас\");\n    a.info();      // метод родителя\n    a.shoot();     // свой метод\n    return 0;\n}" }
+    ]
+   }
+  }
+ ]
+}

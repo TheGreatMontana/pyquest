@@ -18,6 +18,7 @@ const errors = [];
 const warnings = [];
 const pySnippets = [];
 const sqlItems = [];
+const jsItems = [];
 const err = (m) => errors.push(m);
 const warn = (m) => warnings.push(m);
 
@@ -128,11 +129,14 @@ Object.entries(catalog.legacyMap || {}).forEach(([legacy, target]) => {
 });
 
 /* ---------- курсы ---------- */
-const BLOCK_TYPES = ['text', 'code', 'run', 'sqlrun', 'note', 'predict', 'findbug', 'match', 'order', 'checkpoint', 'summary'];
+const BLOCK_TYPES = ['text', 'code', 'run', 'jsrun', 'sqlrun', 'note', 'predict', 'findbug', 'match', 'order', 'checkpoint', 'summary'];
+/* Языки задач: часть исполняется в браузере, часть проверяется сверкой с эталоном */
+const RUNNABLE_KINDS = ['python', 'javascript', 'sql'];
+const COMPILED_KINDS = ['c', 'cpp', 'csharp', 'java'];
 const stats = { courses: 0, modules: 0, lessons: 0, blocks: 0, interactive: 0, quiz: 0, tasks: 0, exams: 0 };
 const legacyTargets = new Set(Object.values(catalog.legacyMap || {}));
 
-function checkQuiz(list, where, needExplain, oKey) {
+function checkQuiz(list, where, needExplain, oKey, sqlModule) {
   (list || []).forEach((q, i) => {
     const w = where + '.q' + i;
     const ok = oKey ? oKey + '.' + i : null;
@@ -142,7 +146,9 @@ function checkQuiz(list, where, needExplain, oKey) {
     if (typeof q.a !== 'number' || q.a < 0 || q.a >= (q.options || []).length) err(w + ': неверный индекс ответа');
     if (needExplain && !q.explain) warn(w + ': нет объяснения');
     if (q.explain) checkMl(q.explain, w + '.explain', false, ok && ok + '.explain');
-    if (q.code && !q.broken) pySnippets.push({ name: w, code: q.code, compileOnly: true, sql: false });
+    /* Код в вопросе компилируется только если это Python: у SQL и компилируемых
+       языков свои движки, а «сломанный» код в вопросах про ошибки — намеренно невалиден. */
+    if (q.code && !q.broken && !q.lang && !sqlModule) pySnippets.push({ name: w, code: q.code, compileOnly: true });
     stats.quiz++;
   });
 }
@@ -161,6 +167,13 @@ function checkTask(task, where, sqlModule, oKey) {
     if (!task.tests) err(where + ': нет тестов');
     else pySnippets.push({ name: where + '.tests', code: task.tests, compileOnly: true });
     if (task.starter) pySnippets.push({ name: where + '.starter', code: task.starter, compileOnly: true });
+  } else if (task.kind === 'javascript') {
+    if (!task.tests) err(where + ': нет тестов');
+    else jsItems.push({ name: where, tests: task.tests, starter: task.starter });
+  } else if (COMPILED_KINDS.includes(task.kind)) {
+    // Компилируемые языки не запускаются в браузере — обязателен эталон для сверки
+    if (!task.solution) err(where + ': задача на ' + task.kind + ' без эталонного решения (solution)');
+    if (task.tests) warn(where + ': тесты у компилируемой задачи не выполняются, они бесполезны');
   } else err(where + ': неизвестный kind ' + task.kind);
   stats.tasks++;
 }
@@ -175,11 +188,19 @@ function checkBlocks(blocks, where, oKey) {
       case 'text': case 'note': checkMl(b.html, w + '.html', true, ok && ok + '.html'); break;
       case 'code': if (!b.code) err(w + ': нет кода'); break;
       case 'run': pySnippets.push({ name: w, code: b.code, exec: true }); break;
+      case 'jsrun': jsItems.push({ name: w, code: b.code, exec: true }); break;
       case 'sqlrun': sqlItems.push({ name: w, sql: b.code, expectRows: false }); break;
       case 'predict':
         stats.interactive++;
         if (!b.code) err(w + ': predict без кода');
-        else pySnippets.push({ name: w, code: b.code, exec: !b.lang || b.lang === 'python' });
+        else {
+          /* Код проверяется движком своего языка: Python — компиляцией, JS — в Node,
+             компилируемые языки не проверяются (компилятора в тестах нет). */
+          const lang = b.lang || 'python';
+          if (lang === 'python') pySnippets.push({ name: w, code: b.code, exec: true });
+          else if (lang === 'javascript') jsItems.push({ name: w, code: b.code, syntaxOnly: true });
+          else if (!COMPILED_KINDS.includes(lang)) err(w + ': неизвестный язык predict: ' + lang);
+        }
         if (typeof b.a !== 'number' || !b.options || b.a >= b.options.length) err(w + ': неверный ответ predict');
         (b.options || []).forEach((o, oi) => checkMl(o, w + '.option' + oi, true));
         break;
@@ -255,7 +276,7 @@ catalog.courses.forEach(meta => {
       checkMl(l.title, w + '/' + l.id + '.title', true, lKey + '.title');
       checkBlocks(l.blocks, w + '/' + l.id, lKey);
     });
-    checkQuiz(m.quiz, w + '.quiz', true, m.id + '.quiz');
+    checkQuiz(m.quiz, w + '.quiz', true, m.id + '.quiz', m.sqlModule);
     if (!m.tasks || m.tasks.length < 1) err(w + ': нет задач');
     const taskIds = new Set();
     (m.tasks || []).forEach((task, ti) => {
@@ -267,7 +288,7 @@ catalog.courses.forEach(meta => {
     else {
       stats.exams++;
       if (!m.exam.time) err(w + '.exam: нет времени');
-      checkQuiz(m.exam.questions, w + '.exam', false, m.id + '.exam.questions');
+      checkQuiz(m.exam.questions, w + '.exam', false, m.id + '.exam.questions', m.sqlModule);
       (m.exam.tasks || []).forEach((task, ti) => checkTask(task, w + '.exam.task' + ti, m.sqlModule, m.id + '.exam.tasks.' + ti));
     }
   });
@@ -314,11 +335,12 @@ if (dicts.ru) {
 fs.mkdirSync(OUT, { recursive: true });
 fs.writeFileSync(path.join(OUT, 'py-snippets.json'), JSON.stringify(pySnippets), 'utf8');
 fs.writeFileSync(path.join(OUT, 'sql-items.json'), JSON.stringify(sqlItems), 'utf8');
+fs.writeFileSync(path.join(OUT, 'js-items.json'), JSON.stringify(jsItems), 'utf8');
 fs.copyFileSync(path.join(CONTENT, 'sql', 'store-db.sql'), path.join(OUT, 'seed.sql'));
 
 console.log('=== КОНТЕНТ ===');
 console.table([stats]);
-console.log('Python-фрагментов:', pySnippets.length, '| SQL-фрагментов:', sqlItems.length);
+console.log('Python-фрагментов:', pySnippets.length, '| JS-фрагментов:', jsItems.length, '| SQL-фрагментов:', sqlItems.length);
 console.log('\n=== ПОКРЫТИЕ ПЕРЕВОДАМИ (поля + оверлеи) ===');
 LANGS.forEach(l => {
   const pct = coverage.total ? Math.round(coverage[l] / coverage.total * 100) : 0;
