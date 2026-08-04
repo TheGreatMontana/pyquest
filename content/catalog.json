@@ -548,7 +548,8 @@
    ],
    "legacyIds": [],
    "moduleCount": 1,
-   "compiled": true
+   "compiled": true,
+   "runner": "c"
   },
   {
    "id": "cpp-basics",
@@ -575,7 +576,8 @@
    ],
    "legacyIds": [],
    "moduleCount": 1,
-   "compiled": true
+   "compiled": true,
+   "runner": "cpp"
   },
   {
    "id": "csharp-basics",
@@ -631,7 +633,8 @@
    ],
    "legacyIds": [],
    "moduleCount": 1,
-   "compiled": true
+   "compiled": true,
+   "runner": "java"
   }
  ],
  "careerPaths": [

@@ -14,6 +14,7 @@ const runners = {
   js: async (code, onStatus) => window.JsRunner.run(code, '', [], onStatus),
   c: async (code, onStatus) => window.CRunner.run(code, 'c', '', onStatus),
   cpp: async (code, onStatus) => window.CRunner.run(code, 'cpp', '', onStatus),
+  java: async (code, onStatus) => window.JavaRunner.run(code, 'java', '', onStatus),
   sql: async (code, onStatus) => {
     const res = await window.SqlRunner.run(code, onStatus);
     return res.error ? { error: res.error } : { html: window.SqlRunner.tableHtml(res.result) };
@@ -21,7 +22,7 @@ const runners = {
 };
 
 /** Язык задачи → ключ раннера. Чего здесь нет — то запускать пока нечем. */
-const RUNNABLE = { python: 'py', javascript: 'js', sql: 'sql', c: 'c', cpp: 'cpp' };
+const RUNNABLE = { python: 'py', javascript: 'js', sql: 'sql', c: 'c', cpp: 'cpp', java: 'java' };
 const LANG_LABEL = { c: 'C', cpp: 'C++', csharp: 'C#', java: 'Java' };
 
 /** Сравнение вывода программы с эталоном: пробелы в конце строк и хвостовые
@@ -380,10 +381,10 @@ function renderTask(root, courseId, course, m, taskId) {
           }
           out.innerHTML = html;
         }
-      } else if (runnerKey === 'c' || runnerKey === 'cpp') {
-        /* C и C++ компилируются настоящим clang прямо в браузере.
+      } else if (runnerKey === 'c' || runnerKey === 'cpp' || runnerKey === 'java') {
+        /* Компилируемые языки собираются настоящим компилятором прямо в браузере.
            Проверка — по выводу программы: он и есть результат работы. */
-        const res = await window.CRunner.run(ed.value, runnerKey, '', s => {
+        const res = await runners[runnerKey](ed.value, s => {
           status.textContent = t('lesson.stage.' + s);
         });
         status.textContent = '';
