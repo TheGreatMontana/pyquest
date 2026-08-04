@@ -119,6 +119,18 @@ export function findModule(course, moduleId) {
   return (course.modules || []).find(m => m.id === moduleId);
 }
 
+/** Проекты — крупные практические работы, лениво. */
+let projects = null;
+export async function loadProjects() {
+  if (projects) return projects;
+  const res = await fetch('content/projects.json' + V());
+  if (!res.ok) throw new Error('Не удалось загрузить проекты');
+  const data = await res.json();
+  projects = data.projects;
+  return projects;
+}
+export function projectsLoaded() { return projects; }
+
 /** Учебная база для SQL-тренажёра — тоже лениво. */
 let sqlSeed = null;
 export async function loadSqlSeed() {

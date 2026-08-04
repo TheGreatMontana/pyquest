@@ -110,6 +110,29 @@ function checkCourseComplete(courseId) {
   }
 }
 
+/* ---------- проекты ---------- */
+
+/** Этап проекта: XP один раз за этап, повторная отметка не платит. */
+export function awardMilestone(projectId, milestoneId) {
+  const S = state();
+  if (!S.paidMilestones) S.paidMilestones = {};
+  const key = projectId + '/' + milestoneId;
+  if (S.paidMilestones[key]) { persist(); return 0; }
+  S.paidMilestones[key] = true;
+  persist();
+  return addXp(rewards().milestone || 50, 'milestone');
+}
+
+/** Завершение проекта: крупный бонус, тоже один раз. */
+export function awardProject(projectId, xp) {
+  const S = state();
+  if (!S.paidProjects) S.paidProjects = {};
+  if (S.paidProjects[projectId]) return 0;
+  S.paidProjects[projectId] = true;
+  persist();
+  return addXp(xp || rewards().projectComplete || 300, 'project');
+}
+
 /** Отметка языка — питает достижение «Полиглот». */
 export function noteLanguage(lang) {
   const S = state();

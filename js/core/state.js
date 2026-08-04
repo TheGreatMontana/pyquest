@@ -23,7 +23,42 @@ export function freshState() {
     finals: {},         // courseId -> лучший % финального экзамена
     ach: [], rm: {}, langsUsed: [],
     assessments: {},    // courseId -> { level, pct, at }
+    projects: {},       // projectId -> { milestones, checklist, startedAt, completedAt, repo }
+    bookmarks: [],      // [{ courseId, moduleId, tab, title, at }]
+    recent: [],         // недавно просмотренные уроки, максимум 8
   };
+}
+
+const RECENT_LIMIT = 8;
+
+/* ---------- закладки и история (раздел «Прогресс пользователя») ---------- */
+
+export function bookmarkKey(courseId, moduleId, tab) {
+  return courseId + '/' + moduleId + (tab ? '/' + tab : '');
+}
+
+export function isBookmarked(courseId, moduleId, tab) {
+  return (S.bookmarks || []).some(b => bookmarkKey(b.courseId, b.moduleId, b.tab) === bookmarkKey(courseId, moduleId, tab));
+}
+
+export function toggleBookmark(entry) {
+  if (!S.bookmarks) S.bookmarks = [];
+  const key = bookmarkKey(entry.courseId, entry.moduleId, entry.tab);
+  const idx = S.bookmarks.findIndex(b => bookmarkKey(b.courseId, b.moduleId, b.tab) === key);
+  if (idx >= 0) S.bookmarks.splice(idx, 1);
+  else S.bookmarks.unshift(Object.assign({ at: new Date().toISOString() }, entry));
+  persist();
+  return idx < 0;                       // true — добавили, false — убрали
+}
+
+/** Запоминает последний открытый урок; дубликаты поднимаются наверх. */
+export function noteRecent(entry) {
+  if (!S.recent) S.recent = [];
+  const key = bookmarkKey(entry.courseId, entry.moduleId);
+  S.recent = S.recent.filter(r => bookmarkKey(r.courseId, r.moduleId) !== key);
+  S.recent.unshift(Object.assign({ at: new Date().toISOString() }, entry));
+  if (S.recent.length > RECENT_LIMIT) S.recent.length = RECENT_LIMIT;
+  persist();
 }
 
 let S = freshState();

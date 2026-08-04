@@ -11,9 +11,10 @@ import { esc, ic, toast, confetti } from './ui.js';
 import { renderAuth, setAuthCallback, doLogout } from './screens/auth.js';
 import { renderDashboard } from './screens/dashboard.js';
 import { renderCatalog, renderDomain } from './screens/catalog.js';
-import { renderCourse, renderModule } from './screens/course.js';
+import { renderCourse, renderModule, initBookmarks } from './screens/course.js';
 import { renderExam, stopExam } from './screens/exam.js';
 import { renderRoadmap, renderPractice, renderAssessment, renderCertificate } from './screens/misc.js';
+import { renderProjects, renderProject } from './screens/projects.js';
 
 const app = document.getElementById('app');
 
@@ -53,6 +54,7 @@ function applyStaticLabels() {
   document.querySelector('[data-i18n="nav.map"]').textContent = t('nav.map');
   document.querySelector('[data-i18n="nav.catalog"]').textContent = t('nav.catalog');
   document.querySelector('[data-i18n="nav.practice"]').textContent = t('nav.practice');
+  document.querySelector('[data-i18n="nav.projects"]').textContent = t('nav.projects');
   document.querySelector('[data-i18n="nav.roadmap"]').textContent = t('nav.roadmap');
   document.querySelector('.footer p').innerHTML = esc(t('footer.text')) +
     ' · <a href="https://github.com/TheGreatMontana/pyquest" target="_blank" rel="noopener">GitHub</a>';
@@ -79,6 +81,8 @@ async function route() {
     if (p[0] === 'domain' && p[1]) return renderDomain(app, p[1]);
     if (p[0] === 'roadmap') return renderRoadmap(app);
     if (p[0] === 'practice') return await renderPractice(app);
+    if (p[0] === 'projects') return await renderProjects(app);
+    if (p[0] === 'project' && p[1]) return await renderProject(app, p[1]);
     if (p[0] === 'assess' && p[1]) return await renderAssessment(app, p[1]);
     if (p[0] === 'cert' && p[1]) return renderCertificate(app, p[1]);
     if (p[0] === 'course' && p[1]) {
@@ -137,6 +141,7 @@ async function boot() {
   await initI18n();
   applyStaticLabels();
   renderLangSwitcher();
+  initBookmarks(app);          // делегирование переживает перерисовку экранов
 
   try {
     await loadCatalog();

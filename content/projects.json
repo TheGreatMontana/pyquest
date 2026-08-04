@@ -1,0 +1,208 @@
+{
+ "schema": 2,
+ "projects": [
+  {
+   "id": "cli-toolkit",
+   "level": "beginner",
+   "estimatedHours": 6,
+   "xp": 300,
+   "glyph": "terminal",
+   "color": "#38bdf8",
+   "requires": ["python-syntax", "python-control-flow"],
+   "skills": ["python-collections", "python-io"],
+   "title": { "ru": "Набор консольных утилит", "uz": "Konsol utilitalari to'plami", "en": "Command-line toolkit" },
+   "summary": {
+    "ru": "Три маленькие программы, которые реально пригодятся: список дел, счётчик слов и калькулятор бюджета. Первый настоящий проект после основ Python.",
+    "uz": "Haqiqatan foydali bo'ladigan uchta kichik dastur: vazifalar ro'yxati, so'zlar hisoblagichi va byudjet kalkulyatori. Python asoslaridan keyingi birinchi haqiqiy loyiha.",
+    "en": "Three small programs you will actually use: a to-do list, a word counter and a budget calculator. Your first real project after the Python basics."
+   },
+   "description": {
+    "ru": "<p>Цель — перейти от учебных задач к программам, которые запускаются из терминала и хранят данные между запусками. Ты соберёшь три утилиты в одном репозитории, каждая в своём файле.</p><p>Это ровно тот тип проекта, который просил показывать твой ментор: небольшой, законченный, с историей коммитов на GitHub.</p>",
+    "uz": "<p>Maqsad — o'quv masalalaridan terminaldan ishga tushadigan va ishga tushirishlar orasida ma'lumotni saqlaydigan dasturlarga o'tish. Siz bitta repozitoriyda uchta utilitani yig'asiz, har biri o'z faylida.</p><p>Bu aynan mentoringiz ko'rsatishni so'ragan loyiha turi: kichik, tugallangan, GitHub'da commit tarixi bilan.</p>",
+    "en": "<p>The goal is to move from exercises to programs that run from a terminal and keep data between runs. You will build three utilities in one repository, each in its own file.</p><p>This is exactly the kind of project your mentor asked to see: small, finished, with a commit history on GitHub.</p>"
+   },
+   "tech": ["Python", "argparse", "JSON", "Git"],
+   "milestones": [
+    { "id": "m1", "title": { "ru": "Репозиторий и структура", "uz": "Repozitoriy va tuzilma", "en": "Repository and structure" },
+      "desc": { "ru": "Создай репозиторий на GitHub, добавь README и .gitignore, сделай первый коммит.", "uz": "GitHub'da repozitoriy yarating, README va .gitignore qo'shing, birinchi commit qiling.", "en": "Create a GitHub repository, add a README and .gitignore, make the first commit." } },
+    { "id": "m2", "title": { "ru": "Список дел с сохранением", "uz": "Saqlanadigan vazifalar ro'yxati", "en": "To-do list with persistence" },
+      "desc": { "ru": "todo.py: добавить задачу, показать список, отметить выполненной. Данные хранятся в JSON-файле и переживают перезапуск.", "uz": "todo.py: vazifa qo'shish, ro'yxatni ko'rsatish, bajarilgan deb belgilash. Ma'lumot JSON faylda saqlanadi va qayta ishga tushirishdan omon qoladi.", "en": "todo.py: add a task, list tasks, mark one done. Data lives in a JSON file and survives a restart." } },
+    { "id": "m3", "title": { "ru": "Счётчик слов в тексте", "uz": "Matndagi so'zlar hisoblagichi", "en": "Word counter" },
+      "desc": { "ru": "wordcount.py: читает текстовый файл и выводит топ-10 самых частых слов. Пригодится словарь и сортировка по значению.", "uz": "wordcount.py: matn faylini o'qiydi va eng ko'p uchraydigan 10 ta so'zni chiqaradi. Lug'at va qiymat bo'yicha saralash kerak bo'ladi.", "en": "wordcount.py: reads a text file and prints the ten most frequent words. You will need a dictionary and sorting by value." } },
+    { "id": "m4", "title": { "ru": "Калькулятор бюджета", "uz": "Byudjet kalkulyatori", "en": "Budget calculator" },
+      "desc": { "ru": "budget.py: считает доходы и расходы из CSV-файла, показывает итог и самую большую статью трат.", "uz": "budget.py: CSV fayldan daromad va xarajatlarni hisoblaydi, natijani va eng katta xarajat moddasini ko'rsatadi.", "en": "budget.py: reads income and expenses from a CSV file, shows the balance and the largest spending category." } },
+    { "id": "m5", "title": { "ru": "README и защита от ошибок", "uz": "README va xatolardan himoya", "en": "README and error handling" },
+      "desc": { "ru": "Опиши в README, как запускать каждую утилиту. Добавь обработку отсутствующих файлов и неверного ввода через try/except.", "uz": "README'da har bir utilitani qanday ishga tushirishni yozing. try/except orqali yo'q fayllar va noto'g'ri kiritishni qayta ishlashni qo'shing.", "en": "Document how to run each utility in the README. Handle missing files and bad input with try/except." } }
+   ],
+   "checklist": {
+    "ru": ["Код на GitHub с осмысленными коммитами", "Каждая утилита запускается из терминала", "Данные сохраняются между запусками", "Программа не падает на неверном вводе", "В README есть примеры запуска"],
+    "uz": ["Kod GitHub'da mazmunli commitlar bilan", "Har bir utilita terminaldan ishga tushadi", "Ma'lumot ishga tushirishlar orasida saqlanadi", "Dastur noto'g'ri kiritishda yiqilmaydi", "README'da ishga tushirish misollari bor"],
+    "en": ["Code on GitHub with meaningful commits", "Each utility runs from the terminal", "Data persists between runs", "The program does not crash on bad input", "The README shows how to run everything"]
+   }
+  },
+  {
+   "id": "sql-report",
+   "level": "intermediate",
+   "estimatedHours": 8,
+   "xp": 400,
+   "glyph": "db",
+   "color": "#f59e0b",
+   "requires": ["sql-select", "sql-joins"],
+   "skills": ["sql-window", "data-analysis"],
+   "title": { "ru": "Аналитический отчёт на SQL", "uz": "SQL'da tahliliy hisobot", "en": "Analytical report in SQL" },
+   "summary": {
+    "ru": "Собери набор запросов, который отвечает на реальные вопросы бизнеса: кто лучшие клиенты, что продаётся хуже всего, как растёт выручка по месяцам.",
+    "uz": "Biznesning haqiqiy savollariga javob beradigan so'rovlar to'plamini yig'ing: eng yaxshi mijozlar kim, nima yomon sotiladi, tushum oylar bo'yicha qanday o'sadi.",
+    "en": "Build a set of queries answering real business questions: who the best customers are, what sells worst, how revenue grows month by month."
+   },
+   "description": {
+    "ru": "<p>Работа Data Engineer начинается не с кода, а с вопроса «что нужно узнать». В этом проекте ты превратишь пять вопросов бизнеса в SQL-запросы и оформишь их как готовый отчёт.</p><p>Тренироваться можно прямо на учебной базе платформы (вкладка «Задачи» любого SQL-модуля), но лучше развернуть TSQLV4 или Northwind из файлов ментора — это ближе к боевым условиям.</p>",
+    "uz": "<p>Data Engineer ishi koddan emas, «nimani bilish kerak» savolidan boshlanadi. Bu loyihada siz biznesning beshta savolini SQL so'rovlariga aylantirasiz va ularni tayyor hisobot sifatida rasmiylashtirasiz.</p><p>Mashq qilish uchun platformaning o'quv bazasidan foydalanish mumkin, lekin mentor fayllaridagi TSQLV4 yoki Northwind'ni o'rnatish yaxshiroq — bu jangovar sharoitlarga yaqinroq.</p>",
+    "en": "<p>A data engineer's work starts with a question, not with code. In this project you turn five business questions into SQL queries and package them as a finished report.</p><p>You can practise on the platform's training database, but deploying TSQLV4 or Northwind from your mentor's files is closer to real conditions.</p>"
+   },
+   "tech": ["SQL", "SQL Server / SQLite", "JOIN", "GROUP BY", "CTE", "оконные функции"],
+   "milestones": [
+    { "id": "m1", "title": { "ru": "Топ клиентов по выручке", "uz": "Tushum bo'yicha eng yaxshi mijozlar", "en": "Top customers by revenue" },
+      "desc": { "ru": "JOIN трёх таблиц + GROUP BY + ORDER BY. Выведи десять клиентов с наибольшей суммой заказов.", "uz": "Uchta jadval JOIN + GROUP BY + ORDER BY. Eng ko'p buyurtma summasiga ega o'nta mijozni chiqaring.", "en": "JOIN three tables + GROUP BY + ORDER BY. Show the ten customers with the highest order totals." } },
+    { "id": "m2", "title": { "ru": "Выручка по месяцам", "uz": "Oylar bo'yicha tushum", "en": "Revenue by month" },
+      "desc": { "ru": "Группировка по месяцу заказа с нарастающим итогом через оконную функцию.", "uz": "Buyurtma oyi bo'yicha guruhlash va oyna funksiyasi orqali o'suvchi jami.", "en": "Group by order month and add a running total with a window function." } },
+    { "id": "m3", "title": { "ru": "Товары-аутсайдеры", "uz": "Eng kam sotilgan tovarlar", "en": "Worst-selling products" },
+      "desc": { "ru": "LEFT JOIN, чтобы найти товары вообще без продаж — их не видно при обычном JOIN.", "uz": "Umuman sotilmagan tovarlarni topish uchun LEFT JOIN — oddiy JOIN'da ular ko'rinmaydi.", "en": "Use LEFT JOIN to find products with no sales at all — a plain JOIN hides them." } },
+    { "id": "m4", "title": { "ru": "Рейтинг внутри категорий", "uz": "Toifalar ichidagi reyting", "en": "Ranking within categories" },
+      "desc": { "ru": "ROW_NUMBER или RANK с PARTITION BY: топ-3 товара в каждой категории.", "uz": "PARTITION BY bilan ROW_NUMBER yoki RANK: har bir toifada eng yaxshi 3 ta tovar.", "en": "ROW_NUMBER or RANK with PARTITION BY: the top three products in each category." } },
+    { "id": "m5", "title": { "ru": "Оформление отчёта", "uz": "Hisobotni rasmiylashtirish", "en": "Package the report" },
+      "desc": { "ru": "Собери запросы в один .sql файл с комментариями: вопрос → запрос → что показал результат. Залей на GitHub.", "uz": "So'rovlarni izohlar bilan bitta .sql faylga yig'ing: savol → so'rov → natija nimani ko'rsatdi. GitHub'ga yuklang.", "en": "Collect the queries in one .sql file with comments: question → query → what the result showed. Push it to GitHub." } }
+   ],
+   "checklist": {
+    "ru": ["Каждый запрос отвечает на сформулированный вопрос", "Использованы JOIN, GROUP BY и оконная функция", "Есть запрос с LEFT JOIN для поиска «пустых» записей", "Запросы прокомментированы", "Файл в репозитории на GitHub"],
+    "uz": ["Har bir so'rov aniq savolga javob beradi", "JOIN, GROUP BY va oyna funksiyasi ishlatilgan", "«Bo'sh» yozuvlarni topish uchun LEFT JOIN so'rovi bor", "So'rovlar izohlangan", "Fayl GitHub repozitoriyasida"],
+    "en": ["Every query answers a stated question", "JOIN, GROUP BY and a window function are used", "There is a LEFT JOIN query finding «empty» records", "Queries are commented", "The file is in a GitHub repository"]
+   }
+  },
+  {
+   "id": "etl-pipeline",
+   "level": "intermediate",
+   "estimatedHours": 12,
+   "xp": 500,
+   "glyph": "layers",
+   "color": "#34d399",
+   "requires": ["python-functions", "python-io", "sql-select"],
+   "skills": ["data-analysis"],
+   "title": { "ru": "ETL-пайплайн: из файлов в базу", "uz": "ETL-quvur: fayllardan bazaga", "en": "ETL pipeline: from files to a database" },
+   "summary": {
+    "ru": "Ключевой проект для Data Engineer: программа читает сырые данные, чистит их и складывает в базу. Именно этим занимается инженер данных каждый день.",
+    "uz": "Data Engineer uchun asosiy loyiha: dastur xom ma'lumotni o'qiydi, tozalaydi va bazaga joylaydi. Ma'lumot muhandisi har kuni aynan shu bilan shug'ullanadi.",
+    "en": "The key data-engineering project: a program reads raw data, cleans it and loads it into a database. This is what a data engineer does every day."
+   },
+   "description": {
+    "ru": "<p><b>ETL</b> = Extract (извлечь) → Transform (преобразовать) → Load (загрузить). Ты напишешь пайплайн, который берёт CSV-файлы с «грязными» данными, приводит их в порядок и загружает в SQLite или PostgreSQL.</p><p>Данные для проекта возьми любые реальные: выгрузку из своего проекта, открытые данные, экспорт из Excel. Чем грязнее исходник, тем полезнее опыт.</p>",
+    "uz": "<p><b>ETL</b> = Extract (chiqarish) → Transform (o'zgartirish) → Load (yuklash). Siz «iflos» ma'lumotli CSV fayllarni oladigan, tartibga soladigan va SQLite yoki PostgreSQL'ga yuklaydigan quvur yozasiz.</p><p>Loyiha uchun har qanday haqiqiy ma'lumotni oling: o'z loyihangizdan eksport, ochiq ma'lumotlar, Excel'dan eksport. Manba qanchalik iflos bo'lsa, tajriba shunchalik foydali.</p>",
+    "en": "<p><b>ETL</b> = Extract → Transform → Load. You will write a pipeline that takes CSV files with messy data, cleans them up and loads them into SQLite or PostgreSQL.</p><p>Use any real data: an export from your own project, open data, a spreadsheet dump. The messier the source, the more useful the experience.</p>"
+   },
+   "tech": ["Python", "csv", "sqlite3", "logging", "SQL"],
+   "milestones": [
+    { "id": "m1", "title": { "ru": "Extract: чтение источника", "uz": "Extract: manbani o'qish", "en": "Extract: read the source" },
+      "desc": { "ru": "Функция, которая читает CSV и возвращает список словарей. Обработай отсутствующий файл и кривую кодировку.", "uz": "CSV o'qib, lug'atlar ro'yxatini qaytaruvchi funksiya. Yo'q fayl va noto'g'ri kodlashni qayta ishlang.", "en": "A function that reads a CSV and returns a list of dictionaries. Handle a missing file and a broken encoding." } },
+    { "id": "m2", "title": { "ru": "Transform: очистка данных", "uz": "Transform: ma'lumotni tozalash", "en": "Transform: clean the data" },
+      "desc": { "ru": "Убери дубликаты, приведи даты к одному формату, преобразуй числа из строк, отбрось строки без обязательных полей.", "uz": "Dublikatlarni olib tashlang, sanalarni bitta formatga keltiring, sonlarni satrlardan o'giring, majburiy maydonlarsiz qatorlarni tashlang.", "en": "Remove duplicates, normalise dates, convert numbers from strings, drop rows missing required fields." } },
+    { "id": "m3", "title": { "ru": "Load: запись в базу", "uz": "Load: bazaga yozish", "en": "Load: write to the database" },
+      "desc": { "ru": "Создай таблицу и загрузи очищенные данные параметризованными запросами. Повторный запуск не должен дублировать записи.", "uz": "Jadval yarating va tozalangan ma'lumotni parametrlangan so'rovlar bilan yuklang. Qayta ishga tushirish yozuvlarni takrorlamasligi kerak.", "en": "Create the table and load the clean data with parameterised queries. Re-running must not duplicate rows." } },
+    { "id": "m4", "title": { "ru": "Логи и отчёт о качестве", "uz": "Loglar va sifat hisoboti", "en": "Logs and a quality report" },
+      "desc": { "ru": "Пиши в лог: сколько строк прочитано, сколько отброшено и почему, сколько загружено. Без этого пайплайн нельзя эксплуатировать.", "uz": "Logga yozing: nechta qator o'qildi, nechtasi tashlandi va nima uchun, nechtasi yuklandi. Busiz quvurni ekspluatatsiya qilib bo'lmaydi.", "en": "Log how many rows were read, how many were dropped and why, how many were loaded. Without this a pipeline cannot be operated." } },
+    { "id": "m5", "title": { "ru": "Идемпотентность и запуск по расписанию", "uz": "Idempotentlik va jadval bo'yicha ishga tushirish", "en": "Idempotency and scheduling" },
+      "desc": { "ru": "Убедись, что повторный запуск на тех же данных даёт тот же результат. Настрой запуск по cron (или опиши, как это сделать).", "uz": "Xuddi shu ma'lumotda qayta ishga tushirish bir xil natija berishiga ishonch hosil qiling. cron orqali ishga tushirishni sozlang (yoki buni qanday qilishni tasvirlang).", "en": "Make sure a second run on the same data yields the same result. Schedule it with cron (or document how)." } },
+    { "id": "m6", "title": { "ru": "Документация проекта", "uz": "Loyiha hujjatlari", "en": "Project documentation" },
+      "desc": { "ru": "README: схема данных, как запустить, что делает каждый шаг, какие проверки качества встроены.", "uz": "README: ma'lumot sxemasi, qanday ishga tushirish, har bir qadam nima qiladi, qanday sifat tekshiruvlari bor.", "en": "README: the data schema, how to run it, what each step does, which quality checks are built in." } }
+   ],
+   "checklist": {
+    "ru": ["Три этапа разделены на функции", "Повторный запуск не создаёт дубликатов", "Ошибочные строки не роняют пайплайн, а логируются", "В логе видно, сколько строк прошло и сколько отброшено", "Запросы к базе параметризованные", "README объясняет запуск и схему данных"],
+    "uz": ["Uchta bosqich funksiyalarga ajratilgan", "Qayta ishga tushirish dublikat yaratmaydi", "Xato qatorlar quvurni yiqitmaydi, logga yoziladi", "Logda nechta qator o'tgani va tashlangani ko'rinadi", "Bazaga so'rovlar parametrlangan", "README ishga tushirish va sxemani tushuntiradi"],
+    "en": ["The three stages are separate functions", "A repeat run creates no duplicates", "Bad rows are logged instead of crashing the pipeline", "The log shows how many rows passed and how many were dropped", "Database queries are parameterised", "The README explains how to run it and the data schema"]
+   }
+  },
+  {
+   "id": "api-service",
+   "level": "intermediate",
+   "estimatedHours": 10,
+   "xp": 450,
+   "glyph": "server",
+   "color": "#60a5fa",
+   "requires": ["python-oop", "http-basics"],
+   "skills": [],
+   "title": { "ru": "Свой REST API с базой", "uz": "Ma'lumotlar bazasi bilan REST API", "en": "Your own REST API with a database" },
+   "summary": {
+    "ru": "Бэкенд-сервис с CRUD-операциями, который можно вызвать из браузера и из другой программы. Тот самый проект, который просил показать ментор.",
+    "uz": "Brauzerdan va boshqa dasturdan chaqirish mumkin bo'lgan CRUD amallarli backend xizmat. Aynan mentor ko'rsatishni so'ragan loyiha.",
+    "en": "A backend service with CRUD operations you can call from a browser and from another program. Exactly the project your mentor asked for."
+   },
+   "description": {
+    "ru": "<p>Ты напишешь API, который хранит данные в базе и умеет их создавать, читать, изменять и удалять. Тема — любая: список книг, трекер тренировок, каталог товаров.</p><p>Именно так устроен и API этой платформы: Flask, SQLite, токены. Можешь подсмотреть в <code>server/app.py</code> репозитория PyQuest.</p>",
+    "uz": "<p>Siz ma'lumotni bazada saqlaydigan va uni yaratish, o'qish, o'zgartirish va o'chirishni biladigan API yozasiz. Mavzu har qanday: kitoblar ro'yxati, mashg'ulotlar trekeri, tovarlar katalogi.</p><p>Bu platformaning API'si ham aynan shunday qurilgan: Flask, SQLite, tokenlar. PyQuest repozitoriyasidagi <code>server/app.py</code> ga qarashingiz mumkin.</p>",
+    "en": "<p>You will write an API that stores data in a database and can create, read, update and delete it. Pick any topic: a book list, a workout tracker, a product catalogue.</p><p>This platform's own API works the same way: Flask, SQLite, tokens. Feel free to study <code>server/app.py</code> in the PyQuest repository.</p>"
+   },
+   "tech": ["Python", "Flask / FastAPI", "SQLite", "REST", "JSON", "requests"],
+   "milestones": [
+    { "id": "m1", "title": { "ru": "Первый эндпоинт", "uz": "Birinchi endpoint", "en": "The first endpoint" },
+      "desc": { "ru": "Подними сервер, сделай GET /api/health, который отвечает JSON. Проверь через браузер и через requests.", "uz": "Serverni ko'taring, JSON qaytaruvchi GET /api/health qiling. Brauzer va requests orqali tekshiring.", "en": "Start the server and add GET /api/health returning JSON. Check it in a browser and with requests." } },
+    { "id": "m2", "title": { "ru": "CRUD над сущностью", "uz": "Obyekt ustida CRUD", "en": "CRUD over a resource" },
+      "desc": { "ru": "GET списка, GET одного, POST создать, PATCH изменить, DELETE удалить. Правильные коды: 200, 201, 404.", "uz": "Ro'yxat GET, bitta GET, POST yaratish, PATCH o'zgartirish, DELETE o'chirish. To'g'ri kodlar: 200, 201, 404.", "en": "GET list, GET one, POST create, PATCH update, DELETE remove. Correct codes: 200, 201, 404." } },
+    { "id": "m3", "title": { "ru": "Хранение в базе", "uz": "Bazada saqlash", "en": "Store it in a database" },
+      "desc": { "ru": "Перенеси данные из списка в памяти в SQLite. Все запросы — параметризованные, без склейки строк.", "uz": "Ma'lumotni xotiradagi ro'yxatdan SQLite'ga ko'chiring. Barcha so'rovlar parametrlangan, satr yopishtirmasdan.", "en": "Move the data from an in-memory list into SQLite. All queries parameterised, no string concatenation." } },
+    { "id": "m4", "title": { "ru": "Валидация входных данных", "uz": "Kiruvchi ma'lumotni tekshirish", "en": "Validate the input" },
+      "desc": { "ru": "Проверяй тело запроса: обязательные поля, типы, длины. На кривой ввод — 400 с понятным сообщением, а не падение.", "uz": "So'rov tanasini tekshiring: majburiy maydonlar, turlar, uzunliklar. Noto'g'ri kiritishda — yiqilish emas, tushunarli xabar bilan 400.", "en": "Check the request body: required fields, types, lengths. Bad input returns 400 with a clear message, not a crash." } },
+    { "id": "m5", "title": { "ru": "Клиент на requests", "uz": "requests'dagi klient", "en": "A client using requests" },
+      "desc": { "ru": "Отдельный скрипт, который дёргает твой API: создаёт запись, читает, меняет, удаляет и проверяет ответы.", "uz": "Sizning API'ingizni chaqiruvchi alohida skript: yozuv yaratadi, o'qiydi, o'zgartiradi, o'chiradi va javoblarni tekshiradi.", "en": "A separate script that calls your API: creates a record, reads, updates, deletes and validates the responses." } },
+    { "id": "m6", "title": { "ru": "Docker и деплой", "uz": "Docker va deploy", "en": "Docker and deployment" },
+      "desc": { "ru": "Заверни сервис в Docker-образ. Если есть свой сервер — подними там за nginx. Это то, что ментор называл «поднять проект на хостинге».", "uz": "Xizmatni Docker imijiga o'rang. O'z serveringiz bo'lsa — u yerda nginx orqasida ko'taring. Mentor buni «loyihani hostingda ko'tarish» degan edi.", "en": "Wrap the service in a Docker image. If you have a server, run it behind nginx — this is what your mentor called «getting a project onto hosting»." } }
+   ],
+   "checklist": {
+    "ru": ["Все пять CRUD-операций работают", "Коды ответов корректные (200/201/400/404)", "Данные лежат в базе, а не в памяти", "Запросы к базе параметризованные", "Есть скрипт-клиент на requests", "README с примерами curl или requests"],
+    "uz": ["Barcha beshta CRUD amali ishlaydi", "Javob kodlari to'g'ri (200/201/400/404)", "Ma'lumot xotirada emas, bazada", "Bazaga so'rovlar parametrlangan", "requests'da klient-skript bor", "curl yoki requests misollari bilan README"],
+    "en": ["All five CRUD operations work", "Response codes are correct (200/201/400/404)", "Data lives in a database, not in memory", "Database queries are parameterised", "There is a client script using requests", "A README with curl or requests examples"]
+   }
+  },
+  {
+   "id": "portfolio",
+   "level": "advanced",
+   "estimatedHours": 16,
+   "xp": 600,
+   "glyph": "trophy",
+   "color": "#fbbf24",
+   "requires": ["python-oop", "sql-joins", "algo-structures"],
+   "skills": [],
+   "title": { "ru": "Портфолио Data Engineer", "uz": "Data Engineer portfoliosi", "en": "Data Engineer portfolio" },
+   "summary": {
+    "ru": "Финальный проект пути: собери всё изученное в одну работу, которую не стыдно показать ментору и работодателю.",
+    "uz": "Yo'lning yakuniy loyihasi: o'rganganlaringizni mentor va ish beruvchiga ko'rsatish uyat bo'lmagan bitta ishga yig'ing.",
+    "en": "The capstone of the path: combine everything you have learned into one piece of work you can show a mentor and an employer."
+   },
+   "description": {
+    "ru": "<p>Один сквозной проект: данные приходят из внешнего источника (API или файлы), проходят через пайплайн, ложатся в базу, а поверх строятся аналитические запросы и небольшой отчёт.</p><p>Это то, о чём говорил ментор: не набор упражнений, а законченная работа с архитектурой, документацией и историей коммитов.</p>",
+    "uz": "<p>Bitta yaxlit loyiha: ma'lumot tashqi manbadan (API yoki fayllar) keladi, quvurdan o'tadi, bazaga tushadi, ustiga tahliliy so'rovlar va kichik hisobot quriladi.</p><p>Bu mentor aytgan narsa: mashqlar to'plami emas, balki arxitektura, hujjatlar va commit tarixi bilan tugallangan ish.</p>",
+    "en": "<p>One end-to-end project: data arrives from an external source (an API or files), flows through a pipeline, lands in a database, and analytical queries plus a small report sit on top.</p><p>This is what your mentor meant: not a pile of exercises, but a finished piece of work with architecture, documentation and a commit history.</p>"
+   },
+   "tech": ["Python", "requests", "pandas", "SQL", "Docker", "Git", "cron / Airflow"],
+   "milestones": [
+    { "id": "m1", "title": { "ru": "Выбор темы и источника данных", "uz": "Mavzu va ma'lumot manbasini tanlash", "en": "Choose a topic and a data source" },
+      "desc": { "ru": "Сформулируй, на какие вопросы ответит проект и откуда возьмутся данные. Запиши это в README до начала кода.", "uz": "Loyiha qaysi savollarga javob berishini va ma'lumot qayerdan olinishini shakllantiring. Buni koddan oldin README'ga yozing.", "en": "State which questions the project answers and where the data comes from. Write it in the README before any code." } },
+    { "id": "m2", "title": { "ru": "Сбор данных", "uz": "Ma'lumot yig'ish", "en": "Data collection" },
+      "desc": { "ru": "Скрипт, забирающий данные из API (requests) или файлов, с обработкой ошибок сети и лимитов.", "uz": "API (requests) yoki fayllardan ma'lumot oladigan skript, tarmoq xatolari va limitlarni qayta ishlash bilan.", "en": "A script pulling data from an API (requests) or files, handling network errors and rate limits." } },
+    { "id": "m3", "title": { "ru": "Пайплайн обработки", "uz": "Ishlov berish quvuri", "en": "Processing pipeline" },
+      "desc": { "ru": "Очистка, нормализация, проверки качества. Если освоил pandas — используй его; если нет, чистый Python тоже подойдёт.", "uz": "Tozalash, normallashtirish, sifat tekshiruvlari. pandas'ni o'zlashtirgan bo'lsangiz — undan foydalaning; yo'q bo'lsa, toza Python ham yaraydi.", "en": "Cleaning, normalisation, quality checks. Use pandas if you know it; plain Python is fine too." } },
+    { "id": "m4", "title": { "ru": "Хранилище и модель данных", "uz": "Ombor va ma'lumot modeli", "en": "Storage and data model" },
+      "desc": { "ru": "Спроектируй таблицы (ключи, связи, индексы) и загрузи данные. Опиши схему в README.", "uz": "Jadvallarni loyihalang (kalitlar, bog'lanishlar, indekslar) va ma'lumotni yuklang. Sxemani README'da tasvirlang.", "en": "Design the tables (keys, relationships, indexes) and load the data. Document the schema in the README." } },
+    { "id": "m5", "title": { "ru": "Аналитика поверх данных", "uz": "Ma'lumot ustidagi tahlil", "en": "Analytics on top" },
+      "desc": { "ru": "5–7 SQL-запросов, отвечающих на вопросы из первого шага. Оконные функции приветствуются.", "uz": "Birinchi qadamdagi savollarga javob beruvchi 5–7 ta SQL so'rov. Oyna funksiyalari qo'llab-quvvatlanadi.", "en": "Five to seven SQL queries answering the questions from step one. Window functions welcome." } },
+    { "id": "m6", "title": { "ru": "Автоматизация запуска", "uz": "Ishga tushirishni avtomatlashtirish", "en": "Automate the run" },
+      "desc": { "ru": "Пайплайн запускается одной командой и по расписанию (cron или Airflow-DAG, если добрался до него).", "uz": "Quvur bitta buyruq bilan va jadval bo'yicha ishga tushadi (cron yoki Airflow-DAG, agar unga yetgan bo'lsangiz).", "en": "The pipeline runs with one command and on a schedule (cron, or an Airflow DAG if you got that far)." } },
+    { "id": "m7", "title": { "ru": "Оформление и защита", "uz": "Rasmiylashtirish va himoya", "en": "Package and present" },
+      "desc": { "ru": "README с архитектурной схемой, инструкцией запуска и выводами. Покажи проект ментору и собери обратную связь.", "uz": "Arxitektura sxemasi, ishga tushirish yo'riqnomasi va xulosalar bilan README. Loyihani mentorga ko'rsating va fikr-mulohaza oling.", "en": "A README with an architecture diagram, run instructions and findings. Show the project to your mentor and collect feedback." } }
+   ],
+   "checklist": {
+    "ru": ["Проект отвечает на сформулированные вопросы", "Данные приходят из внешнего источника", "Пайплайн запускается одной командой", "Схема базы описана в README", "Есть аналитические SQL-запросы с выводами", "История коммитов показывает ход работы", "Проект показан ментору"],
+    "uz": ["Loyiha shakllantirilgan savollarga javob beradi", "Ma'lumot tashqi manbadan keladi", "Quvur bitta buyruq bilan ishga tushadi", "Baza sxemasi README'da tasvirlangan", "Xulosali tahliliy SQL so'rovlar bor", "Commit tarixi ish jarayonini ko'rsatadi", "Loyiha mentorga ko'rsatilgan"],
+    "en": ["The project answers the stated questions", "Data comes from an external source", "The pipeline runs with a single command", "The database schema is documented in the README", "Analytical SQL queries with findings are included", "The commit history shows how the work progressed", "The project has been shown to a mentor"]
+   }
+  }
+ ]
+}

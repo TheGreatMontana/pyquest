@@ -111,6 +111,25 @@ export function renderDashboard(root) {
     '<a class="section-link" href="#/domain/' + dom.id + '">' + esc(t('catalog.open')) + ' ' + ic('chevron') + '</a></h2>' +
     '<div class="course-grid">' + courseCards + '</div>' +
 
+    /* Недавно открытые уроки — вернуться туда, где остановился */
+    ((S.recent || []).length
+      ? '<h2 class="section-title">' + ic('clock') + ' ' + esc(t('dash.recent')) + '</h2><div class="recent-list">' +
+      S.recent.slice(0, 4).map(r =>
+        '<a class="recent-item" href="#/course/' + esc(r.courseId) + '/module/' + esc(r.moduleId) + '/' + esc(r.tab || 'theory') + '">' +
+        ic('book') + '<span><b>' + esc(r.title) + '</b><span class="ri-course">' + esc(r.courseTitle || '') + '</span></span></a>').join('') +
+      '</div>'
+      : '') +
+
+    /* Закладки */
+    ((S.bookmarks || []).length
+      ? '<h2 class="section-title">' + ic('star') + ' ' + esc(t('dash.bookmarks')) +
+      ' <small>' + S.bookmarks.length + '</small></h2><div class="recent-list">' +
+      S.bookmarks.slice(0, 6).map(b =>
+        '<a class="recent-item bookmarked" href="#/course/' + esc(b.courseId) + '/module/' + esc(b.moduleId) + '/' + esc(b.tab || 'theory') + '">' +
+        ic('star') + '<span><b>' + esc(b.title) + '</b><span class="ri-course">' + esc(b.courseTitle || '') + '</span></span></a>').join('') +
+      '</div>'
+      : '') +
+
     /* Диагностика: слабые места */
     (weak.length
       ? '<h2 class="section-title">' + ic('alert') + ' ' + esc(t('dash.weakAreas')) + '</h2><div class="weak-list">' +

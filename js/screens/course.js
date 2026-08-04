@@ -2,7 +2,7 @@
 import { t, tr, isFallback, getLang } from '../core/i18n.js';
 import { esc, ic, progressBar, statusBadge, codeBlock, toast, confetti, bindEditor, announce } from '../ui.js';
 import { courseMeta, loadCourse, findModule, skill, domainsUsingCourse } from '../core/content.js';
-import { state, mod, persist } from '../core/state.js';
+import { state, mod, persist, isBookmarked, toggleBookmark, noteRecent } from '../core/state.js';
 import { courseStatus, courseProgress, isModuleComplete, STATUS } from '../core/graph.js';
 import { awardTheory, awardQuiz, awardTask, noteLanguage } from '../core/gamification.js';
 import { renderBlocks, bindBlocks, setBlockContext, needsRunner } from '../blocks.js';
@@ -109,22 +109,52 @@ function modHeader(courseId, course, m, tab) {
     ['tasks', ic('terminal') + ' ' + t('module.tasks'), tasksDone === m.tasks.length],
     ['exam', ic('shield') + ' ' + t('module.exam'), st.examBest >= 70],
   ];
+  const marked = isBookmarked(courseId, m.id, tab);
   return '<a class="back-link" href="#/course/' + courseId + '">' + ic('chevron', 'flip') + ' ' + esc(t('module.back')) + '</a>' +
     '<div class="mod-header" style="--tc:' + esc(meta.color) + '">' +
     '<span class="mod-num big">' + String(idx + 1).padStart(2, '0') + '</span>' +
     '<div><p class="mod-track">' + esc(tr(meta.title)) + ' · ' + esc(t('module.of', { n: idx + 1, total: course.modules.length })) + '</p>' +
-    '<h1>' + esc(tr(m.title)) + '</h1><p class="mod-tagline">' + esc(tr(m.tagline)) + '</p></div></div>' +
+    '<h1>' + esc(tr(m.title)) + '</h1><p class="mod-tagline">' + esc(tr(m.tagline)) + '</p></div>' +
+    '<button class="bookmark-btn' + (marked ? ' on' : '') + '" data-bm="1"' +
+    ' data-course="' + esc(courseId) + '" data-module="' + esc(m.id) + '" data-tab="' + esc(tab) + '"' +
+    ' data-title="' + esc(tr(m.title)) + '" data-course-title="' + esc(tr(meta.title)) + '"' +
+    ' aria-pressed="' + marked + '" title="' + esc(t(marked ? 'bookmark.remove' : 'bookmark.add')) + '">' +
+    ic('star') + '</button></div>' +
     '<div class="tabs" role="tablist">' + tabs.map(x =>
       '<a class="tab' + (tab === x[0] ? ' active' : '') + '" role="tab" aria-selected="' + (tab === x[0]) + '" href="#/course/' + courseId + '/module/' + m.id + '/' + x[0] + '">' +
       x[1] + (x[2] ? ' <span class="done-mark">' + ic('check') + '</span>' : '') + '</a>').join('') + '</div>';
 }
 
 /* ---------- модуль: маршрутизация вкладок ---------- */
+/**
+ * Обработчик закладок вешается один раз на контейнер приложения:
+ * содержимое перерисовывается постоянно, а сам контейнер живёт всю сессию,
+ * поэтому делегирование переживает смену уроков и вкладок.
+ */
+export function initBookmarks(appEl) {
+  appEl.addEventListener('click', e => {
+    const btn = e.target.closest('[data-bm]');
+    if (!btn) return;
+    const added = toggleBookmark({
+      courseId: btn.dataset.course,
+      moduleId: btn.dataset.module,
+      tab: btn.dataset.tab,
+      title: btn.dataset.title,
+      courseTitle: btn.dataset.courseTitle,
+    });
+    btn.classList.toggle('on', added);
+    btn.setAttribute('aria-pressed', String(added));
+    btn.title = t(added ? 'bookmark.remove' : 'bookmark.add');
+    toast(t(added ? 'bookmark.added' : 'bookmark.removed'));
+  });
+}
+
 export async function renderModule(root, courseId, moduleId, tab, taskId) {
   const course = await loadCourse(courseId);
   const m = findModule(course, moduleId);
   if (!m) { root.innerHTML = '<p class="muted-text">' + esc(t('common.notFound')) + '</p>'; return; }
   noteLanguage(getLang());
+  noteRecent({ courseId, moduleId: m.id, tab: tab || 'theory', title: tr(m.title), courseTitle: tr(courseMeta(courseId).title) });
 
   if (tab === 'quiz') return renderQuiz(root, courseId, course, m);
   if (tab === 'tasks') return taskId ? renderTask(root, courseId, course, m, taskId) : renderTasks(root, courseId, course, m);

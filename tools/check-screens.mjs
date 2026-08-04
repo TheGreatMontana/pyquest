@@ -86,16 +86,16 @@ check('дашборд: навыки отображаются', txt().includes('�
 /* --- каталог --- */
 catalogScreen.renderCatalog(app);
 check('каталог: 16 карточек направлений', app.querySelectorAll('.domain-card').length === 16, app.querySelectorAll('.domain-card').length);
-check('каталог: 9 карточек курсов', app.querySelectorAll('.course-grid .course-card').length === 9);
+check('каталог: 10 карточек курсов', app.querySelectorAll('.course-grid .course-card').length === 10, app.querySelectorAll('.course-grid .course-card').length);
 check('каталог: статусы честно помечены', txt().includes('В разработке'));
 
 /* --- страница направления (визуальный путь) --- */
 catalogScreen.renderDomain(app, 'data-engineering');
 check('направление: заголовок', txt().includes('Data Engineering'));
 check('направление: 4 стадии пути', app.querySelectorAll('.rm-stage').length === 4, app.querySelectorAll('.rm-stage').length);
-check('направление: узлы курсов', app.querySelectorAll('.rm-node').length === 6);
-check('направление: статус-бейджи есть у узлов', app.querySelectorAll('.rm-node .status-badge').length === 6);
-check('направление: внешняя стадия честно помечена', txt().includes('вне платформы'));
+check('направление: узлы курсов (вкл. инструменты DE)', app.querySelectorAll('.rm-node').length === 7, app.querySelectorAll('.rm-node').length);
+check('направление: статус-бейджи есть у узлов', app.querySelectorAll('.rm-node .status-badge').length === 7);
+check('направление: 4-я стадия ведёт на курс инструментов', app.innerHTML.includes('#/course/de-tools'));
 
 catalogScreen.renderDomain(app, 'ai');
 check('направление в разработке: плашка статуса', !!app.querySelector('.notice'));

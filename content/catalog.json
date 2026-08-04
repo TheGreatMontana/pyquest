@@ -131,6 +131,15 @@
     "uz": "Xavfsizlik asoslari",
     "en": "Security fundamentals"
    }
+  },
+  {
+   "id": "de-pipelines",
+   "category": "data",
+   "title": {
+    "ru": "Пайплайны и оркестрация",
+    "uz": "Quvurlar va orkestratsiya",
+    "en": "Pipelines and orchestration"
+   }
   }
  ],
  "courses": [
@@ -396,6 +405,33 @@
    ],
    "legacyIds": [],
    "moduleCount": 1
+  },
+  {
+   "id": "de-tools",
+   "title": {
+    "ru": "Инструменты Data Engineer",
+    "uz": "Data Engineer vositalari",
+    "en": "Data Engineering Tools"
+   },
+   "description": {
+    "ru": "Форматы данных, хранилища, Airflow, Spark и Kafka — как устроена работа с данными в продакшене.",
+    "uz": "Ma'lumot formatlari, omborlar, Airflow, Spark va Kafka — produksiyada ma'lumot bilan ishlash qanday tashkil etilgan.",
+    "en": "Data formats, storage, Airflow, Spark and Kafka — how data work is organised in production."
+   },
+   "glyph": "layers",
+   "color": "#f59e0b",
+   "level": "advanced",
+   "status": "full",
+   "estimatedHours": 12,
+   "requires": [
+    "python-io",
+    "sql-joins"
+   ],
+   "grants": [
+    "de-pipelines"
+   ],
+   "legacyIds": [],
+   "moduleCount": 2
   }
  ],
  "careerPaths": [
@@ -445,8 +481,9 @@
       "uz": "Ma'lumot muhandisi vositalari",
       "en": "Data engineering tools"
      },
-     "courses": [],
-     "external": true
+     "courses": [
+      "de-tools"
+     ]
     }
    ]
   },
@@ -876,7 +913,9 @@
   "examPerfect": 60,
   "finalPass": 300,
   "courseComplete": 100,
-  "interactiveBlock": 15
+  "interactiveBlock": 15,
+  "milestone": 50,
+  "projectComplete": 300
  },
  "ranks": [
   {
