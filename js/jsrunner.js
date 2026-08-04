@@ -7,7 +7,7 @@
   /* Тело воркера. Собирается строкой и запускается через blob: —
      так не нужен отдельный файл и путь к нему. */
   const WORKER_SRC = `
-    self.onmessage = function (e) {
+    self.onmessage = async function (e) {
       const { code, tests } = e.data;
       const out = [];
       const fmt = (v) => {
@@ -25,6 +25,10 @@
 
       let err = null, testErr = null;
       let scope = null;
+      /* Асинхронный код печатает уже после того, как синхронная часть кончилась.
+         Даём промисам и коротким таймерам успеть отработать, иначе вывод пропадёт. */
+      const settle = () => new Promise(r => setTimeout(r, 250));
+      const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
       try {
         // Возвращаем ссылки на объявленные функции, чтобы тесты их видели
         const fn = new Function('console', code + '\\n;return (typeof __exports !== "undefined") ? __exports : this;');
@@ -32,6 +36,8 @@
       } catch (e2) {
         err = (e2 && e2.stack ? String(e2.stack).split('\\n')[0] : String(e2));
       }
+
+      if (!err) await settle();
 
       if (!err && tests) {
         try {

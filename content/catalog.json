@@ -227,6 +227,14 @@
     "uz": "CSS freymvorklari",
     "en": "CSS frameworks"
    }
+  },
+  {
+   "id": "js-async",
+   "title": {
+    "ru": "Асинхронный JavaScript",
+    "uz": "Asinxron JavaScript",
+    "en": "Asynchronous JavaScript"
+   }
   }
  ],
  "courses": [
@@ -534,14 +542,15 @@
    "color": "#fbbf24",
    "level": "beginner",
    "status": "full",
-   "estimatedHours": 10,
+   "estimatedHours": 26,
    "requires": [],
    "grants": [
     "js-syntax",
-    "js-collections"
+    "js-collections",
+    "js-async"
    ],
    "legacyIds": [],
-   "moduleCount": 1,
+   "moduleCount": 4,
    "runner": "javascript"
   },
   {
