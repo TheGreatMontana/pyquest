@@ -1,0 +1,319 @@
+{
+ "id": "ml-intro",
+ "schema": 2,
+ "modules": [
+  {
+   "id": "ml-01",
+   "title": { "ru": "Как машина учится", "uz": "Mashina qanday o'rganadi", "en": "How a machine learns" },
+   "tagline": { "ru": "Модель, ошибка и обучение — на обычном Python, без библиотек", "uz": "Model, xato va o'qitish — kutubxonalarsiz, oddiy Python da", "en": "Model, error and training — in plain Python, no libraries" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "Что вообще значит «обучить модель»", "uz": "«Modelni o'qitish» umuman nima degani", "en": "What “training a model” actually means" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Обычная программа: ты пишешь правило, она применяет. Машинное обучение переворачивает это — ты даёшь примеры, программа <b>сама выводит правило</b>.</p><p>Пример. Есть данные о квартирах: площадь и цена. Никто не говорил компьютеру «цена = площадь × 50». Он посмотрит на десяток примеров и подберёт этот коэффициент сам.</p><p>Модель — это и есть набор подобранных чисел. Обучение — процесс их подбора. Всё остальное в машинном обучении надстроено над этой мыслью.</p>",
+        "uz": "<p>Oddiy dastur: siz qoida yozasiz, u qo'llaydi. Mashinali o'rganish buni ag'daradi — siz misollar berasiz, dastur <b>qoidani o'zi chiqaradi</b>.</p><p>Misol. Kvartiralar haqida ma'lumot bor: maydon va narx. Kompyuterga hech kim «narx = maydon × 50» demagan. U o'nlab misolga qarab bu koeffitsiyentni o'zi topadi.</p><p>Model — bu tanlangan sonlar to'plami. O'qitish — ularni tanlash jarayoni. Mashinali o'rganishdagi qolgan hamma narsa shu fikr ustiga qurilgan.</p>",
+        "en": "<p>An ordinary program: you write the rule, it applies it. Machine learning flips this — you provide examples and the program <b>derives the rule itself</b>.</p><p>Example. You have data about flats: area and price. Nobody told the computer “price = area × 50”. It looks at a dozen examples and finds that coefficient on its own.</p><p>A model is exactly that set of fitted numbers. Training is the process of fitting them. Everything else in machine learning is built on top of this idea.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "# данные: площадь квартиры и её цена\nareas  = [30, 45, 60, 75, 90]\nprices = [1500, 2250, 3000, 3750, 4500]\n\n# модель — одно число: во сколько раз цена больше площади\n# подберём его вручную и посмотрим, насколько ошибаемся\nfor k in [40, 50, 60]:\n    error = 0\n    for a, p in zip(areas, prices):\n        predicted = k * a\n        error += abs(predicted - p)\n    print(f\"k={k}: суммарная ошибка {error}\")"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Видно, что при <code>k = 50</code> ошибка равна нулю — модель угадала правило. Так и работает обучение: перебирать (умнее, чем в лоб) параметры и выбирать те, где ошибка меньше.</p><p>Функция, которая считает эту ошибку, называется <b>функцией потерь</b>. Обучение — это её минимизация.</p>",
+        "uz": "<p>Ko'rinib turibdiki, <code>k = 50</code> da xato nolga teng — model qoidani topdi. O'qitish shunday ishlaydi: parametrlarni (to'g'ridan-to'g'ri emas, aqlliroq) tanlab, xato kamroq bo'lganini olish.</p><p>Bu xatoni hisoblaydigan funksiya <b>yo'qotish funksiyasi</b> deyiladi. O'qitish — uni minimallashtirish.</p>",
+        "en": "<p>At <code>k = 50</code> the error is zero — the model found the rule. That is how training works: search through parameters (more cleverly than brute force) and keep the ones with the smaller error.</p><p>The function computing that error is called the <b>loss function</b>. Training is minimising it.</p>"
+       }
+      },
+      {
+       "type": "checkpoint",
+       "q": { "ru": "Что такое «модель» в машинном обучении?", "uz": "Mashinali o'rganishda «model» nima?", "en": "What is a “model” in machine learning?" },
+       "options": [
+        { "ru": "Программа, написанная человеком по правилам", "uz": "Odam qoidalar bo'yicha yozgan dastur", "en": "A program written by a human from rules" },
+        { "ru": "Набор чисел, подобранных по примерам", "uz": "Misollar bo'yicha tanlangan sonlar to'plami", "en": "A set of numbers fitted from examples" },
+        { "ru": "База данных с ответами", "uz": "Javoblari bor ma'lumotlar bazasi", "en": "A database of answers" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "У простой модели это один коэффициент, у большой языковой — миллиарды. Суть одна: числа, подобранные под данные.",
+        "uz": "Oddiy modelda bu bitta koeffitsiyent, katta til modelida — milliardlab. Mohiyati bir: ma'lumotga moslangan sonlar.",
+        "en": "In a simple model that is one coefficient; in a large language model, billions. The essence is the same: numbers fitted to data."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "Признаки и разметка", "uz": "Belgilar va belgilash", "en": "Features and labels" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Данные для обучения — это таблица. Колонки, по которым предсказываем, называют <b>признаками</b>. Колонку, которую предсказываем, — <b>целевой</b> или разметкой.</p><ul><li>Предсказать цену квартиры — задача <b>регрессии</b>: ответ число</li><li>Предсказать, уйдёт ли клиент — задача <b>классификации</b>: ответ из списка вариантов</li></ul><p>Половина реальной работы — превратить сырые данные в признаки. Дата рождения бесполезна, а возраст из неё — уже полезен.</p>",
+        "uz": "<p>O'qitish uchun ma'lumot — bu jadval. Bashorat qilinadigan ustunlar <b>belgilar</b> deyiladi. Bashorat qilinayotgan ustun — <b>maqsadli</b> yoki belgilash.</p><ul><li>Kvartira narxini bashorat qilish — <b>regressiya</b> vazifasi: javob son</li><li>Mijoz ketadimi yo'qmi — <b>tasniflash</b> vazifasi: javob variantlar ro'yxatidan</li></ul><p>Haqiqiy ishning yarmi — xom ma'lumotni belgilarga aylantirish. Tug'ilgan sana foydasiz, undan olingan yosh esa foydali.</p>",
+        "en": "<p>Training data is a table. The columns you predict from are called <b>features</b>. The column you predict is the <b>target</b>, or label.</p><ul><li>Predicting a flat's price is <b>regression</b>: the answer is a number</li><li>Predicting whether a customer will leave is <b>classification</b>: the answer comes from a list</li></ul><p>Half of the real work is turning raw data into features. A date of birth is useless; the age derived from it is not.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "# таблица: [площадь, комнат, этаж] -> цена\ndata = [\n    ([30, 1, 2], 1500),\n    ([45, 2, 5], 2400),\n    ([60, 2, 1], 3000),\n    ([75, 3, 7], 4100),\n]\n\n# признаки и цель — обычно их разделяют\nX = [row[0] for row in data]     # признаки\ny = [row[1] for row in data]     # целевая переменная\n\nprint(\"признаков у объекта:\", len(X[0]))\nprint(\"объектов в выборке:\", len(X))\nprint(\"среднее по цене:\", sum(y) / len(y))"
+      },
+      {
+       "type": "match",
+       "pairs": [
+        { "left": { "ru": "Признак", "uz": "Belgi", "en": "Feature" }, "right": { "ru": "Колонка, по которой предсказываем", "uz": "Bashorat qilinadigan ustun", "en": "A column you predict from" } },
+        { "left": { "ru": "Целевая переменная", "uz": "Maqsadli o'zgaruvchi", "en": "Target" }, "right": { "ru": "Колонка, которую предсказываем", "uz": "Bashorat qilinayotgan ustun", "en": "The column you predict" } },
+        { "left": { "ru": "Регрессия", "uz": "Regressiya", "en": "Regression" }, "right": { "ru": "Ответ — число", "uz": "Javob — son", "en": "The answer is a number" } },
+        { "left": { "ru": "Классификация", "uz": "Tasniflash", "en": "Classification" }, "right": { "ru": "Ответ — один из вариантов", "uz": "Javob — variantlardan biri", "en": "The answer is one of several options" } }
+       ]
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "Переобучение: главная ловушка", "uz": "Qayta o'qitish: asosiy tuzoq", "en": "Overfitting: the main trap" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Модель можно сделать идеальной на обучающих данных — просто запомнив их. Толку от этого ноль: на новых данных она ошибётся.</p><p>Поэтому данные всегда делят: на одной части учат, на другой — <b>которую модель не видела</b> — проверяют. Если на обучении точность 99%, а на проверке 60% — модель выучила шум, а не закономерность. Это и называется переобучением.</p>",
+        "uz": "<p>Modelni o'qitish ma'lumotlarida ideal qilish mumkin — shunchaki ularni yodlab. Bundan foyda nol: yangi ma'lumotda u xato qiladi.</p><p>Shuning uchun ma'lumot doim bo'linadi: bir qismida o'qitiladi, ikkinchisida — <b>model ko'rmaganida</b> — tekshiriladi. O'qitishda aniqlik 99%, tekshiruvda 60% bo'lsa — model qonuniyatni emas, shovqinni o'rganib olgan. Bu qayta o'qitish deyiladi.</p>",
+        "en": "<p>You can make a model perfect on the training data — simply by memorising it. That is worth nothing: on new data it will fail.</p><p>So the data is always split: train on one part, evaluate on another <b>the model has never seen</b>. If accuracy is 99% on training and 60% on the held-out part, the model learned noise rather than a pattern. That is overfitting.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "data = [(1, 2), (2, 4), (3, 6), (4, 8), (5, 10), (6, 12)]\n\n# делим: 4 примера на обучение, 2 на проверку\ntrain = data[:4]\ntest  = data[4:]\n\n# «обучение»: находим коэффициент по обучающей части\nk = sum(y / x for x, y in train) / len(train)\nprint(f\"выучили k = {k}\")\n\ndef check(rows, name):\n    err = sum(abs(k * x - y) for x, y in rows) / len(rows)\n    print(f\"{name}: средняя ошибка {err:.2f}\")\n\ncheck(train, \"на обучении \")\ncheck(test,  \"на проверке \")"
+      },
+      {
+       "type": "note",
+       "kind": "trap",
+       "html": {
+        "ru": "Ошибка новичка — подбирать модель, глядя на проверочную выборку. Тогда она перестаёт быть честной: ты фактически обучаешься на ней. Поэтому в серьёзной работе данные делят на три части: обучение, настройка, финальная проверка.",
+        "uz": "Yangi boshlovchining xatosi — modelni tekshiruv namunasiga qarab tanlash. Shunda u halol bo'lishdan to'xtaydi: siz aslida unda o'qiyapsiz. Shuning uchun jiddiy ishda ma'lumot uch qismga bo'linadi: o'qitish, sozlash, yakuniy tekshiruv.",
+        "en": "A beginner's mistake is tuning the model while looking at the test set. It then stops being honest: you are effectively training on it. That is why serious work splits data three ways: train, validation, final test."
+       }
+      },
+      {
+       "type": "summary",
+       "items": [
+        { "ru": "Модель — числа, подобранные по примерам; обучение — их подбор", "uz": "Model — misollar bo'yicha tanlangan sonlar; o'qitish — ularni tanlash", "en": "A model is numbers fitted from examples; training is the fitting" },
+        { "ru": "Функция потерь измеряет, насколько модель ошибается", "uz": "Yo'qotish funksiyasi model qanchalik xato qilishini o'lchaydi", "en": "The loss function measures how wrong the model is" },
+        { "ru": "Регрессия предсказывает число, классификация — категорию", "uz": "Regressiya sonni, tasniflash toifani bashorat qiladi", "en": "Regression predicts a number, classification a category" },
+        { "ru": "Проверять надо на данных, которых модель не видела", "uz": "Model ko'rmagan ma'lumotda tekshirish kerak", "en": "Evaluate on data the model has never seen" }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": { "ru": "Чем машинное обучение отличается от обычной программы?", "uz": "Mashinali o'rganish oddiy dasturdan nimasi bilan farq qiladi?", "en": "How does machine learning differ from an ordinary program?" },
+     "options": [
+      { "ru": "Работает быстрее", "uz": "Tezroq ishlaydi", "en": "It runs faster" },
+      { "ru": "Правило выводится из примеров, а не пишется человеком", "uz": "Qoida odam tomonidan yozilmaydi, misollardan chiqariladi", "en": "The rule is derived from examples rather than written by a human" },
+      { "ru": "Не нуждается в данных", "uz": "Ma'lumotga muhtoj emas", "en": "It needs no data" },
+      { "ru": "Всегда даёт верный ответ", "uz": "Doim to'g'ri javob beradi", "en": "It always gives the right answer" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Программист задаёт форму модели и способ измерять ошибку, а конкретные числа находятся при обучении.",
+      "uz": "Dasturchi model shaklini va xatoni o'lchash usulini beradi, aniq sonlar esa o'qitishda topiladi.",
+      "en": "The programmer defines the shape of the model and how to measure error; the actual numbers are found during training."
+     }
+    },
+    {
+     "q": { "ru": "Что измеряет функция потерь?", "uz": "Yo'qotish funksiyasi nimani o'lchaydi?", "en": "What does a loss function measure?" },
+     "options": [
+      { "ru": "Скорость обучения", "uz": "O'qitish tezligini", "en": "Training speed" },
+      { "ru": "Насколько предсказания расходятся с правильными ответами", "uz": "Bashoratlar to'g'ri javoblardan qanchalik farq qilishini", "en": "How far predictions are from the correct answers" },
+      { "ru": "Объём данных", "uz": "Ma'lumot hajmini", "en": "The amount of data" },
+      { "ru": "Количество признаков", "uz": "Belgilar sonini", "en": "The number of features" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Обучение сводится к поиску параметров, при которых потери минимальны.",
+      "uz": "O'qitish yo'qotish minimal bo'ladigan parametrlarni qidirishga keladi.",
+      "en": "Training reduces to searching for the parameters where the loss is smallest."
+     }
+    },
+    {
+     "q": { "ru": "Предсказать, спам письмо или нет — это…", "uz": "Xat spam yoki yo'qligini bashorat qilish — bu…", "en": "Predicting whether an email is spam is…" },
+     "options": [
+      { "ru": "регрессия", "uz": "regressiya", "en": "regression" },
+      { "ru": "классификация", "uz": "tasniflash", "en": "classification" },
+      { "ru": "кластеризация", "uz": "klasterlash", "en": "clustering" },
+      { "ru": "не задача ML", "uz": "ML vazifasi emas", "en": "not an ML task" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Ответ выбирается из фиксированного списка («спам» / «не спам»), а не берётся из непрерывного диапазона.",
+      "uz": "Javob uzluksiz diapazondan emas, qat'iy ro'yxatdan («spam» / «spam emas») tanlanadi.",
+      "en": "The answer comes from a fixed list (“spam” / “not spam”), not from a continuous range."
+     }
+    },
+    {
+     "q": { "ru": "Модель даёт 99% на обучении и 60% на новых данных. Что это?", "uz": "Model o'qitishda 99%, yangi ma'lumotda 60% beradi. Bu nima?", "en": "A model scores 99% on training and 60% on new data. What is this?" },
+     "options": [
+      { "ru": "Отличный результат", "uz": "Ajoyib natija", "en": "An excellent result" },
+      { "ru": "Переобучение: выучен шум, а не закономерность", "uz": "Qayta o'qitish: qonuniyat emas, shovqin o'rganilgan", "en": "Overfitting: it learned noise, not a pattern" },
+      { "ru": "Недостаток данных на обучении", "uz": "O'qitishda ma'lumot yetishmasligi", "en": "Too little training data" },
+      { "ru": "Ошибка в коде", "uz": "Koddagi xato", "en": "A bug in the code" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Разрыв между обучением и проверкой — главный признак переобучения. Лечится упрощением модели или большим количеством данных.",
+      "uz": "O'qitish va tekshiruv orasidagi farq — qayta o'qitishning asosiy belgisi. Modelni soddalashtirish yoki ko'proq ma'lumot bilan davolanadi.",
+      "en": "A gap between training and evaluation is the classic sign of overfitting. Cured by simplifying the model or getting more data."
+     }
+    },
+    {
+     "q": { "ru": "Зачем откладывать часть данных для проверки?", "uz": "Nega ma'lumotning bir qismi tekshiruv uchun ajratiladi?", "en": "Why hold out part of the data for evaluation?" },
+     "options": [
+      { "ru": "Чтобы обучение шло быстрее", "uz": "O'qitish tezroq bo'lishi uchun", "en": "To make training faster" },
+      { "ru": "Чтобы честно оценить работу на незнакомых данных", "uz": "Notanish ma'lumotdagi ishni halol baholash uchun", "en": "To honestly measure performance on unseen data" },
+      { "ru": "Так требует библиотека", "uz": "Kutubxona shuni talab qiladi", "en": "The library requires it" },
+      { "ru": "Чтобы уменьшить объём файла", "uz": "Fayl hajmini kamaytirish uchun", "en": "To shrink the file size" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "На знакомых данных даже плохая модель выглядит прилично — она их просто помнит.",
+      "uz": "Tanish ma'lumotda hatto yomon model ham yaxshi ko'rinadi — u ularni shunchaki eslaydi.",
+      "en": "On familiar data even a bad model looks decent — it simply remembers it."
+     }
+    },
+    {
+     "q": { "ru": "Что такое признак?", "uz": "Belgi nima?", "en": "What is a feature?" },
+     "options": [
+      { "ru": "Колонка, которую предсказываем", "uz": "Bashorat qilinayotgan ustun", "en": "The column being predicted" },
+      { "ru": "Колонка, по которой предсказываем", "uz": "Bashorat qilinadigan ustun", "en": "A column you predict from" },
+      { "ru": "Название модели", "uz": "Model nomi", "en": "The model's name" },
+      { "ru": "Величина ошибки", "uz": "Xato kattaligi", "en": "The size of the error" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Предсказываемую колонку называют целевой. Признаки — это вход, цель — выход.",
+      "uz": "Bashorat qilinayotgan ustun maqsadli deyiladi. Belgilar — kirish, maqsad — chiqish.",
+      "en": "The predicted column is the target. Features are the input, the target is the output."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "python",
+     "title": { "ru": "Средняя ошибка", "uz": "O'rtacha xato", "en": "Mean error" },
+     "brief": { "ru": "Функция потерь своими руками", "uz": "Yo'qotish funksiyasini qo'lda", "en": "A loss function by hand" },
+     "desc": {
+      "ru": "<p>Напиши <code>mae(actual, predicted)</code> — среднюю абсолютную ошибку: среднее из модулей разностей. Для пустых списков верни <code>0</code>.</p>",
+      "uz": "<p><code>mae(actual, predicted)</code> yozing — o'rtacha absolyut xato: farqlar moduli o'rtachasi. Bo'sh ro'yxatlar uchun <code>0</code> qaytaring.</p>",
+      "en": "<p>Write <code>mae(actual, predicted)</code> — the mean absolute error: the average of the absolute differences. Return <code>0</code> for empty lists.</p>"
+     },
+     "starter": "def mae(actual, predicted):\n    # твой код\n    pass\n\nprint(mae([10, 20], [12, 18]))\n",
+     "tests": "assert mae([10, 20], [12, 18]) == 2, 'Ошибка на двух значениях должна быть 2'\nassert mae([5], [5]) == 0, 'Точное предсказание — нулевая ошибка'\nassert mae([], []) == 0, 'Пустые списки дают 0'\nassert abs(mae([1, 2, 3], [1, 2, 6]) - 1) < 1e-9, 'Среднее из |0|, |0|, |3| равно 1'",
+     "hint": {
+      "ru": "Пройди по парам через <code>zip</code>, сложи <code>abs(a - p)</code> и раздели на количество. Не забудь проверку на пустой список.",
+      "uz": "<code>zip</code> orqali juftlar bo'ylab yuring, <code>abs(a - p)</code> ni qo'shing va songa bo'ling. Bo'sh ro'yxat tekshiruvini unutmang.",
+      "en": "Walk the pairs with <code>zip</code>, sum <code>abs(a - p)</code> and divide by the count. Do not forget the empty-list check."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "python",
+     "title": { "ru": "Подбор коэффициента", "uz": "Koeffitsiyentni tanlash", "en": "Fitting a coefficient" },
+     "brief": { "ru": "Простейшее обучение", "uz": "Eng oddiy o'qitish", "en": "The simplest training" },
+     "desc": {
+      "ru": "<p><code>fit(xs, ys)</code> подбирает число <code>k</code> для модели <code>y = k · x</code>. Возьми среднее из отношений <code>y / x</code>. Если данных нет — верни <code>0</code>.</p>",
+      "uz": "<p><code>fit(xs, ys)</code> <code>y = k · x</code> modeli uchun <code>k</code> sonini tanlaydi. <code>y / x</code> nisbatlari o'rtachasini oling. Ma'lumot bo'lmasa — <code>0</code> qaytaring.</p>",
+      "en": "<p><code>fit(xs, ys)</code> fits the number <code>k</code> for the model <code>y = k · x</code>. Take the average of the ratios <code>y / x</code>. If there is no data, return <code>0</code>.</p>"
+     },
+     "starter": "def fit(xs, ys):\n    # твой код\n    pass\n\nprint(fit([1, 2, 3], [2, 4, 6]))\n",
+     "tests": "assert fit([1, 2, 3], [2, 4, 6]) == 2, 'Для y = 2x коэффициент равен 2'\nassert fit([10], [50]) == 5, 'Один пример тоже работает'\nassert fit([], []) == 0, 'Без данных — ноль'\nassert abs(fit([2, 4], [6, 8]) - 2.5) < 1e-9, 'Среднее из 3 и 2 равно 2.5'",
+     "hint": {
+      "ru": "Сумма <code>y / x</code> по всем парам, делённая на их количество. Пустой вход обработай отдельно, иначе будет деление на ноль.",
+      "uz": "Barcha juftlar bo'yicha <code>y / x</code> yig'indisi ularning soniga bo'lingan. Bo'sh kirishni alohida qayta ishlang, aks holda nolga bo'lish bo'ladi.",
+      "en": "Sum <code>y / x</code> over all pairs and divide by their count. Handle the empty input separately or you will divide by zero."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "python",
+     "title": { "ru": "Разделение выборки", "uz": "Namunani bo'lish", "en": "Splitting the sample" },
+     "brief": { "ru": "Обучение и проверка", "uz": "O'qitish va tekshiruv", "en": "Train and test" },
+     "desc": {
+      "ru": "<p><code>split(rows, ratio)</code> делит список на две части: первые <code>ratio</code> долей идут на обучение, остальное — на проверку. Верни кортеж <code>(train, test)</code>. Округляй размер обучающей части вниз.</p>",
+      "uz": "<p><code>split(rows, ratio)</code> ro'yxatni ikkiga bo'ladi: birinchi <code>ratio</code> ulushi o'qitishga, qolgani tekshiruvga. <code>(train, test)</code> kortejini qaytaring. O'qitish qismi o'lchamini pastga yaxlitlang.</p>",
+      "en": "<p><code>split(rows, ratio)</code> divides a list in two: the first <code>ratio</code> share goes to training, the rest to evaluation. Return the tuple <code>(train, test)</code>. Round the training size down.</p>"
+     },
+     "starter": "def split(rows, ratio):\n    # твой код\n    pass\n\nprint(split([1, 2, 3, 4, 5], 0.6))\n",
+     "tests": "tr, te = split([1, 2, 3, 4, 5], 0.6)\nassert tr == [1, 2, 3], 'Обучающая часть — первые 3 из 5'\nassert te == [4, 5], 'Проверочная — остальные'\ntr2, te2 = split([1, 2, 3, 4], 0.5)\nassert tr2 == [1, 2] and te2 == [3, 4], 'Ровно пополам'\ntr3, te3 = split([], 0.8)\nassert tr3 == [] and te3 == [], 'Пустой список делится в два пустых'\ntr4, te4 = split([1, 2, 3], 1.0)\nassert tr4 == [1, 2, 3] and te4 == [], 'Вся выборка на обучение'",
+     "hint": {
+      "ru": "Размер обучающей части — <code>int(len(rows) * ratio)</code>. Дальше обычные срезы списка.",
+      "uz": "O'qitish qismi o'lchami — <code>int(len(rows) * ratio)</code>. Keyin oddiy ro'yxat kesimlari.",
+      "en": "The training size is <code>int(len(rows) * ratio)</code>. Then ordinary list slices."
+     }
+    }
+   ],
+   "exam": {
+    "time": 480,
+    "questions": [
+     {
+      "q": { "ru": "Обучение модели — это…", "uz": "Modelni o'qitish — bu…", "en": "Training a model is…" },
+      "options": [
+       { "ru": "запоминание всех данных", "uz": "barcha ma'lumotni yodlash", "en": "memorising all the data" },
+       { "ru": "подбор параметров, при которых ошибка минимальна", "uz": "xato minimal bo'ladigan parametrlarni tanlash", "en": "finding parameters where the error is smallest" },
+       { "ru": "написание правил вручную", "uz": "qoidalarni qo'lda yozish", "en": "writing rules by hand" },
+       { "ru": "сбор данных", "uz": "ma'lumot yig'ish", "en": "collecting data" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Предсказание завтрашней температуры — какая задача?", "uz": "Ertangi haroratni bashorat qilish — qanday vazifa?", "en": "Predicting tomorrow's temperature is which task?" },
+      "options": [
+       { "ru": "Классификация", "uz": "Tasniflash", "en": "Classification" },
+       { "ru": "Регрессия", "uz": "Regressiya", "en": "Regression" },
+       { "ru": "Кластеризация", "uz": "Klasterlash", "en": "Clustering" },
+       { "ru": "Ни одна из них", "uz": "Hech qaysi", "en": "None of them" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "На каких данных честно оценивать модель?", "uz": "Modelni qanday ma'lumotda halol baholash kerak?", "en": "Which data gives an honest evaluation?" },
+      "options": [
+       { "ru": "На тех же, на которых учили", "uz": "O'qitilgan ma'lumotning o'zida", "en": "The same data it was trained on" },
+       { "ru": "На отложенных, которых модель не видела", "uz": "Model ko'rmagan ajratilgan ma'lumotda", "en": "Held-out data the model has never seen" },
+       { "ru": "На случайных числах", "uz": "Tasodifiy sonlarda", "en": "Random numbers" },
+       { "ru": "Разницы нет", "uz": "Farqi yo'q", "en": "It makes no difference" }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "python",
+      "title": { "ru": "Оценка модели целиком", "uz": "Modelni to'liq baholash", "en": "Evaluating a model end to end" },
+      "desc": {
+       "ru": "<p>Собери всё вместе: <code>evaluate(rows, ratio)</code> принимает список пар <code>(x, y)</code>, делит его, обучает коэффициент <code>k</code> на обучающей части и возвращает среднюю абсолютную ошибку на проверочной.</p><p>Если проверочная часть пуста — верни <code>0.0</code>.</p>",
+       "uz": "<p>Hammasini birlashtiring: <code>evaluate(rows, ratio)</code> <code>(x, y)</code> juftliklar ro'yxatini oladi, uni bo'ladi, o'qitish qismida <code>k</code> koeffitsiyentini o'qitadi va tekshiruv qismidagi o'rtacha absolyut xatoni qaytaradi.</p><p>Tekshiruv qismi bo'sh bo'lsa — <code>0.0</code> qaytaring.</p>",
+       "en": "<p>Put it all together: <code>evaluate(rows, ratio)</code> takes a list of <code>(x, y)</code> pairs, splits it, fits the coefficient <code>k</code> on the training part and returns the mean absolute error on the held-out part.</p><p>If the held-out part is empty, return <code>0.0</code>.</p>"
+      },
+      "starter": "def evaluate(rows, ratio):\n    # раздели, обучи, посчитай ошибку\n    pass\n\nprint(evaluate([(1, 2), (2, 4), (3, 6), (4, 8)], 0.5))\n",
+      "tests": "assert abs(evaluate([(1, 2), (2, 4), (3, 6), (4, 8)], 0.5)) < 1e-9, 'Идеальная зависимость — нулевая ошибка'\nassert evaluate([(1, 2)], 1.0) == 0.0, 'Пустая проверочная часть даёт 0.0'\nres = evaluate([(1, 10), (2, 20), (3, 33)], 0.66)\nassert res > 0, 'Если зависимость не идеальна, ошибка больше нуля'\nassert isinstance(res, float), 'Ошибка должна быть числом с плавающей точкой'",
+      "hint": {
+       "ru": "Три шага: срез на train и test, коэффициент как среднее <code>y / x</code> по train, затем средняя <code>abs(k * x - y)</code> по test.",
+       "uz": "Uch qadam: train va test ga kesim, train bo'yicha <code>y / x</code> o'rtachasi sifatida koeffitsiyent, keyin test bo'yicha o'rtacha <code>abs(k * x - y)</code>.",
+       "en": "Three steps: slice into train and test, fit k as the mean <code>y / x</code> over train, then the mean <code>abs(k * x - y)</code> over test."
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

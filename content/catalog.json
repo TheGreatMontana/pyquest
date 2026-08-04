@@ -275,6 +275,14 @@
     "uz": "Shablonlar va RAII",
     "en": "Templates and RAII"
    }
+  },
+  {
+   "id": "ml-basics",
+   "title": {
+    "ru": "Основы машинного обучения",
+    "uz": "Mashinali o‘rganish asoslari",
+    "en": "Machine learning basics"
+   }
   }
  ],
  "courses": [
@@ -782,6 +790,33 @@
    "legacyIds": [],
    "moduleCount": 1,
    "runner": "tailwind"
+  },
+  {
+   "id": "ml-intro",
+   "title": {
+    "ru": "Машинное обучение: введение",
+    "uz": "Mashinali o‘rganish: kirish",
+    "en": "Machine Learning: Introduction"
+   },
+   "description": {
+    "ru": "Модель, функция потерь, признаки и переобучение — на живом Python без библиотек. Всё, что запускается прямо здесь.",
+    "uz": "Model, yo‘qotish funksiyasi, belgilar va qayta o‘qitish — kutubxonalarsiz tirik Python da. Hammasi shu yerda ishga tushadi.",
+    "en": "Model, loss function, features and overfitting — in live Python without libraries. Everything runs right here."
+   },
+   "glyph": "brain",
+   "color": "#a78bfa",
+   "level": "intermediate",
+   "status": "full",
+   "estimatedHours": 10,
+   "requires": [
+    "python-collections"
+   ],
+   "grants": [
+    "ml-basics"
+   ],
+   "legacyIds": [],
+   "moduleCount": 1,
+   "runner": "python"
   }
  ],
  "careerPaths": [
@@ -1170,6 +1205,57 @@
      ]
     }
    ]
+  },
+  {
+   "id": "ml-path",
+   "stages": [
+    {
+     "id": "ml-st1",
+     "title": {
+      "ru": "Язык расчётов",
+      "uz": "Hisoblar tili",
+      "en": "The language of computation"
+     },
+     "courses": [
+      "python-basics",
+      "python-intermediate"
+     ]
+    },
+    {
+     "id": "ml-st2",
+     "title": {
+      "ru": "Как машина учится",
+      "uz": "Mashina qanday o‘rganadi",
+      "en": "How a machine learns"
+     },
+     "courses": [
+      "ml-intro"
+     ]
+    },
+    {
+     "id": "ml-st3",
+     "title": {
+      "ru": "Данные под моделью",
+      "uz": "Model ostidagi ma’lumot",
+      "en": "The data beneath the model"
+     },
+     "courses": [
+      "analytics-intro",
+      "sql-basics"
+     ]
+    },
+    {
+     "id": "ml-st4",
+     "title": {
+      "ru": "Алгоритмическая база",
+      "uz": "Algoritmik asos",
+      "en": "Algorithmic groundwork"
+     },
+     "courses": [
+      "algorithms"
+     ]
+    }
+   ]
   }
  ],
  "domains": [
@@ -1443,7 +1529,7 @@
    "id": "machine-learning",
    "glyph": "brain",
    "color": "#c084fc",
-   "status": "planned",
+   "status": "starter",
    "title": {
     "ru": "Машинное обучение",
     "uz": "Mashinali o'qitish",
@@ -1488,7 +1574,8 @@
       "Getting a model into production and watching it there"
      ]
     }
-   }
+   },
+   "careerPath": "ml-path"
   },
   {
    "id": "deep-learning",

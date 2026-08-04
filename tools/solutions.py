@@ -95,4 +95,33 @@ SOLUTIONS = {
 'security-intro/se-01/t2': "import hashlib\n\ndef hash_password(password):\n    return hashlib.sha256(password.encode()).hexdigest()\n\ndef verify(password, stored_hash):\n    return hash_password(password) == stored_hash\n\nprint(verify('secret1', hash_password('secret1')))",
 'security-intro/se-01/t3': "def is_dangerous(query):\n    q = query.lower()\n    return '--' in q or 'drop' in q or \"or '1'='1'\" in q\n\nprint(is_dangerous(\"SELECT * FROM users WHERE name = 'admin' --'\"))",
 'security-intro/se-01/exam0': "def build_query(table, column):\n    def safe(name):\n        return all(ch.isalnum() or ch == '_' for ch in name) and len(name) > 0\n    if not safe(table) or not safe(column):\n        return None\n    return f'SELECT * FROM {table} WHERE {column} = ?'\n\nprint(build_query('users', 'id'))",
+
+# ===== ml-intro =====
+'ml-intro/ml-01/t1': """def mae(actual, predicted):
+    if not actual:
+        return 0
+    total = sum(abs(a - p) for a, p in zip(actual, predicted))
+    return total / len(actual)
+
+print(mae([10, 20], [12, 18]))""",
+'ml-intro/ml-01/t2': """def fit(xs, ys):
+    if not xs:
+        return 0
+    return sum(y / x for x, y in zip(xs, ys)) / len(xs)
+
+print(fit([1, 2, 3], [2, 4, 6]))""",
+'ml-intro/ml-01/t3': """def split(rows, ratio):
+    cut = int(len(rows) * ratio)
+    return rows[:cut], rows[cut:]
+
+print(split([1, 2, 3, 4, 5], 0.6))""",
+'ml-intro/ml-01/exam0': """def evaluate(rows, ratio):
+    cut = int(len(rows) * ratio)
+    train, test = rows[:cut], rows[cut:]
+    if not train or not test:
+        return 0.0
+    k = sum(y / x for x, y in train) / len(train)
+    return float(sum(abs(k * x - y) for x, y in test) / len(test))
+
+print(evaluate([(1, 2), (2, 4), (3, 6), (4, 8)], 0.5))""",
 }

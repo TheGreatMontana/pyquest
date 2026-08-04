@@ -85,9 +85,9 @@ check('дашборд: навыки отображаются', txt().includes('�
 
 /* --- каталог --- */
 catalogScreen.renderCatalog(app);
-check('каталог: 7 рабочих направлений карточками', app.querySelectorAll('.domain-card').length === 7, app.querySelectorAll('.domain-card').length);
-check('каталог: 9 будущих направлений компактной строкой', app.querySelectorAll('.domain-chip').length === 9, app.querySelectorAll('.domain-chip').length);
-check('каталог: 18 карточек курсов', app.querySelectorAll('.course-grid .course-card').length === 18, app.querySelectorAll('.course-grid .course-card').length);
+check('каталог: 8 рабочих направлений карточками', app.querySelectorAll('.domain-card').length === 8, app.querySelectorAll('.domain-card').length);
+check('каталог: 8 будущих направлений компактной строкой', app.querySelectorAll('.domain-chip').length === 8, app.querySelectorAll('.domain-chip').length);
+check('каталог: 19 карточек курсов', app.querySelectorAll('.course-grid .course-card').length === 19, app.querySelectorAll('.course-grid .course-card').length);
 check('каталог: незаполненные направления честно отделены', !!app.querySelector('.planned-row'));
 
 /* --- страница направления (визуальный путь) --- */

@@ -140,13 +140,25 @@ bm2.click();
 await tick();
 check('повторный клик снимает закладку', state.state().bookmarks.length === 1, state.state().bookmarks.length);
 
-/* ---------- история просмотров ---------- */
+/* ---------- история просмотров ----------
+   Простое открытие модуля историю НЕ пополняет: иначе курс, в который
+   человек только заглянул, выглядел бы начатым. Считается действие. */
+const nextLesson = async (courseId, moduleId) => {
+  await courseScreen.renderModule(app, courseId, moduleId, 'theory');
+  const btn = app.querySelector('#th-next');
+  if (btn) { btn.click(); await tick(); }
+};
+
 await courseScreen.renderModule(app, 'python-basics', 'pb-02', 'theory');
-await courseScreen.renderModule(app, 'sql-basics', 'sb-01', 'theory');
+check('просто открыть модуль — история не растёт', (state.state().recent || []).length === 0,
+  (state.state().recent || []).length);
+
+await nextLesson('python-basics', 'pb-02');
+await nextLesson('sql-basics', 'sb-01');
 const recent = state.state().recent;
-check('история просмотров пополняется', recent.length >= 2, recent.length);
-check('последний просмотренный — первым', recent[0].moduleId === 'sb-01', recent[0].moduleId);
-await courseScreen.renderModule(app, 'python-basics', 'pb-02', 'theory');
+check('история пополняется по действию', recent.length >= 2, recent.length);
+check('последний — первым', recent[0].moduleId === 'sb-01', recent[0].moduleId);
+await nextLesson('python-basics', 'pb-02');
 check('повторный визит поднимает урок наверх без дублей',
   state.state().recent[0].moduleId === 'pb-02' &&
   state.state().recent.filter(r => r.moduleId === 'pb-02').length === 1);
