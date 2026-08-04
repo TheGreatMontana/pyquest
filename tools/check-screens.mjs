@@ -98,8 +98,12 @@ check('направление: узлы курсов (вкл. инструмен
 check('направление: статус-бейджи есть у узлов', app.querySelectorAll('.rm-node .status-badge').length === 7);
 check('направление: 4-я стадия ведёт на курс инструментов', app.innerHTML.includes('#/course/de-tools'));
 
+check('направление: рассказ «что это за работа»', !!app.querySelector('.about-domain'));
+check('направление: три блока рассказа', app.querySelectorAll('.about-block').length === 3, app.querySelectorAll('.about-block').length);
+
 catalogScreen.renderDomain(app, 'ai');
 check('направление в разработке: плашка статуса', !!app.querySelector('.notice'));
+check('направление в разработке: рассказ о нём всё равно есть', !!app.querySelector('.about-domain'));
 
 /* --- страница курса --- */
 await courseScreen.renderCourse(app, 'python-basics');

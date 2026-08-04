@@ -1189,6 +1189,44 @@
     "ru": "Python, SQL и алгоритмы — путь инженера данных по программе твоего ментора",
     "uz": "Python, SQL va algoritmlar — mentoring dasturi bo'yicha ma'lumot muhandisi yo'li",
     "en": "Python, SQL and algorithms — the data engineer path from your mentor's program"
+   },
+   "about": {
+    "what": {
+     "ru": "<p>Data Engineer строит трубы, по которым течут данные. Компания собирает заказы, клики, платежи, логи — всё это лежит в разных местах, в разных форматах и часто с ошибками. Инженер данных превращает эту кашу в аккуратные таблицы, которыми пользуются аналитики и модели машинного обучения.</p><p>Проще говоря: аналитик отвечает на вопрос «сколько мы заработали», а инженер данных делает так, чтобы данные для этого ответа вообще существовали, обновлялись каждую ночь и не врали.</p>",
+     "uz": "<p>Data Engineer ma'lumotlar oqadigan quvurlarni quradi. Kompaniya buyurtmalar, bosishlar, to'lovlar, loglarni yig'adi — bularning hammasi turli joylarda, turli formatlarda va ko'pincha xatolar bilan yotadi. Ma'lumotlar muhandisi bu bo'tqani analitiklar va mashinali o'rganish modellari foydalanadigan tartibli jadvallarga aylantiradi.</p><p>Oddiyroq aytganda: analitik «qancha ishlab topdik» degan savolga javob beradi, ma'lumotlar muhandisi esa bu javob uchun ma'lumotlar umuman mavjud bo'lishi, har kecha yangilanishi va yolg'on gapirmasligini ta'minlaydi.</p>",
+     "en": "<p>A data engineer builds the pipes that data flows through. A company collects orders, clicks, payments, logs — all of it sitting in different places, in different formats, often with errors. The data engineer turns that mess into tidy tables that analysts and machine-learning models rely on.</p><p>Put simply: the analyst answers “how much did we earn”, while the data engineer makes sure the data behind that answer exists at all, refreshes every night and does not lie.</p>"
+    },
+    "why": {
+     "ru": "<p>Спрос на инженеров данных растёт быстрее, чем на аналитиков: данных становится больше, а разбираться с ними некому. Работа не публичная — интерфейс никто не увидит, — зато стабильная и хорошо оплачиваемая. Порог входа выше, чем в аналитику, потому что нужен настоящий код, а не только SQL и таблицы.</p>",
+     "uz": "<p>Ma'lumotlar muhandislariga talab analitiklarga qaraganda tezroq o'smoqda: ma'lumot ko'payyapti, ular bilan shug'ullanadigan odam yo'q. Ish ommaviy emas — interfeysni hech kim ko'rmaydi — lekin barqaror va yaxshi to'lanadi. Kirish darajasi analitikaga qaraganda yuqoriroq, chunki faqat SQL va jadvallar emas, haqiqiy kod kerak.</p>",
+     "en": "<p>Demand for data engineers is growing faster than for analysts: there is more data and nobody to tame it. The work is not public-facing — nobody sees your interface — but it is stable and well paid. The entry bar is higher than in analytics because you need real code, not just SQL and spreadsheets.</p>"
+    },
+    "learn": {
+     "ru": [
+      "Python до уровня, на котором пишут не скрипты, а инструменты",
+      "SQL глубоко: оконные функции, планы запросов, оптимизация",
+      "Как устроены базы данных и почему запрос тормозит",
+      "ETL и ELT: забрать, преобразовать, положить — и не сломать при сбое",
+      "Хранилища и витрины данных, форматы вроде Parquet",
+      "Airflow, Spark, Kafka — оркестрация, объёмы и потоки"
+     ],
+     "uz": [
+      "Python skript emas, vosita yozadigan darajada",
+      "SQL chuqur: oynali funksiyalar, so'rov rejalari, optimallashtirish",
+      "Ma'lumotlar bazasi qanday tuzilgan va nega so'rov sekinlashadi",
+      "ETL va ELT: olish, o'zgartirish, joylash — va nosozlikda buzmaslik",
+      "Ombor va vitrinalar, Parquet kabi formatlar",
+      "Airflow, Spark, Kafka — orkestratsiya, hajm va oqimlar"
+     ],
+     "en": [
+      "Python to the level where you write tools, not scripts",
+      "SQL in depth: window functions, query plans, optimisation",
+      "How databases work and why a query gets slow",
+      "ETL and ELT: extract, transform, load — without breaking on failure",
+      "Warehouses and data marts, formats like Parquet",
+      "Airflow, Spark, Kafka — orchestration, volume and streams"
+     ]
+    }
    }
   },
   {
@@ -1206,6 +1244,44 @@
     "ru": "Серверы, HTTP, REST API и базы данных",
     "uz": "Serverlar, HTTP, REST API va ma'lumotlar bazalari",
     "en": "Servers, HTTP, REST APIs and databases"
+   },
+   "about": {
+    "what": {
+     "ru": "<p>Бэкенд — та часть, которую пользователь никогда не видит, но без которой ничего не работает. Он хранит данные, проверяет пароли, считает деньги, отправляет письма и отвечает фронтенду на запросы.</p><p>Когда ты нажимаешь «Купить», браузер отправляет запрос на сервер. Бэкенд проверяет, есть ли товар, хватает ли денег, записывает заказ в базу и отвечает «готово». Всё это должно работать одновременно у тысяч людей и не терять заказы при сбое.</p>",
+     "uz": "<p>Backend — foydalanuvchi hech qachon ko'rmaydigan, lekin usiz hech nima ishlamaydigan qism. U ma'lumotlarni saqlaydi, parollarni tekshiradi, pulni hisoblaydi, xat yuboradi va frontendga so'rovlarga javob beradi.</p><p>Siz «Sotib olish» ni bosganingizda brauzer serverga so'rov yuboradi. Backend tovar bor-yo'qligini, pul yetarliligini tekshiradi, buyurtmani bazaga yozadi va «tayyor» deb javob beradi. Bularning hammasi minglab odamda bir vaqtda ishlashi va nosozlikda buyurtmalarni yo'qotmasligi kerak.</p>",
+     "en": "<p>The backend is the part a user never sees, yet nothing works without it. It stores data, checks passwords, counts money, sends email and answers the frontend's requests.</p><p>When you press “Buy”, the browser sends a request to the server. The backend checks whether the item exists, whether there is enough money, writes the order to the database and replies “done”. All of it must work for thousands of people at once and never lose an order when something fails.</p>"
+    },
+    "why": {
+     "ru": "<p>Бэкендеров нанимают всегда: любому продукту нужна серверная часть, а фронтенд иногда можно и купить готовым. Работа менее нарядная, чем фронтенд, но ближе к деньгам компании — а значит, к зарплате. Хороший бэкендер думает не «как сделать», а «что сломается, когда пользователей станет в сто раз больше».</p>",
+     "uz": "<p>Backend dasturchilarni doim yollashadi: har qanday mahsulotga server qismi kerak, frontendni esa ba'zan tayyor sotib olsa ham bo'ladi. Ish frontenddan kamroq bezakli, lekin kompaniya puliga yaqinroq — demak, maoshga ham. Yaxshi backend dasturchi «qanday qilish» emas, «foydalanuvchilar yuz barobar ko'paysa nima buziladi» deb o'ylaydi.</p>",
+     "en": "<p>Backend developers are always hired: every product needs a server side, while a frontend can sometimes be bought ready-made. The work is less glamorous than frontend but closer to the company's money — and therefore to salary. A good backend developer thinks not “how do I build this” but “what breaks when there are a hundred times more users”.</p>"
+    },
+    "learn": {
+     "ru": [
+      "Python и то, как из него делают веб-сервисы",
+      "HTTP: запросы, коды ответов, заголовки",
+      "REST API: как договориться с фронтендом",
+      "Базы данных и SQL — где на самом деле живут данные",
+      "Аутентификация: пароли, токены, права доступа",
+      "Что делать, когда сервис перестал справляться с нагрузкой"
+     ],
+     "uz": [
+      "Python va undan veb-xizmatlar qanday yasalishi",
+      "HTTP: so'rovlar, javob kodlari, sarlavhalar",
+      "REST API: frontend bilan qanday kelishish",
+      "Ma'lumotlar bazasi va SQL — ma'lumot aslida qayerda yashaydi",
+      "Autentifikatsiya: parollar, tokenlar, kirish huquqlari",
+      "Xizmat yukni ko'tarmay qolganda nima qilish"
+     ],
+     "en": [
+      "Python and how web services are built with it",
+      "HTTP: requests, status codes, headers",
+      "REST APIs: agreeing on a contract with the frontend",
+      "Databases and SQL — where the data actually lives",
+      "Authentication: passwords, tokens, permissions",
+      "What to do when the service stops coping with load"
+     ]
+    }
    }
   },
   {
@@ -1223,6 +1299,41 @@
     "ru": "SQL, метрики и выводы из данных",
     "uz": "SQL, metrikalar va ma'lumotlardan xulosalar",
     "en": "SQL, metrics and insights from data"
+   },
+   "about": {
+    "what": {
+     "ru": "<p>Аналитик отвечает на вопросы бизнеса числами. Почему упали продажи? Какая реклама окупается? Что делают пользователи перед тем, как уйти? Он берёт данные, считает, строит графики и — главное — объясняет результат словами, понятными не программисту.</p><p>Половина работы аналитика — не расчёты, а правильно поставленный вопрос и честная интерпретация. Числа можно подогнать под любой ответ; хороший аналитик этого не делает.</p>",
+     "uz": "<p>Analitik biznes savollariga raqamlar bilan javob beradi. Nega sotuv tushdi? Qaysi reklama o'zini oqlaydi? Foydalanuvchilar ketishdan oldin nima qiladi? U ma'lumot oladi, hisoblaydi, grafiklar quradi va — eng muhimi — natijani dasturchi bo'lmagan odamga tushunarli so'zlar bilan tushuntiradi.</p><p>Analitik ishining yarmi — hisob emas, to'g'ri qo'yilgan savol va halol talqin. Raqamlarni istalgan javobga moslashtirsa bo'ladi; yaxshi analitik bunday qilmaydi.</p>",
+     "en": "<p>An analyst answers business questions with numbers. Why did sales drop? Which ads pay off? What do users do right before they leave? They take data, compute, build charts and — most importantly — explain the result in words a non-programmer understands.</p><p>Half of an analyst's job is not the maths but asking the right question and interpreting honestly. Numbers can be bent towards any answer; a good analyst does not bend them.</p>"
+    },
+    "why": {
+     "ru": "<p>Самый мягкий вход в работу с данными: можно начать с SQL и таблиц, без глубокого программирования. Аналитиков берут в любую компанию, где есть клиенты и деньги. Отсюда часто идут дальше — в инженерию данных или в машинное обучение.</p>",
+     "uz": "<p>Ma'lumotlar bilan ishlashga eng yumshoq kirish: chuqur dasturlashsiz, SQL va jadvallardan boshlash mumkin. Analitiklarni mijozlari va puli bor har qanday kompaniyaga olishadi. Shu yerdan ko'pincha keyinroq ketishadi — ma'lumotlar muhandisligiga yoki mashinali o'rganishga.</p>",
+     "en": "<p>The gentlest entry into working with data: you can start with SQL and spreadsheets, without deep programming. Analysts are hired by any company that has customers and money. From here people often move on — into data engineering or machine learning.</p>"
+    },
+    "learn": {
+     "ru": [
+      "SQL как основной рабочий инструмент",
+      "Средние, медианы и почему среднее часто врёт",
+      "Python для расчётов, которые не помещаются в SQL",
+      "Графики, которые не вводят в заблуждение",
+      "Как проверить, что найденная закономерность не случайность"
+     ],
+     "uz": [
+      "SQL asosiy ish vositasi sifatida",
+      "O'rtachalar, medianalar va nega o'rtacha ko'pincha yolg'on gapiradi",
+      "SQL ga sig'maydigan hisoblar uchun Python",
+      "Chalg'itmaydigan grafiklar",
+      "Topilgan qonuniyat tasodif emasligini qanday tekshirish"
+     ],
+     "en": [
+      "SQL as the main working tool",
+      "Averages, medians and why the average often lies",
+      "Python for the calculations SQL cannot hold",
+      "Charts that do not mislead",
+      "How to check that a pattern you found is not a coincidence"
+     ]
+    }
    }
   },
   {
@@ -1240,6 +1351,41 @@
     "ru": "Защита данных, пароли, инъекции и безопасный код",
     "uz": "Ma'lumotlarni himoyalash, parollar, in'ektsiyalar va xavfsiz kod",
     "en": "Data protection, passwords, injection and secure code"
+   },
+   "about": {
+    "what": {
+     "ru": "<p>Кибербезопасность — про то, как ломают системы и как этому мешать. Специалист думает как нападающий: где разработчик не проверил ввод, где пароль хранится открытым текстом, где можно притвориться другим пользователем.</p><p>Это не про «взлом» из фильмов. Большинство настоящих атак скучные: чужой пароль, забытое обновление, лишнее право доступа.</p>",
+     "uz": "<p>Kiberxavfsizlik — tizimlarni qanday buzishlari va bunga qanday to'sqinlik qilish haqida. Mutaxassis hujumchi kabi o'ylaydi: dasturchi kiritishni qayerda tekshirmagan, parol qayerda ochiq matnda saqlanadi, qayerda boshqa foydalanuvchi bo'lib ko'rinish mumkin.</p><p>Bu kinolardagi «buzish» haqida emas. Haqiqiy hujumlarning ko'pchiligi zerikarli: begona parol, unutilgan yangilanish, ortiqcha kirish huquqi.</p>",
+     "en": "<p>Cybersecurity is about how systems get broken and how to stop it. The specialist thinks like an attacker: where did the developer skip validating input, where is a password stored in plain text, where can someone pretend to be another user.</p><p>This is not the “hacking” of films. Most real attacks are boring: a stolen password, a missed update, one permission too many.</p>"
+    },
+    "why": {
+     "ru": "<p>Направление растёт вместе с числом утечек, а специалистов мало. Требует широкого кругозора: чтобы защищать систему, надо понимать, как она устроена — сети, серверы, код, люди. Поэтому сюда редко приходят с нуля, чаще из разработки или администрирования.</p>",
+     "uz": "<p>Yo'nalish sizib chiqishlar soni bilan birga o'smoqda, mutaxassislar esa kam. Keng dunyoqarash talab qiladi: tizimni himoya qilish uchun uning tuzilishini tushunish kerak — tarmoqlar, serverlar, kod, odamlar. Shuning uchun bu yerga noldan kamdan-kam kelishadi, ko'pincha dasturlash yoki administratorlikdan.</p>",
+     "en": "<p>The field grows alongside the number of breaches, and specialists are scarce. It demands breadth: to defend a system you must understand how it works — networks, servers, code, people. That is why few arrive here from zero; most come from development or administration.</p>"
+    },
+    "learn": {
+     "ru": [
+      "Триада: конфиденциальность, целостность, доступность",
+      "Как правильно хранить пароли и почему хеш — не шифрование",
+      "SQL-инъекция и другие последствия доверия к вводу",
+      "Гигиена разработчика: секреты, зависимости, обновления",
+      "Основы сетей: что происходит между браузером и сервером"
+     ],
+     "uz": [
+      "Triada: maxfiylik, yaxlitlik, mavjudlik",
+      "Parollarni qanday to'g'ri saqlash va nega xesh shifrlash emas",
+      "SQL in'ektsiyasi va kiritishga ishonishning boshqa oqibatlari",
+      "Dasturchi gigiyenasi: sirlar, bog'liqliklar, yangilanishlar",
+      "Tarmoq asoslari: brauzer va server o'rtasida nima sodir bo'ladi"
+     ],
+     "en": [
+      "The triad: confidentiality, integrity, availability",
+      "How to store passwords properly and why a hash is not encryption",
+      "SQL injection and other consequences of trusting input",
+      "Developer hygiene: secrets, dependencies, updates",
+      "Networking basics: what happens between browser and server"
+     ]
+    }
    }
   },
   {
@@ -1256,6 +1402,41 @@
     "ru": "Нейросети, LLM и работа с ИИ-моделями",
     "uz": "Neyron tarmoqlar, LLM va AI modellari",
     "en": "Neural networks, LLMs and AI models"
+   },
+   "about": {
+    "what": {
+     "ru": "<p>Искусственный интеллект — общее название для программ, которые решают задачи, не описанные правилами напрямую. Раньше программист писал «если так, то эдак». Теперь модель обучается на примерах и выводит правило сама.</p><p>Сегодня под ИИ чаще всего имеют в виду большие языковые модели — те, что пишут текст и код. Но за ними стоит та же математика, что и за распознаванием картинок: подбор параметров под данные.</p>",
+     "uz": "<p>Sun'iy intellekt — qoidalar bilan bevosita tasvirlanmagan vazifalarni hal qiladigan dasturlarning umumiy nomi. Ilgari dasturchi «agar shunday bo'lsa, unday qil» deb yozardi. Endi model misollarda o'rganadi va qoidani o'zi chiqaradi.</p><p>Bugun SI deganda ko'pincha katta til modellari — matn va kod yozadiganlar nazarda tutiladi. Lekin ular ortida rasmlarni tanish bilan bir xil matematika turadi: ma'lumotga parametrlarni moslash.</p>",
+     "en": "<p>Artificial intelligence is the umbrella term for programs that solve tasks not spelled out as rules. A programmer used to write “if this, then that”. Now a model learns from examples and derives the rule itself.</p><p>Today AI most often means large language models — the ones that write text and code. Behind them sits the same mathematics as image recognition: fitting parameters to data.</p>"
+    },
+    "why": {
+     "ru": "<p>Область на пике внимания и денег, но и требований: без математики и уверенного Python дальше «поиграть с чужой моделью» продвинуться трудно. Зато соседняя ниша — применять готовые модели в продуктах — доступна почти любому разработчику уже сейчас.</p>",
+     "uz": "<p>Soha e'tibor va pul cho'qqisida, lekin talablar ham shunday: matematika va ishonchli Python siz «birovning modeli bilan o'ynash» dan uzoqqa ketish qiyin. Buning o'rniga qo'shni nish — tayyor modellarni mahsulotlarda qo'llash — deyarli har qanday dasturchiga hozir ham ochiq.</p>",
+     "en": "<p>The field sits at the peak of attention and money — and of requirements: without mathematics and confident Python it is hard to go beyond playing with someone else's model. The neighbouring niche, however — applying ready-made models inside products — is open to almost any developer today.</p>"
+    },
+    "learn": {
+     "ru": [
+      "Python и работа с массивами чисел",
+      "Что такое модель, обучение и функция потерь",
+      "Нейросеть: слои, веса, обратное распространение",
+      "Языковые модели: токены, контекст, ограничения",
+      "Честная оценка качества и почему модель ошибается уверенно"
+     ],
+     "uz": [
+      "Python va sonlar massivlari bilan ishlash",
+      "Model, o'qitish va yo'qotish funksiyasi nima",
+      "Neyrotarmoq: qatlamlar, og'irliklar, teskari tarqalish",
+      "Til modellari: tokenlar, kontekst, cheklovlar",
+      "Sifatni halol baholash va nega model ishonch bilan xato qiladi"
+     ],
+     "en": [
+      "Python and working with arrays of numbers",
+      "What a model, training and a loss function are",
+      "Neural networks: layers, weights, backpropagation",
+      "Language models: tokens, context, limits",
+      "Honest evaluation, and why a model is confidently wrong"
+     ]
+    }
    }
   },
   {
@@ -1272,6 +1453,41 @@
     "ru": "Модели, признаки и метрики качества",
     "uz": "Modellar, belgilar va sifat metrikalari",
     "en": "Models, features and quality metrics"
+   },
+   "about": {
+    "what": {
+     "ru": "<p>Машинное обучение — практическая часть ИИ. Есть таблица с данными и колонка, которую надо предсказать: уйдёт ли клиент, сколько будет заказов, мошенническая ли операция. Модель ищет закономерность в прошлых данных и применяет её к новым.</p><p>Большая часть работы — не выбор модели, а подготовка признаков и проверка, что модель не выучила случайный шум.</p>",
+     "uz": "<p>Mashinali o'rganish — SI ning amaliy qismi. Ma'lumotli jadval va bashorat qilish kerak bo'lgan ustun bor: mijoz ketadimi, qancha buyurtma bo'ladi, operatsiya firibgarlikmi. Model o'tgan ma'lumotlarda qonuniyat qidiradi va uni yangilariga qo'llaydi.</p><p>Ishning katta qismi — model tanlash emas, balki belgilar tayyorlash va model tasodifiy shovqinni o'rganib olmaganini tekshirish.</p>",
+     "en": "<p>Machine learning is the practical part of AI. You have a table of data and a column to predict: will this customer churn, how many orders next week, is this transaction fraud. The model finds a pattern in past data and applies it to new data.</p><p>Most of the work is not picking a model but preparing features and checking that the model has not memorised random noise.</p>"
+    },
+    "why": {
+     "ru": "<p>Прикладное ML нужно банкам, магазинам, доставке — везде, где есть история и надо угадать будущее. Вход проще, чем в исследовательский ИИ: хватает уверенного Python, статистики на уровне понимания и терпения к данным.</p>",
+     "uz": "<p>Amaliy ML banklarga, do'konlarga, yetkazib berishga kerak — tarix bor va kelajakni taxmin qilish kerak bo'lgan hamma joyda. Kirish tadqiqot SI siga qaraganda oddiyroq: ishonchli Python, tushunish darajasidagi statistika va ma'lumotga sabr yetadi.</p>",
+     "en": "<p>Applied ML is needed by banks, shops, delivery services — anywhere there is history and a future to guess. The entry is easier than research AI: confident Python, statistics at the level of understanding, and patience with data are enough.</p>"
+    },
+    "learn": {
+     "ru": [
+      "Признаки: как превратить сырые данные в то, что понимает модель",
+      "Классификация и регрессия — два основных типа задач",
+      "Переобучение и как его поймать",
+      "Метрики: почему точность 99% иногда означает бесполезную модель",
+      "Как вывести модель в продакшн и следить за ней"
+     ],
+     "uz": [
+      "Belgilar: xom ma'lumotni model tushunadigan narsaga qanday aylantirish",
+      "Tasniflash va regressiya — vazifalarning ikki asosiy turi",
+      "Qayta o'qitish va uni qanday tutish",
+      "Metrikalar: nega 99% aniqlik ba'zan foydasiz modelni anglatadi",
+      "Modelni ishlab chiqarishga qanday chiqarish va kuzatish"
+     ],
+     "en": [
+      "Features: turning raw data into something a model understands",
+      "Classification and regression — the two main task types",
+      "Overfitting and how to catch it",
+      "Metrics: why 99% accuracy sometimes means a useless model",
+      "Getting a model into production and watching it there"
+     ]
+    }
    }
   },
   {
@@ -1288,6 +1504,41 @@
     "ru": "Нейросети, свёртки и трансформеры",
     "uz": "Neyron tarmoqlar, konvolyutsiya va transformerlar",
     "en": "Neural nets, convolutions and transformers"
+   },
+   "about": {
+    "what": {
+     "ru": "<p>Глубокое обучение — та часть машинного обучения, где модель состоит из многих слоёв и учится на сырых данных: картинках, звуке, тексте. Признаки не придумывает человек — сеть находит их сама.</p><p>Цена этого — данные и вычисления. Там, где обычной модели хватит тысячи строк таблицы, глубокой сети нужны сотни тысяч примеров и видеокарта.</p>",
+     "uz": "<p>Chuqur o'rganish — mashinali o'rganishning modeli ko'p qatlamdan iborat va xom ma'lumotda o'rganadigan qismi: rasmlar, ovoz, matn. Belgilarni odam o'ylab topmaydi — tarmoq ularni o'zi topadi.</p><p>Buning narxi — ma'lumot va hisoblash. Oddiy modelga jadvalning ming qatori yetadigan joyda chuqur tarmoqqa yuz minglab misol va videokarta kerak.</p>",
+     "en": "<p>Deep learning is the part of machine learning where the model has many layers and learns from raw data: images, audio, text. A human does not design the features — the network finds them itself.</p><p>The price is data and compute. Where an ordinary model is happy with a thousand table rows, a deep network wants hundreds of thousands of examples and a GPU.</p>"
+    },
+    "why": {
+     "ru": "<p>Всё, что сегодня называют прорывом ИИ, выросло отсюда. Но это и самая требовательная область: без линейной алгебры и понимания, что происходит внутри, остаётся только копировать чужие решения.</p>",
+     "uz": "<p>Bugun SI yutug'i deb ataladigan hamma narsa shu yerdan o'sgan. Lekin bu eng talabchan soha ham: chiziqli algebra va ichkarida nima bo'layotganini tushunmasdan, faqat birovning yechimini nusxalash qoladi.</p>",
+     "en": "<p>Everything called an AI breakthrough today grew out of this. It is also the most demanding area: without linear algebra and an understanding of what happens inside, all that is left is copying other people's solutions.</p>"
+    },
+    "learn": {
+     "ru": [
+      "Как из простого нейрона получается сеть",
+      "Обучение: градиенты и почему сеть вообще учится",
+      "Свёрточные сети для изображений",
+      "Трансформеры — то, на чём построены языковые модели",
+      "Дообучение готовых моделей вместо обучения с нуля"
+     ],
+     "uz": [
+      "Oddiy neyrondan tarmoq qanday hosil bo'ladi",
+      "O'qitish: gradiyentlar va nega tarmoq umuman o'rganadi",
+      "Rasmlar uchun konvolyutsion tarmoqlar",
+      "Transformerlar — til modellari qurilgan asos",
+      "Noldan o'qitish o'rniga tayyor modellarni qo'shimcha o'qitish"
+     ],
+     "en": [
+      "How a network emerges from a simple neuron",
+      "Training: gradients and why a network learns at all",
+      "Convolutional networks for images",
+      "Transformers — what language models are built on",
+      "Fine-tuning existing models instead of training from scratch"
+     ]
+    }
    }
   },
   {
@@ -1304,6 +1555,41 @@
     "ru": "Тексты, эмбеддинги и языковые модели",
     "uz": "Matnlar, embeddinglar va til modellari",
     "en": "Text, embeddings and language models"
+   },
+   "about": {
+    "what": {
+     "ru": "<p>Обработка естественного языка — про то, как заставить программу работать с человеческим текстом: понимать смысл, отвечать, переводить, находить нужное среди миллионов документов.</p><p>Главная трудность в том, что язык неоднозначен. Одно слово значит разное в разных фразах, а смысл часто зависит от того, чего в тексте нет.</p>",
+     "uz": "<p>Tabiiy tilni qayta ishlash — dasturni inson matni bilan ishlashga majbur qilish haqida: ma'noni tushunish, javob berish, tarjima qilish, millionlab hujjat orasidan keraklisini topish.</p><p>Asosiy qiyinchilik shundaki, til noaniq. Bitta so'z turli iboralarda turlicha ma'no beradi, ma'no esa ko'pincha matnda yo'q narsaga bog'liq.</p>",
+     "en": "<p>Natural language processing is about making programs work with human text: understanding meaning, answering, translating, finding the right thing among millions of documents.</p><p>The core difficulty is ambiguity. One word means different things in different sentences, and meaning often depends on what the text does not say.</p>"
+    },
+    "why": {
+     "ru": "<p>Область, которая за несколько лет изменилась сильнее всех: то, что раньше требовало отдельной модели на каждую задачу, теперь часто решается одной большой моделью. Умение грамотно её применить — востребованный навык сам по себе.</p>",
+     "uz": "<p>Bir necha yilda hammadan ko'proq o'zgargan soha: ilgari har bir vazifa uchun alohida model talab qilingan narsa endi ko'pincha bitta katta model bilan hal qilinadi. Uni to'g'ri qo'llash malakasi o'z-o'zidan talabgir.</p>",
+     "en": "<p>The field that changed most in a few years: what used to need a separate model per task is now often solved by one large model. Knowing how to apply it well is a marketable skill in itself.</p>"
+    },
+    "learn": {
+     "ru": [
+      "Как текст превращается в числа: токены и векторы",
+      "Поиск по смыслу, а не по совпадению слов",
+      "Классификация текстов и извлечение сущностей",
+      "Работа с языковой моделью: промпт, контекст, ограничения",
+      "Оценка качества там, где нет единственно верного ответа"
+     ],
+     "uz": [
+      "Matn sonlarga qanday aylanadi: tokenlar va vektorlar",
+      "So'z mosligi bo'yicha emas, ma'no bo'yicha qidiruv",
+      "Matnlarni tasniflash va mohiyatlarni ajratish",
+      "Til modeli bilan ishlash: prompt, kontekst, cheklovlar",
+      "Yagona to'g'ri javob yo'q joyda sifatni baholash"
+     ],
+     "en": [
+      "How text becomes numbers: tokens and vectors",
+      "Search by meaning rather than word overlap",
+      "Text classification and entity extraction",
+      "Working with a language model: prompt, context, limits",
+      "Evaluating quality where there is no single right answer"
+     ]
+    }
    }
   },
   {
@@ -1320,6 +1606,41 @@
     "ru": "Изображения, детекция и сегментация",
     "uz": "Tasvirlar, detektsiya va segmentatsiya",
     "en": "Images, detection and segmentation"
+   },
+   "about": {
+    "what": {
+     "ru": "<p>Компьютерное зрение учит программу извлекать смысл из изображений и видео: что на снимке, где именно, сколько объектов, изменилось ли что-то по сравнению с прошлым кадром.</p><p>Применения обычно очень приземлённые: контроль качества на производстве, распознавание номеров, подсчёт людей в очереди, медицинские снимки.</p>",
+     "uz": "<p>Kompyuter ko'rishi dasturni tasvir va videodan ma'no ajratishga o'rgatadi: suratda nima bor, aynan qayerda, nechta obyekt, oldingi kadrga nisbatan nimadir o'zgardimi.</p><p>Qo'llanishlar odatda juda amaliy: ishlab chiqarishda sifat nazorati, raqamlarni tanish, navbatdagi odamlarni sanash, tibbiy suratlar.</p>",
+     "en": "<p>Computer vision teaches a program to extract meaning from images and video: what is in the frame, where exactly, how many objects, what changed since the last frame.</p><p>The applications are usually very down-to-earth: quality control on a production line, plate recognition, counting people in a queue, medical imaging.</p>"
+    },
+    "why": {
+     "ru": "<p>Одна из немногих областей ИИ, где результат виден невооружённым глазом и легко показать заказчику. Требует терпения к данным: разметка изображений — долгая и скучная часть, которую нельзя пропустить.</p>",
+     "uz": "<p>Natija yalang'och ko'z bilan ko'rinadigan va buyurtmachiga ko'rsatish oson bo'lgan kam sonli SI sohalaridan biri. Ma'lumotga sabr talab qiladi: rasmlarni belgilash — o'tkazib yuborib bo'lmaydigan uzoq va zerikarli qism.</p>",
+     "en": "<p>One of the few AI areas where the result is visible to the naked eye and easy to show a client. It demands patience with data: labelling images is the long, boring part you cannot skip.</p>"
+    },
+    "learn": {
+     "ru": [
+      "Как изображение выглядит для компьютера",
+      "Классификация: что изображено на картинке",
+      "Детекция: где именно находится объект",
+      "Сегментация: разметка по пикселям",
+      "Готовые модели и дообучение под свою задачу"
+     ],
+     "uz": [
+      "Tasvir kompyuter uchun qanday ko'rinadi",
+      "Tasniflash: rasmda nima tasvirlangan",
+      "Detektsiya: obyekt aynan qayerda",
+      "Segmentatsiya: piksellar bo'yicha belgilash",
+      "Tayyor modellar va o'z vazifangizga moslashtirish"
+     ],
+     "en": [
+      "What an image looks like to a computer",
+      "Classification: what is in the picture",
+      "Detection: where exactly the object is",
+      "Segmentation: labelling pixel by pixel",
+      "Pre-trained models and fine-tuning for your own task"
+     ]
+    }
    }
   },
   {
@@ -1336,6 +1657,41 @@
     "ru": "Политики, аудит и управление рисками",
     "uz": "Siyosatlar, audit va risklarni boshqarish",
     "en": "Policies, audit and risk management"
+   },
+   "about": {
+    "what": {
+     "ru": "<p>Информационная безопасность — управленческая сторона защиты. Не «найти уязвимость в коде», а выстроить процесс: кто к чему имеет доступ, что делать при инциденте, как доказать регулятору, что данные защищены.</p><p>Если кибербезопасность ближе к технике, то здесь больше про политики, аудит и оценку рисков — что защищать в первую очередь при ограниченном бюджете.</p>",
+     "uz": "<p>Axborot xavfsizligi — himoyaning boshqaruv tomoni. «Kodda zaiflik topish» emas, balki jarayon qurish: kim nimaga kira oladi, hodisada nima qilish, ma'lumot himoyalanganini regulyatorga qanday isbotlash.</p><p>Kiberxavfsizlik texnikaga yaqin bo'lsa, bu yerda ko'proq siyosat, audit va risklarni baholash — cheklangan byudjetda birinchi navbatda nimani himoya qilish.</p>",
+     "en": "<p>Information security is the management side of defence. Not “find a bug in the code”, but build a process: who has access to what, what happens during an incident, how to prove to a regulator that data is protected.</p><p>Where cybersecurity leans technical, this leans towards policy, audit and risk assessment — what to protect first on a limited budget.</p>"
+    },
+    "why": {
+     "ru": "<p>Направление для тех, кому интересна не только техника, но и то, как решения принимаются. Часто становится следующим шагом после нескольких лет в разработке или администрировании.</p>",
+     "uz": "<p>Faqat texnika emas, qarorlar qanday qabul qilinishi ham qiziq bo'lganlar uchun yo'nalish. Ko'pincha dasturlash yoki administratorlikda bir necha yildan keyingi qadam bo'ladi.</p>",
+     "en": "<p>For people interested not only in the technology but in how decisions get made. It often becomes the next step after a few years in development or administration.</p>"
+    },
+    "learn": {
+     "ru": [
+      "Оценка рисков: что вероятно и что дорого",
+      "Политики доступа и принцип наименьших прав",
+      "Реагирование на инциденты",
+      "Аудит и соответствие требованиям",
+      "Человеческий фактор: почему техника не спасает"
+     ],
+     "uz": [
+      "Risklarni baholash: nima ehtimolli va nima qimmat",
+      "Kirish siyosatlari va eng kam huquq tamoyili",
+      "Hodisalarga javob berish",
+      "Audit va talablarga muvofiqlik",
+      "Inson omili: nega texnika qutqarmaydi"
+     ],
+     "en": [
+      "Risk assessment: what is likely and what is expensive",
+      "Access policies and least privilege",
+      "Incident response",
+      "Audit and compliance",
+      "The human factor: why technology alone does not save you"
+     ]
+    }
    }
   },
   {
@@ -1353,7 +1709,45 @@
     "uz": "HTML, CSS, JavaScript va interfeyslar",
     "en": "HTML, CSS, JavaScript and interfaces"
    },
-   "careerPath": "frontend-path"
+   "careerPath": "frontend-path",
+   "about": {
+    "what": {
+     "ru": "<p>Фронтенд — всё, что человек видит и трогает в браузере. Кнопки, формы, анимации, тёмная тема, поведение на телефоне. Три опоры: HTML задаёт смысл содержимого, CSS — внешний вид, JavaScript — поведение.</p><p>Работа заметная: результат виден сразу, его можно показать. И обманчиво простая — сделать красиво несложно, сложно сделать так, чтобы работало на всех экранах, читалось с клавиатуры и не тормозило на дешёвом телефоне.</p>",
+     "uz": "<p>Frontend — brauzerda odam ko'radigan va teginadigan hamma narsa. Tugmalar, formalar, animatsiyalar, qorong'i mavzu, telefondagi xatti-harakat. Uchta ustun: HTML mazmun ma'nosini, CSS tashqi ko'rinishni, JavaScript xatti-harakatni beradi.</p><p>Ish ko'rinarli: natija darhol ko'rinadi, uni ko'rsatish mumkin. Va aldamchi sodda — chiroyli qilish qiyin emas, barcha ekranlarda ishlashi, klaviaturadan o'qilishi va arzon telefonda sekinlashmasligini ta'minlash qiyin.</p>",
+     "en": "<p>Frontend is everything a person sees and touches in the browser. Buttons, forms, animations, dark mode, behaviour on a phone. Three pillars: HTML gives content meaning, CSS gives it looks, JavaScript gives it behaviour.</p><p>The work is visible: you can show the result immediately. And deceptively simple — making it pretty is easy; making it work on every screen, navigable by keyboard and fast on a cheap phone is not.</p>"
+    },
+    "why": {
+     "ru": "<p>Самый короткий путь от нуля до первого заказа: результат виден без сервера и базы данных, портфолио собирается из своих же страниц. Отсюда и конкуренция на входе высокая — но она отсеивается быстро, потому что до уровня «умею собрать интерфейс, который не разваливается» доходят немногие.</p>",
+     "uz": "<p>Noldan birinchi buyurtmagacha eng qisqa yo'l: natija serversiz va ma'lumotlar bazasisiz ko'rinadi, portfolio o'z sahifalaringizdan yig'iladi. Shundan kirishda raqobat yuqori — lekin u tez saralanadi, chunki «buzilmaydigan interfeys yig'a olaman» darajasiga kamchilik yetadi.</p>",
+     "en": "<p>The shortest path from zero to a first paid job: the result is visible without a server or a database, and your portfolio is built from your own pages. Hence the crowded entrance — but it thins out fast, because few reach the level of “I can build an interface that does not fall apart”.</p>"
+    },
+    "learn": {
+     "ru": [
+      "HTML: структура документа и семантика вместо каши из div",
+      "CSS: блочная модель, flexbox, grid, адаптивность",
+      "Tailwind: быстрая вёрстка утилитарными классами",
+      "JavaScript: от переменных до асинхронности",
+      "Как страница общается с сервером",
+      "Доступность: клавиатура, скринридеры, контраст"
+     ],
+     "uz": [
+      "HTML: hujjat tuzilishi va div bo'tqasi o'rniga semantika",
+      "CSS: blok modeli, flexbox, grid, moslashuvchanlik",
+      "Tailwind: utilitar sinflar bilan tez belgilash",
+      "JavaScript: o'zgaruvchilardan asinxronlikkacha",
+      "Sahifa server bilan qanday muloqot qiladi",
+      "Qulaylik: klaviatura, skrinriderlar, kontrast"
+     ],
+     "en": [
+      "HTML: document structure and semantics instead of div soup",
+      "CSS: the box model, flexbox, grid, responsiveness",
+      "Tailwind: fast styling with utility classes",
+      "JavaScript: from variables to asynchrony",
+      "How a page talks to the server",
+      "Accessibility: keyboard, screen readers, contrast"
+     ]
+    }
+   }
   },
   {
    "id": "fullstack",
@@ -1370,7 +1764,42 @@
     "uz": "Frontend va backend bir yo'lda",
     "en": "Frontend and backend in one path"
    },
-   "careerPath": "fullstack-path"
+   "careerPath": "fullstack-path",
+   "about": {
+    "what": {
+     "ru": "<p>Full-Stack — тот, кто может собрать продукт целиком: и страницу в браузере, и сервер с базой. Не «знает всё», а понимает всю цепочку — от нажатия кнопки до записи в базу и обратно.</p><p>Такой человек особенно ценен в маленькой команде и в собственном проекте: не нужно ждать, пока кто-то другой сделает свою половину.</p>",
+     "uz": "<p>Full-Stack — mahsulotni butunlay yig'a oladigan odam: brauzerdagi sahifani ham, bazali serverni ham. «Hammasini biladi» emas, balki butun zanjirni tushunadi — tugmani bosishdan bazaga yozishgacha va orqaga.</p><p>Bunday odam kichik jamoada va o'z loyihasida ayniqsa qadrli: birov o'z yarmini qilishini kutish shart emas.</p>",
+     "en": "<p>Full-stack means being able to build a product end to end: the page in the browser and the server with its database. Not “knows everything”, but understands the whole chain — from a button press to a database write and back.</p><p>Such a person is especially valuable in a small team and in your own project: you never wait for someone else to finish their half.</p>"
+    },
+    "why": {
+     "ru": "<p>Это путь для тех, кто хочет делать продукты, а не задачи. Дольше учиться, зато можно запустить своё дело в одиночку. В найме full-stack ждут в стартапах и небольших студиях; в крупных компаниях чаще всё-таки выбирают одну сторону.</p>",
+     "uz": "<p>Bu vazifalarni emas, mahsulotlarni qilmoqchi bo'lganlar uchun yo'l. O'rganish uzoqroq, lekin o'z ishini yolg'iz boshlash mumkin. Yollashda full-stack ni startaplar va kichik studiyalar kutadi; yirik kompaniyalarda ko'pincha baribir bitta tomon tanlanadi.</p>",
+     "en": "<p>This is the path for people who want to ship products rather than tickets. It takes longer to learn, but you can launch something on your own. In hiring, full-stack is sought by startups and small studios; big companies usually still expect you to pick a side.</p>"
+    },
+    "learn": {
+     "ru": [
+      "Вёрстку и интерфейс: HTML, CSS, JavaScript",
+      "Серверную часть: Python, HTTP, REST",
+      "Базы данных и SQL",
+      "Как связать одно с другим и не запутаться",
+      "Развёртывание: как выложить проект в интернет"
+     ],
+     "uz": [
+      "Belgilash va interfeys: HTML, CSS, JavaScript",
+      "Server qismi: Python, HTTP, REST",
+      "Ma'lumotlar bazasi va SQL",
+      "Bularni qanday bog'lash va chalkashmaslik",
+      "Joylashtirish: loyihani internetga qanday chiqarish"
+     ],
+     "en": [
+      "Markup and interface: HTML, CSS, JavaScript",
+      "The server side: Python, HTTP, REST",
+      "Databases and SQL",
+      "How to connect the two without getting lost",
+      "Deployment: getting the project onto the internet"
+     ]
+    }
+   }
   },
   {
    "id": "big-data",
@@ -1386,6 +1815,41 @@
     "ru": "Spark, Kafka и распределённая обработка",
     "uz": "Spark, Kafka va taqsimlangan ishlov",
     "en": "Spark, Kafka and distributed processing"
+   },
+   "about": {
+    "what": {
+     "ru": "<p>Big Data начинается там, где данные перестают помещаться на одну машину. Терабайты логов, миллиарды событий — обычная база и обычный Python с этим не справятся.</p><p>Решение — распределённая обработка: данные и вычисления разбрасывают по десяткам машин. Отсюда новые проблемы: как разделить, что делать, если одна машина умерла, и почему результат зависит от порядка.</p>",
+     "uz": "<p>Big Data ma'lumot bitta mashinaga sig'may qolgan joyda boshlanadi. Terabaytlab loglar, milliardlab hodisalar — oddiy baza va oddiy Python bunga uddalay olmaydi.</p><p>Yechim — taqsimlangan qayta ishlash: ma'lumot va hisoblash o'nlab mashinalarga tarqatiladi. Shundan yangi muammolar: qanday bo'lish, bitta mashina o'lsa nima qilish va nega natija tartibga bog'liq.</p>",
+     "en": "<p>Big data begins where the data stops fitting on one machine. Terabytes of logs, billions of events — an ordinary database and ordinary Python will not cope.</p><p>The answer is distributed processing: data and computation are spread across dozens of machines. Which brings new problems: how to split the work, what to do when one machine dies, and why the result depends on ordering.</p>"
+    },
+    "why": {
+     "ru": "<p>Естественное продолжение инженерии данных для тех, кто дорос до больших объёмов. Навык узкий, но дефицитный: компаний с настоящими большими данными меньше, чем кажется, зато платят там соответственно.</p>",
+     "uz": "<p>Katta hajmlarga yetganlar uchun ma'lumotlar muhandisligining tabiiy davomi. Malaka tor, lekin taqchil: haqiqiy katta ma'lumotli kompaniyalar ko'ringanidan kam, lekin u yerda mos ravishda to'lashadi.</p>",
+     "en": "<p>The natural continuation of data engineering for those who have outgrown ordinary volumes. A narrow skill, but a scarce one: fewer companies have genuinely big data than it seems, and they pay accordingly.</p>"
+    },
+    "learn": {
+     "ru": [
+      "Почему одна машина перестаёт справляться",
+      "Распределённое хранение и обработка",
+      "Spark: вычисления на кластере",
+      "Kafka: потоки событий в реальном времени",
+      "Отказоустойчивость: система живёт, когда часть узлов мертва"
+     ],
+     "uz": [
+      "Nega bitta mashina uddalay olmay qoladi",
+      "Taqsimlangan saqlash va qayta ishlash",
+      "Spark: klasterdagi hisoblashlar",
+      "Kafka: real vaqtdagi hodisalar oqimi",
+      "Nosozlikka chidamlilik: tugunlarning bir qismi o'lganda tizim yashaydi"
+     ],
+     "en": [
+      "Why a single machine stops coping",
+      "Distributed storage and processing",
+      "Spark: computation on a cluster",
+      "Kafka: real-time event streams",
+      "Fault tolerance: the system survives dead nodes"
+     ]
+    }
    }
   },
   {
@@ -1402,6 +1866,41 @@
     "ru": "AWS, GCP, Azure и облачные хранилища",
     "uz": "AWS, GCP, Azure va bulutli saqlash",
     "en": "AWS, GCP, Azure and cloud storage"
+   },
+   "about": {
+    "what": {
+     "ru": "<p>Облачная инженерия — про то, как разместить систему на чужих серверах и платить только за использованное. Вместо покупки железа арендуют вычисления, хранилище и базы, а масштаб меняют одной командой.</p><p>Работа сводится к выбору: что дешевле, что надёжнее, что переживёт отказ целого дата-центра — и как всё это описать кодом, а не кликами мышкой.</p>",
+     "uz": "<p>Bulut muhandisligi — tizimni begona serverlarda joylashtirish va faqat ishlatilganiga to'lash haqida. Temir sotib olish o'rniga hisoblash, saqlash va bazalar ijaraga olinadi, miqyos esa bitta buyruq bilan o'zgartiriladi.</p><p>Ish tanlovga keladi: nima arzonroq, nima ishonchliroq, nima butun ma'lumot markazi ishdan chiqsa omon qoladi — va bularning hammasini sichqoncha bosishlari emas, kod bilan qanday tasvirlash.</p>",
+     "en": "<p>Cloud engineering is about placing a system on someone else's servers and paying only for what you use. Instead of buying hardware you rent compute, storage and databases, and change scale with a single command.</p><p>The work comes down to choices: what is cheaper, what is more reliable, what survives an entire data centre failing — and how to describe all of it as code rather than mouse clicks.</p>"
+    },
+    "why": {
+     "ru": "<p>Почти все новые проекты сегодня начинаются в облаке, поэтому навык нужен и разработчикам, и инженерам данных. Отдельная ценность — умение считать деньги: в облаке легко случайно потратить бюджет за выходные.</p>",
+     "uz": "<p>Bugun deyarli barcha yangi loyihalar bulutda boshlanadi, shuning uchun malaka dasturchilarga ham, ma'lumotlar muhandislariga ham kerak. Alohida qadriyat — pul sanash malakasi: bulutda dam olish kunlarida byudjetni tasodifan sarflash oson.</p>",
+     "en": "<p>Almost every new project starts in the cloud today, so the skill is needed by developers and data engineers alike. A separate value is being able to count money: in the cloud it is easy to burn a budget over a weekend by accident.</p>"
+    },
+    "learn": {
+     "ru": [
+      "Что арендуют в облаке и как за это платят",
+      "Виртуальные машины, контейнеры и функции",
+      "Хранилища и облачные базы данных",
+      "Инфраструктура как код",
+      "Надёжность: резервирование и восстановление"
+     ],
+     "uz": [
+      "Bulutda nima ijaraga olinadi va buning uchun qanday to'lanadi",
+      "Virtual mashinalar, konteynerlar va funksiyalar",
+      "Saqlash va bulutli ma'lumotlar bazalari",
+      "Infratuzilma kod sifatida",
+      "Ishonchlilik: zaxiralash va tiklash"
+     ],
+     "en": [
+      "What you rent in the cloud and how you pay for it",
+      "Virtual machines, containers and functions",
+      "Storage and managed databases",
+      "Infrastructure as code",
+      "Reliability: redundancy and recovery"
+     ]
+    }
    }
   },
   {
@@ -1418,6 +1917,41 @@
     "ru": "Docker, CI/CD и эксплуатация",
     "uz": "Docker, CI/CD va ekspluatatsiya",
     "en": "Docker, CI/CD and operations"
+   },
+   "about": {
+    "what": {
+     "ru": "<p>DevOps — не должность, а способ работы: сократить путь от написанной строки кода до работающего у пользователя. Автоматическая сборка, автоматические тесты, автоматическая выкладка — и возможность быстро откатиться, когда что-то пошло не так.</p><p>Побочный, но главный эффект: выкладка перестаёт быть событием, которого боятся, и становится рутиной, которая случается по десять раз в день.</p>",
+     "uz": "<p>DevOps — lavozim emas, ishlash usuli: yozilgan kod qatoridan foydalanuvchida ishlashgacha bo'lgan yo'lni qisqartirish. Avtomatik yig'ish, avtomatik testlar, avtomatik joylashtirish — va nimadir noto'g'ri ketganda tez orqaga qaytish imkoniyati.</p><p>Yon, lekin asosiy samara: joylashtirish qo'rqiladigan hodisa bo'lishdan to'xtaydi va kuniga o'n marta sodir bo'ladigan odatiy ishga aylanadi.</p>",
+     "en": "<p>DevOps is not a job title but a way of working: shortening the path from a written line of code to something running for users. Automatic builds, automatic tests, automatic deployment — and the ability to roll back quickly when something goes wrong.</p><p>The side effect, which is really the main one: releasing stops being a feared event and becomes a routine that happens ten times a day.</p>"
+    },
+    "why": {
+     "ru": "<p>Навык, который повышает ценность любого разработчика, даже если он не собирается менять специальность. А как отдельная профессия — одна из самых оплачиваемых, потому что отвечает за то, что нельзя уронить.</p>",
+     "uz": "<p>Har qanday dasturchining qadrini oshiradigan malaka, hatto u kasbini o'zgartirmoqchi bo'lmasa ham. Alohida kasb sifatida esa — eng yaxshi to'lanadiganlardan biri, chunki qulatib bo'lmaydigan narsa uchun javob beradi.</p>",
+     "en": "<p>A skill that raises the value of any developer, even one who never plans to switch specialities. And as a profession of its own it is among the best paid, because it owns the things you must not drop.</p>"
+    },
+    "learn": {
+     "ru": [
+      "Linux и командная строка как рабочая среда",
+      "Docker: одинаковое окружение везде",
+      "CI/CD: сборка, тесты и выкладка без ручной работы",
+      "Мониторинг и логи: узнать о поломке раньше пользователя",
+      "Управление конфигурацией и секретами"
+     ],
+     "uz": [
+      "Linux va buyruq qatori ish muhiti sifatida",
+      "Docker: hamma joyda bir xil muhit",
+      "CI/CD: qo'l mehnatisiz yig'ish, testlar va joylashtirish",
+      "Monitoring va loglar: nosozlik haqida foydalanuvchidan oldin bilish",
+      "Konfiguratsiya va sirlarni boshqarish"
+     ],
+     "en": [
+      "Linux and the command line as your working environment",
+      "Docker: the same environment everywhere",
+      "CI/CD: build, test and deploy without manual work",
+      "Monitoring and logs: learning about a failure before the user does",
+      "Configuration and secrets management"
+     ]
+    }
    }
   },
   {
@@ -1435,7 +1969,42 @@
     "uz": "Git, testlash, arxitektura va kod-revyu",
     "en": "Git, testing, architecture and code review"
    },
-   "careerPath": "se-path"
+   "careerPath": "se-path",
+   "about": {
+    "what": {
+     "ru": "<p>Основы разработки — то общее, что нужно любому программисту независимо от языка и направления. Как хранить историю изменений, как писать код, который поймёт другой человек, как убедиться, что программа работает, и как не сломать то, что уже работало.</p><p>Эти вещи не привязаны к моде: инструменты меняются, а необходимость объяснять свой замысел и проверять свою работу — нет.</p>",
+     "uz": "<p>Dasturlash asoslari — til va yo'nalishdan qat'i nazar har qanday dasturchiga kerak bo'lgan umumiy narsa. O'zgarishlar tarixini qanday saqlash, boshqa odam tushunadigan kod qanday yozish, dastur ishlashiga qanday ishonch hosil qilish va allaqachon ishlayotgan narsani qanday buzmaslik.</p><p>Bu narsalar modaga bog'liq emas: vositalar o'zgaradi, o'z niyatini tushuntirish va o'z ishini tekshirish zarurati esa yo'q.</p>",
+     "en": "<p>Software engineering fundamentals are what every programmer needs regardless of language or field. How to keep a history of changes, how to write code another person can read, how to be sure the program works, and how not to break what already worked.</p><p>None of it follows fashion: tools change, the need to explain your intent and verify your work does not.</p>"
+    },
+    "why": {
+     "ru": "<p>Разница между «умею писать код» и «беру на работу» обычно именно здесь. Кандидат без Git, без тестов и без привычки объяснять решения дороже обходится команде, даже если алгоритмы знает лучше всех.</p>",
+     "uz": "<p>«Kod yoza olaman» va «ishga olaman» o'rtasidagi farq odatda aynan shu yerda. Gitsiz, testsiz va qarorlarni tushuntirish odatisiz nomzod jamoaga qimmatga tushadi, hatto algoritmlarni hammadan yaxshi bilsa ham.</p>",
+     "en": "<p>The gap between “I can write code” and “we are hiring you” usually sits right here. A candidate without Git, without tests and without the habit of explaining decisions costs a team more, even if they know algorithms best.</p>"
+    },
+    "learn": {
+     "ru": [
+      "Алгоритмы и структуры данных: почему один код быстрее другого",
+      "Сложность алгоритма и как её оценивать на глаз",
+      "Git: история изменений и совместная работа",
+      "Тесты: как проверить программу, не запуская её руками",
+      "Читаемость: имена, разбиение, комментарии по делу"
+     ],
+     "uz": [
+      "Algoritmlar va ma'lumot tuzilmalari: nega bir kod boshqasidan tez",
+      "Algoritm murakkabligi va uni ko'zda qanday baholash",
+      "Git: o'zgarishlar tarixi va birgalikda ishlash",
+      "Testlar: dasturni qo'lda ishga tushirmasdan qanday tekshirish",
+      "O'qilishi: nomlar, bo'lish, joyiga izohlar"
+     ],
+     "en": [
+      "Algorithms and data structures: why one piece of code is faster",
+      "Algorithmic complexity and how to estimate it by eye",
+      "Git: change history and working together",
+      "Tests: verifying a program without running it by hand",
+      "Readability: names, decomposition, comments that earn their place"
+     ]
+    }
+   }
   }
  ],
  "legacyMap": {

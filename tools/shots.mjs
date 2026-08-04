@@ -72,6 +72,8 @@ const PAGES = [
   ['01-dashboard', '#/'],
   ['02-catalog', '#/catalog'],
   ['03-domain-frontend', '#/domain/frontend'],
+  ['12-domain-devops', '#/domain/devops'],
+  ['13-domain-backend', '#/domain/backend'],
   ['10-html-lesson', '#/course/html-basics/module/ht-01/theory'],
   ['11-css-task', '#/course/css-basics/module/cs-01/tasks/t2'],
   ['04-domain-de', '#/domain/data-engineering'],

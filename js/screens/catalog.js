@@ -97,6 +97,23 @@ export function renderDomain(root, domainId) {
     });
   }
 
+  /* Рассказ о направлении: что это за работа, зачем она и чему тут учат.
+     Без него страница отвечала только «какие курсы», но не «а мне это зачем». */
+  let aboutHtml = '';
+  if (d.about) {
+    const learn = tr(d.about.learn) || [];
+    aboutHtml = '<section class="about-domain">' +
+      '<div class="about-block"><h2>' + ic('info') + ' ' + esc(t('domain.aboutWhat')) + '</h2>' +
+      tr(d.about.what) + '</div>' +
+      '<div class="about-block"><h2>' + ic('target') + ' ' + esc(t('domain.aboutWhy')) + '</h2>' +
+      tr(d.about.why) + '</div>' +
+      (learn.length
+        ? '<div class="about-block"><h2>' + ic('book') + ' ' + esc(t('domain.aboutLearn')) + '</h2><ul class="about-list">' +
+          learn.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul></div>'
+        : '') +
+      '</section>';
+  }
+
   root.innerHTML =
     '<a class="back-link" href="#/catalog">' + ic('chevron', 'flip') + ' ' + esc(t('nav.catalog')) + '</a>' +
     '<div class="domain-head" style="--tc:' + esc(d.color) + '">' +
@@ -106,6 +123,10 @@ export function renderDomain(root, domainId) {
     (pp.total ? '<div class="dh-progress"><span>' + esc(t('domain.progress')) + '</span>' + progressBar(pp.pct) +
       '<b>' + pp.done + '/' + pp.total + '</b></div>' : '') +
     '</div>' +
+    /* Рассказ о направлении: что это за работа, зачем она и чему тут учат.
+       Без него страница отвечала только «какие курсы», но не «а мне это зачем». */
+    aboutHtml +
+
     (d.status === 'planned'
       ? '<div class="notice">' + ic('info') + ' ' + esc(t('catalog.plannedNote')) + '</div>'
       : '') +

@@ -175,15 +175,25 @@ export async function renderModule(root, courseId, moduleId, tab, taskId) {
   const m = findModule(course, moduleId);
   if (!m) { root.innerHTML = '<p class="muted-text">' + esc(t('common.notFound')) + '</p>'; return; }
   noteLanguage(getLang());
-  noteRecent({ courseId, moduleId: m.id, tab: tab || 'theory', title: tr(m.title), courseTitle: tr(courseMeta(courseId).title) });
 
-  if (tab === 'quiz') return renderQuiz(root, courseId, course, m);
-  if (tab === 'tasks') return taskId ? renderTask(root, courseId, course, m, taskId) : renderTasks(root, courseId, course, m);
-  return renderTheory(root, courseId, course, m);
+  /* «Продолжить с того же места» должно означать, что ты действительно начал,
+     а не просто заглянул. Поэтому запоминаем модуль по первому реальному
+     действию, а не при открытии страницы. */
+  const remember = () => noteRecent({
+    courseId, moduleId: m.id, tab: tab || 'theory',
+    title: tr(m.title), courseTitle: tr(courseMeta(courseId).title),
+  });
+  /* Если в модуле уже есть прогресс, он и так «в работе» — освежаем позицию */
+  const stNow = mod(courseId, m.id);
+  if (stNow.theory || stNow.quizBest || stNow.examBest || Object.keys(stNow.tasks || {}).length) remember();
+
+  if (tab === 'quiz') return renderQuiz(root, courseId, course, m, remember);
+  if (tab === 'tasks') return taskId ? renderTask(root, courseId, course, m, taskId, remember) : renderTasks(root, courseId, course, m);
+  return renderTheory(root, courseId, course, m, remember);
 }
 
 /* ---------- теория ---------- */
-function renderTheory(root, courseId, course, m) {
+function renderTheory(root, courseId, course, m, remember) {
   const st = mod(courseId, m.id);
   let idx = 0;
 
@@ -209,7 +219,7 @@ function renderTheory(root, courseId, course, m) {
     const prev = root.querySelector('#th-prev');
     if (prev) prev.addEventListener('click', () => { idx--; draw(); window.scrollTo(0, 0); });
     const next = root.querySelector('#th-next');
-    if (next) next.addEventListener('click', () => { idx++; draw(); window.scrollTo(0, 0); });
+    if (next) next.addEventListener('click', () => { if (remember) remember(); idx++; draw(); window.scrollTo(0, 0); });
     const done = root.querySelector('#th-done');
     if (done) done.addEventListener('click', () => {
       const gained = awardTheory(courseId, m.id);
@@ -221,7 +231,7 @@ function renderTheory(root, courseId, course, m) {
 }
 
 /* ---------- квиз ---------- */
-function renderQuiz(root, courseId, course, m) {
+function renderQuiz(root, courseId, course, m, remember) {
   const st = mod(courseId, m.id);
   const qs = m.quiz;
   const session = { idx: 0, correct: 0, results: [] };
@@ -239,6 +249,7 @@ function renderQuiz(root, courseId, course, m) {
       '<div id="quiz-after"></div></section>';
 
     root.querySelectorAll('.quiz-opt').forEach(btn => btn.addEventListener('click', () => {
+      if (remember) remember();
       const i = +btn.getAttribute('data-i');
       const ok = i === q.a;
       session.results.push(ok);
@@ -293,7 +304,7 @@ function renderTasks(root, courseId, course, m) {
 }
 
 /* ---------- одна задача ---------- */
-function renderTask(root, courseId, course, m, taskId) {
+function renderTask(root, courseId, course, m, taskId, remember) {
   const task = m.tasks.find(x => x.id === taskId);
   if (!task) return renderTasks(root, courseId, course, m);
   const st = mod(courseId, m.id);
@@ -461,6 +472,10 @@ function renderTask(root, courseId, course, m, taskId) {
     }
   }
   const runBtn = root.querySelector('#run-btn');
+  if (remember) {
+    if (runBtn) runBtn.addEventListener('click', remember);
+    root.querySelector('#check-btn').addEventListener('click', remember);
+  }
   if (runBtn) runBtn.addEventListener('click', () => exec(false));
   root.querySelector('#check-btn').addEventListener('click', () => exec(true));
 }
