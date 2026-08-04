@@ -22,7 +22,10 @@ const runners = {
 };
 
 /** Язык задачи → ключ раннера. Чего здесь нет — то запускать пока нечем. */
-const RUNNABLE = { python: 'py', javascript: 'js', sql: 'sql', c: 'c', cpp: 'cpp', java: 'java' };
+const RUNNABLE = { python: 'py', javascript: 'js', sql: 'sql', c: 'c', cpp: 'cpp', java: 'java',
+                   html: 'web', css: 'web', tailwind: 'web' };
+/** Языки вёрстки: результат не текст в консоли, а страница — её надо показывать. */
+const WEB_KINDS = ['html', 'css', 'tailwind'];
 const LANG_LABEL = { c: 'C', cpp: 'C++', csharp: 'C#', java: 'Java' };
 
 /** Сравнение вывода программы с эталоном: пробелы в конце строк и хвостовые
@@ -297,6 +300,7 @@ function renderTask(root, courseId, course, m, taskId) {
   const saveKey = 'pyquest_code_' + courseId + '_' + m.id + '_' + taskId;
   const saved = localStorage.getItem(saveKey);
   const isSql = task.kind === 'sql';
+  const isWeb = WEB_KINDS.includes(task.kind);
   const runnerKey = RUNNABLE[task.kind];        // undefined для C/C++/C#/Java — их не запускаем
   const runnable = !!runnerKey;
 
@@ -315,12 +319,20 @@ function renderTask(root, courseId, course, m, taskId) {
     '<button class="btn secondary small" id="reset-btn">' + esc(t('task.reset')) + '</button>' +
     '<span class="py-loading" id="py-status" role="status"></span></div>' +
     '<div class="hint-box" id="hint" hidden></div>' +
+    (isWeb ? '<div class="web-pane"><div class="web-pane-head">' + ic('eye') + ' ' + esc(t('task.preview')) + '</div>' +
+             '<div class="web-frame" id="preview"></div></div>' : '') +
     '<div class="run-out" id="out" role="log">' + esc(t('task.output')) + '</div></section>';
 
   const ed = root.querySelector('#ed');
   const out = root.querySelector('#out');
   const status = root.querySelector('#py-status');
   bindEditor(ed, saveKey);
+
+  /* Вёрстку показываем сразу при открытии задачи: пустая белая панель ничего
+     не объясняет, а увидеть исходную разметку до правок — полезно. */
+  if (isWeb && window.WebRunner) {
+    window.WebRunner.render(root.querySelector('#preview'), task.kind, ed.value, task, null, null);
+  }
 
   /* Прогрессивные подсказки: от направления мысли к скелету решения.
      Готовый ответ не выдаётся — цель научить, а не закрыть задачу. */
@@ -380,6 +392,21 @@ function renderTask(root, courseId, course, m, taskId) {
             if (/Ошибка SQL/.test(res.message)) html += mentorNote(res.message, 'sql');
           }
           out.innerHTML = html;
+        }
+      } else if (isWeb) {
+        /* Вёрстку показываем, а не печатаем: студент должен видеть результат.
+           Проверки идут внутри того же sandbox-документа. */
+        const pane = root.querySelector('#preview');
+        status.textContent = '';
+        if (!withCheck) {
+          window.WebRunner.render(pane, task.kind, ed.value, task, null, null);
+          out.innerHTML = '<span class="muted-text">' + esc(t('task.previewHint')) + '</span>';
+        } else {
+          out.innerHTML = esc(t('lesson.running'));
+          window.WebRunner.render(pane, task.kind, ed.value, task, task.tests, (res) => {
+            if (res.ok) { out.innerHTML = '<span class="ok">✓ ' + esc(t('task.solved')) + '</span>'; solved(); }
+            else out.innerHTML = '<span class="err">✗ ' + esc(res.err) + '</span>';
+          });
         }
       } else if (runnerKey === 'c' || runnerKey === 'cpp' || runnerKey === 'java') {
         /* Компилируемые языки собираются настоящим компилятором прямо в браузере.

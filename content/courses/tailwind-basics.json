@@ -1,0 +1,565 @@
+{
+ "id": "tailwind-basics",
+ "schema": 2,
+ "modules": [
+  {
+   "id": "tw-01",
+   "title": {
+    "ru": "Утилитарные классы",
+    "uz": "Utilitar sinflar",
+    "en": "Utility classes"
+   },
+   "tagline": {
+    "ru": "Стили прямо в разметке — и почему это работает",
+    "uz": "Uslublar to‘g‘ridan-to‘g‘ri belgilashda — va nega bu ishlaydi",
+    "en": "Styles right in the markup — and why that works"
+   },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": {
+      "ru": "Другой подход",
+      "uz": "Boshqacha yondashuv",
+      "en": "A different approach"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>В обычном CSS ты придумываешь имя класса, пишешь для него правило и связываешь два файла. Tailwind предлагает обратное: набор готовых мелких классов, каждый из которых делает <b>одну вещь</b>.</p><p><code>p-4</code> — padding, <code>flex</code> — display: flex, <code>text-white</code> — цвет текста. Стиль виден прямо в разметке, прыгать между файлами не нужно.</p>",
+        "uz": "<p>Oddiy CSS da siz sinf nomini o‘ylab topasiz, unga qoida yozasiz va ikkita faylni bog‘laysiz. Tailwind teskarisini taklif qiladi: har biri <b>bitta ish</b> qiladigan tayyor mayda sinflar to‘plami.</p><p><code>p-4</code> — padding, <code>flex</code> — display: flex, <code>text-white</code> — matn rangi. Uslub bevosita belgilashda ko‘rinadi, fayllar orasida sakrash shart emas.</p>",
+        "en": "<p>In plain CSS you invent a class name, write a rule for it and link two files. Tailwind proposes the opposite: a set of ready-made small classes, each doing <b>one thing</b>.</p><p><code>p-4</code> is padding, <code>flex</code> is display: flex, <code>text-white</code> is text colour. The style is visible right in the markup, with no jumping between files.</p>"
+       }
+      },
+      {
+       "type": "webrun",
+       "kind": "tailwind",
+       "code": "<div class=\"p-6 bg-slate-100\">\n  <div class=\"bg-white rounded-xl shadow p-5 max-w-sm\">\n    <h2 class=\"text-xl font-bold text-slate-900\">Карточка курса</h2>\n    <p class=\"mt-2 text-slate-600\">Собрана без единой строки CSS.</p>\n    <button class=\"mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700\">\n      Начать\n    </button>\n  </div>\n</div>"
+      },
+      {
+       "type": "note",
+       "kind": "note",
+       "html": {
+        "ru": "Здесь Tailwind подключён через CDN — так удобно учиться. В настоящем проекте его ставят пакетом, и сборщик оставляет только те классы, которые реально использованы: итоговый CSS выходит крошечным.",
+        "uz": "Bu yerda Tailwind CDN orqali ulangan — o‘rganish uchun qulay. Haqiqiy loyihada u paket sifatida o‘rnatiladi va yig‘uvchi faqat haqiqatan ishlatilgan sinflarni qoldiradi: yakuniy CSS juda kichik chiqadi.",
+        "en": "Here Tailwind is loaded from a CDN, which is convenient for learning. In a real project it is installed as a package and the bundler keeps only the classes actually used, so the final CSS is tiny."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": {
+      "ru": "Шкала размеров",
+      "uz": "O‘lchamlar shkalasi",
+      "en": "The sizing scale"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Числа в классах — не пиксели, а шаги шкалы. Один шаг равен <code>0.25rem</code>, то есть 4px:</p><ul><li><code>p-1</code> → 4px, <code>p-2</code> → 8px, <code>p-4</code> → 16px, <code>p-6</code> → 24px</li><li>Направления: <code>pt-</code> сверху, <code>pb-</code> снизу, <code>px-</code> по бокам, <code>py-</code> сверху и снизу</li><li>То же для отступов снаружи: <code>m-4</code>, <code>mt-2</code>, <code>mx-auto</code></li></ul><p>Шкала — главная ценность Tailwind: отступы во всём проекте кратны одному шагу, и вёрстка сама собой выглядит ровной.</p>",
+        "uz": "<p>Sinflardagi raqamlar — piksel emas, shkala qadamlari. Bir qadam <code>0.25rem</code> ga, ya’ni 4px ga teng:</p><ul><li><code>p-1</code> → 4px, <code>p-2</code> → 8px, <code>p-4</code> → 16px, <code>p-6</code> → 24px</li><li>Yo‘nalishlar: <code>pt-</code> yuqoridan, <code>pb-</code> pastdan, <code>px-</code> yon tomonlardan, <code>py-</code> yuqori va pastdan</li><li>Tashqi chekinishlar uchun ham xuddi shunday: <code>m-4</code>, <code>mt-2</code>, <code>mx-auto</code></li></ul><p>Shkala — Tailwind ning asosiy qadriyati: butun loyihadagi chekinishlar bitta qadamga karrali va joylashuv o‘z-o‘zidan tekis ko‘rinadi.</p>",
+        "en": "<p>The numbers in class names are not pixels but steps on a scale. One step is <code>0.25rem</code>, that is 4px:</p><ul><li><code>p-1</code> → 4px, <code>p-2</code> → 8px, <code>p-4</code> → 16px, <code>p-6</code> → 24px</li><li>Directions: <code>pt-</code> top, <code>pb-</code> bottom, <code>px-</code> sides, <code>py-</code> top and bottom</li><li>The same for outer spacing: <code>m-4</code>, <code>mt-2</code>, <code>mx-auto</code></li></ul><p>The scale is Tailwind's main value: spacing across the whole project is a multiple of one step, and the layout looks even on its own.</p>"
+       }
+      },
+      {
+       "type": "webrun",
+       "kind": "tailwind",
+       "code": "<div class=\"space-y-2 p-4\">\n  <div class=\"bg-blue-200 p-1\">p-1 — 4px</div>\n  <div class=\"bg-blue-300 p-2\">p-2 — 8px</div>\n  <div class=\"bg-blue-400 p-4\">p-4 — 16px</div>\n  <div class=\"bg-blue-500 p-6 text-white\">p-6 — 24px</div>\n</div>"
+      },
+      {
+       "type": "checkpoint",
+       "q": {
+        "ru": "Сколько пикселей даёт <code>p-8</code>?",
+        "uz": "<code>p-8</code> necha piksel beradi?",
+        "en": "How many pixels does <code>p-8</code> give?"
+       },
+       "options": [
+        {
+         "ru": "8px",
+         "uz": "8px",
+         "en": "8px"
+        },
+        {
+         "ru": "32px",
+         "uz": "32px",
+         "en": "32px"
+        },
+        {
+         "ru": "80px",
+         "uz": "80px",
+         "en": "80px"
+        }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "8 шагов × 4px = 32px. Число в классе — это шаги шкалы, а не пиксели.",
+        "uz": "8 qadam × 4px = 32px. Sinfdagi raqam — shkala qadamlari, piksel emas.",
+        "en": "8 steps × 4px = 32px. The number in the class is scale steps, not pixels."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": {
+      "ru": "Адаптивность и состояния",
+      "uz": "Moslashuvchanlik va holatlar",
+      "en": "Responsiveness and states"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Префикс перед классом включает его при условии:</p><ul><li><code>md:flex</code> — начиная с ширины 768px</li><li><code>lg:grid-cols-3</code> — с 1024px</li><li><code>hover:bg-blue-700</code> — при наведении</li><li><code>focus:ring-2</code> — при фокусе с клавиатуры</li></ul><p>Важное правило: Tailwind построен «сначала мобильные». Класс без префикса действует всегда, а <code>md:</code> добавляется на широких экранах — не наоборот.</p>",
+        "uz": "<p>Sinf oldidagi prefiks uni shart bo‘yicha yoqadi:</p><ul><li><code>md:flex</code> — 768px kenglikdan boshlab</li><li><code>lg:grid-cols-3</code> — 1024px dan</li><li><code>hover:bg-blue-700</code> — sichqoncha olib borilganda</li><li><code>focus:ring-2</code> — klaviatura fokusida</li></ul><p>Muhim qoida: Tailwind «avval mobil» tamoyili asosida qurilgan. Prefikssiz sinf doim ishlaydi, <code>md:</code> esa keng ekranlarda qo‘shiladi — teskarisi emas.</p>",
+        "en": "<p>A prefix before a class turns it on under a condition:</p><ul><li><code>md:flex</code> — from 768px wide</li><li><code>lg:grid-cols-3</code> — from 1024px</li><li><code>hover:bg-blue-700</code> — on hover</li><li><code>focus:ring-2</code> — on keyboard focus</li></ul><p>An important rule: Tailwind is mobile-first. A class without a prefix always applies, and <code>md:</code> adds on wide screens — not the other way round.</p>"
+       }
+      },
+      {
+       "type": "webrun",
+       "kind": "tailwind",
+       "code": "<div class=\"p-4 flex flex-col md:flex-row gap-3\">\n  <div class=\"flex-1 bg-emerald-500 text-white p-4 rounded\">Первый</div>\n  <div class=\"flex-1 bg-emerald-600 text-white p-4 rounded\">Второй</div>\n  <div class=\"flex-1 bg-emerald-700 text-white p-4 rounded\">Третий</div>\n</div>\n<p class=\"px-4 text-sm text-slate-500\">На узком экране — столбец, на широком — строка.</p>"
+      },
+      {
+       "type": "summary",
+       "items": [
+        {
+         "ru": "Каждый класс делает одну вещь",
+         "uz": "Har bir sinf bitta ish qiladi",
+         "en": "Each class does one thing"
+        },
+        {
+         "ru": "Числа — шаги шкалы по 4px, а не пиксели",
+         "uz": "Raqamlar — 4px lik shkala qadamlari, piksel emas",
+         "en": "Numbers are 4px scale steps, not pixels"
+        },
+        {
+         "ru": "Префикс md:/lg: включает класс с указанной ширины",
+         "uz": "md:/lg: prefiksi sinfni ko‘rsatilgan kenglikdan yoqadi",
+         "en": "The md:/lg: prefix enables a class from a given width"
+        },
+        {
+         "ru": "Сначала мобильные: без префикса — всегда, с префиксом — шире",
+         "uz": "Avval mobil: prefikssiz — doim, prefiks bilan — kengroqda",
+         "en": "Mobile-first: no prefix always, prefixed on wider screens"
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": {
+      "ru": "Что делает класс <code>p-4</code>?",
+      "uz": "<code>p-4</code> sinfi nima qiladi?",
+      "en": "What does the <code>p-4</code> class do?"
+     },
+     "options": [
+      {
+       "ru": "Внешний отступ 4px",
+       "uz": "Tashqi chekinish 4px",
+       "en": "4px outer margin"
+      },
+      {
+       "ru": "Внутренний отступ 16px",
+       "uz": "Ichki chekinish 16px",
+       "en": "16px inner padding"
+      },
+      {
+       "ru": "Ширину 4rem",
+       "uz": "Kenglik 4rem",
+       "en": "Width of 4rem"
+      },
+      {
+       "ru": "Размер шрифта 4px",
+       "uz": "Shrift o‘lchami 4px",
+       "en": "4px font size"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "<code>p</code> — padding, 4 — четыре шага шкалы по 0.25rem, то есть 16px.",
+      "uz": "<code>p</code> — padding, 4 — 0.25rem lik to‘rt qadam, ya’ni 16px.",
+      "en": "<code>p</code> is padding, 4 is four steps of 0.25rem, that is 16px."
+     }
+    },
+    {
+     "q": {
+      "ru": "Когда применится <code>md:flex</code>?",
+      "uz": "<code>md:flex</code> qachon qo‘llanadi?",
+      "en": "When does <code>md:flex</code> apply?"
+     },
+     "options": [
+      {
+       "ru": "Только на телефонах",
+       "uz": "Faqat telefonlarda",
+       "en": "Only on phones"
+      },
+      {
+       "ru": "На экранах шириной от 768px",
+       "uz": "Kengligi 768px dan katta ekranlarda",
+       "en": "On screens 768px and wider"
+      },
+      {
+       "ru": "Всегда",
+       "uz": "Doim",
+       "en": "Always"
+      },
+      {
+       "ru": "При наведении мыши",
+       "uz": "Sichqoncha olib borilganda",
+       "en": "On mouse hover"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "<code>md:</code> — контрольная точка 768px. Ниже неё класс не действует.",
+      "uz": "<code>md:</code> — 768px nazorat nuqtasi. Undan pastda sinf ishlamaydi.",
+      "en": "<code>md:</code> is the 768px breakpoint. Below it the class does not apply."
+     }
+    },
+    {
+     "q": {
+      "ru": "Чем Tailwind отличается от обычного CSS по подходу?",
+      "uz": "Tailwind yondashuv bo‘yicha oddiy CSS dan nimasi bilan farq qiladi?",
+      "en": "How does Tailwind differ from plain CSS in approach?"
+     },
+     "options": [
+      {
+       "ru": "Это другой язык вместо CSS",
+       "uz": "Bu CSS o‘rniga boshqa til",
+       "en": "It is a different language replacing CSS"
+      },
+      {
+       "ru": "Готовые мелкие классы вместо своих имён и отдельного файла",
+       "uz": "O‘z nomlaringiz va alohida fayl o‘rniga tayyor mayda sinflar",
+       "en": "Ready-made small classes instead of your own names and a separate file"
+      },
+      {
+       "ru": "Он работает только с React",
+       "uz": "U faqat React bilan ishlaydi",
+       "en": "It only works with React"
+      },
+      {
+       "ru": "Он не поддерживает адаптивность",
+       "uz": "U moslashuvchanlikni qo‘llab-quvvatlamaydi",
+       "en": "It does not support responsiveness"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Под капотом это тот же CSS — Tailwind лишь генерирует его за тебя по именам классов.",
+      "uz": "Ostida o‘sha CSS — Tailwind uni sinf nomlari bo‘yicha siz uchun generatsiya qiladi, xolos.",
+      "en": "Under the hood it is the same CSS — Tailwind just generates it for you from the class names."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что означает <code>hover:bg-blue-700</code>?",
+      "uz": "<code>hover:bg-blue-700</code> nimani anglatadi?",
+      "en": "What does <code>hover:bg-blue-700</code> mean?"
+     },
+     "options": [
+      {
+       "ru": "Фон всегда синий",
+       "uz": "Fon doim ko‘k",
+       "en": "The background is always blue"
+      },
+      {
+       "ru": "Фон становится синим при наведении",
+       "uz": "Sichqoncha olib borilganda fon ko‘k bo‘ladi",
+       "en": "The background turns blue on hover"
+      },
+      {
+       "ru": "Текст синий",
+       "uz": "Matn ko‘k",
+       "en": "The text is blue"
+      },
+      {
+       "ru": "Рамка синяя",
+       "uz": "Ramka ko‘k",
+       "en": "The border is blue"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Префикс <code>hover:</code> — это состояние. Есть также <code>focus:</code>, <code>active:</code>, <code>disabled:</code>.",
+      "uz": "<code>hover:</code> prefiksi — bu holat. Shuningdek <code>focus:</code>, <code>active:</code>, <code>disabled:</code> ham bor.",
+      "en": "The <code>hover:</code> prefix is a state. There are also <code>focus:</code>, <code>active:</code>, <code>disabled:</code>."
+     }
+    },
+    {
+     "q": {
+      "ru": "Почему итоговый CSS в проекте с Tailwind получается маленьким?",
+      "uz": "Nega Tailwind li loyihada yakuniy CSS kichik chiqadi?",
+      "en": "Why is the final CSS small in a Tailwind project?"
+     },
+     "options": [
+      {
+       "ru": "Tailwind сжимает стили архиватором",
+       "uz": "Tailwind uslublarni arxivator bilan siqadi",
+       "en": "Tailwind compresses styles with an archiver"
+      },
+      {
+       "ru": "Сборщик оставляет только использованные классы",
+       "uz": "Yig‘uvchi faqat ishlatilgan sinflarni qoldiradi",
+       "en": "The bundler keeps only the classes you actually used"
+      },
+      {
+       "ru": "Он вообще не генерирует CSS",
+       "uz": "U umuman CSS generatsiya qilmaydi",
+       "en": "It does not generate CSS at all"
+      },
+      {
+       "ru": "Браузер сам его чистит",
+       "uz": "Brauzer uni o‘zi tozalaydi",
+       "en": "The browser cleans it up itself"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Сборка просматривает разметку, находит имена классов и генерирует CSS только для них.",
+      "uz": "Yig‘ish belgilashni ko‘rib chiqadi, sinf nomlarini topadi va faqat ular uchun CSS generatsiya qiladi.",
+      "en": "The build scans your markup, finds class names and generates CSS only for those."
+     }
+    },
+    {
+     "q": {
+      "ru": "Как в Tailwind центрировать блок по горизонтали?",
+      "uz": "Tailwind da blokni gorizontal markazlashtirish qanday?",
+      "en": "How do you centre a block horizontally in Tailwind?"
+     },
+     "options": [
+      {
+       "ru": "center-block",
+       "uz": "center-block",
+       "en": "center-block"
+      },
+      {
+       "ru": "mx-auto вместе с ограничением ширины",
+       "uz": "kenglik cheklovi bilan birga mx-auto",
+       "en": "mx-auto together with a width limit"
+      },
+      {
+       "ru": "align-center",
+       "uz": "align-center",
+       "en": "align-center"
+      },
+      {
+       "ru": "text-center",
+       "uz": "text-center",
+       "en": "text-center"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "<code>mx-auto</code> — это <code>margin-left: auto; margin-right: auto</code>. Без ограничения ширины (например <code>max-w-md</code>) центрировать нечего.",
+      "uz": "<code>mx-auto</code> — bu <code>margin-left: auto; margin-right: auto</code>. Kenglik cheklovisiz (masalan <code>max-w-md</code>) markazlashtiradigan narsa yo‘q.",
+      "en": "<code>mx-auto</code> is <code>margin-left: auto; margin-right: auto</code>. Without a width limit (say <code>max-w-md</code>) there is nothing to centre."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "tailwind",
+     "title": {
+      "ru": "Синяя кнопка",
+      "uz": "Ko‘k tugma",
+      "en": "A blue button"
+     },
+     "brief": {
+      "ru": "Классы вместо CSS",
+      "uz": "CSS o‘rniga sinflar",
+      "en": "Classes instead of CSS"
+     },
+     "desc": {
+      "ru": "<p>Сделай кнопку <code>&lt;button&gt;</code> с классами Tailwind: фон <code>bg-blue-600</code>, белый текст <code>text-white</code>, отступы <code>px-4</code> и <code>py-2</code>, скругление <code>rounded-lg</code>.</p>",
+      "uz": "<p>Tailwind sinflari bilan <code>&lt;button&gt;</code> yarating: fon <code>bg-blue-600</code>, oq matn <code>text-white</code>, chekinishlar <code>px-4</code> va <code>py-2</code>, yumaloqlash <code>rounded-lg</code>.</p>",
+      "en": "<p>Create a <code>&lt;button&gt;</code> with Tailwind classes: background <code>bg-blue-600</code>, white text <code>text-white</code>, padding <code>px-4</code> and <code>py-2</code>, radius <code>rounded-lg</code>.</p>"
+     },
+     "starter": "<button class=\"\">Отправить</button>\n",
+     "tests": "var b = $('button');\nassert(b, 'Нет тега <button>');\nequal(style(b, 'background-color'), 'rgb(37, 99, 235)', 'Фон (bg-blue-600)');\nequal(style(b, 'color'), 'rgb(255, 255, 255)', 'Цвет текста (text-white)');\nequal(style(b, 'padding-left'), '16px', 'Боковые отступы (px-4)');\nequal(style(b, 'padding-top'), '8px', 'Вертикальные отступы (py-2)');\nequal(style(b, 'border-top-left-radius'), '8px', 'Скругление (rounded-lg)');",
+     "hint": {
+      "ru": "Все классы пишутся через пробел в одном атрибуте: <code>class=\"bg-blue-600 text-white px-4 py-2 rounded-lg\"</code>.",
+      "uz": "Barcha sinflar bitta atributda bo‘sh joy bilan yoziladi: <code>class=\"bg-blue-600 text-white px-4 py-2 rounded-lg\"</code>.",
+      "en": "All classes go in one attribute separated by spaces: <code>class=\"bg-blue-600 text-white px-4 py-2 rounded-lg\"</code>."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "tailwind",
+     "title": {
+      "ru": "Шапка на flex",
+      "uz": "Flex dagi shapka",
+      "en": "A flex header"
+     },
+     "brief": {
+      "ru": "flex, justify-between, items-center",
+      "uz": "flex, justify-between, items-center",
+      "en": "flex, justify-between, items-center"
+     },
+     "desc": {
+      "ru": "<p>Сделай <code>&lt;header&gt;</code> с классами <code>flex</code>, <code>justify-between</code>, <code>items-center</code> и <code>p-4</code>. Внутри — два элемента <code>&lt;span&gt;</code>.</p>",
+      "uz": "<p><code>flex</code>, <code>justify-between</code>, <code>items-center</code> va <code>p-4</code> sinflari bilan <code>&lt;header&gt;</code> yarating. Ichida — ikkita <code>&lt;span&gt;</code>.</p>",
+      "en": "<p>Create a <code>&lt;header&gt;</code> with the classes <code>flex</code>, <code>justify-between</code>, <code>items-center</code> and <code>p-4</code>. Put two <code>&lt;span&gt;</code> elements inside.</p>"
+     },
+     "starter": "<header class=\"\">\n  <span>Логотип</span>\n</header>\n",
+     "tests": "var h = $('header');\nassert(h, 'Нет тега <header>');\nequal(style(h, 'display'), 'flex', 'display (flex)');\nequal(style(h, 'justify-content'), 'space-between', 'justify-between');\nequal(style(h, 'align-items'), 'center', 'items-center');\nequal(style(h, 'padding-top'), '16px', 'Отступы (p-4)');\nequal($$('header span').length, 2, 'Количество элементов внутри');",
+     "hint": {
+      "ru": "<code>&lt;header class=\"flex justify-between items-center p-4\"&gt;</code> и два <code>&lt;span&gt;</code> внутри.",
+      "uz": "<code>&lt;header class=\"flex justify-between items-center p-4\"&gt;</code> va ichida ikkita <code>&lt;span&gt;</code>.",
+      "en": "<code>&lt;header class=\"flex justify-between items-center p-4\"&gt;</code> with two <code>&lt;span&gt;</code> inside."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "tailwind",
+     "title": {
+      "ru": "Карточка по центру",
+      "uz": "Markazdagi kartochka",
+      "en": "A centred card"
+     },
+     "brief": {
+      "ru": "mx-auto, max-w, shadow",
+      "uz": "mx-auto, max-w, shadow",
+      "en": "mx-auto, max-w, shadow"
+     },
+     "desc": {
+      "ru": "<p>Собери <code>&lt;div&gt;</code> с классами <code>max-w-sm</code>, <code>mx-auto</code>, <code>bg-white</code>, <code>rounded-xl</code>, <code>p-6</code>. Внутри — заголовок <code>&lt;h2&gt;</code> с классом <code>text-xl</code> и <code>font-bold</code>.</p>",
+      "uz": "<p><code>max-w-sm</code>, <code>mx-auto</code>, <code>bg-white</code>, <code>rounded-xl</code>, <code>p-6</code> sinfli <code>&lt;div&gt;</code> tuzing. Ichida — <code>text-xl</code> va <code>font-bold</code> sinfli <code>&lt;h2&gt;</code>.</p>",
+      "en": "<p>Build a <code>&lt;div&gt;</code> with the classes <code>max-w-sm</code>, <code>mx-auto</code>, <code>bg-white</code>, <code>rounded-xl</code>, <code>p-6</code>. Inside, an <code>&lt;h2&gt;</code> with <code>text-xl</code> and <code>font-bold</code>.</p>"
+     },
+     "starter": "<div class=\"\">\n  <h2 class=\"\">Заголовок</h2>\n</div>\n",
+     "tests": "var d = $('div');\nassert(d, 'Нет тега <div>');\nequal(style(d, 'max-width'), '384px', 'Ограничение ширины (max-w-sm)');\nequal(style(d, 'margin-left'), style(d, 'margin-right'), 'mx-auto: отступы слева и справа равны');\nequal(style(d, 'padding-top'), '24px', 'Отступы (p-6)');\nequal(style(d, 'border-top-left-radius'), '12px', 'Скругление (rounded-xl)');\nvar h = $('div h2');\nassert(h, 'Внутри div нужен <h2>');\nequal(style(h, 'font-size'), '20px', 'Размер заголовка (text-xl)');\nequal(style(h, 'font-weight'), '700', 'Жирность (font-bold)');",
+     "hint": {
+      "ru": "<code>max-w-sm</code> — это 24rem, то есть 384px. <code>text-xl</code> — 20px, <code>font-bold</code> — 700.",
+      "uz": "<code>max-w-sm</code> — bu 24rem, ya’ni 384px. <code>text-xl</code> — 20px, <code>font-bold</code> — 700.",
+      "en": "<code>max-w-sm</code> is 24rem, that is 384px. <code>text-xl</code> is 20px, <code>font-bold</code> is 700."
+     }
+    }
+   ],
+   "exam": {
+    "time": 420,
+    "questions": [
+     {
+      "q": {
+       "ru": "Сколько пикселей даёт <code>m-6</code>?",
+       "uz": "<code>m-6</code> necha piksel beradi?",
+       "en": "How many pixels does <code>m-6</code> give?"
+      },
+      "options": [
+       {
+        "ru": "6px",
+        "uz": "6px",
+        "en": "6px"
+       },
+       {
+        "ru": "24px",
+        "uz": "24px",
+        "en": "24px"
+       },
+       {
+        "ru": "60px",
+        "uz": "60px",
+        "en": "60px"
+       },
+       {
+        "ru": "12px",
+        "uz": "12px",
+        "en": "12px"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "Какой префикс отвечает за состояние фокуса?",
+       "uz": "Qaysi prefiks fokus holatiga javob beradi?",
+       "en": "Which prefix handles the focus state?"
+      },
+      "options": [
+       {
+        "ru": "md:",
+        "uz": "md:",
+        "en": "md:"
+       },
+       {
+        "ru": "focus:",
+        "uz": "focus:",
+        "en": "focus:"
+       },
+       {
+        "ru": "active-focus:",
+        "uz": "active-focus:",
+        "en": "active-focus:"
+       },
+       {
+        "ru": "on-focus:",
+        "uz": "on-focus:",
+        "en": "on-focus:"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "Класс без префикса действует…",
+       "uz": "Prefikssiz sinf…",
+       "en": "A class without a prefix applies…"
+      },
+      "options": [
+       {
+        "ru": "только на широких экранах",
+        "uz": "faqat keng ekranlarda",
+        "en": "only on wide screens"
+       },
+       {
+        "ru": "на всех ширинах",
+        "uz": "barcha kengliklarda",
+        "en": "at all widths"
+       },
+       {
+        "ru": "только при наведении",
+        "uz": "faqat sichqoncha olib borilganda",
+        "en": "only on hover"
+       },
+       {
+        "ru": "только в тёмной теме",
+        "uz": "faqat qorong‘i mavzuda",
+        "en": "only in dark mode"
+       }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "tailwind",
+      "title": {
+       "ru": "Адаптивная сетка",
+       "uz": "Moslashuvchan to‘r",
+       "en": "A responsive grid"
+      },
+      "desc": {
+       "ru": "<p>Собери <code>&lt;div&gt;</code> с классами <code>grid</code>, <code>grid-cols-1</code>, <code>md:grid-cols-3</code>, <code>gap-4</code> и тремя карточками <code>&lt;div&gt;</code> внутри, у каждой класс <code>p-4</code>.</p>",
+       "uz": "<p><code>grid</code>, <code>grid-cols-1</code>, <code>md:grid-cols-3</code>, <code>gap-4</code> sinfli <code>&lt;div&gt;</code> va ichida <code>p-4</code> sinfli uchta <code>&lt;div&gt;</code> kartochka tuzing.</p>",
+       "en": "<p>Build a <code>&lt;div&gt;</code> with the classes <code>grid</code>, <code>grid-cols-1</code>, <code>md:grid-cols-3</code>, <code>gap-4</code>, holding three <code>&lt;div&gt;</code> cards each with <code>p-4</code>.</p>"
+      },
+      "starter": "<div class=\"\">\n  <div class=\"\">Одна</div>\n</div>\n",
+      "tests": "var g = $('div');\nassert(g, 'Нет внешнего <div>');\nequal(style(g, 'display'), 'grid', 'display (grid)');\nassert(style(g, 'gap').indexOf('16px') === 0, 'gap-4 должен дать 16px, а сейчас: ' + style(g, 'gap'));\nvar cards = $$('div > div');\nequal(cards.length, 3, 'Карточек внутри');\nequal(style(cards[0], 'padding-top'), '16px', 'Отступ карточки (p-4)');",
+      "hint": {
+       "ru": "Внешний блок: <code>class=\"grid grid-cols-1 md:grid-cols-3 gap-4\"</code>, внутри три <code>&lt;div class=\"p-4\"&gt;</code>.",
+       "uz": "Tashqi blok: <code>class=\"grid grid-cols-1 md:grid-cols-3 gap-4\"</code>, ichida uchta <code>&lt;div class=\"p-4\"&gt;</code>.",
+       "en": "Outer block: <code>class=\"grid grid-cols-1 md:grid-cols-3 gap-4\"</code>, with three <code>&lt;div class=\"p-4\"&gt;</code> inside."
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

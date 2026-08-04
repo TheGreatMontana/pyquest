@@ -63,7 +63,8 @@ button, .tab, .quiz-opt, .mod-row, .rm-item { touch-action: manipulation; -webki
 }
 .brand { display: flex; align-items: center; gap: 10px; color: var(--text); }
 .brand-mark { width: 32px; height: 32px; border-radius: 8px; }
-.brand-name { font-size: 1.12rem; font-weight: 700; line-height: 1.1; display: flex; flex-direction: column; }
+/* Одной строкой: колонка разрывала логотип на «Py» и «Quest» */
+.brand-name { font-size: 1.12rem; font-weight: 700; line-height: 1.1; white-space: nowrap; }
 .brand-name b { color: var(--primary); font-weight: 800; display: inline; }
 .brand-name small { font-size: .66rem; font-weight: 500; color: var(--faint); letter-spacing: .02em; }
 .topnav { display: flex; gap: 4px; margin-left: 6px; }
@@ -1084,4 +1085,36 @@ pre.code code { background: none; padding: 0; color: var(--text); font-size: 1em
   .hero h1 { font-size: 1.25rem; }
   .theory-nav { flex-wrap: wrap; gap: 8px; }
   .theory-progress { order: -1; width: 100%; text-align: center; }
+}
+
+/* ---------- Предпросмотр вёрстки (HTML / CSS / Tailwind) ---------- */
+/* Результат вёрстки нужно видеть, поэтому под кодом идёт живая страница.
+   Она в sandbox-iframe с чужим происхождением — до нашей страницы не дотянется. */
+.web-pane {
+  margin: 14px 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  overflow: hidden;
+  background: #fff;
+}
+.web-pane-head {
+  display: flex; align-items: center; gap: 7px;
+  padding: 8px 12px;
+  font-size: .8rem; font-weight: 600;
+  color: var(--faint);
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+.web-pane-head .ic { width: 15px; height: 15px; }
+.web-frame { background: #fff; }
+.web-preview {
+  display: block;
+  width: 100%;
+  min-height: 190px;
+  height: 260px;
+  border: 0;
+  background: #fff;
+}
+@media (max-width: 640px) {
+  .web-preview { height: 220px; }
 }

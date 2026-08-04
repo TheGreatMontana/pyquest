@@ -1,0 +1,577 @@
+{
+ "id": "css-basics",
+ "schema": 2,
+ "modules": [
+  {
+   "id": "cs-01",
+   "title": {
+    "ru": "Селекторы и коробка",
+    "uz": "Selektorlar va quti",
+    "en": "Selectors and the box"
+   },
+   "tagline": {
+    "ru": "Как выбрать элемент и задать ему размеры",
+    "uz": "Elementni qanday tanlash va o‘lchamini berish",
+    "en": "How to pick an element and size it"
+   },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": {
+      "ru": "Правило CSS",
+      "uz": "CSS qoidasi",
+      "en": "A CSS rule"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>HTML говорит <i>что</i> это. CSS говорит <i>как это выглядит</i>. Правило состоит из селектора и объявлений:</p><pre><code>селектор { свойство: значение; }</code></pre><p>Селектор отвечает на вопрос «к каким элементам применить», объявления — «что с ними сделать».</p>",
+        "uz": "<p>HTML <i>bu nima</i> ekanini aytadi. CSS <i>u qanday ko‘rinishini</i> aytadi. Qoida selektor va e’lonlardan iborat:</p><pre><code>selektor { xossa: qiymat; }</code></pre><p>Selektor «qaysi elementlarga qo‘llash» degan savolga javob beradi, e’lonlar — «ular bilan nima qilish».</p>",
+        "en": "<p>HTML says <i>what</i> something is. CSS says <i>how it looks</i>. A rule consists of a selector and declarations:</p><pre><code>selector { property: value; }</code></pre><p>The selector answers “which elements does this apply to”, the declarations say “what to do with them”.</p>"
+       }
+      },
+      {
+       "type": "webrun",
+       "kind": "css",
+       "html": "<h1>Заголовок</h1>\n<p class=\"lead\">Важный абзац</p>\n<p>Обычный абзац</p>",
+       "code": "h1 {\n  color: #2563eb;\n  font-family: system-ui, sans-serif;\n}\n\n.lead {\n  font-size: 20px;\n  font-weight: 600;\n  color: #0f172a;\n}\n\np {\n  color: #475569;\n  line-height: 1.6;\n}"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Три главных вида селекторов:</p><ul><li><code>p</code> — по тегу: все абзацы</li><li><code>.lead</code> — по классу: элементы с <code>class=\"lead\"</code></li><li><code>#top</code> — по идентификатору: единственный элемент с <code>id=\"top\"</code></li></ul><p>В работе почти всегда используют классы: тег слишком широко, id слишком узко.</p>",
+        "uz": "<p>Selektorlarning uchta asosiy turi:</p><ul><li><code>p</code> — teg bo‘yicha: barcha xatboshilar</li><li><code>.lead</code> — sinf bo‘yicha: <code>class=\"lead\"</code> li elementlar</li><li><code>#top</code> — identifikator bo‘yicha: <code>id=\"top\"</code> li yagona element</li></ul><p>Amalda deyarli har doim sinflar ishlatiladi: teg juda keng, id juda tor.</p>",
+        "en": "<p>Three main kinds of selectors:</p><ul><li><code>p</code> — by tag: every paragraph</li><li><code>.lead</code> — by class: elements with <code>class=\"lead\"</code></li><li><code>#top</code> — by id: the single element with <code>id=\"top\"</code></li></ul><p>In practice classes are used almost always: a tag is too broad, an id too narrow.</p>"
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": {
+      "ru": "Блочная модель",
+      "uz": "Blok modeli",
+      "en": "The box model"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Каждый элемент — прямоугольник из четырёх слоёв изнутри наружу: <b>содержимое → padding → border → margin</b>.</p><p><code>padding</code> — воздух внутри рамки, <code>margin</code> — расстояние до соседей снаружи. Их путают чаще всего.</p>",
+        "uz": "<p>Har bir element — ichkaridan tashqariga to‘rt qatlamli to‘rtburchak: <b>mazmun → padding → border → margin</b>.</p><p><code>padding</code> — ramka ichidagi havo, <code>margin</code> — tashqarida qo‘shnilargacha masofa. Ularni ko‘pincha adashtirishadi.</p>",
+        "en": "<p>Every element is a rectangle of four layers from the inside out: <b>content → padding → border → margin</b>.</p><p><code>padding</code> is the air inside the border, <code>margin</code> is the distance to neighbours outside it. These two get confused most often.</p>"
+       }
+      },
+      {
+       "type": "webrun",
+       "kind": "css",
+       "html": "<div class=\"box\">Содержимое</div>\n<div class=\"box\">Второй блок</div>",
+       "code": ".box {\n  background: #dbeafe;\n  border: 3px solid #2563eb;\n  padding: 16px;      /* воздух внутри */\n  margin: 12px;       /* отступ снаружи */\n  width: 200px;\n}"
+      },
+      {
+       "type": "note",
+       "kind": "trap",
+       "html": {
+        "ru": "По умолчанию <code>width: 200px</code> задаёт ширину <b>содержимого</b>, а padding и border добавляются сверху — блок займёт больше 200px. Лечится строкой <code>box-sizing: border-box</code>, её ставят почти в каждом проекте.",
+        "uz": "Sukut bo‘yicha <code>width: 200px</code> <b>mazmun</b> kengligini beradi, padding va border esa ustiga qo‘shiladi — blok 200px dan ko‘proq joy egallaydi. <code>box-sizing: border-box</code> qatori bu muammoni hal qiladi, uni deyarli har bir loyihada qo‘yishadi.",
+        "en": "By default <code>width: 200px</code> sets the width of the <b>content</b>, while padding and border are added on top — the box ends up wider than 200px. The fix is <code>box-sizing: border-box</code>, used in almost every project."
+       }
+      },
+      {
+       "type": "predict",
+       "lang": "css",
+       "code": ".card {\n  width: 100px;\n  padding: 20px;\n  border: 5px solid black;\n}",
+       "options": [
+        {
+         "ru": "Блок займёт 100px по ширине",
+         "uz": "Blok kengligi 100px bo‘ladi",
+         "en": "The box will be 100px wide"
+        },
+        {
+         "ru": "Блок займёт 150px по ширине",
+         "uz": "Blok kengligi 150px bo‘ladi",
+         "en": "The box will be 150px wide"
+        },
+        {
+         "ru": "Блок займёт 125px по ширине",
+         "uz": "Blok kengligi 125px bo‘ladi",
+         "en": "The box will be 125px wide"
+        }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "100 + 20·2 (padding) + 5·2 (border) = 150px. Именно поэтому и придумали <code>box-sizing: border-box</code>.",
+        "uz": "100 + 20·2 (padding) + 5·2 (border) = 150px. Aynan shuning uchun <code>box-sizing: border-box</code> o‘ylab topilgan.",
+        "en": "100 + 20·2 (padding) + 5·2 (border) = 150px. That is exactly why <code>box-sizing: border-box</code> exists."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": {
+      "ru": "Flexbox: раскладка в строку",
+      "uz": "Flexbox: qatorga joylash",
+      "en": "Flexbox: laying out a row"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Раньше блоки выравнивали хаками. Сегодня достаточно <code>display: flex</code> у родителя — дети встают в ряд, и появляются два главных рычага:</p><ul><li><code>justify-content</code> — распределение вдоль строки</li><li><code>align-items</code> — выравнивание поперёк</li><li><code>gap</code> — расстояние между детьми</li></ul>",
+        "uz": "<p>Ilgari bloklar hiylalar bilan tekislangan. Bugun ota-elementga <code>display: flex</code> yetarli — bolalar qatorga tiziladi, va ikkita asosiy richag paydo bo‘ladi:</p><ul><li><code>justify-content</code> — qator bo‘ylab taqsimlash</li><li><code>align-items</code> — ko‘ndalangiga tekislash</li><li><code>gap</code> — bolalar orasidagi masofa</li></ul>",
+        "en": "<p>Blocks used to be aligned with hacks. Today <code>display: flex</code> on the parent is enough — children line up in a row, and two main levers appear:</p><ul><li><code>justify-content</code> — distribution along the row</li><li><code>align-items</code> — alignment across it</li><li><code>gap</code> — spacing between children</li></ul>"
+       }
+      },
+      {
+       "type": "webrun",
+       "kind": "css",
+       "html": "<div class=\"row\">\n  <div class=\"item\">1</div>\n  <div class=\"item\">2</div>\n  <div class=\"item\">3</div>\n</div>",
+       "code": ".row {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  gap: 12px;\n  background: #f1f5f9;\n  padding: 12px;\n}\n\n.item {\n  background: #2563eb;\n  color: #fff;\n  padding: 18px 26px;\n  border-radius: 8px;\n  font-family: system-ui, sans-serif;\n}"
+      },
+      {
+       "type": "summary",
+       "items": [
+        {
+         "ru": "Селектор выбирает элементы, объявления их меняют",
+         "uz": "Selektor elementlarni tanlaydi, e’lonlar ularni o‘zgartiradi",
+         "en": "A selector picks elements, declarations change them"
+        },
+        {
+         "ru": "padding внутри рамки, margin снаружи",
+         "uz": "padding ramka ichida, margin tashqarida",
+         "en": "padding is inside the border, margin outside"
+        },
+        {
+         "ru": "box-sizing: border-box избавляет от арифметики ширины",
+         "uz": "box-sizing: border-box kenglik arifmetikasidan xalos qiladi",
+         "en": "box-sizing: border-box removes the width arithmetic"
+        },
+        {
+         "ru": "display: flex — основной инструмент раскладки",
+         "uz": "display: flex — joylashtirishning asosiy vositasi",
+         "en": "display: flex is the main layout tool"
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": {
+      "ru": "Чем <code>padding</code> отличается от <code>margin</code>?",
+      "uz": "<code>padding</code> <code>margin</code> dan nimasi bilan farq qiladi?",
+      "en": "How does <code>padding</code> differ from <code>margin</code>?"
+     },
+     "options": [
+      {
+       "ru": "Ничем",
+       "uz": "Hech nimasi bilan",
+       "en": "In no way"
+      },
+      {
+       "ru": "padding — внутри рамки, margin — снаружи",
+       "uz": "padding — ramka ichida, margin — tashqarida",
+       "en": "padding is inside the border, margin outside"
+      },
+      {
+       "ru": "padding работает только с текстом",
+       "uz": "padding faqat matn bilan ishlaydi",
+       "en": "padding only works with text"
+      },
+      {
+       "ru": "margin задаёт цвет",
+       "uz": "margin rang beradi",
+       "en": "margin sets the colour"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Фон элемента заливает padding, но не margin — по этому их легко отличить на глаз.",
+      "uz": "Element foni padding ni bo‘yaydi, margin ni esa yo‘q — shu bilan ularni ko‘zda farqlash oson.",
+      "en": "The element's background fills the padding but not the margin — an easy way to tell them apart visually."
+     }
+    },
+    {
+     "q": {
+      "ru": "Какой селектор выберет <code>class=\"card\"</code>?",
+      "uz": "Qaysi selektor <code>class=\"card\"</code> ni tanlaydi?",
+      "en": "Which selector picks <code>class=\"card\"</code>?"
+     },
+     "options": [
+      {
+       "ru": "#card",
+       "uz": "#card",
+       "en": "#card"
+      },
+      {
+       "ru": ".card",
+       "uz": ".card",
+       "en": ".card"
+      },
+      {
+       "ru": "card",
+       "uz": "card",
+       "en": "card"
+      },
+      {
+       "ru": "*card",
+       "uz": "*card",
+       "en": "*card"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Точка — класс, решётка — идентификатор, голое слово — тег.",
+      "uz": "Nuqta — sinf, panjara — identifikator, yalang‘och so‘z — teg.",
+      "en": "A dot is a class, a hash is an id, a bare word is a tag."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что делает <code>box-sizing: border-box</code>?",
+      "uz": "<code>box-sizing: border-box</code> nima qiladi?",
+      "en": "What does <code>box-sizing: border-box</code> do?"
+     },
+     "options": [
+      {
+       "ru": "Добавляет рамку",
+       "uz": "Ramka qo‘shadi",
+       "en": "Adds a border"
+      },
+      {
+       "ru": "Включает padding и border в заданную ширину",
+       "uz": "padding va border ni berilgan kenglikka qo‘shadi",
+       "en": "Includes padding and border in the declared width"
+      },
+      {
+       "ru": "Убирает отступы",
+       "uz": "Chekinishlarni olib tashlaydi",
+       "en": "Removes spacing"
+      },
+      {
+       "ru": "Делает блок круглым",
+       "uz": "Blokni dumaloq qiladi",
+       "en": "Makes the box round"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "С ним <code>width: 200px</code> означает ровно 200px на экране, сколько бы ни было padding.",
+      "uz": "U bilan <code>width: 200px</code> ekranda aynan 200px degani, padding qancha bo‘lishidan qat’i nazar.",
+      "en": "With it, <code>width: 200px</code> means exactly 200px on screen no matter how much padding there is."
+     }
+    },
+    {
+     "q": {
+      "ru": "Какое свойство ставит расстояние между flex-элементами?",
+      "uz": "Qaysi xossa flex elementlar orasiga masofa qo‘yadi?",
+      "en": "Which property sets spacing between flex items?"
+     },
+     "options": [
+      {
+       "ru": "space",
+       "uz": "space",
+       "en": "space"
+      },
+      {
+       "ru": "gap",
+       "uz": "gap",
+       "en": "gap"
+      },
+      {
+       "ru": "margin-between",
+       "uz": "margin-between",
+       "en": "margin-between"
+      },
+      {
+       "ru": "flex-space",
+       "uz": "flex-space",
+       "en": "flex-space"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "<code>gap</code> заменил хаки с margin у соседних элементов и работает и во flex, и в grid.",
+      "uz": "<code>gap</code> qo‘shni elementlardagi margin hiylalarini almashtirdi va flex da ham, grid da ham ishlaydi.",
+      "en": "<code>gap</code> replaced margin hacks between siblings and works in both flex and grid."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что делает <code>justify-content: center</code> во flex-строке?",
+      "uz": "Flex qatorida <code>justify-content: center</code> nima qiladi?",
+      "en": "What does <code>justify-content: center</code> do in a flex row?"
+     },
+     "options": [
+      {
+       "ru": "Центрирует текст внутри каждого элемента",
+       "uz": "Har bir element ichidagi matnni markazlashtiradi",
+       "en": "Centres the text inside each item"
+      },
+      {
+       "ru": "Собирает элементы к центру вдоль строки",
+       "uz": "Elementlarni qator bo‘ylab markazga to‘playdi",
+       "en": "Groups the items towards the centre along the row"
+      },
+      {
+       "ru": "Выравнивает элементы по вертикали",
+       "uz": "Elementlarni vertikal tekislaydi",
+       "en": "Aligns the items vertically"
+      },
+      {
+       "ru": "Растягивает элементы на всю ширину",
+       "uz": "Elementlarni butun kenglikka cho‘zadi",
+       "en": "Stretches the items to full width"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Поперёк строки отвечает <code>align-items</code>. Вдоль — <code>justify-content</code>.",
+      "uz": "Qator ko‘ndalangiga <code>align-items</code> javob beradi. Bo‘ylab — <code>justify-content</code>.",
+      "en": "Across the row it is <code>align-items</code>. Along the row it is <code>justify-content</code>."
+     }
+    },
+    {
+     "q": {
+      "ru": "Почему в работе предпочитают классы, а не id?",
+      "uz": "Nega amalda id emas, sinflar afzal ko‘riladi?",
+      "en": "Why are classes preferred over ids in practice?"
+     },
+     "options": [
+      {
+       "ru": "id медленнее работают",
+       "uz": "id sekinroq ishlaydi",
+       "en": "ids are slower"
+      },
+      {
+       "ru": "Класс можно повторно применить ко многим элементам",
+       "uz": "Sinfni ko‘p elementlarga qayta qo‘llash mumkin",
+       "en": "A class can be reused across many elements"
+      },
+      {
+       "ru": "id запрещены стандартом",
+       "uz": "id standart bo‘yicha taqiqlangan",
+       "en": "ids are forbidden by the standard"
+      },
+      {
+       "ru": "Класс короче пишется",
+       "uz": "Sinf qisqaroq yoziladi",
+       "en": "A class is shorter to type"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "id должен быть уникален на странице, поэтому переиспользовать стиль не выйдет. Плюс у id слишком высокая специфичность — его трудно перекрыть.",
+      "uz": "id sahifada noyob bo‘lishi kerak, shuning uchun uslubni qayta ishlatib bo‘lmaydi. Qolaversa, id ning aniqligi juda yuqori — uni qoplash qiyin.",
+      "en": "An id must be unique on the page, so the style cannot be reused. Also an id has very high specificity and is hard to override."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "css",
+     "title": {
+      "ru": "Покрасить заголовок",
+      "uz": "Sarlavhani bo‘yash",
+      "en": "Colour the heading"
+     },
+     "brief": {
+      "ru": "Селектор по тегу",
+      "uz": "Teg bo‘yicha selektor",
+      "en": "Tag selector"
+     },
+     "desc": {
+      "ru": "<p>Разметка уже дана. Сделай текст <code>&lt;h1&gt;</code> красным (<code>red</code>), а размер шрифта абзацев — <code>20px</code>.</p>",
+      "uz": "<p>Belgilash allaqachon berilgan. <code>&lt;h1&gt;</code> matnini qizil (<code>red</code>) qiling, xatboshilar shrift o‘lchamini esa <code>20px</code>.</p>",
+      "en": "<p>The markup is given. Make the <code>&lt;h1&gt;</code> text red (<code>red</code>) and the paragraph font size <code>20px</code>.</p>"
+     },
+     "html": "<h1>Заголовок</h1>\n<p>Первый абзац</p>\n<p>Второй абзац</p>",
+     "starter": "h1 {\n  \n}\n",
+     "tests": "equal(style('h1', 'color'), 'rgb(255, 0, 0)', 'Цвет заголовка');\nequal(style($$('p')[0], 'font-size'), '20px', 'Размер шрифта абзаца');\nequal(style($$('p')[1], 'font-size'), '20px', 'Размер шрифта у всех абзацев');",
+     "hint": {
+      "ru": "<code>h1 { color: red; }</code> и <code>p { font-size: 20px; }</code>. Браузер отдаёт цвет как <code>rgb(255, 0, 0)</code> — это то же самое.",
+      "uz": "<code>h1 { color: red; }</code> va <code>p { font-size: 20px; }</code>. Brauzer rangni <code>rgb(255, 0, 0)</code> deb qaytaradi — bu bir xil narsa.",
+      "en": "<code>h1 { color: red; }</code> and <code>p { font-size: 20px; }</code>. The browser reports the colour as <code>rgb(255, 0, 0)</code> — same thing."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "css",
+     "title": {
+      "ru": "Карточка с рамкой",
+      "uz": "Ramkali kartochka",
+      "en": "A bordered card"
+     },
+     "brief": {
+      "ru": "Классы и блочная модель",
+      "uz": "Sinflar va blok modeli",
+      "en": "Classes and the box model"
+     },
+     "desc": {
+      "ru": "<p>Оформи элементы с классом <code>card</code>: внутренний отступ <code>16px</code>, рамка <code>2px solid blue</code>, скругление <code>8px</code> и <code>box-sizing: border-box</code>.</p>",
+      "uz": "<p><code>card</code> sinfli elementlarni bezang: ichki chekinish <code>16px</code>, ramka <code>2px solid blue</code>, yumaloqlash <code>8px</code> va <code>box-sizing: border-box</code>.</p>",
+      "en": "<p>Style elements with the <code>card</code> class: padding <code>16px</code>, border <code>2px solid blue</code>, radius <code>8px</code> and <code>box-sizing: border-box</code>.</p>"
+     },
+     "html": "<div class=\"card\">Первая карточка</div>\n<div class=\"card\">Вторая карточка</div>",
+     "starter": ".card {\n  \n}\n",
+     "tests": "var c = $('.card');\nassert(c, 'Не найден элемент с классом card');\nequal(style(c, 'padding-top'), '16px', 'Внутренний отступ');\nequal(style(c, 'border-top-width'), '2px', 'Толщина рамки');\nequal(style(c, 'border-top-style'), 'solid', 'Стиль рамки');\nequal(style(c, 'border-top-color'), 'rgb(0, 0, 255)', 'Цвет рамки');\nequal(style(c, 'border-top-left-radius'), '8px', 'Скругление');\nequal(style(c, 'box-sizing'), 'border-box', 'box-sizing');",
+     "hint": {
+      "ru": "Все свойства в одном правиле <code>.card { … }</code>: padding, border, border-radius, box-sizing.",
+      "uz": "Barcha xossalar bitta <code>.card { … }</code> qoidasida: padding, border, border-radius, box-sizing.",
+      "en": "All properties in one rule <code>.card { … }</code>: padding, border, border-radius, box-sizing."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "css",
+     "title": {
+      "ru": "Шапка на flex",
+      "uz": "Flex dagi shapka",
+      "en": "A flex header"
+     },
+     "brief": {
+      "ru": "display: flex",
+      "uz": "display: flex",
+      "en": "display: flex"
+     },
+     "desc": {
+      "ru": "<p>Сделай <code>.header</code> флекс-контейнером: элементы по краям (<code>space-between</code>), выравнивание по центру поперёк (<code>center</code>), расстояние между ними <code>10px</code>.</p>",
+      "uz": "<p><code>.header</code> ni fleks-konteyner qiling: elementlar chetlarda (<code>space-between</code>), ko‘ndalangiga markazga tekislash (<code>center</code>), ular orasidagi masofa <code>10px</code>.</p>",
+      "en": "<p>Make <code>.header</code> a flex container: items pushed to the edges (<code>space-between</code>), centred across (<code>center</code>), with <code>10px</code> between them.</p>"
+     },
+     "html": "<div class=\"header\">\n  <span>Логотип</span>\n  <span>Меню</span>\n</div>",
+     "starter": ".header {\n  \n}\n",
+     "tests": "var h = $('.header');\nassert(h, 'Не найден .header');\nequal(style(h, 'display'), 'flex', 'display');\nequal(style(h, 'justify-content'), 'space-between', 'justify-content');\nequal(style(h, 'align-items'), 'center', 'align-items');\nassert(style(h, 'gap').indexOf('10px') === 0, 'gap должен быть 10px, а сейчас: ' + style(h, 'gap'));",
+     "hint": {
+      "ru": "<code>display: flex; justify-content: space-between; align-items: center; gap: 10px;</code>",
+      "uz": "<code>display: flex; justify-content: space-between; align-items: center; gap: 10px;</code>",
+      "en": "<code>display: flex; justify-content: space-between; align-items: center; gap: 10px;</code>"
+     }
+    }
+   ],
+   "exam": {
+    "time": 480,
+    "questions": [
+     {
+      "q": {
+       "ru": "Что из этого — селектор по идентификатору?",
+       "uz": "Bulardan qaysi biri identifikator selektori?",
+       "en": "Which of these is an id selector?"
+      },
+      "options": [
+       {
+        "ru": ".menu",
+        "uz": ".menu",
+        "en": ".menu"
+       },
+       {
+        "ru": "#menu",
+        "uz": "#menu",
+        "en": "#menu"
+       },
+       {
+        "ru": "menu",
+        "uz": "menu",
+        "en": "menu"
+       },
+       {
+        "ru": "@menu",
+        "uz": "@menu",
+        "en": "@menu"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "Какой слой блочной модели заливается фоном элемента?",
+       "uz": "Blok modelining qaysi qatlami element foni bilan bo‘yaladi?",
+       "en": "Which box-model layer is filled by the element's background?"
+      },
+      "options": [
+       {
+        "ru": "margin",
+        "uz": "margin",
+        "en": "margin"
+       },
+       {
+        "ru": "padding",
+        "uz": "padding",
+        "en": "padding"
+       },
+       {
+        "ru": "Оба",
+        "uz": "Ikkalasi",
+        "en": "Both"
+       },
+       {
+        "ru": "Ни один",
+        "uz": "Hech biri",
+        "en": "Neither"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "Что произойдёт при <code>display: flex</code> у родителя?",
+       "uz": "Ota-elementda <code>display: flex</code> bo‘lsa nima bo‘ladi?",
+       "en": "What happens with <code>display: flex</code> on the parent?"
+      },
+      "options": [
+       {
+        "ru": "Дети встанут в столбец",
+        "uz": "Bolalar ustunga tiziladi",
+        "en": "Children stack into a column"
+       },
+       {
+        "ru": "Дети встанут в строку",
+        "uz": "Bolalar qatorga tiziladi",
+        "en": "Children line up in a row"
+       },
+       {
+        "ru": "Дети исчезнут",
+        "uz": "Bolalar yo‘qoladi",
+        "en": "Children disappear"
+       },
+       {
+        "ru": "Ничего",
+        "uz": "Hech nima",
+        "en": "Nothing"
+       }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "css",
+      "title": {
+       "ru": "Кнопка",
+       "uz": "Tugma",
+       "en": "A button"
+      },
+      "desc": {
+       "ru": "<p>Оформи <code>.btn</code>: белый текст (<code>white</code>), фон <code>#2563eb</code>, отступы <code>12px</code>, скругление <code>6px</code>, курсор <code>pointer</code>.</p>",
+       "uz": "<p><code>.btn</code> ni bezang: oq matn (<code>white</code>), fon <code>#2563eb</code>, chekinish <code>12px</code>, yumaloqlash <code>6px</code>, kursor <code>pointer</code>.</p>",
+       "en": "<p>Style <code>.btn</code>: white text (<code>white</code>), background <code>#2563eb</code>, padding <code>12px</code>, radius <code>6px</code>, cursor <code>pointer</code>.</p>"
+      },
+      "html": "<button class=\"btn\">Отправить</button>",
+      "starter": ".btn {\n  \n}\n",
+      "tests": "var b = $('.btn');\nassert(b, 'Не найден .btn');\nequal(style(b, 'color'), 'rgb(255, 255, 255)', 'Цвет текста');\nequal(style(b, 'background-color'), 'rgb(37, 99, 235)', 'Цвет фона');\nequal(style(b, 'padding-top'), '12px', 'Отступы');\nequal(style(b, 'border-top-left-radius'), '6px', 'Скругление');\nequal(style(b, 'cursor'), 'pointer', 'Курсор');",
+      "hint": {
+       "ru": "<code>#2563eb</code> браузер вернёт как <code>rgb(37, 99, 235)</code>.",
+       "uz": "<code>#2563eb</code> ni brauzer <code>rgb(37, 99, 235)</code> deb qaytaradi.",
+       "en": "The browser reports <code>#2563eb</code> as <code>rgb(37, 99, 235)</code>."
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

@@ -42,6 +42,13 @@ export function renderBlock(b, i) {
         '<div class="try-out" hidden></div></div>';
     }
 
+    case 'webrun': {
+      /* Пример вёрстки: код и сразу под ним — как это выглядит */
+      return codeBlock(b.code, b.lang || 'html') +
+        '<div class="web-pane"><div class="web-pane-head">' + ic('eye') + ' ' + esc(t('lesson.preview')) + '</div>' +
+        '<div class="web-frame" data-web="' + i + '"></div></div>';
+    }
+
     case 'note': {
       const kind = b.kind || 'note';
       const label = t(kind === 'tip' ? 'block.tip' : kind === 'trap' ? 'block.trap' : 'block.note');
@@ -135,6 +142,12 @@ function reward(i) {
  * runners: { py(code), sql(code) } — для блоков с запуском.
  */
 export function bindBlocks(container, blocks, runners) {
+  /* Предпросмотр вёрстки рисуем сразу: ждать нажатия незачем, это не вычисление */
+  container.querySelectorAll('[data-web]').forEach(box => {
+    const b = blocks[+box.getAttribute('data-web')];
+    if (window.WebRunner) window.WebRunner.render(box, b.kind || 'html', b.code, b, null, null);
+  });
+
   /* Запускаемые примеры */
   container.querySelectorAll('[data-run]').forEach(btn => {
     btn.addEventListener('click', async () => {
@@ -290,5 +303,6 @@ export function needsRunner(blocks) {
     cpp: blocks.some(b => b.type === 'cpprun'),
     java: blocks.some(b => b.type === 'javarun'),
     sql: blocks.some(b => b.type === 'sqlrun'),
+    web: blocks.some(b => b.type === 'webrun'),
   };
 }

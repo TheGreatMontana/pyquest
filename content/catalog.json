@@ -203,6 +203,30 @@
     "uz": "Statik turlash",
     "en": "Static typing"
    }
+  },
+  {
+   "id": "html-semantics",
+   "title": {
+    "ru": "Семантическая вёрстка",
+    "uz": "Semantik belgilash",
+    "en": "Semantic markup"
+   }
+  },
+  {
+   "id": "css-layout",
+   "title": {
+    "ru": "Вёрстка и раскладка CSS",
+    "uz": "CSS joylashuvi",
+    "en": "CSS layout"
+   }
+  },
+  {
+   "id": "css-frameworks",
+   "title": {
+    "ru": "CSS-фреймворки",
+    "uz": "CSS freymvorklari",
+    "en": "CSS frameworks"
+   }
   }
  ],
  "courses": [
@@ -635,6 +659,85 @@
    "moduleCount": 1,
    "compiled": true,
    "runner": "java"
+  },
+  {
+   "id": "html-basics",
+   "title": {
+    "ru": "HTML: основы вёрстки",
+    "uz": "HTML: belgilash asoslari",
+    "en": "HTML Fundamentals"
+   },
+   "description": {
+    "ru": "Теги, структура документа и семантика. Каждый пример — живая страница: код слева, результат сразу под ним.",
+    "uz": "Teglar, hujjat tuzilishi va semantika. Har bir misol — tirik sahifa: kod va darhol ostida natija.",
+    "en": "Tags, document structure and semantics. Every example is a live page: the code and the result right below it."
+   },
+   "glyph": "code",
+   "color": "#f97316",
+   "level": "beginner",
+   "status": "full",
+   "estimatedHours": 18,
+   "requires": [],
+   "grants": [
+    "html-semantics"
+   ],
+   "legacyIds": [],
+   "moduleCount": 1,
+   "runner": "html"
+  },
+  {
+   "id": "css-basics",
+   "title": {
+    "ru": "CSS: стили и раскладка",
+    "uz": "CSS: uslublar va joylashuv",
+    "en": "CSS: styles and layout"
+   },
+   "description": {
+    "ru": "Селекторы, блочная модель и flexbox. Пишешь стили — сразу видишь, что получилось.",
+    "uz": "Selektorlar, blok modeli va flexbox. Uslub yozasiz — natijani darhol ko‘rasiz.",
+    "en": "Selectors, the box model and flexbox. Write styles and see the result immediately."
+   },
+   "glyph": "code",
+   "color": "#2563eb",
+   "level": "beginner",
+   "status": "full",
+   "estimatedHours": 20,
+   "requires": [
+    "html-semantics"
+   ],
+   "grants": [
+    "css-layout"
+   ],
+   "legacyIds": [],
+   "moduleCount": 1,
+   "runner": "css"
+  },
+  {
+   "id": "tailwind-basics",
+   "title": {
+    "ru": "Tailwind CSS",
+    "uz": "Tailwind CSS",
+    "en": "Tailwind CSS"
+   },
+   "description": {
+    "ru": "Утилитарные классы, шкала отступов, адаптивность и состояния. Тот же CSS, но быстрее.",
+    "uz": "Utilitar sinflar, chekinishlar shkalasi, moslashuvchanlik va holatlar. O‘sha CSS, lekin tezroq.",
+    "en": "Utility classes, the spacing scale, responsiveness and states. The same CSS, only faster."
+   },
+   "glyph": "code",
+   "color": "#06b6d4",
+   "level": "beginner",
+   "status": "full",
+   "estimatedHours": 12,
+   "requires": [
+    "css-layout"
+   ],
+   "grants": [
+    "css-frameworks"
+   ],
+   "legacyIds": [],
+   "moduleCount": 1,
+   "runner": "tailwind"
   }
  ],
  "careerPaths": [
@@ -840,27 +943,60 @@
     {
      "id": "fe-st1",
      "title": {
-      "ru": "Язык браузера",
-      "uz": "Brauzer tili",
-      "en": "The browser language"
+      "ru": "Разметка страницы",
+      "uz": "Sahifa belgilash",
+      "en": "Page markup"
+     },
+     "courses": [
+      "html-basics"
+     ]
+    },
+    {
+     "id": "fe-st2",
+     "title": {
+      "ru": "Внешний вид",
+      "uz": "Tashqi ko‘rinish",
+      "en": "Visual styling"
+     },
+     "courses": [
+      "css-basics"
+     ]
+    },
+    {
+     "id": "fe-st3",
+     "title": {
+      "ru": "Быстрая вёрстка",
+      "uz": "Tez belgilash",
+      "en": "Faster styling"
+     },
+     "courses": [
+      "tailwind-basics"
+     ]
+    },
+    {
+     "id": "fe-st4",
+     "title": {
+      "ru": "Поведение страницы",
+      "uz": "Sahifa xatti-harakati",
+      "en": "Page behaviour"
      },
      "courses": [
       "javascript-basics"
      ]
     },
     {
-     "id": "fe-st2",
+     "id": "fe-st5",
      "title": {
-      "ru": "Как работает веб",
-      "uz": "Veb qanday ishlaydi",
-      "en": "How the web works"
+      "ru": "Связь с сервером",
+      "uz": "Server bilan aloqa",
+      "en": "Talking to the server"
      },
      "courses": [
       "backend-intro"
      ]
     },
     {
-     "id": "fe-st3",
+     "id": "fe-st6",
      "title": {
       "ru": "Алгоритмы для собеседований",
       "uz": "Suhbatlar uchun algoritmlar",
@@ -875,6 +1011,18 @@
   {
    "id": "fullstack-path",
    "stages": [
+    {
+     "id": "fs-st0",
+     "title": {
+      "ru": "Вёрстка интерфейса",
+      "uz": "Interfeys belgilash",
+      "en": "Interface markup"
+     },
+     "courses": [
+      "html-basics",
+      "css-basics"
+     ]
+    },
     {
      "id": "fs-st1",
      "title": {
@@ -1150,7 +1298,7 @@
    "id": "frontend",
    "glyph": "code",
    "color": "#38bdf8",
-   "status": "starter",
+   "status": "full",
    "title": {
     "ru": "Фронтенд-разработка",
     "uz": "Frontend dasturlash",

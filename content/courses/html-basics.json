@@ -1,0 +1,717 @@
+{
+ "id": "html-basics",
+ "schema": 2,
+ "modules": [
+  {
+   "id": "ht-01",
+   "title": {
+    "ru": "Скелет страницы",
+    "uz": "Sahifa skeleti",
+    "en": "The page skeleton"
+   },
+   "tagline": {
+    "ru": "Теги, вложенность, структура документа",
+    "uz": "Teglar, ichma-ichlik, hujjat tuzilishi",
+    "en": "Tags, nesting, document structure"
+   },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": {
+      "ru": "Что такое HTML",
+      "uz": "HTML nima",
+      "en": "What HTML is"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>HTML — не язык программирования. Здесь нет переменных, условий и циклов. HTML отвечает на один вопрос: <b>что это за содержимое</b>.</p><p>Ты размечаешь текст тегами, а браузер понимает: вот заголовок, вот абзац, вот список, вот ссылка. Это называется <b>семантикой</b> — смыслом разметки.</p>",
+        "uz": "<p>HTML — dasturlash tili emas. Bu yerda o‘zgaruvchilar, shartlar va sikllar yo‘q. HTML bitta savolga javob beradi: <b>bu qanday mazmun</b>.</p><p>Siz matnni teglar bilan belgilaysiz, brauzer esa tushunadi: mana sarlavha, mana xatboshi, mana ro‘yxat, mana havola. Bu <b>semantika</b> — belgilashning ma’nosi deb ataladi.</p>",
+        "en": "<p>HTML is not a programming language. There are no variables, conditions or loops. HTML answers one question: <b>what is this content</b>.</p><p>You mark text up with tags, and the browser understands: here is a heading, here is a paragraph, a list, a link. This is called <b>semantics</b> — the meaning of the markup.</p>"
+       }
+      },
+      {
+       "type": "webrun",
+       "kind": "html",
+       "code": "<h1>Азиз учится вёрстке</h1>\n<p>Это <b>первый</b> абзац с <i>разными</i> начертаниями.</p>\n<ul>\n  <li>HTML — структура</li>\n  <li>CSS — внешний вид</li>\n  <li>JavaScript — поведение</li>\n</ul>"
+      },
+      {
+       "type": "note",
+       "kind": "tip",
+       "html": {
+        "ru": "Результат под кодом — это настоящая страница в браузере, а не картинка. Меняй код в задачах и сразу увидишь, что получилось.",
+        "uz": "Kod ostidagi natija — bu haqiqiy brauzer sahifasi, rasm emas. Topshiriqlarda kodni o‘zgartiring va natijani darhol ko‘ring.",
+        "en": "The result under the code is a real page in the browser, not a picture. Change the code in the tasks and you will see the outcome immediately."
+       }
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Тег обычно состоит из пары: открывающий <code>&lt;p&gt;</code> и закрывающий <code>&lt;/p&gt;</code>. Между ними — содержимое. Есть и одиночные теги, которым нечего оборачивать: <code>&lt;br&gt;</code>, <code>&lt;img&gt;</code>, <code>&lt;input&gt;</code>.</p>",
+        "uz": "<p>Teg odatda juftlikdan iborat: ochuvchi <code>&lt;p&gt;</code> va yopuvchi <code>&lt;/p&gt;</code>. Ular orasida — mazmun. Yakka teglar ham bor: <code>&lt;br&gt;</code>, <code>&lt;img&gt;</code>, <code>&lt;input&gt;</code>.</p>",
+        "en": "<p>A tag usually comes as a pair: opening <code>&lt;p&gt;</code> and closing <code>&lt;/p&gt;</code>. The content sits between them. Some tags are self-closing because they wrap nothing: <code>&lt;br&gt;</code>, <code>&lt;img&gt;</code>, <code>&lt;input&gt;</code>.</p>"
+       }
+      },
+      {
+       "type": "summary",
+       "items": [
+        {
+         "ru": "HTML описывает смысл содержимого, а не его вид",
+         "uz": "HTML mazmunning ma’nosini tasvirlaydi, ko‘rinishini emas",
+         "en": "HTML describes what content means, not how it looks"
+        },
+        {
+         "ru": "Теги обычно парные: открывающий и закрывающий",
+         "uz": "Teglar odatda juft: ochuvchi va yopuvchi",
+         "en": "Tags usually come in pairs: opening and closing"
+        },
+        {
+         "ru": "Браузер строит из разметки дерево элементов",
+         "uz": "Brauzer belgilashdan elementlar daraxtini quradi",
+         "en": "The browser builds a tree of elements from the markup"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": {
+      "ru": "Структура документа",
+      "uz": "Hujjat tuzilishi",
+      "en": "Document structure"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Полная страница всегда устроена одинаково:</p><ul><li><code>&lt;!DOCTYPE html&gt;</code> — говорит браузеру, что это современный HTML</li><li><code>&lt;head&gt;</code> — служебное: кодировка, заголовок вкладки, подключение стилей. На странице не видно</li><li><code>&lt;body&gt;</code> — всё, что человек видит</li></ul>",
+        "uz": "<p>To‘liq sahifa har doim bir xil tuzilgan:</p><ul><li><code>&lt;!DOCTYPE html&gt;</code> — brauzerga bu zamonaviy HTML ekanini aytadi</li><li><code>&lt;head&gt;</code> — xizmat qismi: kodlash, varaq sarlavhasi, uslublar ulanishi. Sahifada ko‘rinmaydi</li><li><code>&lt;body&gt;</code> — odam ko‘radigan hamma narsa</li></ul>",
+        "en": "<p>A full page is always laid out the same way:</p><ul><li><code>&lt;!DOCTYPE html&gt;</code> — tells the browser this is modern HTML</li><li><code>&lt;head&gt;</code> — housekeeping: encoding, tab title, stylesheet links. Not visible on the page</li><li><code>&lt;body&gt;</code> — everything a person sees</li></ul>"
+       }
+      },
+      {
+       "type": "code",
+       "lang": "html",
+       "code": "<!DOCTYPE html>\n<html lang=\"ru\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Моя страница</title>\n</head>\n<body>\n  <h1>Привет!</h1>\n</body>\n</html>"
+      },
+      {
+       "type": "note",
+       "kind": "trap",
+       "html": {
+        "ru": "Без <code>&lt;meta charset=\"utf-8\"&gt;</code> кириллица превращается в кракозябры. Это первая ошибка почти у всех новичков.",
+        "uz": "<code>&lt;meta charset=\"utf-8\"&gt;</code> bo‘lmasa, kirill harflari buzilib ketadi. Bu deyarli barcha yangi boshlovchilarning birinchi xatosi.",
+        "en": "Without <code>&lt;meta charset=\"utf-8\"&gt;</code> non-Latin text turns into gibberish. It is the first mistake almost every beginner makes."
+       }
+      },
+      {
+       "type": "checkpoint",
+       "q": {
+        "ru": "Куда попадает содержимое, которое видит пользователь?",
+        "uz": "Foydalanuvchi ko‘radigan mazmun qayerga tushadi?",
+        "en": "Where does the content a user sees go?"
+       },
+       "options": [
+        {
+         "ru": "В <head>",
+         "uz": "<head> ichiga",
+         "en": "Into <head>"
+        },
+        {
+         "ru": "В <body>",
+         "uz": "<body> ichiga",
+         "en": "Into <body>"
+        },
+        {
+         "ru": "В <title>",
+         "uz": "<title> ichiga",
+         "en": "Into <title>"
+        }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "<code>&lt;head&gt;</code> — служебная часть, её не видно. Всё видимое живёт в <code>&lt;body&gt;</code>.",
+        "uz": "<code>&lt;head&gt;</code> — xizmat qismi, u ko‘rinmaydi. Ko‘rinadigan hamma narsa <code>&lt;body&gt;</code> ichida.",
+        "en": "<code>&lt;head&gt;</code> is the housekeeping part and is invisible. Everything visible lives in <code>&lt;body&gt;</code>."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": {
+      "ru": "Текст, ссылки и картинки",
+      "uz": "Matn, havolalar va rasmlar",
+      "en": "Text, links and images"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Заголовки идут от <code>&lt;h1&gt;</code> до <code>&lt;h6&gt;</code>. <code>&lt;h1&gt;</code> на странице один — это её главная тема. Дальше по убыванию, без перескоков: после h1 идёт h2, а не h4.</p><p>Ссылка — <code>&lt;a href=\"...\"&gt;</code>, картинка — <code>&lt;img src=\"...\" alt=\"...\"&gt;</code>. Атрибут <code>alt</code> обязателен: его читают незрячие пользователи и поисковики.</p>",
+        "uz": "<p>Sarlavhalar <code>&lt;h1&gt;</code> dan <code>&lt;h6&gt;</code> gacha. Sahifada <code>&lt;h1&gt;</code> bitta bo‘ladi — bu uning asosiy mavzusi. Keyin kamayish tartibida, sakramasdan: h1 dan keyin h2, h4 emas.</p><p>Havola — <code>&lt;a href=\"...\"&gt;</code>, rasm — <code>&lt;img src=\"...\" alt=\"...\"&gt;</code>. <code>alt</code> atributi majburiy: uni ko‘zi ojizlar va qidiruv tizimlari o‘qiydi.</p>",
+        "en": "<p>Headings run from <code>&lt;h1&gt;</code> to <code>&lt;h6&gt;</code>. There is one <code>&lt;h1&gt;</code> per page — its main topic. Then downwards without skipping: h2 follows h1, not h4.</p><p>A link is <code>&lt;a href=\"...\"&gt;</code>, an image is <code>&lt;img src=\"...\" alt=\"...\"&gt;</code>. The <code>alt</code> attribute is required: screen readers and search engines read it.</p>"
+       }
+      },
+      {
+       "type": "webrun",
+       "kind": "html",
+       "code": "<h1>Заголовок страницы</h1>\n<h2>Подзаголовок</h2>\n<p>Абзац со <a href=\"https://developer.mozilla.org\">ссылкой на MDN</a>.</p>\n<p>Список покупок:</p>\n<ol>\n  <li>Ноутбук</li>\n  <li>Кофе</li>\n</ol>"
+      },
+      {
+       "type": "findbug",
+       "lines": [
+        "<h1>Мой сайт</h1>",
+        "<p>Привет, мир!",
+        "<img src=\"cat.jpg\" alt=\"Кот\">"
+       ],
+       "bugLine": 1,
+       "explain": {
+        "ru": "Абзац открыт, но не закрыт: не хватает <code>&lt;/p&gt;</code>. Браузер попробует догадаться сам, но верстка «поедет».",
+        "uz": "Xatboshi ochilgan, lekin yopilmagan: <code>&lt;/p&gt;</code> yetishmayapti. Brauzer o‘zi taxmin qiladi, lekin joylashuv buziladi.",
+        "en": "The paragraph is opened but never closed: <code>&lt;/p&gt;</code> is missing. The browser will guess, but the layout will drift."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l4",
+     "title": {
+      "ru": "Семантика вместо каши из div",
+      "uz": "div bo‘tqasi o‘rniga semantika",
+      "en": "Semantics instead of div soup"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Можно всю страницу собрать из <code>&lt;div&gt;</code>. Так делать не надо. Есть теги, которые говорят о роли блока: <code>&lt;header&gt;</code>, <code>&lt;nav&gt;</code>, <code>&lt;main&gt;</code>, <code>&lt;section&gt;</code>, <code>&lt;article&gt;</code>, <code>&lt;footer&gt;</code>.</p><p>Зачем: скринридер объявит «навигация» вместо «блок»; поисковик поймёт, где основной текст; а другой разработчик прочитает вёрстку без расспросов.</p>",
+        "uz": "<p>Butun sahifani <code>&lt;div&gt;</code> lardan yig‘sa bo‘ladi. Lekin shunday qilish kerak emas. Blok rolini bildiradigan teglar bor: <code>&lt;header&gt;</code>, <code>&lt;nav&gt;</code>, <code>&lt;main&gt;</code>, <code>&lt;section&gt;</code>, <code>&lt;article&gt;</code>, <code>&lt;footer&gt;</code>.</p><p>Nima uchun: skrinrider «blok» emas, «navigatsiya» deb e’lon qiladi; qidiruv tizimi asosiy matnni topadi; boshqa dasturchi esa savolsiz tushunadi.</p>",
+        "en": "<p>You could build a whole page out of <code>&lt;div&gt;</code>. Don't. There are tags that state a block's role: <code>&lt;header&gt;</code>, <code>&lt;nav&gt;</code>, <code>&lt;main&gt;</code>, <code>&lt;section&gt;</code>, <code>&lt;article&gt;</code>, <code>&lt;footer&gt;</code>.</p><p>Why: a screen reader announces “navigation” instead of “block”; a search engine finds the main text; another developer reads your markup without asking questions.</p>"
+       }
+      },
+      {
+       "type": "webrun",
+       "kind": "html",
+       "code": "<header>\n  <h1>Блог Азиза</h1>\n  <nav>\n    <a href=\"#\">Главная</a> ·\n    <a href=\"#\">Статьи</a>\n  </nav>\n</header>\n<main>\n  <article>\n    <h2>Первая статья</h2>\n    <p>Текст статьи.</p>\n  </article>\n</main>\n<footer>\n  <p>© 2026</p>\n</footer>"
+      },
+      {
+       "type": "match",
+       "pairs": [
+        {
+         "left": {
+          "ru": "<nav>",
+          "uz": "<nav>",
+          "en": "<nav>"
+         },
+         "right": {
+          "ru": "Блок навигации по сайту",
+          "uz": "Sayt bo‘ylab navigatsiya bloki",
+          "en": "Site navigation block"
+         }
+        },
+        {
+         "left": {
+          "ru": "<main>",
+          "uz": "<main>",
+          "en": "<main>"
+         },
+         "right": {
+          "ru": "Основное содержимое страницы",
+          "uz": "Sahifaning asosiy mazmuni",
+          "en": "Main content of the page"
+         }
+        },
+        {
+         "left": {
+          "ru": "<article>",
+          "uz": "<article>",
+          "en": "<article>"
+         },
+         "right": {
+          "ru": "Самостоятельная единица: пост, новость",
+          "uz": "Mustaqil birlik: post, yangilik",
+          "en": "A self-contained unit: post, news item"
+         }
+        },
+        {
+         "left": {
+          "ru": "<footer>",
+          "uz": "<footer>",
+          "en": "<footer>"
+         },
+         "right": {
+          "ru": "Подвал: копирайт, контакты",
+          "uz": "Pastki qism: mualliflik huquqi, kontaktlar",
+          "en": "Footer: copyright, contacts"
+         }
+        }
+       ]
+      },
+      {
+       "type": "summary",
+       "items": [
+        {
+         "ru": "Один <h1> на страницу, дальше по убыванию без перескоков",
+         "uz": "Sahifada bitta <h1>, keyin sakramasdan kamayish tartibida",
+         "en": "One <h1> per page, then descending without skipping"
+        },
+        {
+         "ru": "alt у картинки обязателен",
+         "uz": "Rasmda alt majburiy",
+         "en": "alt on an image is required"
+        },
+        {
+         "ru": "Семантические теги вместо div там, где у блока есть роль",
+         "uz": "Blokning roli bo‘lsa, div o‘rniga semantik teglar",
+         "en": "Semantic tags instead of div wherever a block has a role"
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": {
+      "ru": "Сколько тегов <code>&lt;h1&gt;</code> должно быть на странице?",
+      "uz": "Sahifada nechta <code>&lt;h1&gt;</code> tegi bo‘lishi kerak?",
+      "en": "How many <code>&lt;h1&gt;</code> tags should a page have?"
+     },
+     "options": [
+      {
+       "ru": "Сколько угодно",
+       "uz": "Xohlagancha",
+       "en": "As many as you like"
+      },
+      {
+       "ru": "Один",
+       "uz": "Bitta",
+       "en": "One"
+      },
+      {
+       "ru": "Ровно шесть",
+       "uz": "Roppa-rosa oltita",
+       "en": "Exactly six"
+      },
+      {
+       "ru": "Ни одного",
+       "uz": "Bitta ham",
+       "en": "None"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "<code>&lt;h1&gt;</code> — главная тема страницы, она одна. Дальше идут <code>&lt;h2&gt;</code>, <code>&lt;h3&gt;</code> и так далее.",
+      "uz": "<code>&lt;h1&gt;</code> — sahifaning asosiy mavzusi, u bitta. Keyin <code>&lt;h2&gt;</code>, <code>&lt;h3&gt;</code> va hokazo.",
+      "en": "<code>&lt;h1&gt;</code> is the page's main topic, so there is one. Then come <code>&lt;h2&gt;</code>, <code>&lt;h3&gt;</code> and so on."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что делает атрибут <code>alt</code> у картинки?",
+      "uz": "Rasmdagi <code>alt</code> atributi nima qiladi?",
+      "en": "What does the <code>alt</code> attribute on an image do?"
+     },
+     "options": [
+      {
+       "ru": "Задаёт размер картинки",
+       "uz": "Rasm o‘lchamini beradi",
+       "en": "Sets the image size"
+      },
+      {
+       "ru": "Описывает картинку текстом для тех, кто её не видит",
+       "uz": "Rasmni ko‘rmaydiganlar uchun uni matn bilan tasvirlaydi",
+       "en": "Describes the image in text for those who cannot see it"
+      },
+      {
+       "ru": "Добавляет подпись под картинкой",
+       "uz": "Rasm ostiga izoh qo‘shadi",
+       "en": "Adds a caption under the image"
+      },
+      {
+       "ru": "Ничего, это устаревший атрибут",
+       "uz": "Hech nima, bu eskirgan atribut",
+       "en": "Nothing, it is a legacy attribute"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Скринридер прочитает <code>alt</code> вслух, а если картинка не загрузилась — браузер покажет этот текст.",
+      "uz": "Skrinrider <code>alt</code> ni ovoz chiqarib o‘qiydi, rasm yuklanmasa — brauzer shu matnni ko‘rsatadi.",
+      "en": "A screen reader reads <code>alt</code> aloud, and if the image fails to load the browser shows that text."
+     }
+    },
+    {
+     "q": {
+      "ru": "Чем <code>&lt;ol&gt;</code> отличается от <code>&lt;ul&gt;</code>?",
+      "uz": "<code>&lt;ol&gt;</code> <code>&lt;ul&gt;</code> dan nimasi bilan farq qiladi?",
+      "en": "How does <code>&lt;ol&gt;</code> differ from <code>&lt;ul&gt;</code>?"
+     },
+     "options": [
+      {
+       "ru": "Ничем, это синонимы",
+       "uz": "Hech nimasi bilan, ular sinonim",
+       "en": "In no way, they are synonyms"
+      },
+      {
+       "ru": "<ol> — нумерованный список, <ul> — маркированный",
+       "uz": "<ol> — raqamlangan ro‘yxat, <ul> — belgilangan",
+       "en": "<ol> is a numbered list, <ul> is a bulleted one"
+      },
+      {
+       "ru": "<ol> работает только внутри <table>",
+       "uz": "<ol> faqat <table> ichida ishlaydi",
+       "en": "<ol> only works inside <table>"
+      },
+      {
+       "ru": "<ul> устарел",
+       "uz": "<ul> eskirgan",
+       "en": "<ul> is deprecated"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Порядок важен — <code>&lt;ol&gt;</code> (ordered). Порядок не важен — <code>&lt;ul&gt;</code> (unordered).",
+      "uz": "Tartib muhim bo‘lsa — <code>&lt;ol&gt;</code> (ordered). Muhim bo‘lmasa — <code>&lt;ul&gt;</code> (unordered).",
+      "en": "Order matters — <code>&lt;ol&gt;</code> (ordered). Order does not matter — <code>&lt;ul&gt;</code> (unordered)."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что случится без <code>&lt;meta charset=\"utf-8\"&gt;</code>?",
+      "uz": "<code>&lt;meta charset=\"utf-8\"&gt;</code> bo‘lmasa nima bo‘ladi?",
+      "en": "What happens without <code>&lt;meta charset=\"utf-8\"&gt;</code>?"
+     },
+     "options": [
+      {
+       "ru": "Страница не откроется",
+       "uz": "Sahifa ochilmaydi",
+       "en": "The page will not open"
+      },
+      {
+       "ru": "Кириллица может отобразиться кракозябрами",
+       "uz": "Kirill harflari buzilib ko‘rinishi mumkin",
+       "en": "Non-Latin text may render as gibberish"
+      },
+      {
+       "ru": "Пропадут картинки",
+       "uz": "Rasmlar yo‘qoladi",
+       "en": "Images will disappear"
+      },
+      {
+       "ru": "Ничего",
+       "uz": "Hech nima",
+       "en": "Nothing"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Браузер угадывает кодировку, и часто угадывает неверно. Указывай её явно — это одна строка.",
+      "uz": "Brauzer kodlashni taxmin qiladi va ko‘pincha noto‘g‘ri taxmin qiladi. Uni aniq ko‘rsating — bu bitta qator.",
+      "en": "The browser guesses the encoding and often guesses wrong. State it explicitly — it is one line."
+     }
+    },
+    {
+     "q": {
+      "ru": "Какой тег правильнее для меню сайта?",
+      "uz": "Sayt menyusi uchun qaysi teg to‘g‘riroq?",
+      "en": "Which tag is the right one for a site menu?"
+     },
+     "options": [
+      {
+       "ru": "<div class=\"menu\">",
+       "uz": "<div class=\"menu\">",
+       "en": "<div class=\"menu\">"
+      },
+      {
+       "ru": "<nav>",
+       "uz": "<nav>",
+       "en": "<nav>"
+      },
+      {
+       "ru": "<section>",
+       "uz": "<section>",
+       "en": "<section>"
+      },
+      {
+       "ru": "<aside>",
+       "uz": "<aside>",
+       "en": "<aside>"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "<code>&lt;nav&gt;</code> прямо говорит о роли блока. Скринридер объявит его как навигацию.",
+      "uz": "<code>&lt;nav&gt;</code> blok rolini bevosita bildiradi. Skrinrider uni navigatsiya deb e’lon qiladi.",
+      "en": "<code>&lt;nav&gt;</code> states the block's role directly. A screen reader announces it as navigation."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что такое одиночный тег?",
+      "uz": "Yakka teg nima?",
+      "en": "What is a self-closing tag?"
+     },
+     "options": [
+      {
+       "ru": "Тег, который пишут один раз на странице",
+       "uz": "Sahifada bir marta yoziladigan teg",
+       "en": "A tag written once per page"
+      },
+      {
+       "ru": "Тег без закрывающей пары — ему нечего оборачивать",
+       "uz": "Yopuvchi juftsiz teg — u hech nimani o‘ramaydi",
+       "en": "A tag with no closing pair — it wraps nothing"
+      },
+      {
+       "ru": "Устаревший тег",
+       "uz": "Eskirgan teg",
+       "en": "A deprecated tag"
+      },
+      {
+       "ru": "Тег внутри <head>",
+       "uz": "<head> ichidagi teg",
+       "en": "A tag inside <head>"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "<code>&lt;br&gt;</code>, <code>&lt;img&gt;</code>, <code>&lt;input&gt;</code>, <code>&lt;meta&gt;</code> — им нечего оборачивать, поэтому закрывающего тега нет.",
+      "uz": "<code>&lt;br&gt;</code>, <code>&lt;img&gt;</code>, <code>&lt;input&gt;</code>, <code>&lt;meta&gt;</code> — ular hech nimani o‘ramaydi, shuning uchun yopuvchi teg yo‘q.",
+      "en": "<code>&lt;br&gt;</code>, <code>&lt;img&gt;</code>, <code>&lt;input&gt;</code>, <code>&lt;meta&gt;</code> wrap nothing, so there is no closing tag."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "html",
+     "title": {
+      "ru": "Первая страница",
+      "uz": "Birinchi sahifa",
+      "en": "Your first page"
+     },
+     "brief": {
+      "ru": "Заголовок и абзац",
+      "uz": "Sarlavha va xatboshi",
+      "en": "Heading and paragraph"
+     },
+     "desc": {
+      "ru": "<p>Сделай заголовок первого уровня с текстом <b>Азиз</b> и под ним абзац с любым текстом.</p><p>Нажми «Запустить» — увидишь результат. «Проверить» сверит с заданием.</p>",
+      "uz": "<p>Matni <b>Азиз</b> bo‘lgan birinchi darajali sarlavha va uning ostida ixtiyoriy matnli xatboshi yarating.</p><p>«Ishga tushirish» ni bosing — natijani ko‘rasiz. «Tekshirish» topshiriq bilan solishtiradi.</p>",
+      "en": "<p>Create a first-level heading with the text <b>Азиз</b> and a paragraph with any text below it.</p><p>Press “Run” to see the result. “Check” compares it against the task.</p>"
+     },
+     "starter": "<h1>Замени меня</h1>\n",
+     "tests": "assert($('h1'), 'На странице нет тега h1');\nequal(text('h1'), 'Азиз', 'Текст заголовка');\nassert($('p'), 'Не хватает абзаца <p>');\nassert(text('p').length > 0, 'Абзац пустой — напиши в нём хоть что-нибудь');",
+     "hint": {
+      "ru": "<code>&lt;h1&gt;Азиз&lt;/h1&gt;</code>, а следом <code>&lt;p&gt;текст&lt;/p&gt;</code>.",
+      "uz": "<code>&lt;h1&gt;Азиз&lt;/h1&gt;</code>, keyin <code>&lt;p&gt;matn&lt;/p&gt;</code>.",
+      "en": "<code>&lt;h1&gt;Азиз&lt;/h1&gt;</code>, then <code>&lt;p&gt;text&lt;/p&gt;</code>."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "html",
+     "title": {
+      "ru": "Список и ссылка",
+      "uz": "Ro‘yxat va havola",
+      "en": "A list and a link"
+     },
+     "brief": {
+      "ru": "ul, li, a",
+      "uz": "ul, li, a",
+      "en": "ul, li, a"
+     },
+     "desc": {
+      "ru": "<p>Собери маркированный список из <b>трёх</b> пунктов, а после него — ссылку на <code>https://developer.mozilla.org</code>.</p>",
+      "uz": "<p><b>Uchta</b> banddan iborat belgilangan ro‘yxat tuzing, undan keyin — <code>https://developer.mozilla.org</code> ga havola.</p>",
+      "en": "<p>Build a bulleted list of <b>three</b> items, and after it a link to <code>https://developer.mozilla.org</code>.</p>"
+     },
+     "starter": "<ul>\n  <li>Первый пункт</li>\n</ul>\n",
+     "tests": "assert($('ul'), 'Нужен маркированный список <ul>');\nequal($$('ul li').length, 3, 'Количество пунктов в списке');\nvar a = $('a');\nassert(a, 'Не хватает ссылки <a>');\nequal(a.getAttribute('href'), 'https://developer.mozilla.org', 'Адрес в href');",
+     "hint": {
+      "ru": "Внутри <code>&lt;ul&gt;</code> должно быть три <code>&lt;li&gt;</code>. Ссылка: <code>&lt;a href=\"https://developer.mozilla.org\"&gt;MDN&lt;/a&gt;</code>.",
+      "uz": "<code>&lt;ul&gt;</code> ichida uchta <code>&lt;li&gt;</code> bo‘lishi kerak. Havola: <code>&lt;a href=\"https://developer.mozilla.org\"&gt;MDN&lt;/a&gt;</code>.",
+      "en": "Three <code>&lt;li&gt;</code> inside <code>&lt;ul&gt;</code>. The link: <code>&lt;a href=\"https://developer.mozilla.org\"&gt;MDN&lt;/a&gt;</code>."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "html",
+     "title": {
+      "ru": "Семантический каркас",
+      "uz": "Semantik karkas",
+      "en": "A semantic skeleton"
+     },
+     "brief": {
+      "ru": "header, main, footer",
+      "uz": "header, main, footer",
+      "en": "header, main, footer"
+     },
+     "desc": {
+      "ru": "<p>Собери каркас страницы: <code>&lt;header&gt;</code> с заголовком <code>&lt;h1&gt;</code>, <code>&lt;main&gt;</code> с абзацем и <code>&lt;footer&gt;</code>. Внутри <code>&lt;header&gt;</code> добавь <code>&lt;nav&gt;</code> с двумя ссылками.</p>",
+      "uz": "<p>Sahifa karkasini tuzing: <code>&lt;h1&gt;</code> sarlavhali <code>&lt;header&gt;</code>, xatboshili <code>&lt;main&gt;</code> va <code>&lt;footer&gt;</code>. <code>&lt;header&gt;</code> ichiga ikkita havolali <code>&lt;nav&gt;</code> qo‘shing.</p>",
+      "en": "<p>Build a page skeleton: <code>&lt;header&gt;</code> with an <code>&lt;h1&gt;</code>, <code>&lt;main&gt;</code> with a paragraph, and <code>&lt;footer&gt;</code>. Add a <code>&lt;nav&gt;</code> with two links inside <code>&lt;header&gt;</code>.</p>"
+     },
+     "starter": "<header>\n  \n</header>\n",
+     "tests": "assert($('header'), 'Нет <header>');\nassert($('header h1'), 'Внутри <header> должен быть <h1>');\nassert($('header nav'), 'Внутри <header> должен быть <nav>');\nequal($$('header nav a').length, 2, 'Ссылок в навигации');\nassert($('main'), 'Нет <main>');\nassert($('main p'), 'Внутри <main> должен быть абзац <p>');\nassert($('footer'), 'Нет <footer>');",
+     "hint": {
+      "ru": "Порядок такой: header (внутри h1 и nav с двумя a) → main (внутри p) → footer.",
+      "uz": "Tartib shunday: header (ichida h1 va ikkita a bo‘lgan nav) → main (ichida p) → footer.",
+      "en": "The order is: header (with h1 and a nav holding two a) → main (with p) → footer."
+     }
+    }
+   ],
+   "exam": {
+    "time": 480,
+    "questions": [
+     {
+      "q": {
+       "ru": "Что описывает HTML?",
+       "uz": "HTML nimani tasvirlaydi?",
+       "en": "What does HTML describe?"
+      },
+      "options": [
+       {
+        "ru": "Внешний вид страницы",
+        "uz": "Sahifaning tashqi ko‘rinishi",
+        "en": "The look of the page"
+       },
+       {
+        "ru": "Смысл и структуру содержимого",
+        "uz": "Mazmunning ma’nosi va tuzilishi",
+        "en": "The meaning and structure of content"
+       },
+       {
+        "ru": "Поведение при кликах",
+        "uz": "Bosishlardagi xatti-harakat",
+        "en": "Behaviour on clicks"
+       },
+       {
+        "ru": "Работу сервера",
+        "uz": "Server ishi",
+        "en": "Server work"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "Какой тег подключает картинку?",
+       "uz": "Qaysi teg rasmni ulaydi?",
+       "en": "Which tag embeds an image?"
+      },
+      "options": [
+       {
+        "ru": "<picture src>",
+        "uz": "<picture src>",
+        "en": "<picture src>"
+       },
+       {
+        "ru": "<img src>",
+        "uz": "<img src>",
+        "en": "<img src>"
+       },
+       {
+        "ru": "<image href>",
+        "uz": "<image href>",
+        "en": "<image href>"
+       },
+       {
+        "ru": "<src img>",
+        "uz": "<src img>",
+        "en": "<src img>"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "Где указывают заголовок вкладки браузера?",
+       "uz": "Brauzer varag‘i sarlavhasi qayerda ko‘rsatiladi?",
+       "en": "Where is the browser tab title set?"
+      },
+      "options": [
+       {
+        "ru": "<h1> в body",
+        "uz": "body dagi <h1>",
+        "en": "<h1> in body"
+       },
+       {
+        "ru": "<title> в head",
+        "uz": "head dagi <title>",
+        "en": "<title> in head"
+       },
+       {
+        "ru": "<header>",
+        "uz": "<header>",
+        "en": "<header>"
+       },
+       {
+        "ru": "<meta name=\"tab\">",
+        "uz": "<meta name=\"tab\">",
+        "en": "<meta name=\"tab\">"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "Зачем нужны семантические теги?",
+       "uz": "Semantik teglar nima uchun kerak?",
+       "en": "Why do semantic tags matter?"
+      },
+      "options": [
+       {
+        "ru": "Страница грузится быстрее",
+        "uz": "Sahifa tezroq yuklanadi",
+        "en": "The page loads faster"
+       },
+       {
+        "ru": "Доступность, поиск и читаемость кода",
+        "uz": "Qulaylik, qidiruv va kod o‘qilishi",
+        "en": "Accessibility, search and code readability"
+       },
+       {
+        "ru": "Они обязательны по стандарту",
+        "uz": "Ular standart bo‘yicha majburiy",
+        "en": "They are required by the standard"
+       },
+       {
+        "ru": "Без них не работает CSS",
+        "uz": "Ularsiz CSS ishlamaydi",
+        "en": "CSS does not work without them"
+       }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "html",
+      "title": {
+       "ru": "Карточка статьи",
+       "uz": "Maqola kartochkasi",
+       "en": "An article card"
+      },
+      "desc": {
+       "ru": "<p>Собери <code>&lt;article&gt;</code>, внутри которой: заголовок <code>&lt;h2&gt;</code>, абзац и картинка с непустым <code>alt</code>.</p>",
+       "uz": "<p><code>&lt;article&gt;</code> tuzing, ichida: <code>&lt;h2&gt;</code> sarlavha, xatboshi va bo‘sh bo‘lmagan <code>alt</code> li rasm.</p>",
+       "en": "<p>Build an <code>&lt;article&gt;</code> containing: an <code>&lt;h2&gt;</code> heading, a paragraph, and an image with a non-empty <code>alt</code>.</p>"
+      },
+      "starter": "<article>\n  \n</article>\n",
+      "tests": "assert($('article'), 'Нет <article>');\nassert($('article h2'), 'Внутри article нужен <h2>');\nassert($('article p'), 'Внутри article нужен абзац');\nvar img = $('article img');\nassert(img, 'Внутри article нужна картинка <img>');\nassert((img.getAttribute('alt') || '').trim().length > 0, 'У картинки должен быть непустой alt');",
+      "hint": {
+       "ru": "Картинка может ссылаться на любой адрес — проверяется наличие тега и атрибута alt.",
+       "uz": "Rasm ixtiyoriy manzilga ishora qilishi mumkin — teg va alt atributi borligi tekshiriladi.",
+       "en": "The image may point anywhere — the check looks for the tag and the alt attribute."
+      }
+     }
+    ]
+   }
+  }
+ ]
+}
