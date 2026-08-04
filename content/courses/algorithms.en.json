@@ -13,7 +13,6 @@
  "alg-01.tasks.2.title": "How many steps?",
  "alg-01.tasks.2.brief": "Feel log n for yourself",
  "alg-01.exam.tasks.0.title": "Does the number exist?",
-
  "alg-02.title": "Sorting",
  "alg-02.tagline": "Selection and bubble sort · Grokking ch. 2",
  "alg-02.lessons.0.title": "The sorting problem",
@@ -28,7 +27,6 @@
  "alg-02.tasks.2.title": "Top students",
  "alg-02.tasks.2.brief": "Sorting with key",
  "alg-02.exam.tasks.0.title": "Sort descending",
-
  "alg-03.title": "Recursion",
  "alg-03.tagline": "Base and recursive cases, the call stack · Grokking ch. 3",
  "alg-03.lessons.0.title": "A function calling itself",
@@ -42,7 +40,6 @@
  "alg-03.tasks.2.title": "Power of a number",
  "alg-03.tasks.2.brief": "Recursive maths",
  "alg-03.exam.tasks.0.title": "Fibonacci numbers",
-
  "alg-04.title": "Hash tables and graphs",
  "alg-04.tagline": "dict under the hood, BFS and the road to LeetCode · Grokking ch. 5–6",
  "alg-04.lessons.0.title": "Hash tables — the most useful tool",
@@ -56,5 +53,27 @@
  "alg-04.tasks.1.brief": "A counting classic",
  "alg-04.tasks.2.title": "Is there a path?",
  "alg-04.tasks.2.brief": "BFS over a graph",
- "alg-04.exam.tasks.0.title": "Two Sum — LeetCode problem #1"
+ "alg-04.exam.tasks.0.title": "Two Sum — LeetCode problem #1",
+ "alg-01.exam.questions.2.options.3": "None",
+ "alg-01.exam.questions.3.options.3": "The same",
+ "alg-01.exam.questions.4.options.0": "For speed",
+ "alg-01.exam.questions.4.options.2": "For looks",
+ "alg-02.quiz.1.options.3": "An error",
+ "alg-02.quiz.3.options.0": "An error",
+ "alg-02.exam.questions.2.options.3": "An error",
+ "alg-02.exam.questions.3.options.0": "Always",
+ "alg-02.exam.questions.3.options.3": "Never",
+ "alg-02.exam.questions.4.options.0": "The same",
+ "alg-02.exam.questions.4.options.3": "It depends on the language",
+ "alg-03.quiz.0.options.3": "Nothing",
+ "alg-03.quiz.3.options.2": "An error",
+ "alg-03.quiz.4.options.3": "Never",
+ "alg-03.quiz.5.options.3": "An error",
+ "alg-03.exam.questions.1.options.3": "An error",
+ "alg-04.quiz.4.options.2": "For sorting",
+ "alg-04.exam.questions.1.options.0": "For speed",
+ "alg-04.exam.questions.1.options.3": "Sorting",
+ "alg-04.exam.questions.3.options.0": "A database",
+ "alg-04.exam.questions.3.options.2": "A query language",
+ "alg-04.exam.questions.3.options.3": "A file format"
 }

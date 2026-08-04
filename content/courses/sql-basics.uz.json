@@ -13,7 +13,6 @@
  "sb-01.tasks.2.title": "O'z jadvalingiz",
  "sb-01.tasks.2.brief": "CREATE TABLE + INSERT",
  "sb-01.exam.tasks.0.title": "Qoldiqlari bilan katalog",
-
  "sb-02.title": "Filtrlash va saralash",
  "sb-02.tagline": "WHERE, ORDER BY, DISTINCT, NULL, CASE · Week 2",
  "sb-02.lessons.0.title": "WHERE — qatorlar filtri",
@@ -28,7 +27,6 @@
  "sb-02.tasks.2.title": "Iyun oyidagi faol buyurtmalar",
  "sb-02.tasks.2.brief": "IN + sanalar oralig'i",
  "sb-02.exam.tasks.0.title": "Mavjud tovarlar, avval qimmatlari",
-
  "sb-03.title": "Funksiyalar va to'plamlar",
  "sb-03.tagline": "Satrlar, sanalar, CAST, UNION va EXCEPT · Week 2",
  "sb-03.lessons.0.title": "Satr funksiyalari",
@@ -41,5 +39,21 @@
  "sb-03.tasks.1.brief": "ROUND + arifmetika",
  "sb-03.tasks.2.title": "Kompaniyaning barcha shaharlari",
  "sb-03.tasks.2.brief": "UNION",
- "sb-03.exam.tasks.0.title": "Bo'shliqsiz rahbar"
+ "sb-03.exam.tasks.0.title": "Bo'shliqsiz rahbar",
+ "sb-01.quiz.2.options.0": "Jadval paroli",
+ "sb-01.quiz.3.options.0": "Tez qidirish uchun",
+ "sb-01.quiz.3.options.2": "Shifrlash uchun",
+ "sb-01.quiz.3.options.3": "Saralash uchun",
+ "sb-01.quiz.5.options.0": "Yagonalikni tekshiradi",
+ "sb-01.quiz.5.options.2": "Indeks yaratadi",
+ "sb-01.quiz.5.options.3": "NULL ni taqiqlaydi",
+ "sb-01.exam.questions.1.options.0": "Saralaydi",
+ "sb-01.exam.questions.4.options.3": "Xato",
+ "sb-02.quiz.6.options.0": "Xato",
+ "sb-02.exam.questions.2.options.0": "Saralaydi",
+ "sb-02.exam.questions.4.options.1": "Barcha qatorlar",
+ "sb-02.exam.questions.4.options.2": "Bironta ham qator yo'q",
+ "sb-03.quiz.1.options.3": "Xato",
+ "sb-03.quiz.2.options.0": "Hech nimasi bilan",
+ "sb-03.exam.questions.0.options.3": "Xato"
 }

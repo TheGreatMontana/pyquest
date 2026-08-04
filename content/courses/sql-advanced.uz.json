@@ -13,7 +13,6 @@
  "sa-01.tasks.2.title": "Kim kimning rahbari",
  "sa-01.tasks.2.brief": "Self-join",
  "sa-01.exam.tasks.0.title": "Toifasi bilan qimmat elektronika",
-
  "sa-02.title": "GROUP BY va ichki so'rovlar",
  "sa-02.tagline": "Agregatlar, HAVING, ichma-ich so'rovlar · Week 2–3",
  "sa-02.lessons.0.title": "Agregat funksiyalar",
@@ -28,7 +27,6 @@
  "sa-02.tasks.2.title": "O'rtachadan qimmat",
  "sa-02.tasks.2.brief": "Ichki so'rov",
  "sa-02.exam.tasks.0.title": "Mijozlar bo'yicha buyurtmalar",
-
  "sa-03.title": "CTE va oyna funksiyalari",
  "sa-03.tagline": "WITH, ROW_NUMBER, RANK, LAG · Week 4",
  "sa-03.lessons.0.title": "CTE — umumiy jadval ifodasi",
@@ -42,5 +40,19 @@
  "sa-03.tasks.1.brief": "ROW_NUMBER + PARTITION BY",
  "sa-03.tasks.2.title": "Maosh va reytingdagi o'rin",
  "sa-03.tasks.2.brief": "DENSE_RANK",
- "sa-03.exam.tasks.0.title": "Narx bo'yicha tovarlar reytingi"
+ "sa-03.exam.tasks.0.title": "Narx bo'yicha tovarlar reytingi",
+ "sa-01.quiz.2.options.2": "Saralash",
+ "sa-01.quiz.4.options.3": "Xato",
+ "sa-01.exam.questions.0.options.3": "Xato",
+ "sa-02.quiz.0.options.3": "Birinchi qatorni",
+ "sa-02.quiz.1.options.0": "Hech qanday",
+ "sa-02.quiz.3.options.0": "Ha",
+ "sa-02.quiz.3.options.1": "Yo'q",
+ "sa-02.quiz.3.options.3": "Xato",
+ "sa-02.exam.questions.1.options.0": "Ha",
+ "sa-02.exam.questions.3.options.3": "Xato",
+ "sa-03.quiz.1.options.0": "Hech nimasi bilan",
+ "sa-03.quiz.4.options.3": "Xato",
+ "sa-03.exam.questions.1.options.3": "Xato",
+ "sa-03.exam.questions.3.options.3": "Xato"
 }

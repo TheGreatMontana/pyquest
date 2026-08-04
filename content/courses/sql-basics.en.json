@@ -13,7 +13,6 @@
  "sb-01.tasks.2.title": "Your own table",
  "sb-01.tasks.2.brief": "CREATE TABLE + INSERT",
  "sb-01.exam.tasks.0.title": "Catalogue with stock",
-
  "sb-02.title": "Filtering and sorting",
  "sb-02.tagline": "WHERE, ORDER BY, DISTINCT, NULL, CASE · Week 2",
  "sb-02.lessons.0.title": "WHERE — the row filter",
@@ -28,7 +27,6 @@
  "sb-02.tasks.2.title": "Active June orders",
  "sb-02.tasks.2.brief": "IN + date range",
  "sb-02.exam.tasks.0.title": "In-stock products, priciest first",
-
  "sb-03.title": "Functions and set operations",
  "sb-03.tagline": "Strings, dates, CAST, UNION and EXCEPT · Week 2",
  "sb-03.lessons.0.title": "String functions",
@@ -41,5 +39,21 @@
  "sb-03.tasks.1.brief": "ROUND + arithmetic",
  "sb-03.tasks.2.title": "Every city in the company",
  "sb-03.tasks.2.brief": "UNION",
- "sb-03.exam.tasks.0.title": "Manager without blanks"
+ "sb-03.exam.tasks.0.title": "Manager without blanks",
+ "sb-01.quiz.2.options.0": "A table password",
+ "sb-01.quiz.3.options.0": "For fast lookup",
+ "sb-01.quiz.3.options.2": "For encryption",
+ "sb-01.quiz.3.options.3": "For sorting",
+ "sb-01.quiz.5.options.0": "It checks uniqueness",
+ "sb-01.quiz.5.options.2": "It creates an index",
+ "sb-01.quiz.5.options.3": "It forbids NULL",
+ "sb-01.exam.questions.1.options.0": "It sorts",
+ "sb-01.exam.questions.4.options.3": "An error",
+ "sb-02.quiz.6.options.0": "An error",
+ "sb-02.exam.questions.2.options.0": "It sorts",
+ "sb-02.exam.questions.4.options.1": "All rows",
+ "sb-02.exam.questions.4.options.2": "No rows at all",
+ "sb-03.quiz.1.options.3": "An error",
+ "sb-03.quiz.2.options.0": "In no way",
+ "sb-03.exam.questions.0.options.3": "An error"
 }
