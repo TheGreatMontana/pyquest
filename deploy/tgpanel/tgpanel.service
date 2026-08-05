@@ -1,0 +1,28 @@
+# Панель управления проектами сервера из Telegram.
+# Кладётся в /etc/systemd/system/tgpanel.service
+#
+# Работает от root, потому что управляет systemd-сервисами и docker. Это много
+# власти, поэтому вся защита — в самом боте: белый список проектов и приём
+# команд только от одного Telegram-аккаунта. Токен лежит в отдельном файле
+# с правами 600 и в репозиторий не попадает.
+
+[Unit]
+Description=Telegram panel for server projects
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+EnvironmentFile=/opt/tgpanel/config.env
+ExecStart=/usr/bin/python3 /opt/tgpanel/bot.py
+WorkingDirectory=/opt/tgpanel
+Restart=always
+RestartSec=10
+
+# Домашнюю директорию задаём явно: иначе некоторые утилиты пытаются писать
+# в чужую и сыплют ошибками в журнал
+Environment=HOME=/opt/tgpanel
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target

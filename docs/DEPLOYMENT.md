@@ -9,7 +9,14 @@
 | База аккаунтов и прогресса | `/opt/pyquest-api/pyquest.db` (SQLite) |
 | Конфиг nginx | `/etc/nginx/sites-available/course` → symlink в `sites-enabled` |
 | Сертификат | Let's Encrypt, автопродление certbot |
-| Домен | `course.azizbek-azimov.uz` → `37.27.15.73` |
+| Домен | `course.azizbek-azimov.uz` |
+
+Команды ниже используют переменную, чтобы адрес сервера не был вшит в документацию:
+
+```bash
+export SERVER=root@<адрес-сервера>
+export KEY=~/.ssh/id_hetzner
+```
 
 **Границы:** PyQuest занимает только эти пути. Соседние проекты на сервере (`doubleasec`, `wazuh`, `wedding`) и общесистемные конфиги не затрагиваются.
 
@@ -17,8 +24,8 @@
 
 ```bash
 cd /путь/к/pyquest
-scp -i ~/.ssh/id_hetzner -r index.html css js content root@37.27.15.73:/var/www/course/
-ssh -i ~/.ssh/id_hetzner root@37.27.15.73 "chown -R www-data:www-data /var/www/course"
+scp -i $KEY -r index.html css js content $SERVER:/var/www/course/
+ssh -i $KEY $SERVER "chown -R www-data:www-data /var/www/course"
 ```
 
 **Обязательный шаг: инвалидация кэша.** nginx кэширует css/js на 7 дней, поэтому при каждом релизе поднимаем версию в `index.html`:
@@ -34,8 +41,8 @@ ssh -i ~/.ssh/id_hetzner root@37.27.15.73 "chown -R www-data:www-data /var/www/c
 ## 3. Обновление API
 
 ```bash
-scp -i ~/.ssh/id_hetzner server/app.py root@37.27.15.73:/opt/pyquest-api/app.py
-ssh -i ~/.ssh/id_hetzner root@37.27.15.73 "systemctl restart pyquest-api && systemctl is-active pyquest-api"
+scp -i $KEY server/app.py $SERVER:/opt/pyquest-api/app.py
+ssh -i $KEY $SERVER "systemctl restart pyquest-api && systemctl is-active pyquest-api"
 ```
 
 Схема БД создаётся автоматически при старте (`CREATE TABLE IF NOT EXISTS`), миграций не требуется.
@@ -105,13 +112,13 @@ curl -s -o /dev/null -w "%{http_code}\n" https://wedding.azizbek-azimov.uz/
 
 ```bash
 # посмотреть журнал и список копий
-ssh root@37.27.15.73 "tail -5 /var/log/pyquest-backup.log && ls -la /opt/pyquest-api/backups/"
+ssh -i $KEY $SERVER "tail -5 /var/log/pyquest-backup.log && ls -la /opt/pyquest-api/backups/"
 
 # ручной бэкап перед рискованными изменениями
-ssh root@37.27.15.73 "/opt/pyquest-api/backup-db.sh"
+ssh -i $KEY $SERVER "/opt/pyquest-api/backup-db.sh"
 
 # восстановление из копии
-ssh root@37.27.15.73 "systemctl stop pyquest-api && \
+ssh -i $KEY $SERVER "systemctl stop pyquest-api && \
   gunzip -c /opt/pyquest-api/backups/pyquest-ГГГГММДД-ЧЧММСС.db.gz > /opt/pyquest-api/pyquest.db && \
   chown www-data:www-data /opt/pyquest-api/pyquest.db && systemctl start pyquest-api"
 ```
@@ -140,6 +147,6 @@ cd server && PYQUEST_DB=./dev.db python app.py     # поднимет API на 1
 
 ```bash
 git checkout main
-scp -r index.html css js data root@37.27.15.73:/var/www/course/
-ssh root@37.27.15.73 "cp /opt/pyquest-api/backups/<дата>.db /opt/pyquest-api/pyquest.db && systemctl restart pyquest-api"
+scp -r index.html css js data $SERVER:/var/www/course/
+ssh -i $KEY $SERVER "cp /opt/pyquest-api/backups/<дата>.db /opt/pyquest-api/pyquest.db && systemctl restart pyquest-api"
 ```
