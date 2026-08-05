@@ -302,6 +302,347 @@
      }
     ]
    }
+  },
+  {
+   "id": "cv-02",
+   "title": { "ru": "От пикселей к признакам", "uz": "Piksellardan belgilarga", "en": "From pixels to features" },
+   "tagline": { "ru": "Пулинг, гистограммы и распознавание по шаблону — как из чисел получается смысл", "uz": "Pulling, gistogrammalar va namuna bo'yicha tanish — sonlardan ma'no qanday chiqadi", "en": "Pooling, histograms and template matching — how numbers turn into meaning" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "Пулинг: меньше данных, тот же смысл", "uz": "Pulling: kamroq ma'lumot, o'sha ma'no", "en": "Pooling: less data, same meaning" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Фотография с телефона — это двенадцать миллионов чисел. Обрабатывать их все на каждом шаге бессмысленно: соседние пиксели почти всегда одинаковые.</p><p>Поэтому после свёртки изображение <b>уменьшают</b>. Берут квадрат 2×2 и заменяют его одним числом — обычно максимумом. Это и есть <b>пулинг</b> (pooling).</p><p>Картинка становится вчетверо меньше, а всё важное остаётся: если в квадрате был яркий край, максимум его сохранит. Заодно появляется устойчивость к сдвигу — край, съехавший на пиксель, даст тот же результат.</p>",
+        "uz": "<p>Telefondagi surat — o'n ikki million son. Ularning hammasini har qadamda qayta ishlash ma'nosiz: qo'shni piksellar deyarli doim bir xil.</p><p>Shuning uchun svertkadan keyin tasvir <b>kichraytiriladi</b>. 2×2 kvadrat olinib, bitta son bilan almashtiriladi — odatda maksimum bilan. Bu <b>pulling</b> (pooling).</p><p>Rasm to'rt barobar kichrayadi, muhimi esa qoladi: kvadratda yorqin chekka bo'lsa, maksimum uni saqlaydi. Shu bilan birga siljishga chidamlilik paydo bo'ladi — bir pikselga siljigan chekka o'sha natijani beradi.</p>",
+        "en": "<p>A phone photo is twelve million numbers. Processing all of them at every step is pointless: neighbouring pixels are nearly always the same.</p><p>So after a convolution the image is <b>shrunk</b>. Take a 2×2 square and replace it with a single number — usually the maximum. That is <b>pooling</b>.</p><p>The picture becomes four times smaller while everything important survives: if the square held a bright edge, the maximum keeps it. As a bonus you gain robustness to shifts — an edge moved by one pixel gives the same result.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "image = [\n    [1, 2, 8, 9],\n    [3, 4, 7, 6],\n    [5, 0, 1, 2],\n    [1, 1, 3, 4],\n]\n\ndef pool_max(img, size=2):\n    out = []\n    for y in range(0, len(img) - size + 1, size):\n        row = []\n        for x in range(0, len(img[0]) - size + 1, size):\n            block = [img[y + dy][x + dx] for dy in range(size) for dx in range(size)]\n            row.append(max(block))\n        out.append(row)\n    return out\n\nfor line in image:\n    print(line)\nprint(\"после пулинга 2x2:\")\nfor line in pool_max(image):\n    print(line)"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Шестнадцать чисел превратились в четыре, а самые яркие точки каждой четверти сохранились. Настоящие сети чередуют: свёртка находит признак → пулинг сжимает → снова свёртка ищет признак покрупнее.</p><p>Первые слои так видят края, следующие — углы и текстуры, дальше — части объектов, и только в конце — «кошка». Никто не программировал эту иерархию: она возникает сама, потому что так дешевле всего уменьшать ошибку.</p>",
+        "uz": "<p>O'n oltita son to'rttaga aylandi, har chorakning eng yorqin nuqtalari esa saqlandi. Haqiqiy tarmoqlar navbatlashtiradi: svertka belgini topadi → pulling siqadi → yana svertka yirikroq belgini qidiradi.</p><p>Birinchi qatlamlar shunday chekkalarni ko'radi, keyingilari — burchak va teksturalarni, undan keyin — obyekt qismlarini va faqat oxirida — «mushuk» ni. Bu iyerarxiyani hech kim dasturlashtirmagan: u o'zi paydo bo'ladi, chunki xatoni kamaytirishning eng arzon yo'li shu.</p>",
+        "en": "<p>Sixteen numbers became four, and the brightest point of each quarter survived. Real networks alternate: a convolution finds a feature → pooling shrinks → another convolution looks for a larger feature.</p><p>The first layers see edges this way, the next ones corners and textures, then parts of objects, and only at the end “a cat”. Nobody programmed this hierarchy: it emerges on its own because that is the cheapest way to reduce the error.</p>"
+       }
+      },
+      {
+       "type": "checkpoint",
+       "q": { "ru": "Изображение 8×8 прошло пулинг 2×2. Какого оно стало размера?", "uz": "8×8 tasvir 2×2 pulling dan o'tdi. U qanday o'lchamga keldi?", "en": "An 8×8 image went through 2×2 pooling. What size is it now?" },
+       "options": [
+        { "ru": "8×8, размер не меняется", "uz": "8×8, o'lcham o'zgarmaydi", "en": "8×8, the size does not change" },
+        { "ru": "4×4 — по каждой стороне вдвое меньше", "uz": "4×4 — har tomoni ikki barobar kichik", "en": "4×4 — half along each side" },
+        { "ru": "2×2", "uz": "2×2", "en": "2×2" },
+        { "ru": "16×16", "uz": "16×16", "en": "16×16" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Каждая сторона делится на 2, значит пикселей становится вчетверо меньше: было 64, стало 16.",
+        "uz": "Har tomon 2 ga bo'linadi, demak piksellar to'rt barobar kamayadi: 64 edi, 16 bo'ldi.",
+        "en": "Each side is divided by 2, so the pixel count drops fourfold: 64 became 16."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "Гистограмма: портрет картинки одним списком", "uz": "Gistogramma: rasm portreti bitta ro'yxatda", "en": "The histogram: a picture's portrait in one list" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Иногда положение пикселей неважно — важно, каких оттенков в картинке много. Ночное фото тёмное целиком, снимок снега светлый целиком, где именно там что — дело десятое.</p><p><b>Гистограмма</b> отвечает ровно на этот вопрос: сколько пикселей попало в каждый диапазон яркости. Картинка любого размера превращается в список фиксированной длины — например, из восьми чисел.</p><p>Это старый приём, но живой: по гистограмме отличают день от ночи, ищут похожие изображения в базе и автоматически правят контраст.</p>",
+        "uz": "<p>Ba'zan piksellar joylashuvi muhim emas — rasmda qaysi ranglar ko'pligi muhim. Tungi surat butunlay qorong'i, qor surati butunlay yorug', u yerda nima qayerda ekani ikkinchi darajali.</p><p><b>Gistogramma</b> aynan shu savolga javob beradi: har bir yorqinlik diapazoniga nechta piksel tushgan. Har qanday o'lchamdagi rasm qat'iy uzunlikdagi ro'yxatga aylanadi — masalan, sakkizta songa.</p><p>Bu eski, lekin tirik usul: gistogramma bo'yicha kunni tundan ajratadi, bazadan o'xshash tasvirlarni qidiradi va kontrastni avtomatik to'g'rilaydi.</p>",
+        "en": "<p>Sometimes pixel positions do not matter — what matters is which shades dominate. A night photo is dark all over, a snow shot is bright all over; exactly what sits where is secondary.</p><p>A <b>histogram</b> answers precisely this question: how many pixels fall into each brightness range. An image of any size turns into a fixed-length list — say, eight numbers.</p><p>It is an old trick but very much alive: histograms tell day from night, find similar images in a database and fix contrast automatically.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "night = [[10, 20, 5], [15, 8, 12], [3, 25, 18]]\nsnow  = [[240, 250, 230], [245, 255, 235], [250, 240, 248]]\n\ndef histogram(img, bins=4):\n    step = 256 / bins\n    counts = [0] * bins\n    for row in img:\n        for value in row:\n            idx = min(int(value / step), bins - 1)\n            counts[idx] += 1\n    return counts\n\nprint(\"ночь:\", histogram(night))\nprint(\"снег:\", histogram(snow))\nprint()\nprint(\"средняя яркость ночи:\", sum(sum(r) for r in night) / 9)\nprint(\"средняя яркость снега:\", sum(sum(r) for r in snow) / 9)"
+      },
+      {
+       "type": "note",
+       "kind": "tip",
+       "html": {
+        "ru": "Обрати внимание на <code>min(..., bins - 1)</code>. Значение 255 при четырёх корзинах даёт индекс 3.98 → 3, а вот 256 дало бы 4 и вышло бы за границы списка. В обработке изображений такие «на единицу мимо» — самая частая ошибка.",
+        "uz": "<code>min(..., bins - 1)</code> ga e'tibor bering. To'rtta savatda 255 qiymati 3.98 → 3 indeksini beradi, 256 esa 4 ni berib, ro'yxat chegarasidan chiqib ketardi. Tasvirlarni qayta ishlashda bunday «bittaga yanglishish» eng ko'p uchraydigan xato.",
+        "en": "Note the <code>min(..., bins - 1)</code>. With four bins the value 255 gives index 3.98 → 3, while 256 would give 4 and run past the end of the list. In image processing these off-by-one slips are the most common bug."
+       }
+      },
+      {
+       "type": "predict",
+       "code": "img = [[0, 0], [255, 255]]\n\ndef histogram(img, bins=2):\n    step = 256 / bins\n    counts = [0] * bins\n    for row in img:\n        for v in row:\n            counts[min(int(v / step), bins - 1)] += 1\n    return counts\n\nprint(histogram(img))",
+       "options": [
+        { "ru": "[2, 2]", "uz": "[2, 2]", "en": "[2, 2]" },
+        { "ru": "[4, 0]", "uz": "[4, 0]", "en": "[4, 0]" },
+        { "ru": "[0, 4]", "uz": "[0, 4]", "en": "[0, 4]" },
+        { "ru": "[1, 1]", "uz": "[1, 1]", "en": "[1, 1]" }
+       ],
+       "a": 0,
+       "explain": {
+        "ru": "Два нуля попадают в первую корзину (0–127), два значения 255 — во вторую (128–255). Ровно пополам.",
+        "uz": "Ikki nol birinchi savatga (0–127), ikkita 255 qiymati ikkinchisiga (128–255) tushadi. Aynan teng ikkiga.",
+        "en": "The two zeros land in the first bin (0–127) and the two 255s in the second (128–255). Exactly half and half."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "Поиск объекта по шаблону", "uz": "Namuna bo'yicha obyekt qidirish", "en": "Finding an object by template" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Самый прямой способ найти что-то на картинке: взять маленькое изображение искомого (<b>шаблон</b>) и приложить его ко всем возможным местам большого. Где различие минимально — там объект.</p><p>Различие считают суммой модулей разностей по всем пикселям. Ноль означает точное совпадение.</p><p>Метод честно работает, если объект не повёрнут, не изменил размер и освещение то же. Как только что-то из этого нарушается — рассыпается. Именно поэтому появились нейросети: они ищут не пиксели, а признаки, которые переживают поворот и смену света.</p>",
+        "uz": "<p>Rasmda biror narsani topishning eng to'g'ridan-to'g'ri usuli: qidirilayotgan narsaning kichik tasvirini (<b>namuna</b>) olib, uni kattaning barcha mumkin bo'lgan joylariga qo'yish. Farq minimal bo'lgan joyda — obyekt.</p><p>Farq barcha piksellar bo'yicha modullar yig'indisi bilan hisoblanadi. Nol aniq mos kelishni bildiradi.</p><p>Usul obyekt burilmagan, o'lchamini o'zgartirmagan va yoritish o'sha bo'lsa halol ishlaydi. Shulardan biri buzilishi bilan — parchalanadi. Aynan shuning uchun neyron tarmoqlar paydo bo'ldi: ular piksel emas, burilish va yorug'lik almashuvidan omon qoladigan belgilarni qidiradi.</p>",
+        "en": "<p>The most direct way to find something in a picture: take a small image of what you are looking for (a <b>template</b>) and place it over every possible position of the large one. Where the difference is smallest, there is the object.</p><p>The difference is the sum of absolute differences across all pixels. Zero means an exact match.</p><p>The method works honestly if the object is not rotated, not resized and the lighting is the same. As soon as one of those breaks, it falls apart. This is exactly why neural networks appeared: they look for features rather than pixels, and features survive rotation and changes of light.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "scene = [\n    [0, 0, 0, 0, 0],\n    [0, 9, 9, 0, 0],\n    [0, 9, 9, 0, 0],\n    [0, 0, 0, 0, 0],\n]\ntemplate = [\n    [9, 9],\n    [9, 9],\n]\n\ndef find(scene, tpl):\n    th, tw = len(tpl), len(tpl[0])\n    best, best_pos = None, None\n    for y in range(len(scene) - th + 1):\n        for x in range(len(scene[0]) - tw + 1):\n            diff = sum(abs(scene[y + dy][x + dx] - tpl[dy][dx])\n                       for dy in range(th) for dx in range(tw))\n            if best is None or diff < best:\n                best, best_pos = diff, (y, x)\n    return best_pos, best\n\npos, diff = find(scene, template)\nprint(\"нашли в позиции (строка, столбец):\", pos)\nprint(\"расхождение:\", diff, \"— ноль значит точное совпадение\")"
+      },
+      {
+       "type": "note",
+       "kind": "trap",
+       "html": {
+        "ru": "Сделай сцену вдвое ярче — прибавь 50 к каждому пикселю — и расхождение перестанет быть нулевым, хотя объект тот же. Поэтому перед сравнением яркость обычно выравнивают, а лучше сравнивают не сами значения, а их изменения: границы от освещения зависят гораздо меньше.",
+        "uz": "Sahnani ikki barobar yorqin qiling — har pikselga 50 qo'shing — va farq nol bo'lmay qoladi, obyekt esa o'sha. Shuning uchun solishtirishdan oldin yorqinlik odatda tekislanadi, undan ham yaxshisi — qiymatlarning o'zi emas, o'zgarishlari solishtiriladi: chegaralar yoritishga ancha kam bog'liq.",
+        "en": "Make the scene brighter — add 50 to every pixel — and the difference stops being zero although the object is the same. That is why brightness is usually equalised before comparison, or better still you compare changes rather than values: edges depend far less on lighting."
+       }
+      },
+      {
+       "type": "summary",
+       "items": [
+        { "ru": "Пулинг уменьшает картинку, сохраняя самое яркое в каждом блоке", "uz": "Pulling har blokdagi eng yorqinini saqlab, rasmni kichraytiradi", "en": "Pooling shrinks the image while keeping the brightest value of each block" },
+        { "ru": "Свёртка и пулинг чередуются: признаки растут от краёв к объектам", "uz": "Svertka va pulling navbatlashadi: belgilar chekkalardan obyektlargacha o'sadi", "en": "Convolution and pooling alternate: features grow from edges to objects" },
+        { "ru": "Гистограмма сжимает изображение любого размера в короткий список", "uz": "Gistogramma har qanday o'lchamdagi tasvirni qisqa ro'yxatga siqadi", "en": "A histogram compresses an image of any size into a short list" },
+        { "ru": "Поиск по шаблону точен, но ломается от поворота и смены света", "uz": "Namuna bo'yicha qidiruv aniq, lekin burilish va yorug'lik almashuvidan buziladi", "en": "Template matching is exact but breaks on rotation and lighting changes" },
+        { "ru": "Индекс корзины всегда ограничивай — иначе выход за границы списка", "uz": "Savat indeksini doim cheklang — aks holda ro'yxat chegarasidan chiqish", "en": "Always clamp the bin index — otherwise you run off the end of the list" }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": { "ru": "Что делает max-пулинг с блоком 2×2?", "uz": "Max-pulling 2×2 blok bilan nima qiladi?", "en": "What does max pooling do with a 2×2 block?" },
+     "options": [
+      { "ru": "Складывает все четыре числа", "uz": "To'rtala sonni qo'shadi", "en": "Adds all four numbers" },
+      { "ru": "Заменяет блок его наибольшим значением", "uz": "Blokni uning eng katta qiymati bilan almashtiradi", "en": "Replaces the block with its largest value" },
+      { "ru": "Усредняет и округляет", "uz": "O'rtachalab yaxlitlaydi", "en": "Averages and rounds" },
+      { "ru": "Удаляет блок целиком", "uz": "Blokni butunlay o'chiradi", "en": "Removes the block entirely" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Есть и average-пулинг со средним, но максимум чаще: он сохраняет самый сильный отклик признака.",
+      "uz": "O'rtacha bilan average-pulling ham bor, lekin maksimum ko'proq: u belgining eng kuchli javobini saqlaydi.",
+      "en": "Average pooling exists too, but the maximum is more common: it keeps the strongest feature response."
+     }
+    },
+    {
+     "q": { "ru": "Зачем в свёрточных сетях уменьшают изображение?", "uz": "Nega svertka tarmoqlarida tasvir kichraytiriladi?", "en": "Why do convolutional networks shrink the image?" },
+     "options": [
+      { "ru": "Чтобы картинка занимала меньше места на диске", "uz": "Rasm diskda kamroq joy egallashi uchun", "en": "So the picture takes less disk space" },
+      { "ru": "Меньше вычислений и устойчивость к сдвигу объекта", "uz": "Kamroq hisob va obyekt siljishiga chidamlilik", "en": "Fewer computations and robustness to object shifts" },
+      { "ru": "Чтобы увеличить количество слоёв", "uz": "Qatlamlar sonini oshirish uchun", "en": "To increase the number of layers" },
+      { "ru": "Чтобы избавиться от цвета", "uz": "Rangdan qutulish uchun", "en": "To get rid of colour" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Соседние пиксели почти одинаковы, поэтому потеря информации мала, а выигрыш по скорости огромный.",
+      "uz": "Qo'shni piksellar deyarli bir xil, shuning uchun axborot yo'qotish kichik, tezlikdagi yutuq esa juda katta.",
+      "en": "Neighbouring pixels are nearly identical, so the information loss is small while the speed gain is huge."
+     }
+    },
+    {
+     "q": { "ru": "Что описывает гистограмма изображения?", "uz": "Tasvir gistogrammasi nimani tasvirlaydi?", "en": "What does an image histogram describe?" },
+     "options": [
+      { "ru": "Где именно находятся объекты", "uz": "Obyektlar aynan qayerda joylashganini", "en": "Exactly where the objects are" },
+      { "ru": "Сколько пикселей попало в каждый диапазон яркости", "uz": "Har yorqinlik diapazoniga nechta piksel tushganini", "en": "How many pixels fall into each brightness range" },
+      { "ru": "Размер файла", "uz": "Fayl hajmini", "en": "The file size" },
+      { "ru": "Количество объектов на снимке", "uz": "Suratdagi obyektlar sonini", "en": "The number of objects in the shot" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Положение теряется полностью — в этом и сила, и слабость: две совсем разные картинки могут дать одинаковую гистограмму.",
+      "uz": "Joylashuv butunlay yo'qoladi — kuchi ham, zaifligi ham shunda: butunlay boshqa ikki rasm bir xil gistogramma berishi mumkin.",
+      "en": "Position is lost entirely — that is both the strength and the weakness: two completely different pictures can produce the same histogram."
+     }
+    },
+    {
+     "q": { "ru": "Поиск по шаблону нашёл расхождение 0. Что это значит?", "uz": "Namuna bo'yicha qidiruv 0 farq topdi. Bu nimani anglatadi?", "en": "Template matching found a difference of 0. What does that mean?" },
+     "options": [
+      { "ru": "Объекта нет", "uz": "Obyekt yo'q", "en": "The object is absent" },
+      { "ru": "Все пиксели совпали в точности", "uz": "Barcha piksellar aniq mos keldi", "en": "Every pixel matched exactly" },
+      { "ru": "Шаблон слишком большой", "uz": "Namuna juda katta", "en": "The template is too large" },
+      { "ru": "Изображение пустое", "uz": "Tasvir bo'sh", "en": "The image is empty" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Сумма модулей разностей равна нулю только тогда, когда каждая разность нулевая.",
+      "uz": "Modullar farqlari yig'indisi faqat har bir farq nol bo'lgandagina nolga teng.",
+      "en": "The sum of absolute differences is zero only when every difference is zero."
+     }
+    },
+    {
+     "q": { "ru": "Объект на фото повернули на 30°. Что будет с поиском по шаблону?", "uz": "Suratdagi obyekt 30° ga burildi. Namuna bo'yicha qidiruv bilan nima bo'ladi?", "en": "The object in the photo was rotated by 30°. What happens to template matching?" },
+     "options": [
+      { "ru": "Ничего, метод устойчив к повороту", "uz": "Hech nima, usul burilishga chidamli", "en": "Nothing, the method is rotation-invariant" },
+      { "ru": "Совпадение сильно ухудшится или пропадёт", "uz": "Moslik keskin yomonlashadi yoki yo'qoladi", "en": "The match degrades badly or disappears" },
+      { "ru": "Расхождение станет отрицательным", "uz": "Farq manfiy bo'ladi", "en": "The difference becomes negative" },
+      { "ru": "Шаблон повернётся сам", "uz": "Namuna o'zi buriladi", "en": "The template rotates by itself" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Метод сравнивает пиксель с пикселем на одних и тех же местах. Поворот сдвигает всё — и совпадение теряется.",
+      "uz": "Usul pikselni bir xil joylardagi piksel bilan solishtiradi. Burilish hammasini siljitadi — moslik yo'qoladi.",
+      "en": "The method compares pixel against pixel at identical positions. Rotation moves everything and the match is lost."
+     }
+    },
+    {
+     "q": { "ru": "Почему индекс корзины гистограммы ограничивают через min?", "uz": "Nega gistogramma savati indeksi min orqali cheklanadi?", "en": "Why is the histogram bin index clamped with min?" },
+     "options": [
+      { "ru": "Для красоты кода", "uz": "Kod chiroyi uchun", "en": "For code aesthetics" },
+      { "ru": "Иначе крайнее значение может выйти за границы списка", "uz": "Aks holda chekka qiymat ro'yxat chegarasidan chiqishi mumkin", "en": "Otherwise the extreme value can run past the end of the list" },
+      { "ru": "Чтобы значения были целыми", "uz": "Qiymatlar butun bo'lishi uchun", "en": "To keep the values integers" },
+      { "ru": "Так быстрее", "uz": "Shunday tezroq", "en": "It is faster" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Классическая ошибка на единицу: при делении 255 на ширину корзины легко получить индекс, равный количеству корзин.",
+      "uz": "Klassik bittaga yanglishish: 255 ni savat kengligiga bo'lganda savatlar soniga teng indeks olish oson.",
+      "en": "The classic off-by-one: dividing 255 by the bin width can easily yield an index equal to the bin count."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "python",
+     "title": { "ru": "Max-пулинг", "uz": "Max-pulling", "en": "Max pooling" },
+     "brief": { "ru": "Уменьшить картинку вдвое", "uz": "Rasmni ikki barobar kichraytirish", "en": "Halve the picture" },
+     "desc": {
+      "ru": "<p><code>pool(img)</code> получает список списков чисел и возвращает изображение вдвое меньше: каждый блок 2×2 заменяется своим максимумом.</p><p>Если сторона нечётная, лишнюю строку или столбец просто отбрось. Пустой вход даёт пустой список.</p>",
+      "uz": "<p><code>pool(img)</code> sonlar ro'yxatlari ro'yxatini oladi va ikki barobar kichik tasvirni qaytaradi: har 2×2 blok o'z maksimumi bilan almashtiriladi.</p><p>Tomon toq bo'lsa, ortiqcha qator yoki ustunni tashlab yuboring. Bo'sh kirish bo'sh ro'yxat beradi.</p>",
+      "en": "<p><code>pool(img)</code> takes a list of lists of numbers and returns an image half the size: every 2×2 block is replaced by its maximum.</p><p>If a side is odd, simply drop the extra row or column. Empty input gives an empty list.</p>"
+     },
+     "starter": "def pool(img):\n    # твой код\n    pass\n\nprint(pool([[1, 2, 8, 9], [3, 4, 7, 6], [5, 0, 1, 2], [1, 1, 3, 4]]))\n",
+     "tests": "img = [[1, 2, 8, 9], [3, 4, 7, 6], [5, 0, 1, 2], [1, 1, 3, 4]]\nassert pool(img) == [[4, 9], [5, 4]], 'Максимум каждой четверти'\nassert pool([[1, 2], [3, 4]]) == [[4]], 'Один блок — одно число'\nassert pool([]) == [], 'Пустой вход'\nassert pool([[7, 7, 7], [7, 7, 7], [7, 7, 7]]) == [[7]], 'Нечётная сторона: лишнее отбрасываем'\nassert pool([[0, 0], [0, 5]]) == [[5]], 'Ноль не мешает найти максимум'",
+     "hint": {
+      "ru": "Два вложенных цикла с шагом 2. Внутри собери четыре значения <code>img[y][x], img[y][x+1], img[y+1][x], img[y+1][x+1]</code> и возьми <code>max</code>. Границы задай как <code>range(0, len(img) - 1, 2)</code>.",
+      "uz": "Qadami 2 bo'lgan ikki ichma-ich sikl. Ichida to'rt qiymatni <code>img[y][x], img[y][x+1], img[y+1][x], img[y+1][x+1]</code> yig'ing va <code>max</code> oling. Chegaralarni <code>range(0, len(img) - 1, 2)</code> deb bering.",
+      "en": "Two nested loops with step 2. Inside, gather the four values <code>img[y][x], img[y][x+1], img[y+1][x], img[y+1][x+1]</code> and take the <code>max</code>. Bound the loops with <code>range(0, len(img) - 1, 2)</code>."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "python",
+     "title": { "ru": "Гистограмма яркости", "uz": "Yorqinlik gistogrammasi", "en": "Brightness histogram" },
+     "brief": { "ru": "Портрет картинки в четырёх числах", "uz": "Rasm portreti to'rt sonda", "en": "A picture's portrait in four numbers" },
+     "desc": {
+      "ru": "<p><code>histogram(img, bins)</code> считает, сколько пикселей попало в каждую из <code>bins</code> равных корзин диапазона 0–255. Верни список длины <code>bins</code>.</p><p>Ширина корзины — <code>256 / bins</code>. Индекс обязательно ограничь: значение 255 должно попасть в последнюю корзину, а не за неё.</p>",
+      "uz": "<p><code>histogram(img, bins)</code> 0–255 diapazonining <code>bins</code> ta teng savatidan har biriga nechta piksel tushganini sanaydi. Uzunligi <code>bins</code> bo'lgan ro'yxat qaytaring.</p><p>Savat kengligi — <code>256 / bins</code>. Indeksni albatta cheklang: 255 qiymati oxirgi savatga tushishi kerak, undan tashqariga emas.</p>",
+      "en": "<p><code>histogram(img, bins)</code> counts how many pixels fall into each of <code>bins</code> equal buckets over the range 0–255. Return a list of length <code>bins</code>.</p><p>The bin width is <code>256 / bins</code>. Clamp the index: the value 255 must land in the last bin, not past it.</p>"
+     },
+     "starter": "def histogram(img, bins):\n    # твой код\n    pass\n\nprint(histogram([[0, 0], [255, 255]], 2))\n",
+     "tests": "assert histogram([[0, 0], [255, 255]], 2) == [2, 2], 'Поровну в две корзины'\nassert histogram([[0, 255]], 4) == [1, 0, 0, 1], 'Края попадают в первую и последнюю'\nassert histogram([], 4) == [0, 0, 0, 0], 'Пустое изображение — все нули'\nassert histogram([[128]], 2) == [0, 1], 'Значение 128 начинает вторую корзину'\nassert histogram([[127]], 2) == [1, 0], 'А 127 ещё в первой'\nassert sum(histogram([[1, 2, 3], [4, 5, 6]], 3)) == 6, 'Сумма равна числу пикселей'",
+     "hint": {
+      "ru": "Ширина корзины <code>256 / bins</code>, индекс <code>int(value / step)</code>. Обязательно оберни в <code>min(idx, bins - 1)</code>, иначе 255 при некоторых bins вылетит за список.",
+      "uz": "Savat kengligi <code>256 / bins</code>, indeks <code>int(value / step)</code>. Albatta <code>min(idx, bins - 1)</code> ga o'rang, aks holda ba'zi bins larda 255 ro'yxatdan chiqib ketadi.",
+      "en": "Bin width is <code>256 / bins</code>, the index is <code>int(value / step)</code>. Always wrap it in <code>min(idx, bins - 1)</code> or 255 will escape the list for some bin counts."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "python",
+     "title": { "ru": "Найти шаблон", "uz": "Namunani topish", "en": "Find the template" },
+     "brief": { "ru": "Где на картинке объект", "uz": "Rasmda obyekt qayerda", "en": "Where the object is in the picture" },
+     "desc": {
+      "ru": "<p><code>find(scene, tpl)</code> прикладывает шаблон <code>tpl</code> ко всем возможным позициям сцены и возвращает кортеж <code>(строка, столбец)</code> левого верхнего угла лучшего совпадения.</p><p>Похожесть — сумма модулей разностей: чем меньше, тем лучше. Если шаблон не помещается в сцену, верни <code>None</code>.</p><p>При равных расхождениях бери позицию, найденную раньше при обходе сверху вниз и слева направо.</p>",
+      "uz": "<p><code>find(scene, tpl)</code> <code>tpl</code> namunani sahnaning barcha mumkin bo'lgan joylariga qo'yadi va eng yaxshi moslikning chap yuqori burchagi <code>(qator, ustun)</code> kortejini qaytaradi.</p><p>O'xshashlik — modullar farqlari yig'indisi: qancha kichik bo'lsa, shuncha yaxshi. Namuna sahnaga sig'masa, <code>None</code> qaytaring.</p><p>Farqlar teng bo'lsa, yuqoridan pastga va chapdan o'ngga aylanishda oldinroq topilgan joyni oling.</p>",
+      "en": "<p><code>find(scene, tpl)</code> places the template <code>tpl</code> at every possible position in the scene and returns the tuple <code>(row, column)</code> of the top-left corner of the best match.</p><p>Similarity is the sum of absolute differences: smaller is better. If the template does not fit in the scene, return <code>None</code>.</p><p>On ties, take the position found earlier when scanning top to bottom and left to right.</p>"
+     },
+     "starter": "def find(scene, tpl):\n    # твой код\n    pass\n\nscene = [[0, 0, 0], [0, 9, 9], [0, 9, 9]]\nprint(find(scene, [[9, 9], [9, 9]]))\n",
+     "tests": "scene = [[0, 0, 0, 0], [0, 9, 9, 0], [0, 9, 9, 0], [0, 0, 0, 0]]\nassert find(scene, [[9, 9], [9, 9]]) == (1, 1), 'Квадрат девяток стоит в позиции (1, 1)'\nassert find(scene, [[0, 0], [0, 0]]) == (0, 0), 'Первое совпадение при обходе'\nassert find([[5]], [[5]]) == (0, 0), 'Сцена и шаблон одного размера'\nassert find([[1, 2]], [[1, 2, 3]]) is None, 'Шаблон шире сцены'\nassert find([], [[1]]) is None, 'Пустая сцена'\nassert find([[1, 2, 3]], [[3]]) == (0, 2), 'Ищем один пиксель'",
+     "hint": {
+      "ru": "Сначала проверь, что шаблон помещается. Дальше два цикла по позициям, внутри — сумма <code>abs(scene[y+dy][x+dx] - tpl[dy][dx])</code>. Запоминай минимум и его позицию, обновляя только при строгом <code>&lt;</code>.",
+      "uz": "Avval namuna sig'ishini tekshiring. Keyin joylar bo'yicha ikki sikl, ichida — <code>abs(scene[y+dy][x+dx] - tpl[dy][dx])</code> yig'indisi. Minimum va uning joyini eslab qoling, faqat qat'iy <code>&lt;</code> da yangilang.",
+      "en": "First check the template fits. Then two loops over positions with the sum <code>abs(scene[y+dy][x+dx] - tpl[dy][dx])</code> inside. Remember the minimum and its position, updating only on a strict <code>&lt;</code>."
+     }
+    }
+   ],
+   "exam": {
+    "time": 540,
+    "questions": [
+     {
+      "q": { "ru": "Картинка 100×100 прошла три пулинга 2×2 подряд. Её размер стал…", "uz": "100×100 rasm ketma-ket uchta 2×2 pulling dan o'tdi. Uning o'lchami…", "en": "A 100×100 picture went through three consecutive 2×2 poolings. Its size became…" },
+      "options": [
+       { "ru": "50×50", "uz": "50×50", "en": "50×50" },
+       { "ru": "примерно 12×12", "uz": "taxminan 12×12", "en": "about 12×12" },
+       { "ru": "100×100", "uz": "100×100", "en": "100×100" },
+       { "ru": "1×1", "uz": "1×1", "en": "1×1" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Две разные фотографии дали одинаковую гистограмму. Возможно ли это?", "uz": "Ikki turli surat bir xil gistogramma berdi. Bu mumkinmi?", "en": "Two different photographs produced identical histograms. Is that possible?" },
+      "options": [
+       { "ru": "Нет, гистограмма уникальна", "uz": "Yo'q, gistogramma noyob", "en": "No, a histogram is unique" },
+       { "ru": "Да — гистограмма не хранит расположение пикселей", "uz": "Ha — gistogramma piksellar joylashuvini saqlamaydi", "en": "Yes — a histogram does not store pixel positions" },
+       { "ru": "Только если фото одинакового размера", "uz": "Faqat suratlar bir xil o'lchamda bo'lsa", "en": "Only if the photos are the same size" },
+       { "ru": "Только для чёрно-белых", "uz": "Faqat oq-qora uchun", "en": "Only for black-and-white images" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Почему в свёрточных сетях иерархия признаков возникает сама?", "uz": "Nega svertka tarmoqlarida belgilar iyerarxiyasi o'zi paydo bo'ladi?", "en": "Why does the feature hierarchy in convolutional networks emerge on its own?" },
+      "options": [
+       { "ru": "Её прописывают в коде слоями", "uz": "U kodda qatlamlar bilan yoziladi", "en": "It is written into the code layer by layer" },
+       { "ru": "Так дешевле всего уменьшать ошибку, и обучение находит этот путь", "uz": "Xatoni kamaytirishning eng arzon yo'li shu va o'qitish bu yo'lni topadi", "en": "It is the cheapest way to reduce the error, and training finds that path" },
+       { "ru": "Из-за пулинга", "uz": "Pulling tufayli", "en": "Because of pooling" },
+       { "ru": "Это случайность", "uz": "Bu tasodif", "en": "It is a coincidence" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Сцену осветлили, прибавив 50 к каждому пикселю. Поиск по шаблону…", "uz": "Sahna har pikselga 50 qo'shib yoritildi. Namuna bo'yicha qidiruv…", "en": "The scene was brightened by adding 50 to every pixel. Template matching…" },
+      "options": [
+       { "ru": "даст то же расхождение", "uz": "o'sha farqni beradi", "en": "gives the same difference" },
+       { "ru": "перестанет давать нулевое расхождение, хотя объект тот же", "uz": "obyekt o'sha bo'lsa ham nol farq bermay qoladi", "en": "stops giving a zero difference although the object is unchanged" },
+       { "ru": "не запустится", "uz": "ishga tushmaydi", "en": "will not run" },
+       { "ru": "найдёт объект точнее", "uz": "obyektni aniqroq topadi", "en": "finds the object more accurately" }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "python",
+      "title": { "ru": "Конвейер обработки", "uz": "Qayta ishlash konveyeri", "en": "The processing pipeline" },
+      "desc": {
+       "ru": "<p>Собери настоящий конвейер компьютерного зрения: <code>describe(img, bins)</code> сначала уменьшает изображение max-пулингом 2×2, затем строит по уменьшенному гистограмму из <code>bins</code> корзин и возвращает её.</p><p>Так и работают классические системы: сжать → описать коротким вектором → сравнить. Пустое изображение даёт список из нулей.</p>",
+       "uz": "<p>Haqiqiy kompyuter ko'rish konveyerini yig'ing: <code>describe(img, bins)</code> avval tasvirni 2×2 max-pulling bilan kichraytiradi, so'ng kichraytirilgani bo'yicha <code>bins</code> ta savatli gistogramma quradi va uni qaytaradi.</p><p>Klassik tizimlar shunday ishlaydi: siqish → qisqa vektor bilan tasvirlash → solishtirish. Bo'sh tasvir nollardan iborat ro'yxat beradi.</p>",
+       "en": "<p>Assemble a real computer vision pipeline: <code>describe(img, bins)</code> first shrinks the image with 2×2 max pooling, then builds a histogram of <code>bins</code> buckets over the shrunk version and returns it.</p><p>This is how classical systems work: compress → describe with a short vector → compare. An empty image gives a list of zeros.</p>"
+      },
+      "starter": "def describe(img, bins):\n    # сначала пулинг, потом гистограмма\n    pass\n\nprint(describe([[0, 0, 255, 255], [0, 0, 255, 255], [0, 0, 0, 0], [0, 0, 0, 0]], 2))\n",
+      "tests": "img = [[0, 0, 255, 255], [0, 0, 255, 255], [0, 0, 0, 0], [0, 0, 0, 0]]\nassert describe(img, 2) == [3, 1], 'После пулинга остаётся один яркий пиксель из четырёх'\nassert describe([], 4) == [0, 0, 0, 0], 'Пустое изображение'\nassert describe([[255, 255], [255, 255]], 2) == [0, 1], 'Один блок, одно яркое значение'\nassert sum(describe([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]], 4)) == 4, 'Пикселей после пулинга ровно четыре'\nassert len(describe([[1, 2], [3, 4]], 8)) == 8, 'Длина результата равна числу корзин'",
+      "hint": {
+       "ru": "Две функции из задач 1 и 2 подряд: <code>histogram(pool(img), bins)</code>. Не забудь, что пулинг пустого изображения даёт пустой список, а гистограмма пустого — нули.",
+       "uz": "1 va 2-vazifadagi ikki funksiya ketma-ket: <code>histogram(pool(img), bins)</code>. Esda tuting: bo'sh tasvir pullingi bo'sh ro'yxat, bo'shning gistogrammasi esa nollar beradi.",
+       "en": "The two functions from tasks 1 and 2 back to back: <code>histogram(pool(img), bins)</code>. Remember that pooling an empty image gives an empty list, and a histogram of empty gives zeros."
+      }
+     }
+    ]
+   }
   }
  ]
 }

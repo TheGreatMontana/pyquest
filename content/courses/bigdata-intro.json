@@ -290,6 +290,347 @@
      }
     ]
    }
+  },
+  {
+   "id": "bd-02",
+   "title": { "ru": "Как данные лежат на диске", "uz": "Ma'lumot diskda qanday yotadi", "en": "How data sits on disk" },
+   "tagline": { "ru": "Колоночные форматы, партиции и сжатие — почему один запрос читает 2 ГБ, а другой 20 МБ", "uz": "Ustunli formatlar, partitsiyalar va siqish — nega bir so'rov 2 GB, boshqasi 20 MB o'qiydi", "en": "Columnar formats, partitions and compression — why one query reads 2 GB and another 20 MB" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "Строки против колонок", "uz": "Qatorlar va ustunlar", "en": "Rows versus columns" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Таблица на диске — это всё равно один длинный поток байтов. Записать её можно двумя способами, и разница между ними определяет скорость работы больше, чем железо.</p><p><b>Построчно</b> (CSV, обычные базы): сначала все поля первой записи, потом все поля второй. Удобно, когда нужна запись целиком: «покажи заказ №5».</p><p><b>Поколоночно</b> (Parquet, ORC): сначала весь столбец «дата», потом весь столбец «сумма». Удобно, когда нужен один столбец у миллиона записей: «посчитай сумму продаж за год».</p><p>Аналитика почти всегда второго вида. У таблицы 50 колонок, а в запросе участвуют три — колоночный формат прочитает только их и не тронет остальные 47.</p>",
+        "uz": "<p>Diskdagi jadval baribir bitta uzun bayt oqimi. Uni ikki usulda yozish mumkin va ular orasidagi farq ish tezligini temirdan ko'ra ko'proq belgilaydi.</p><p><b>Qatorlab</b> (CSV, oddiy bazalar): avval birinchi yozuvning barcha maydonlari, keyin ikkinchisiniki. Butun yozuv kerak bo'lganda qulay: «5-buyurtmani ko'rsat».</p><p><b>Ustunlab</b> (Parquet, ORC): avval butun «sana» ustuni, keyin butun «summa» ustuni. Million yozuvning bitta ustuni kerak bo'lganda qulay: «yillik sotuv summasini hisobla».</p><p>Analitika deyarli doim ikkinchi turdan. Jadvalda 50 ustun, so'rovda esa uchtasi qatnashadi — ustunli format faqat shularni o'qiydi va qolgan 47 tasiga tegmaydi.</p>",
+        "en": "<p>A table on disk is still one long stream of bytes. It can be written two ways, and the difference between them shapes performance more than the hardware does.</p><p><b>Row-wise</b> (CSV, ordinary databases): all fields of the first record, then all fields of the second. Convenient when you need a whole record: “show order #5”.</p><p><b>Column-wise</b> (Parquet, ORC): the entire “date” column first, then the entire “amount” column. Convenient when you need one column across a million records: “sum the sales for the year”.</p><p>Analytics is almost always the second kind. A table has 50 columns and a query touches three — a columnar format reads only those and never touches the other 47.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "ROWS = 1_000_000\nCOLUMNS = {\n    \"id\": 8, \"дата\": 8, \"клиент\": 40, \"товар\": 60, \"сумма\": 8,\n    \"город\": 30, \"канал\": 20, \"комментарий\": 200,\n}\n\nrow_size = sum(COLUMNS.values())\nprint(\"размер одной записи:\", row_size, \"байт\")\nprint(\"вся таблица:\", ROWS * row_size / 1e9, \"ГБ\")\nprint()\n\n# запрос: сумма продаж по датам — нужны две колонки из восьми\nneeded = [\"дата\", \"сумма\"]\ncolumnar = sum(COLUMNS[c] for c in needed) * ROWS\nprint(\"построчный формат прочитает:\", ROWS * row_size / 1e9, \"ГБ\")\nprint(\"колоночный формат прочитает:\", columnar / 1e9, \"ГБ\")\nprint(\"выигрыш в\", round(row_size / sum(COLUMNS[c] for c in needed), 1), \"раз\")"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Двадцать три раза — и это без единой строчки оптимизации, только выбором формата хранения.</p><p>У колоночного формата есть и второй подарок. В одной колонке лежат однотипные значения: тысяча одинаковых городов подряд, даты по возрастанию. Такое сжимается в разы лучше, чем перемешанные поля строки. На практике Parquet выходит в 5–10 раз меньше того же CSV.</p><p>Обратная сторона: чтобы обновить одну запись, надо трогать все колонки. Поэтому колоночные форматы почти всегда <b>только для чтения</b>: файл пишется один раз и дальше не меняется.</p>",
+        "uz": "<p>Yigirma uch barobar — va bu bitta ham optimallashtirish qatorisiz, faqat saqlash formatini tanlash bilan.</p><p>Ustunli formatning ikkinchi sovg'asi ham bor. Bitta ustunda bir turdagi qiymatlar yotadi: ketma-ket mingta bir xil shahar, o'sish bo'yicha sanalar. Bunday narsa qator maydonlari aralashmasidan ancha yaxshi siqiladi. Amalda Parquet o'sha CSV dan 5–10 barobar kichik chiqadi.</p><p>Teskari tomoni: bitta yozuvni yangilash uchun barcha ustunlarga tegish kerak. Shuning uchun ustunli formatlar deyarli doim <b>faqat o'qish uchun</b>: fayl bir marta yoziladi va keyin o'zgarmaydi.</p>",
+        "en": "<p>Twenty-three times — with no optimisation at all, purely from the choice of storage format.</p><p>The columnar format has a second gift. One column holds values of the same kind: a thousand identical cities in a row, dates in ascending order. That compresses far better than the mixed fields of a record. In practice Parquet comes out 5–10 times smaller than the same CSV.</p><p>The flip side: updating one record means touching every column. So columnar formats are almost always <b>write-once</b>: the file is written and never changed again.</p>"
+       }
+      },
+      {
+       "type": "checkpoint",
+       "q": { "ru": "Запрос «покажи все поля заказа №1234». Какой формат быстрее?", "uz": "«1234-buyurtmaning barcha maydonlarini ko'rsat» so'rovi. Qaysi format tezroq?", "en": "The query “show every field of order #1234”. Which format is faster?" },
+       "options": [
+        { "ru": "Колоночный", "uz": "Ustunli", "en": "Columnar" },
+        { "ru": "Построчный — вся запись лежит рядом", "uz": "Qatorli — butun yozuv yonma-yon yotadi", "en": "Row-wise — the whole record sits together" },
+        { "ru": "Одинаково", "uz": "Bir xil", "en": "The same" },
+        { "ru": "Зависит от диска", "uz": "Diskka bog'liq", "en": "It depends on the disk" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Колоночному формату пришлось бы прыгать по восьми разным местам файла ради одной записи. Поэтому в проде часто держат оба хранилища: базу для точечных запросов и Parquet для аналитики.",
+        "uz": "Ustunli format bitta yozuv uchun faylning sakkiz turli joyiga sakrashi kerak bo'lardi. Shuning uchun ishlab chiqarishda ko'pincha ikkala ombor saqlanadi: nuqtali so'rovlar uchun baza va analitika uchun Parquet.",
+        "en": "A columnar format would have to jump between eight different places in the file for one record. That is why production often keeps both stores: a database for point lookups and Parquet for analytics."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "Партиции: не читать лишнее", "uz": "Partitsiyalar: ortiqchasini o'qimaslik", "en": "Partitions: not reading the extra" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Второй способ читать меньше — вообще не открывать ненужные файлы. Для этого данные раскладывают по папкам, имя которых само содержит значение колонки:</p><pre><code>sales/год=2024/месяц=01/part-0.parquet\nsales/год=2024/месяц=02/part-0.parquet\nsales/год=2025/месяц=01/part-0.parquet</code></pre><p>Это <b>партиционирование</b>. Запрос «продажи за январь 2025» открывает одну папку из тридцати шести и не касается остальных. Движок понимает это ещё до чтения — просто по именам путей.</p><p>Выбор колонки для партиционирования — главное решение при проектировании хранилища. Правило простое: партиционируют по тому, по чему <b>всегда фильтруют</b>. Обычно это дата.</p>",
+        "uz": "<p>Kamroq o'qishning ikkinchi yo'li — keraksiz fayllarni umuman ochmaslik. Buning uchun ma'lumot papkalarga joylanadi, papka nomi esa ustun qiymatini o'zida saqlaydi:</p><pre><code>sales/yil=2024/oy=01/part-0.parquet\nsales/yil=2024/oy=02/part-0.parquet\nsales/yil=2025/oy=01/part-0.parquet</code></pre><p>Bu <b>partitsiyalash</b>. «2025-yil yanvar sotuvlari» so'rovi o'ttiz oltitadan bitta papkani ochadi va qolganlariga tegmaydi. Dvigatel buni o'qishdan oldin tushunadi — shunchaki yo'l nomlari bo'yicha.</p><p>Partitsiyalash uchun ustun tanlash — ombor loyihalashdagi asosiy qaror. Qoida oddiy: <b>doim filtrlanadigan</b> narsa bo'yicha partitsiyalanadi. Odatda bu sana.</p>",
+        "en": "<p>The second way to read less is to never open the unnecessary files at all. For that, data is laid out in folders whose names carry a column value:</p><pre><code>sales/year=2024/month=01/part-0.parquet\nsales/year=2024/month=02/part-0.parquet\nsales/year=2025/month=01/part-0.parquet</code></pre><p>This is <b>partitioning</b>. The query “sales for January 2025” opens one folder out of thirty-six and never touches the rest. The engine works this out before reading anything — purely from the path names.</p><p>Choosing the partition column is the main decision when designing a warehouse. The rule is simple: partition by what you <b>always filter on</b>. Usually that is the date.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "# три года данных, по месяцам\npartitions = [(year, month) for year in (2023, 2024, 2025) for month in range(1, 13)]\nSIZE_MB = 800     # размер одной партиции\n\ndef scan(filter_year=None, filter_month=None):\n    hit = [p for p in partitions\n           if (filter_year is None or p[0] == filter_year)\n           and (filter_month is None or p[1] == filter_month)]\n    return len(hit), len(hit) * SIZE_MB\n\nfor name, args in [\n    (\"без фильтра\", {}),\n    (\"за 2025 год\", {\"filter_year\": 2025}),\n    (\"январь 2025\", {\"filter_year\": 2025, \"filter_month\": 1}),\n    (\"январи всех лет\", {\"filter_month\": 1}),\n]:\n    n, mb = scan(**args)\n    print(f\"{name:18} партиций {n:2} -> {mb / 1024:.2f} ГБ\")"
+      },
+      {
+       "type": "note",
+       "kind": "trap",
+       "html": {
+        "ru": "Партиционировать по колонке с тысячами разных значений — например, по идентификатору клиента — верный способ убить хранилище. Появятся сто тысяч папок по несколько килобайт, и время уйдёт не на чтение, а на перечисление файлов. Хорошая партиция — это сотни мегабайт, а не байты.",
+        "uz": "Minglab turli qiymatli ustun bo'yicha — masalan, mijoz identifikatori bo'yicha — partitsiyalash omborni o'ldirishning ishonchli yo'li. Bir necha kilobaytlik yuz ming papka paydo bo'ladi va vaqt o'qishga emas, fayllarni sanashga ketadi. Yaxshi partitsiya — yuzlab megabayt, baytlar emas.",
+        "en": "Partitioning by a column with thousands of distinct values — a customer id, say — is a reliable way to kill a warehouse. You get a hundred thousand folders of a few kilobytes each, and the time goes into listing files rather than reading them. A good partition is hundreds of megabytes, not bytes."
+       }
+      },
+      {
+       "type": "predict",
+       "code": "partitions = [(y, m) for y in (2023, 2024) for m in range(1, 13)]\n\nselected = [p for p in partitions if p[0] == 2024 and p[1] <= 3]\nprint(len(selected), \"из\", len(partitions))",
+       "options": [
+        { "ru": "3 из 24", "uz": "24 dan 3", "en": "3 out of 24" },
+        { "ru": "12 из 24", "uz": "24 dan 12", "en": "12 out of 24" },
+        { "ru": "6 из 24", "uz": "24 dan 6", "en": "6 out of 24" },
+        { "ru": "3 из 12", "uz": "12 dan 3", "en": "3 out of 12" }
+       ],
+       "a": 0,
+       "explain": {
+        "ru": "Два года по двенадцать месяцев дают 24 партиции. Фильтр по 2024 году и первым трём месяцам оставляет ровно три.",
+        "uz": "Ikki yil o'n ikki oydan 24 partitsiya beradi. 2024-yil va birinchi uch oy bo'yicha filtr aynan uchtasini qoldiradi.",
+        "en": "Two years of twelve months give 24 partitions. Filtering on 2024 and the first three months leaves exactly three."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "Сжатие и мелкие файлы", "uz": "Siqish va mayda fayllar", "en": "Compression and small files" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Данные почти всегда хранят сжатыми. Причина не в экономии диска — диск дёшев. Причина в том, что <b>распаковать быстрее, чем прочитать лишнее</b>: процессор давно обгоняет диск и сеть.</p><p>Выбор алгоритма — компромисс:</p><ul><li><b>Snappy</b> — сжимает слабо, но очень быстро. По умолчанию для горячих данных.</li><li><b>Gzip</b> — сжимает сильно, распаковывает медленно. Для архивов, которые читают редко.</li><li><b>Zstd</b> — золотая середина, всё чаще выбор по умолчанию.</li></ul><p>Отдельная беда, не связанная со сжатием, — <b>проблема мелких файлов</b>. Тысяча файлов по 100 КБ читается кратно дольше, чем один на 100 МБ: на каждый файл идёт отдельное открытие, чтение метаданных, сетевой запрос. Поэтому в хранилищах регулярно запускают уплотнение — склейку мелких файлов в крупные.</p>",
+        "uz": "<p>Ma'lumot deyarli doim siqilgan holda saqlanadi. Sabab disk tejashda emas — disk arzon. Sabab shundaki, <b>ochish ortiqchasini o'qishdan tez</b>: protsessor allaqachon disk va tarmoqdan o'zib ketgan.</p><p>Algoritm tanlash — murosaga kelish:</p><ul><li><b>Snappy</b> — kuchsiz, lekin juda tez siqadi. Issiq ma'lumot uchun sukut bo'yicha.</li><li><b>Gzip</b> — kuchli siqadi, sekin ochadi. Kam o'qiladigan arxivlar uchun.</li><li><b>Zstd</b> — oltin o'rta, tobora ko'proq sukut bo'yicha tanlov.</li></ul><p>Siqish bilan bog'liq bo'lmagan alohida bало — <b>mayda fayllar muammosi</b>. 100 KB lik mingta fayl 100 MB lik bittasidan bir necha barobar uzoq o'qiladi: har fayl uchun alohida ochish, metama'lumot o'qish, tarmoq so'rovi ketadi. Shuning uchun omborlarda muntazam zichlash — mayda fayllarni yiriklarga yopishtirish ishga tushiriladi.</p>",
+        "en": "<p>Data is almost always stored compressed. Not to save disk — disk is cheap. The reason is that <b>decompressing is faster than reading the extra bytes</b>: the CPU has long outrun disk and network.</p><p>Choosing an algorithm is a trade-off:</p><ul><li><b>Snappy</b> — compresses weakly but very fast. The default for hot data.</li><li><b>Gzip</b> — compresses hard, decompresses slowly. For archives read rarely.</li><li><b>Zstd</b> — the middle ground, increasingly the default.</li></ul><p>A separate problem, unrelated to compression, is the <b>small files problem</b>. A thousand 100 KB files take many times longer to read than one 100 MB file: each file costs an open, a metadata read, a network round trip. That is why warehouses run compaction regularly — gluing small files into large ones.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "RAW_GB = 100\nDISK_MB_S = 200          # скорость чтения с диска\nOPEN_MS = 15             # накладные расходы на открытие одного файла\n\nprofiles = [\n    (\"без сжатия\", 1.0, 0),\n    (\"snappy\",     2.5, 400),     # МБ/с распаковки условно\n    (\"gzip\",       5.0, 80),\n]\n\nfor name, ratio, unpack_mb_s in profiles:\n    on_disk = RAW_GB * 1024 / ratio\n    read_s = on_disk / DISK_MB_S\n    unpack_s = on_disk / unpack_mb_s if unpack_mb_s else 0\n    print(f\"{name:11} на диске {on_disk/1024:5.1f} ГБ  чтение {read_s:5.0f} с  +распаковка {unpack_s:4.0f} с  = {read_s + unpack_s:5.0f} с\")\n\nprint()\nfor count, size_mb in [(1, 100_000), (1_000, 100), (1_000_000, 0.1)]:\n    overhead = count * OPEN_MS / 1000\n    print(f\"{count:>9} файлов -> только на открытие {overhead:8.0f} с\")"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Первая таблица показывает, почему сжатие почти всегда выигрывает: даже медленный gzip суммарно быстрее, чем читать в пять раз больше байтов.</p><p>Вторая — почему миллион мелких файлов невозможно спасти никаким сжатием: четыре часа уйдут на одни только открытия, ещё до первого прочитанного байта.</p>",
+        "uz": "<p>Birinchi jadval nega siqish deyarli doim yutishini ko'rsatadi: hatto sekin gzip ham besh barobar ko'p baytni o'qishdan jami tezroq.</p><p>Ikkinchisi — nega million mayda faylni hech qanday siqish qutqara olmasligini: birinchi o'qilgan baytdan oldin, faqat ochishlarga to'rt soat ketadi.</p>",
+        "en": "<p>The first table shows why compression almost always wins: even slow gzip is faster in total than reading five times as many bytes.</p><p>The second shows why no compression can save a million small files: four hours go into the opens alone, before a single byte is read.</p>"
+       }
+      },
+      {
+       "type": "summary",
+       "items": [
+        { "ru": "Колоночный формат читает только нужные столбцы — выигрыш в десятки раз", "uz": "Ustunli format faqat kerakli ustunlarni o'qiydi — o'nlab barobar yutuq", "en": "A columnar format reads only the needed columns — a tenfold-plus win" },
+        { "ru": "Партиции отсекают целые файлы ещё до чтения, по именам путей", "uz": "Partitsiyalar butun fayllarni o'qishdan oldin, yo'l nomlari bo'yicha kesadi", "en": "Partitions eliminate whole files before reading, from the path names" },
+        { "ru": "Партиционируй по тому, по чему всегда фильтруешь; обычно это дата", "uz": "Doim filtrlaydigan narsa bo'yicha partitsiyalang; odatda bu sana", "en": "Partition by what you always filter on; usually the date" },
+        { "ru": "Слишком мелкие партиции хуже, чем их отсутствие", "uz": "Juda mayda partitsiyalar ularning yo'qligidan yomonroq", "en": "Too-fine partitions are worse than none" },
+        { "ru": "Сжатие экономит не диск, а время чтения", "uz": "Siqish diskni emas, o'qish vaqtini tejaydi", "en": "Compression saves reading time, not disk" },
+        { "ru": "Тысячи мелких файлов убивают производительность накладными расходами", "uz": "Minglab mayda fayllar qo'shimcha xarajatlar bilan unumdorlikni o'ldiradi", "en": "Thousands of small files kill performance through overhead" }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": { "ru": "Какой формат выгоднее для запроса «средняя сумма по всем заказам»?", "uz": "«Barcha buyurtmalar bo'yicha o'rtacha summa» so'rovi uchun qaysi format foydali?", "en": "Which format suits the query “average amount across all orders”?" },
+     "options": [
+      { "ru": "Построчный", "uz": "Qatorli", "en": "Row-wise" },
+      { "ru": "Колоночный — нужна одна колонка из многих", "uz": "Ustunli — ko'plardan bitta ustun kerak", "en": "Columnar — one column out of many is needed" },
+      { "ru": "Любой, разницы нет", "uz": "Har qanday, farqi yo'q", "en": "Either, it makes no difference" },
+      { "ru": "Текстовый лог", "uz": "Matnli log", "en": "A text log" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Построчный формат прочитает все поля всех записей, включая длинные комментарии, которые запросу не нужны.",
+      "uz": "Qatorli format barcha yozuvlarning barcha maydonlarini, so'rovga kerak bo'lmagan uzun izohlar bilan birga o'qiydi.",
+      "en": "The row format would read every field of every record, including the long comments the query does not need."
+     }
+    },
+    {
+     "q": { "ru": "Почему в колоночном формате данные сжимаются лучше?", "uz": "Nega ustunli formatda ma'lumot yaxshiroq siqiladi?", "en": "Why does data compress better in a columnar format?" },
+     "options": [
+      { "ru": "Используются другие алгоритмы", "uz": "Boshqa algoritmlar ishlatiladi", "en": "Different algorithms are used" },
+      { "ru": "Рядом лежат однотипные и часто повторяющиеся значения", "uz": "Yonma-yon bir turdagi va tez-tez takrorlanadigan qiymatlar yotadi", "en": "Similar and often repeating values sit next to each other" },
+      { "ru": "Файлы меньше по размеру", "uz": "Fayllar hajmi kichik", "en": "The files are smaller" },
+      { "ru": "Колонок меньше, чем строк", "uz": "Ustunlar qatorlardan kam", "en": "There are fewer columns than rows" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Тысяча подряд идущих «Ташкент» сжимается почти в ничто, а те же значения вперемешку с числами и текстом — нет.",
+      "uz": "Ketma-ket kelgan mingta «Toshkent» deyarli hech nimaga siqiladi, o'sha qiymatlar son va matn bilan aralash bo'lsa — yo'q.",
+      "en": "A thousand consecutive “Tashkent” values compress to almost nothing; the same values interleaved with numbers and text do not."
+     }
+    },
+    {
+     "q": { "ru": "Данные партиционированы по дате. Запрос без фильтра по дате…", "uz": "Ma'lumot sana bo'yicha partitsiyalangan. Sana bo'yicha filtrsiz so'rov…", "en": "Data is partitioned by date. A query with no date filter…" },
+     "options": [
+      { "ru": "прочитает одну партицию", "uz": "bitta partitsiyani o'qiydi", "en": "reads one partition" },
+      { "ru": "прочитает все партиции — партиционирование не поможет", "uz": "barcha partitsiyalarni o'qiydi — partitsiyalash yordam bermaydi", "en": "reads every partition — partitioning does not help" },
+      { "ru": "вернёт ошибку", "uz": "xato qaytaradi", "en": "returns an error" },
+      { "ru": "прочитает случайную партицию", "uz": "tasodifiy partitsiyani o'qiydi", "en": "reads a random partition" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Партиции помогают только тогда, когда по колонке партиционирования есть условие. Иначе движку нечего отсекать.",
+      "uz": "Partitsiyalar faqat partitsiyalash ustuni bo'yicha shart bo'lgandagina yordam beradi. Aks holda dvigatelning kesadigan narsasi yo'q.",
+      "en": "Partitions help only when there is a condition on the partition column. Otherwise the engine has nothing to prune."
+     }
+    },
+    {
+     "q": { "ru": "Что случится, если партиционировать по идентификатору клиента?", "uz": "Mijoz identifikatori bo'yicha partitsiyalansa nima bo'ladi?", "en": "What happens if you partition by customer id?" },
+     "options": [
+      { "ru": "Всё станет быстрее", "uz": "Hammasi tezlashadi", "en": "Everything gets faster" },
+      { "ru": "Появятся десятки тысяч крошечных файлов, и всё замедлится", "uz": "O'n minglab mitti fayl paydo bo'ladi va hammasi sekinlashadi", "en": "Tens of thousands of tiny files appear and everything slows down" },
+      { "ru": "Данные потеряются", "uz": "Ma'lumot yo'qoladi", "en": "Data is lost" },
+      { "ru": "Сжатие перестанет работать", "uz": "Siqish ishlashdan to'xtaydi", "en": "Compression stops working" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Партиционируют по колонкам с малым числом разных значений: год, месяц, страна. Клиентов — миллионы.",
+      "uz": "Turli qiymatlari kam ustunlar bo'yicha partitsiyalanadi: yil, oy, mamlakat. Mijozlar esa — millionlab.",
+      "en": "You partition by columns with few distinct values: year, month, country. Customers number in the millions."
+     }
+    },
+    {
+     "q": { "ru": "Зачем сжимать данные, если диск дешёвый?", "uz": "Disk arzon bo'lsa, ma'lumotni nega siqish kerak?", "en": "Why compress data if disk is cheap?" },
+     "options": [
+      { "ru": "Из экономии места", "uz": "Joy tejash uchun", "en": "To save space" },
+      { "ru": "Читать меньше байтов быстрее, чем читать больше и не распаковывать", "uz": "Kamroq bayt o'qish ko'proq o'qib ochmaslikdan tez", "en": "Reading fewer bytes beats reading more and skipping decompression" },
+      { "ru": "Так требуют форматы", "uz": "Formatlar shuni talab qiladi", "en": "The formats require it" },
+      { "ru": "Для безопасности", "uz": "Xavfsizlik uchun", "en": "For security" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Процессор простаивает, ожидая диск и сеть. Отдать ему работу по распаковке — почти всегда выгодная сделка.",
+      "uz": "Protsessor disk va tarmoqni kutib bo'sh turadi. Unga ochish ishini berish — deyarli doim foydali savdo.",
+      "en": "The CPU idles waiting for disk and network. Handing it decompression work is almost always a good trade."
+     }
+    },
+    {
+     "q": { "ru": "В хранилище миллион файлов по 100 КБ. Главная проблема?", "uz": "Omborda 100 KB lik million fayl. Asosiy muammo?", "en": "A warehouse holds a million 100 KB files. The main problem?" },
+     "options": [
+      { "ru": "Занимают много места", "uz": "Ko'p joy egallaydi", "en": "They take up a lot of space" },
+      { "ru": "Накладные расходы на открытие каждого съедают всё время", "uz": "Har birini ochish qo'shimcha xarajati butun vaqtni yeydi", "en": "The per-file open overhead eats all the time" },
+      { "ru": "Плохо сжимаются", "uz": "Yomon siqiladi", "en": "They compress badly" },
+      { "ru": "Проблемы нет", "uz": "Muammo yo'q", "en": "There is no problem" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Суммарный объём тут скромный — 100 ГБ. Убивает именно количество: миллион открытий по 15 мс это больше четырёх часов.",
+      "uz": "Bu yerda umumiy hajm kamtarona — 100 GB. Aynan soni o'ldiradi: 15 ms dan million ochish to'rt soatdan ko'p.",
+      "en": "The total volume is modest — 100 GB. It is the count that kills: a million opens at 15 ms each is over four hours."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "python",
+     "title": { "ru": "Сколько прочитает колоночный формат", "uz": "Ustunli format qancha o'qiydi", "en": "How much a columnar format reads" },
+     "brief": { "ru": "Считаем выигрыш формата", "uz": "Format yutug'ini hisoblaymiz", "en": "Measuring the format's win" },
+     "desc": {
+      "ru": "<p><code>bytes_read(columns, needed, rows)</code>: <code>columns</code> — словарь «имя колонки → размер в байтах», <code>needed</code> — список запрошенных колонок, <code>rows</code> — число записей.</p><p>Верни, сколько байт прочитает колоночный формат: сумма размеров только запрошенных колонок, умноженная на число строк.</p><p>Неизвестные имена в <code>needed</code> просто пропускай.</p>",
+      "uz": "<p><code>bytes_read(columns, needed, rows)</code>: <code>columns</code> — «ustun nomi → baytdagi hajm» lug'ati, <code>needed</code> — so'ralgan ustunlar ro'yxati, <code>rows</code> — yozuvlar soni.</p><p>Ustunli format necha bayt o'qishini qaytaring: faqat so'ralgan ustunlar hajmlari yig'indisi, qatorlar soniga ko'paytirilgan.</p><p><code>needed</code> dagi noma'lum nomlarni shunchaki o'tkazib yuboring.</p>",
+      "en": "<p><code>bytes_read(columns, needed, rows)</code>: <code>columns</code> is a dict “column name → size in bytes”, <code>needed</code> is the list of requested columns, <code>rows</code> is the record count.</p><p>Return how many bytes a columnar format reads: the sum of sizes of the requested columns only, times the number of rows.</p><p>Skip unknown names in <code>needed</code>.</p>"
+     },
+     "starter": "def bytes_read(columns, needed, rows):\n    # твой код\n    pass\n\nprint(bytes_read({'id': 8, 'сумма': 8, 'текст': 200}, ['сумма'], 1000))\n",
+     "tests": "cols = {'id': 8, 'дата': 8, 'сумма': 8, 'текст': 200}\nassert bytes_read(cols, ['сумма'], 1000) == 8000, 'Одна колонка на тысяче записей'\nassert bytes_read(cols, ['дата', 'сумма'], 1000) == 16000, 'Две колонки'\nassert bytes_read(cols, list(cols), 1) == 224, 'Все колонки одной записи'\nassert bytes_read(cols, [], 1000) == 0, 'Ничего не запросили — ничего не читаем'\nassert bytes_read(cols, ['нет_такой'], 1000) == 0, 'Неизвестная колонка пропускается'\nassert bytes_read({}, ['любая'], 100) == 0, 'Пустая схема'",
+     "hint": {
+      "ru": "Сложи <code>columns[c]</code> для тех <code>c</code>, которые есть в словаре, и умножь на <code>rows</code>. Проверку наличия удобно сделать через <code>if c in columns</code>.",
+      "uz": "Lug'atda mavjud <code>c</code> lar uchun <code>columns[c]</code> ni qo'shing va <code>rows</code> ga ko'paytiring. Mavjudlikni <code>if c in columns</code> orqali tekshirish qulay.",
+      "en": "Sum <code>columns[c]</code> for those <code>c</code> present in the dict and multiply by <code>rows</code>. The presence check is easiest as <code>if c in columns</code>."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "python",
+     "title": { "ru": "Отсечение партиций", "uz": "Partitsiyalarni kesish", "en": "Partition pruning" },
+     "brief": { "ru": "Какие папки вообще откроем", "uz": "Qaysi papkalarni umuman ochamiz", "en": "Which folders we open at all" },
+     "desc": {
+      "ru": "<p><code>prune(partitions, filters)</code>: <code>partitions</code> — список словарей вида <code>{'год': 2025, 'месяц': 1}</code>, <code>filters</code> — словарь условий.</p><p>Верни список партиций, у которых <b>все</b> указанные в <code>filters</code> ключи совпадают. Пустой фильтр означает «читаем всё».</p>",
+      "uz": "<p><code>prune(partitions, filters)</code>: <code>partitions</code> — <code>{'год': 2025, 'месяц': 1}</code> ko'rinishidagi lug'atlar ro'yxati, <code>filters</code> — shartlar lug'ati.</p><p><code>filters</code> da ko'rsatilgan <b>barcha</b> kalitlari mos keladigan partitsiyalar ro'yxatini qaytaring. Bo'sh filtr «hammasini o'qiymiz» degani.</p>",
+      "en": "<p><code>prune(partitions, filters)</code>: <code>partitions</code> is a list of dicts like <code>{'год': 2025, 'месяц': 1}</code>, <code>filters</code> is a dict of conditions.</p><p>Return the partitions where <b>all</b> keys given in <code>filters</code> match. An empty filter means “read everything”.</p>"
+     },
+     "starter": "def prune(partitions, filters):\n    # твой код\n    pass\n\nparts = [{'год': 2024, 'месяц': 1}, {'год': 2025, 'месяц': 1}]\nprint(prune(parts, {'год': 2025}))\n",
+     "tests": "parts = [{'год': y, 'месяц': m} for y in (2024, 2025) for m in (1, 2, 3)]\nassert len(prune(parts, {})) == 6, 'Без фильтра читаем всё'\nassert len(prune(parts, {'год': 2025})) == 3, 'Один год — три месяца'\nassert prune(parts, {'год': 2025, 'месяц': 2}) == [{'год': 2025, 'месяц': 2}], 'Точное попадание в одну партицию'\nassert prune(parts, {'год': 2030}) == [], 'Такого года нет'\nassert len(prune(parts, {'месяц': 1})) == 2, 'Январь есть в обоих годах'\nassert prune([], {'год': 2025}) == [], 'Партиций нет'",
+     "hint": {
+      "ru": "Списковое включение по <code>partitions</code> с проверкой <code>all(p.get(k) == v for k, v in filters.items())</code>. Пустой словарь условий даст <code>all([])</code>, а это <code>True</code> — как раз то, что нужно.",
+      "uz": "<code>partitions</code> bo'ylab <code>all(p.get(k) == v for k, v in filters.items())</code> tekshiruvi bilan ro'yxat inklyuziyasi. Bo'sh shartlar lug'ati <code>all([])</code> beradi, bu esa <code>True</code> — aynan kerakli narsa.",
+      "en": "A list comprehension over <code>partitions</code> with the check <code>all(p.get(k) == v for k, v in filters.items())</code>. An empty condition dict gives <code>all([])</code>, which is <code>True</code> — exactly what is wanted."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "python",
+     "title": { "ru": "Уплотнение файлов", "uz": "Fayllarni zichlash", "en": "File compaction" },
+     "brief": { "ru": "Склеить мелочь в крупное", "uz": "Maydani yiriklarga yopishtirish", "en": "Gluing small into large" },
+     "desc": {
+      "ru": "<p><code>compact(sizes, target)</code> получает список размеров файлов в мегабайтах и целевой размер. Иди по списку по порядку и складывай файлы в текущую пачку. Как только сумма пачки достигла или превысила <code>target</code>, закрывай её и начинай новую.</p><p>Верни список сумм получившихся пачек. Остаток, не дотянувший до цели, всё равно попадает в результат последней пачкой.</p>",
+      "uz": "<p><code>compact(sizes, target)</code> megabaytlardagi fayl hajmlari ro'yxatini va maqsadli hajmni oladi. Ro'yxat bo'ylab tartib bilan yuring va fayllarni joriy to'plamga qo'shing. To'plam yig'indisi <code>target</code> ga yetgani yoki oshgani zahoti uni yoping va yangisini boshlang.</p><p>Hosil bo'lgan to'plamlar yig'indilari ro'yxatini qaytaring. Maqsadga yetmagan qoldiq ham natijaga oxirgi to'plam sifatida tushadi.</p>",
+      "en": "<p><code>compact(sizes, target)</code> receives a list of file sizes in megabytes and a target size. Walk the list in order, adding files to the current batch. As soon as the batch total reaches or exceeds <code>target</code>, close it and start a new one.</p><p>Return the list of resulting batch totals. A remainder that never reaches the target still appears as the last batch.</p>"
+     },
+     "starter": "def compact(sizes, target):\n    # твой код\n    pass\n\nprint(compact([30, 40, 50, 20, 10], 64))\n",
+     "tests": "assert compact([30, 40, 50, 20, 10], 64) == [70, 70, 10], 'Пачки закрываются при достижении 64'\nassert compact([], 64) == [], 'Нет файлов — нет пачек'\nassert compact([100], 64) == [100], 'Один большой файл сразу закрывает пачку'\nassert compact([10, 10, 10], 64) == [30], 'Ничего не дотянуло — одна пачка остатком'\nassert compact([64, 64], 64) == [64, 64], 'Ровно цель закрывает пачку'\nassert sum(compact([5, 15, 25, 35], 20)) == 80, 'Данные не теряются'",
+     "hint": {
+      "ru": "Веди накопитель и список результатов. После каждого файла проверяй <code>if acc &gt;= target</code>: добавляй накопитель в список и обнуляй. После цикла не забудь про непустой остаток.",
+      "uz": "To'plovchi va natijalar ro'yxatini yuriting. Har fayldan keyin <code>if acc &gt;= target</code> ni tekshiring: to'plovchini ro'yxatga qo'shing va nollang. Sikldan keyin bo'sh bo'lmagan qoldiqni unutmang.",
+      "en": "Keep an accumulator and a result list. After each file check <code>if acc &gt;= target</code>: append the accumulator and reset it. After the loop remember the non-empty remainder."
+     }
+    }
+   ],
+   "exam": {
+    "time": 540,
+    "questions": [
+     {
+      "q": { "ru": "Таблица из 50 колонок, запрос читает 2. Колоночный формат по сравнению с построчным прочитает…", "uz": "50 ustunli jadval, so'rov 2 tasini o'qiydi. Ustunli format qatorliga nisbatan…", "en": "A 50-column table, a query reads 2. Compared with row-wise, columnar reads…" },
+      "options": [
+       { "ru": "столько же", "uz": "shuncha", "en": "the same" },
+       { "ru": "значительно меньше — только эти две колонки", "uz": "sezilarli kam — faqat shu ikki ustunni", "en": "significantly less — only those two columns" },
+       { "ru": "больше", "uz": "ko'proq", "en": "more" },
+       { "ru": "ровно половину", "uz": "aynan yarmini", "en": "exactly half" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Данные лежат в папках вида год=/месяц=. Как называется этот приём?", "uz": "Ma'lumot yil=/oy= ko'rinishidagi papkalarda yotibdi. Bu usul nima deyiladi?", "en": "Data lives in folders like year=/month=. What is this technique called?" },
+      "options": [
+       { "ru": "Сжатие", "uz": "Siqish", "en": "Compression" },
+       { "ru": "Партиционирование", "uz": "Partitsiyalash", "en": "Partitioning" },
+       { "ru": "Индексирование", "uz": "Indekslash", "en": "Indexing" },
+       { "ru": "Уплотнение", "uz": "Zichlash", "en": "Compaction" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Что выбрать для горячих данных, которые читают постоянно?", "uz": "Doim o'qiladigan issiq ma'lumot uchun nima tanlanadi?", "en": "What do you pick for hot data that is read constantly?" },
+      "options": [
+       { "ru": "Gzip — сжимает сильнее всех", "uz": "Gzip — hammadan kuchli siqadi", "en": "Gzip — it compresses the hardest" },
+       { "ru": "Snappy или zstd — быстрая распаковка важнее степени сжатия", "uz": "Snappy yoki zstd — tez ochish siqish darajasidan muhimroq", "en": "Snappy or zstd — fast decompression beats compression ratio" },
+       { "ru": "Без сжатия", "uz": "Siqishsiz", "en": "No compression" },
+       { "ru": "Разницы нет", "uz": "Farqi yo'q", "en": "It makes no difference" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Зачем в хранилищах регулярно запускают уплотнение?", "uz": "Nega omborlarda muntazam zichlash ishga tushiriladi?", "en": "Why do warehouses run compaction regularly?" },
+      "options": [
+       { "ru": "Чтобы освободить место", "uz": "Joy bo'shatish uchun", "en": "To free up space" },
+       { "ru": "Чтобы склеить мелкие файлы и убрать накладные расходы на их открытие", "uz": "Mayda fayllarni yopishtirib, ochish qo'shimcha xarajatini olib tashlash uchun", "en": "To glue small files together and remove the per-file open overhead" },
+       { "ru": "Чтобы поменять формат", "uz": "Formatni o'zgartirish uchun", "en": "To change the format" },
+       { "ru": "Для резервной копии", "uz": "Zaxira nusxa uchun", "en": "For backups" }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "python",
+      "title": { "ru": "Стоимость запроса", "uz": "So'rov narxi", "en": "The cost of a query" },
+      "desc": {
+       "ru": "<p>Собери всё вместе. <code>query_cost(partitions, filters, columns, needed)</code> считает, сколько байт прочитает запрос.</p><ul><li><code>partitions</code> — список словарей, у каждого есть ключ <code>'rows'</code> с числом записей плюс ключи партиционирования</li><li><code>filters</code> — условия отбора партиций</li><li><code>columns</code> — схема «колонка → байт»</li><li><code>needed</code> — какие колонки нужны запросу</li></ul><p>Сначала отсеки партиции по фильтрам, затем сложи <code>rows</code> у выживших и умножь на размер нужных колонок.</p>",
+       "uz": "<p>Hammasini birlashtiring. <code>query_cost(partitions, filters, columns, needed)</code> so'rov necha bayt o'qishini hisoblaydi.</p><ul><li><code>partitions</code> — lug'atlar ro'yxati, har birida yozuvlar soni bilan <code>'rows'</code> kaliti va partitsiyalash kalitlari bor</li><li><code>filters</code> — partitsiyalarni tanlash shartlari</li><li><code>columns</code> — «ustun → bayt» sxemasi</li><li><code>needed</code> — so'rovga qaysi ustunlar kerak</li></ul><p>Avval partitsiyalarni filtrlar bo'yicha kesing, so'ng omon qolganlarning <code>rows</code> ini qo'shing va kerakli ustunlar hajmiga ko'paytiring.</p>",
+       "en": "<p>Put it all together. <code>query_cost(partitions, filters, columns, needed)</code> computes how many bytes a query reads.</p><ul><li><code>partitions</code> — a list of dicts, each with a <code>'rows'</code> key holding the record count plus the partition keys</li><li><code>filters</code> — conditions for selecting partitions</li><li><code>columns</code> — the schema “column → bytes”</li><li><code>needed</code> — which columns the query needs</li></ul><p>First prune the partitions by the filters, then sum <code>rows</code> over the survivors and multiply by the size of the needed columns.</p>"
+      },
+      "starter": "def query_cost(partitions, filters, columns, needed):\n    # отсечь партиции, сложить строки, умножить на размер колонок\n    pass\n\nparts = [{'год': 2024, 'rows': 1000}, {'год': 2025, 'rows': 2000}]\nprint(query_cost(parts, {'год': 2025}, {'сумма': 8, 'текст': 200}, ['сумма']))\n",
+      "tests": "cols = {'id': 8, 'дата': 8, 'сумма': 8, 'текст': 200}\nparts = [{'год': 2024, 'месяц': 1, 'rows': 1000}, {'год': 2025, 'месяц': 1, 'rows': 2000}, {'год': 2025, 'месяц': 2, 'rows': 3000}]\nassert query_cost(parts, {'год': 2025}, cols, ['сумма']) == 40000, '5000 строк по 8 байт'\nassert query_cost(parts, {}, cols, ['сумма']) == 48000, 'Без фильтра читаем все 6000 строк'\nassert query_cost(parts, {'год': 2025, 'месяц': 2}, cols, ['дата', 'сумма']) == 48000, 'Одна партиция, две колонки'\nassert query_cost(parts, {'год': 2030}, cols, ['сумма']) == 0, 'Ни одна партиция не подошла'\nassert query_cost(parts, {}, cols, []) == 0, 'Колонки не запрошены'\nassert query_cost([], {}, cols, ['сумма']) == 0, 'Партиций нет'",
+      "hint": {
+       "ru": "Две функции, которые ты уже написал: сначала <code>prune</code>, потом ширина строки как сумма нужных колонок. Строки складывай через <code>sum(p['rows'] for p in survived)</code>.",
+       "uz": "Siz allaqachon yozgan ikki funksiya: avval <code>prune</code>, keyin qator kengligi kerakli ustunlar yig'indisi sifatida. Qatorlarni <code>sum(p['rows'] for p in survived)</code> orqali qo'shing.",
+       "en": "The two functions you already wrote: first <code>prune</code>, then the row width as the sum of the needed columns. Sum rows with <code>sum(p['rows'] for p in survived)</code>."
+      }
+     }
+    ]
+   }
   }
  ]
 }

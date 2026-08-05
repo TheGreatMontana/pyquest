@@ -398,6 +398,60 @@ print(edges([[0, 0, 255, 255]]))""",
     return {'top': min(ys), 'left': min(xs), 'bottom': max(ys), 'right': max(xs)}
 
 print(bounding_box([[0, 0], [0, 200]], 150))""",
+'cv-intro/cv-02/t1': """def pool(img):
+    if not img:
+        return []
+    out = []
+    for y in range(0, len(img) - 1, 2):
+        row = []
+        for x in range(0, len(img[y]) - 1, 2):
+            row.append(max(img[y][x], img[y][x + 1], img[y + 1][x], img[y + 1][x + 1]))
+        out.append(row)
+    return out
+
+print(pool([[1, 2, 8, 9], [3, 4, 7, 6], [5, 0, 1, 2], [1, 1, 3, 4]]))""",
+'cv-intro/cv-02/t2': """def histogram(img, bins):
+    step = 256 / bins
+    counts = [0] * bins
+    for row in img:
+        for value in row:
+            counts[min(int(value / step), bins - 1)] += 1
+    return counts
+
+print(histogram([[0, 0], [255, 255]], 2))""",
+'cv-intro/cv-02/t3': """def find(scene, tpl):
+    if not scene or not tpl:
+        return None
+    th, tw = len(tpl), len(tpl[0])
+    if th > len(scene) or tw > len(scene[0]):
+        return None
+    best, best_pos = None, None
+    for y in range(len(scene) - th + 1):
+        for x in range(len(scene[0]) - tw + 1):
+            diff = sum(abs(scene[y + dy][x + dx] - tpl[dy][dx])
+                       for dy in range(th) for dx in range(tw))
+            if best is None or diff < best:
+                best, best_pos = diff, (y, x)
+    return best_pos
+
+scene = [[0, 0, 0], [0, 9, 9], [0, 9, 9]]
+print(find(scene, [[9, 9], [9, 9]]))""",
+'cv-intro/cv-02/exam0': """def describe(img, bins):
+    small = []
+    for y in range(0, len(img) - 1, 2):
+        row = []
+        for x in range(0, len(img[y]) - 1, 2):
+            row.append(max(img[y][x], img[y][x + 1], img[y + 1][x], img[y + 1][x + 1]))
+        small.append(row)
+
+    step = 256 / bins
+    counts = [0] * bins
+    for row in small:
+        for value in row:
+            counts[min(int(value / step), bins - 1)] += 1
+    return counts
+
+print(describe([[0, 0, 255, 255], [0, 0, 255, 255], [0, 0, 0, 0], [0, 0, 0, 0]], 2))""",
 
 # ===== devops-intro =====
 'devops-intro/do-01/t1': """def run_pipeline(steps):
@@ -425,6 +479,40 @@ print(last_good([('v1', True), ('v2', True), ('v3', False)]))""",
     return errors / len(lines) > threshold
 
 print(should_alert(['ERROR a', 'INFO b'], 0.4))""",
+'devops-intro/do-02/t1': """def canary(stages, base, limit):
+    threshold = base * limit
+    for i, err in enumerate(stages):
+        if err > threshold:
+            return i
+    return -1
+
+print(canary([0.01, 0.18, 0.0], 0.01, 3))""",
+'devops-intro/do-02/t2': """def percentile(values, p):
+    if not values:
+        return 0
+    ordered = sorted(values)
+    idx = int(len(ordered) * p / 100)
+    return ordered[min(idx, len(ordered) - 1)]
+
+print(percentile([10, 20, 30, 40, 100], 50))""",
+'devops-intro/do-02/t3': """def budget(slo, days):
+    if days <= 0:
+        return 0.0
+    return days * 24 * 60 * (100 - slo) / 100
+
+print(budget(99.9, 30))""",
+'devops-intro/do-02/exam0': """def release_ok(times, errors, p, max_ms, max_error):
+    if times:
+        ordered = sorted(times)
+        idx = min(int(len(ordered) * p / 100), len(ordered) - 1)
+        if ordered[idx] > max_ms:
+            return False
+    if errors:
+        if sum(errors) / len(errors) > max_error:
+            return False
+    return True
+
+print(release_ok([80, 90, 95, 2100], [0, 0, 0, 1], 50, 200, 0.3))""",
 
 # ===== bigdata-intro =====
 'bigdata-intro/bd-01/t1': """def map_step(chunk):
@@ -459,6 +547,39 @@ print(skew([10, 10, 10, 10]))""",
     return total
 
 print(word_count(['a b', 'b c']))""",
+'bigdata-intro/bd-02/t1': """def bytes_read(columns, needed, rows):
+    width = sum(columns[c] for c in needed if c in columns)
+    return width * rows
+
+print(bytes_read({'id': 8, 'сумма': 8, 'текст': 200}, ['сумма'], 1000))""",
+'bigdata-intro/bd-02/t2': """def prune(partitions, filters):
+    return [p for p in partitions
+            if all(p.get(k) == v for k, v in filters.items())]
+
+parts = [{'год': 2024, 'месяц': 1}, {'год': 2025, 'месяц': 1}]
+print(prune(parts, {'год': 2025}))""",
+'bigdata-intro/bd-02/t3': """def compact(sizes, target):
+    batches = []
+    acc = 0
+    for size in sizes:
+        acc += size
+        if acc >= target:
+            batches.append(acc)
+            acc = 0
+    if acc:
+        batches.append(acc)
+    return batches
+
+print(compact([30, 40, 50, 20, 10], 64))""",
+'bigdata-intro/bd-02/exam0': """def query_cost(partitions, filters, columns, needed):
+    survived = [p for p in partitions
+                if all(p.get(k) == v for k, v in filters.items())]
+    rows = sum(p['rows'] for p in survived)
+    width = sum(columns[c] for c in needed if c in columns)
+    return rows * width
+
+parts = [{'год': 2024, 'rows': 1000}, {'год': 2025, 'rows': 2000}]
+print(query_cost(parts, {'год': 2025}, {'сумма': 8, 'текст': 200}, ['сумма']))""",
 
 # ===== cloud-intro =====
 'cloud-intro/cl-01/t1': """def monthly_cost(machines, price_per_hour):

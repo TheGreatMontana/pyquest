@@ -945,7 +945,7 @@
    "color": "#22d3ee",
    "level": "intermediate",
    "status": "full",
-   "estimatedHours": 9,
+   "estimatedHours": 15,
    "requires": [
     "python-collections"
    ],
@@ -953,7 +953,7 @@
     "cv-basics"
    ],
    "legacyIds": [],
-   "moduleCount": 1,
+   "moduleCount": 2,
    "runner": "python"
   },
   {
@@ -972,7 +972,7 @@
    "color": "#34d399",
    "level": "intermediate",
    "status": "full",
-   "estimatedHours": 9,
+   "estimatedHours": 15,
    "requires": [
     "python-collections"
    ],
@@ -980,7 +980,7 @@
     "devops-basics"
    ],
    "legacyIds": [],
-   "moduleCount": 1,
+   "moduleCount": 2,
    "runner": "python"
   },
   {
@@ -999,7 +999,7 @@
    "color": "#f59e0b",
    "level": "intermediate",
    "status": "full",
-   "estimatedHours": 9,
+   "estimatedHours": 15,
    "requires": [
     "python-collections"
    ],
@@ -1007,7 +1007,7 @@
     "bigdata-basics"
    ],
    "legacyIds": [],
-   "moduleCount": 1,
+   "moduleCount": 2,
    "runner": "python"
   },
   {

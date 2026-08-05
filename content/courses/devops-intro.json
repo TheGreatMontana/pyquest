@@ -295,6 +295,339 @@
      }
     ]
    }
+  },
+  {
+   "id": "do-02",
+   "title": { "ru": "Выкладка без страха и наблюдаемость", "uz": "Qo'rquvsiz yoyish va kuzatuvchanlik", "en": "Deploying without fear, and observability" },
+   "tagline": { "ru": "Канареечный релиз, откат, метрики и алерты — чтобы не узнавать о падении от пользователей", "uz": "Kanareyka relizi, qaytarish, metrikalar va ogohlantirishlar — pasayish haqida foydalanuvchidan bilmaslik uchun", "en": "Canary releases, rollbacks, metrics and alerts — so users are not the ones who tell you it broke" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "Как выкладывать, чтобы не сломать всем сразу", "uz": "Hammaga birdan buzmaslik uchun qanday yoyish kerak", "en": "How to deploy without breaking it for everyone at once" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Простой способ выложить новую версию — остановить старую и запустить новую. Пока идёт запуск, сайт не работает, а если новая версия сломана, сломана она сразу у всех.</p><p>Поэтому придумали стратегии выкладки:</p><ul><li><b>Blue-green.</b> Держим два одинаковых окружения. Новая версия поднимается рядом на «зелёном», проверяется, и трафик переключается одним движением. Не так — переключаем обратно, откат занимает секунды.</li><li><b>Канареечный релиз.</b> Новую версию получают сначала 1% пользователей. Если у них ошибок не больше обычного — 5%, потом 25%, потом все. Плохую версию увидит малая часть людей.</li><li><b>Пофазовая.</b> Обновляем серверы по одному, следя за здоровьем каждого.</li></ul><p>Общее у всех — <b>решение принимается по числам</b>, а не по ощущению. Значит, числа надо собирать.</p>",
+        "uz": "<p>Yangi versiyani yoyishning oddiy yo'li — eskisini to'xtatib, yangisini ishga tushirish. Ishga tushish davomida sayt ishlamaydi, yangi versiya buzuq bo'lsa esa u birdan hamma uchun buzuq.</p><p>Shuning uchun yoyish strategiyalari o'ylab topilgan:</p><ul><li><b>Blue-green.</b> Ikki bir xil muhit saqlanadi. Yangi versiya yonida «yashil» da ko'tariladi, tekshiriladi va trafik bir harakat bilan almashtiriladi. Noto'g'ri bo'lsa — orqaga qaytaramiz, qaytarish soniyalar oladi.</li><li><b>Kanareyka relizi.</b> Yangi versiyani avval foydalanuvchilarning 1% i oladi. Ularda xato odatdagidan ko'p bo'lmasa — 5%, keyin 25%, keyin hammasi. Yomon versiyani odamlarning kichik qismi ko'radi.</li><li><b>Bosqichma-bosqich.</b> Serverlarni bittalab yangilaymiz, har birining sog'ligini kuzatib.</li></ul><p>Hammasining umumiysi — <b>qaror sonlar bo'yicha qabul qilinadi</b>, his-tuyg'u bilan emas. Demak, sonlarni yig'ish kerak.</p>",
+        "en": "<p>The simple way to release a new version is to stop the old one and start the new one. While it starts the site is down, and if the new version is broken it is broken for everybody at once.</p><p>Hence deployment strategies:</p><ul><li><b>Blue-green.</b> Keep two identical environments. The new version comes up alongside on “green”, gets checked, and traffic switches in one move. If it is wrong, switch back — the rollback takes seconds.</li><li><b>Canary release.</b> The new version reaches 1% of users first. If their error rate is no worse than usual, then 5%, then 25%, then everyone. Only a small fraction of people ever see a bad version.</li><li><b>Rolling.</b> Update servers one at a time, watching the health of each.</li></ul><p>What they share is that <b>the decision is made from numbers</b>, not from a feeling. Which means the numbers must be collected.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "# канареечная выкладка: доля трафика растёт, пока ошибок не больше нормы\nBASE_ERROR = 0.01          # обычный уровень ошибок — 1%\nSTAGES = [1, 5, 25, 100]   # проценты трафика\n\ndef rollout(error_rates):\n    for stage, err in zip(STAGES, error_rates):\n        print(f\"{stage:3}% трафика — ошибок {err * 100:.1f}%\", end=\"  \")\n        if err > BASE_ERROR * 3:\n            print(\"-> ОТКАТ\")\n            return \"откат\"\n        print(\"-> продолжаем\")\n    return \"выложено\"\n\nprint(\"хорошая версия:\")\nprint(\"итог:\", rollout([0.010, 0.012, 0.009, 0.011]))\nprint()\nprint(\"сломанная версия:\")\nprint(\"итог:\", rollout([0.011, 0.180, 0.0, 0.0]))"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Сломанную версию остановили на пяти процентах. Девяносто пять процентов пользователей её не увидели, а инженер узнал о проблеме от системы, а не из твиттера.</p><p>Ключевое слово тут — <b>порог</b>. Не «ошибок стало больше», а «ошибок стало втрое больше нормы». Без нормы сравнивать не с чем, поэтому её измеряют заранее.</p>",
+        "uz": "<p>Buzuq versiya besh foizda to'xtatildi. Foydalanuvchilarning to'qson besh foizi uni ko'rmadi, muhandis esa muammo haqida tvitterdan emas, tizimdan bildi.</p><p>Bu yerdagi kalit so'z — <b>chegara</b>. «Xato ko'paydi» emas, «xato normadan uch barobar ko'paydi». Normasiz solishtirishga narsa yo'q, shuning uchun u oldindan o'lchanadi.</p>",
+        "en": "<p>The broken version was stopped at five percent. Ninety-five percent of users never saw it, and the engineer heard about the problem from the system rather than from Twitter.</p><p>The key word here is <b>threshold</b>. Not “errors went up” but “errors went three times above normal”. Without a normal there is nothing to compare against, which is why it is measured in advance.</p>"
+       }
+      },
+      {
+       "type": "checkpoint",
+       "q": { "ru": "Чем канареечный релиз отличается от blue-green?", "uz": "Kanareyka relizi blue-green dan nimasi bilan farq qiladi?", "en": "How does a canary release differ from blue-green?" },
+       "options": [
+        { "ru": "Ничем, это одно и то же", "uz": "Hech nimasi bilan, bu bir xil narsa", "en": "Not at all, they are the same thing" },
+        { "ru": "Трафик переводится постепенно, а не весь сразу", "uz": "Trafik hammasi birdan emas, bosqichma-bosqich o'tkaziladi", "en": "Traffic moves gradually instead of all at once" },
+        { "ru": "Канареечный не требует тестов", "uz": "Kanareyka testlarni talab qilmaydi", "en": "A canary needs no tests" },
+        { "ru": "Blue-green работает только в облаке", "uz": "Blue-green faqat bulutda ishlaydi", "en": "Blue-green works only in the cloud" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "В blue-green переключение мгновенное для всех — зато откат тоже мгновенный. В канареечном плохую версию видит только малая доля пользователей.",
+        "uz": "Blue-green da almashtirish hamma uchun bir zumda — buning evaziga qaytarish ham bir zumda. Kanareykada yomon versiyani foydalanuvchilarning kichik qismigina ko'radi.",
+        "en": "In blue-green the switch is instant for everyone — but so is the rollback. In a canary only a small share of users ever meets a bad version."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "Логи, метрики, трассировки", "uz": "Loglar, metrikalar, trassirovkalar", "en": "Logs, metrics, traces" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Сервис работает, но «как-то медленно». Что смотреть? Есть три разных инструмента, и путать их — обычная ошибка.</p><ul><li><b>Логи</b> — записи о событиях. Отвечают на вопрос «что именно случилось с этим запросом». Подробно, но искать в них тяжело.</li><li><b>Метрики</b> — числа во времени: запросов в секунду, доля ошибок, время ответа. Отвечают на «как система чувствует себя в целом» и дешёвы для хранения.</li><li><b>Трассировки</b> — путь одного запроса через все сервисы с временем на каждом шаге. Отвечают на «где именно потерялись эти три секунды».</li></ul><p>Порядок работы обычно такой: метрика показала всплеск → трассировка указала на медленный сервис → лог объяснил причину.</p>",
+        "uz": "<p>Xizmat ishlayapti, lekin «negadir sekin». Nimaga qarash kerak? Uchta turli asbob bor va ularni chalkashtirish — odatiy xato.</p><ul><li><b>Loglar</b> — hodisalar haqidagi yozuvlar. «Shu so'rov bilan aynan nima bo'ldi» degan savolga javob beradi. Batafsil, lekin ularda qidirish og'ir.</li><li><b>Metrikalar</b> — vaqt bo'yicha sonlar: sekundiga so'rovlar, xatolar ulushi, javob vaqti. «Tizim umuman qanday his qilyapti» ga javob beradi va saqlash uchun arzon.</li><li><b>Trassirovkalar</b> — bitta so'rovning barcha xizmatlar orqali yo'li, har qadamdagi vaqt bilan. «Bu uch soniya aynan qayerda yo'qoldi» ga javob beradi.</li></ul><p>Ish tartibi odatda shunday: metrika sakrashni ko'rsatdi → trassirovka sekin xizmatni ko'rsatdi → log sababni tushuntirdi.</p>",
+        "en": "<p>A service is running but “somehow slow”. What do you look at? There are three different tools and confusing them is a common mistake.</p><ul><li><b>Logs</b> — records of events. They answer “what exactly happened to this request”. Detailed, but hard to search.</li><li><b>Metrics</b> — numbers over time: requests per second, error rate, response time. They answer “how does the system feel overall” and are cheap to store.</li><li><b>Traces</b> — the path of a single request through all services with timings at each step. They answer “where exactly did those three seconds go”.</li></ul><p>The usual order of work: a metric showed a spike → a trace pointed at the slow service → a log explained the cause.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "# время ответа 21 запроса в миллисекундах\ntimes = [80, 95, 88, 91, 87, 90, 84, 99, 92, 86, 96,\n         89, 93, 85, 97, 90, 88, 91, 87, 94, 2100]\n\ndef percentile(values, p):\n    ordered = sorted(values)\n    idx = int(len(ordered) * p / 100)\n    return ordered[min(idx, len(ordered) - 1)]\n\nprint(\"среднее:      \", sum(times) / len(times), \"мс\")\nprint(\"медиана (p50):\", percentile(times, 50), \"мс\")\nprint(\"p95:          \", percentile(times, 95), \"мс\")\nprint(\"максимум:     \", max(times), \"мс\")"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Среднее — 186 мс, а половина пользователей получила ответ за 90. Один медленный запрос перекосил всю картину.</p><p>Поэтому в эксплуатации смотрят не на среднее, а на <b>перцентили</b>. <code>p95 = 99 мс</code> читается так: девяносто пять процентов запросов уложились в 99 миллисекунд. А <code>p99</code> показывает, как живут самые невезучие — и именно они пишут в поддержку.</p><p>Целевое значение перцентиля, о котором договорились с бизнесом, называется <b>SLO</b>. Например: «p95 меньше 200 мс в 99,9% времени месяца». Из SLO прямо следует, когда команда обязана бросить всё и чинить.</p>",
+        "uz": "<p>O'rtacha — 190 ms, foydalanuvchilarning yarmi esa javobni 90 da oldi. Bitta sekin so'rov butun manzarani og'dirdi.</p><p>Shuning uchun ekspluatatsiyada o'rtachaga emas, <b>protsentillarga</b> qaraladi. <code>p95 = 97 ms</code> shunday o'qiladi: so'rovlarning to'qson besh foizi 97 millisekundga sig'di. <code>p99</code> esa eng omadsizlar qanday yashashini ko'rsatadi — va aynan ular qo'llab-quvvatlashga yozadi.</p><p>Biznes bilan kelishilgan protsentil maqsadli qiymati <b>SLO</b> deyiladi. Masalan: «oyning 99,9% vaqtida p95 200 ms dan kam». SLO dan bevosita jamoa hamma narsani tashlab tuzatishga majbur bo'lgan payt kelib chiqadi.</p>",
+        "en": "<p>The mean is 190 ms while half the users got an answer in 90. A single slow request skewed the whole picture.</p><p>That is why operations looks at <b>percentiles</b>, not means. <code>p95 = 97 ms</code> reads: ninety-five percent of requests fit within 97 milliseconds. And <code>p99</code> shows how the unluckiest fare — and they are the ones who write to support.</p><p>A percentile target agreed with the business is called an <b>SLO</b>. For example: “p95 under 200 ms for 99.9% of the month”. The SLO directly determines when the team must drop everything and fix things.</p>"
+       }
+      },
+      {
+       "type": "note",
+       "kind": "trap",
+       "html": {
+        "ru": "Алерт на каждую ошибку в логе — верный способ перестать читать алерты. Через неделю их будет двести в день, и настоящую аварию никто не заметит. Оповещать надо о том, что <b>видит пользователь</b>: выросла доля ошибок, вырос p95, упала доступность. Всё остальное — на дашборд, а не в телефон.",
+        "uz": "Logdagi har xatoga ogohlantirish — ogohlantirishlarni o'qishni to'xtatishning ishonchli yo'li. Bir haftadan keyin ular kuniga ikki yuzta bo'ladi va haqiqiy avariyani hech kim sezmaydi. <b>Foydalanuvchi ko'radigan</b> narsa haqida xabar berish kerak: xatolar ulushi oshdi, p95 oshdi, ochiqlik tushdi. Qolgani — telefonga emas, boshqaruv paneliga.",
+        "en": "An alert for every error line is the surest way to stop reading alerts. In a week there will be two hundred a day and nobody will notice a real outage. Alert on what <b>the user sees</b>: the error rate rose, p95 rose, availability fell. Everything else belongs on a dashboard, not in a phone."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "Когда что-то упало", "uz": "Biror narsa yiqilganda", "en": "When something goes down" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Авария случится. Вопрос только в том, сколько она продлится и повторится ли.</p><p>Порядок действий в зрелых командах жёсткий и в нём есть смысл:</p><ol><li><b>Восстановить работу</b>, а не найти причину. Откатить релиз, увеличить количество серверов, отключить сломанную функцию. Разбираться будем потом.</li><li><b>Сообщить</b> — коллегам и пользователям. Молчащий статус хуже плохих новостей.</li><li><b>Зафиксировать время</b>: когда началось, когда заметили, когда починили. Эти три числа и есть качество эксплуатации.</li><li><b>Разбор без поиска виноватых</b> (postmortem). Вопрос не «кто выкатил», а «почему система позволила это выкатить».</li></ol><p>Последний пункт важнее всех. Наказанный инженер не делает систему надёжнее, а вот отсутствующая проверка в конвейере — делает, когда её добавляют.</p>",
+        "uz": "<p>Avariya bo'ladi. Savol faqat u qancha davom etishi va takrorlanishida.</p><p>Yetuk jamoalarda harakatlar tartibi qat'iy va unda ma'no bor:</p><ol><li><b>Ishni tiklash</b>, sababni topish emas. Relizni qaytarish, serverlar sonini oshirish, buzuq funksiyani o'chirish. Keyin aniqlaymiz.</li><li><b>Xabar berish</b> — hamkasblarga va foydalanuvchilarga. Jim status yomon yangilikdan yomonroq.</li><li><b>Vaqtni qayd etish</b>: qachon boshlandi, qachon sezildi, qachon tuzatildi. Shu uch son ekspluatatsiya sifati.</li><li><b>Aybdor qidirmasdan tahlil</b> (postmortem). Savol «kim chiqardi» emas, «nega tizim buni chiqarishga ruxsat berdi».</li></ol><p>Oxirgi band hammasidan muhim. Jazolangan muhandis tizimni ishonchliroq qilmaydi, konveyerdagi yetishmayotgan tekshiruv esa — qo'shilganda qiladi.</p>",
+        "en": "<p>An outage will happen. The only questions are how long it lasts and whether it repeats.</p><p>The order of actions in mature teams is strict, and for good reason:</p><ol><li><b>Restore service</b>, do not find the cause. Roll back the release, add servers, turn the broken feature off. The investigation comes later.</li><li><b>Communicate</b> — to colleagues and to users. A silent status page is worse than bad news.</li><li><b>Record the times</b>: when it started, when it was noticed, when it was fixed. Those three numbers are your operational quality.</li><li><b>A blameless review</b> (postmortem). The question is not “who shipped it” but “why did the system allow it to ship”.</li></ol><p>The last point matters most. A punished engineer does not make the system more reliable; a missing check in the pipeline does, once it is added.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "# журнал инцидента: минуты от начала суток\nincident = {\n    \"началось\": 143,\n    \"заметили\": 158,\n    \"починили\": 191,\n}\n\ndetect = incident[\"заметили\"] - incident[\"началось\"]\nfix = incident[\"починили\"] - incident[\"заметили\"]\ntotal = incident[\"починили\"] - incident[\"началось\"]\n\nprint(f\"время до обнаружения: {detect} мин\")\nprint(f\"время до починки:     {fix} мин\")\nprint(f\"пользователи страдали: {total} мин\")\nprint()\n\n# доступность за месяц: сколько минут простоя допустимо\nMONTH = 30 * 24 * 60\nfor target in [99.0, 99.9, 99.99]:\n    allowed = MONTH * (100 - target) / 100\n    print(f\"SLO {target}% -> допустимо {allowed:.0f} мин простоя в месяц\")"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Пятнадцать минут ушло только на то, чтобы заметить. Это самое дешёвое, что можно улучшить: алерт по метрике сокращает эти пятнадцать минут до одной, и делать для этого ничего сложного не нужно.</p><p>Посмотри на последние строки. «Три девятки» звучат солидно, но это всего 43 минуты простоя в месяц — примерно один неудачный релиз. А «четыре девятки» — четыре минуты, и здесь уже недостаточно стараться: нужны автоматический откат и резервирование.</p>",
+        "uz": "<p>Faqat sezish uchun o'n besh daqiqa ketdi. Bu yaxshilash mumkin bo'lgan eng arzon narsa: metrika bo'yicha ogohlantirish bu o'n besh daqiqani birgacha qisqartiradi va buning uchun murakkab hech nima qilish shart emas.</p><p>Oxirgi qatorlarga qarang. «Uchta to'qqiz» jiddiy eshitiladi, lekin bu oyiga atigi 43 daqiqa to'xtash — taxminan bitta muvaffaqiyatsiz reliz. «To'rtta to'qqiz» esa — to'rt daqiqa, va bu yerda harakat qilish yetarli emas: avtomatik qaytarish va zaxiralash kerak.</p>",
+        "en": "<p>Fifteen minutes went to merely noticing. That is the cheapest thing to improve: an alert on a metric cuts those fifteen minutes to one, and nothing complicated is required.</p><p>Look at the last lines. “Three nines” sounds respectable, but it is only 43 minutes of downtime a month — roughly one bad release. “Four nines” is four minutes, and there trying hard is no longer enough: you need automatic rollback and redundancy.</p>"
+       }
+      },
+      {
+       "type": "summary",
+       "items": [
+        { "ru": "Выкладывать надо постепенно: канарейка или blue-green, всегда с откатом", "uz": "Bosqichma-bosqich yoyish kerak: kanareyka yoki blue-green, doim qaytarish bilan", "en": "Deploy gradually: canary or blue-green, always with a rollback" },
+        { "ru": "Решение продолжать или откатывать принимается по порогу, а не на глаз", "uz": "Davom etish yoki qaytarish qarori chegara bo'yicha qabul qilinadi, ko'z bilan emas", "en": "The decision to continue or roll back comes from a threshold, not from eyeballing" },
+        { "ru": "Логи — что случилось, метрики — как в целом, трассировки — где время", "uz": "Loglar — nima bo'ldi, metrikalar — umuman qanday, trassirovkalar — vaqt qayerda", "en": "Logs say what happened, metrics how things are overall, traces where the time went" },
+        { "ru": "Смотри на перцентили, среднее скрывает медленные запросы", "uz": "Protsentillarga qarang, o'rtacha sekin so'rovlarni yashiradi", "en": "Look at percentiles; the mean hides slow requests" },
+        { "ru": "Сначала восстановить сервис, потом искать причину", "uz": "Avval xizmatni tiklash, keyin sabab qidirish", "en": "Restore the service first, look for the cause afterwards" },
+        { "ru": "Разбор аварии — про систему, а не про виноватого", "uz": "Avariya tahlili — tizim haqida, aybdor haqida emas", "en": "An outage review is about the system, not about who is to blame" }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": { "ru": "В чём смысл канареечного релиза?", "uz": "Kanareyka relizining ma'nosi nimada?", "en": "What is the point of a canary release?" },
+     "options": [
+      { "ru": "Выложить быстрее", "uz": "Tezroq yoyish", "en": "To deploy faster" },
+      { "ru": "Показать новую версию малой доле пользователей и проверить метрики", "uz": "Yangi versiyani foydalanuvchilarning kichik qismiga ko'rsatib, metrikalarni tekshirish", "en": "Show the new version to a small share of users and check the metrics" },
+      { "ru": "Обойтись без тестов", "uz": "Testlarsiz o'tish", "en": "To skip testing" },
+      { "ru": "Сэкономить на серверах", "uz": "Serverlarda tejash", "en": "To save on servers" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Цена ошибки падает в сто раз: плохую версию увидит один процент, а не все.",
+      "uz": "Xato narxi yuz barobar tushadi: yomon versiyani hammasi emas, bir foiz ko'radi.",
+      "en": "The cost of a mistake drops a hundredfold: one percent sees a bad version instead of everyone."
+     }
+    },
+    {
+     "q": { "ru": "Что показывает p95 времени ответа?", "uz": "Javob vaqtining p95 i nimani ko'rsatadi?", "en": "What does the p95 response time show?" },
+     "options": [
+      { "ru": "Среднее время ответа", "uz": "O'rtacha javob vaqtini", "en": "The average response time" },
+      { "ru": "Порог, в который уложились 95% запросов", "uz": "So'rovlarning 95% i sig'gan chegarani", "en": "The threshold that 95% of requests fit within" },
+      { "ru": "Максимальное время", "uz": "Maksimal vaqtni", "en": "The maximum time" },
+      { "ru": "Долю успешных запросов", "uz": "Muvaffaqiyatli so'rovlar ulushini", "en": "The share of successful requests" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Оставшиеся 5% — самые медленные. Их и надо разбирать, а среднее их прячет.",
+      "uz": "Qolgan 5% — eng sekinlari. Ularni tahlil qilish kerak, o'rtacha esa ularni yashiradi.",
+      "en": "The remaining 5% are the slowest. Those are what you investigate, and the mean hides them."
+     }
+    },
+    {
+     "q": { "ru": "Сервис отвечает медленно. Что смотреть первым?", "uz": "Xizmat sekin javob beryapti. Birinchi nimaga qarash kerak?", "en": "A service is responding slowly. What do you look at first?" },
+     "options": [
+      { "ru": "Логи всех серверов подряд", "uz": "Barcha serverlar loglarini ketma-ket", "en": "The logs of every server in turn" },
+      { "ru": "Метрики: они покажут, где и когда началось", "uz": "Metrikalarni: ular qayerda va qachon boshlanganini ko'rsatadi", "en": "Metrics: they show where and when it started" },
+      { "ru": "Исходный код", "uz": "Manba kodini", "en": "The source code" },
+      { "ru": "Ничего, само пройдёт", "uz": "Hech nimani, o'zi o'tadi", "en": "Nothing, it will pass" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Метрика сужает область поиска за секунды, а логи без этого — стог сена.",
+      "uz": "Metrika qidiruv sohasini soniyalarda toraytiradi, loglar esa busiz — pichan g'aram.",
+      "en": "A metric narrows the search in seconds; logs without it are a haystack."
+     }
+    },
+    {
+     "q": { "ru": "SLO 99,9% — сколько это простоя в месяц?", "uz": "SLO 99,9% — bu oyiga qancha to'xtash?", "en": "An SLO of 99.9% — how much downtime a month is that?" },
+     "options": [
+      { "ru": "Около 4 минут", "uz": "Taxminan 4 daqiqa", "en": "About 4 minutes" },
+      { "ru": "Около 43 минут", "uz": "Taxminan 43 daqiqa", "en": "About 43 minutes" },
+      { "ru": "Около 7 часов", "uz": "Taxminan 7 soat", "en": "About 7 hours" },
+      { "ru": "Простоя быть не должно", "uz": "To'xtash bo'lmasligi kerak", "en": "There must be no downtime" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "0,1% от 43 200 минут месяца — это 43 минуты. Один затянувшийся релиз съедает бюджет целиком.",
+      "uz": "Oyning 43 200 daqiqasining 0,1% i — 43 daqiqa. Bitta cho'zilgan reliz butun byudjetni yeydi.",
+      "en": "0.1% of the month's 43,200 minutes is 43 minutes. One drawn-out release eats the entire budget."
+     }
+    },
+    {
+     "q": { "ru": "Что делают первым при аварии?", "uz": "Avariyada birinchi nima qilinadi?", "en": "What comes first during an outage?" },
+     "options": [
+      { "ru": "Ищут, кто виноват", "uz": "Kim aybdorligini qidiradi", "en": "Find out who is to blame" },
+      { "ru": "Восстанавливают работу, причину ищут потом", "uz": "Ishni tiklaydi, sababni keyin qidiradi", "en": "Restore service; look for the cause afterwards" },
+      { "ru": "Пишут подробный отчёт", "uz": "Batafsil hisobot yozadi", "en": "Write a detailed report" },
+      { "ru": "Ждут, пройдёт ли само", "uz": "O'zi o'tadimi deb kutadi", "en": "Wait to see if it passes" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Каждая минута расследования при работающей аварии — минута, которую теряют пользователи. Откат почти всегда быстрее поиска причины.",
+      "uz": "Avariya davom etayotganda tergovning har daqiqasi — foydalanuvchilar yo'qotadigan daqiqa. Qaytarish deyarli doim sabab qidirishdan tez.",
+      "en": "Every minute of investigation during a live outage is a minute users lose. A rollback is almost always faster than finding the cause."
+     }
+    },
+    {
+     "q": { "ru": "Почему разбор аварии делают без поиска виноватых?", "uz": "Nega avariya tahlili aybdor qidirmasdan qilinadi?", "en": "Why are outage reviews blameless?" },
+     "options": [
+      { "ru": "Чтобы никого не обидеть", "uz": "Hech kimni xafa qilmaslik uchun", "en": "So nobody gets upset" },
+      { "ru": "Иначе люди начнут скрывать ошибки, и причины останутся неизвестными", "uz": "Aks holda odamlar xatolarni yashira boshlaydi va sabablar noma'lum qoladi", "en": "Otherwise people hide mistakes and the causes stay unknown" },
+      { "ru": "Так требует закон", "uz": "Qonun shuni talab qiladi", "en": "The law requires it" },
+      { "ru": "Виноватого и так все знают", "uz": "Aybdorni hamma baribir biladi", "en": "Everyone knows who it was anyway" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Надёжность растёт от исправленных процессов, а не от наказаний. Скрытая ошибка повторится, признанная — нет.",
+      "uz": "Ishonchlilik jazodan emas, tuzatilgan jarayonlardan o'sadi. Yashirilgan xato takrorlanadi, tan olingani — yo'q.",
+      "en": "Reliability grows from fixed processes, not punishment. A hidden mistake repeats; an admitted one does not."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "python",
+     "title": { "ru": "Решение о канарейке", "uz": "Kanareyka haqida qaror", "en": "The canary decision" },
+     "brief": { "ru": "Продолжать или откатывать", "uz": "Davom etish yoki qaytarish", "en": "Continue or roll back" },
+     "desc": {
+      "ru": "<p><code>canary(stages, base, limit)</code> получает список долей ошибок по этапам выкладки, обычный уровень ошибок <code>base</code> и множитель <code>limit</code>.</p><p>Иди по этапам. Как только ошибок стало больше <code>base * limit</code>, верни номер этапа (нумерация с нуля), на котором пришлось откатиться. Если все этапы прошли — верни <code>-1</code>.</p>",
+      "uz": "<p><code>canary(stages, base, limit)</code> yoyish bosqichlari bo'yicha xatolar ulushlari ro'yxatini, odatiy xato darajasi <code>base</code> va ko'paytuvchi <code>limit</code> ni oladi.</p><p>Bosqichlar bo'ylab yuring. Xato <code>base * limit</code> dan oshgani zahoti qaytarishga to'g'ri kelgan bosqich raqamini (noldan sanoq) qaytaring. Barcha bosqichlar o'tsa — <code>-1</code> qaytaring.</p>",
+      "en": "<p><code>canary(stages, base, limit)</code> receives a list of error rates per rollout stage, the normal error level <code>base</code> and a multiplier <code>limit</code>.</p><p>Walk the stages. As soon as errors exceed <code>base * limit</code>, return the index of the stage (zero-based) where the rollback was needed. If every stage passed, return <code>-1</code>.</p>"
+     },
+     "starter": "def canary(stages, base, limit):\n    # твой код\n    pass\n\nprint(canary([0.01, 0.18, 0.0], 0.01, 3))\n",
+     "tests": "assert canary([0.010, 0.012, 0.009, 0.011], 0.01, 3) == -1, 'Все этапы в норме'\nassert canary([0.011, 0.180, 0.0, 0.0], 0.01, 3) == 1, 'Откат на втором этапе'\nassert canary([0.5], 0.01, 3) == 0, 'Сломалось сразу'\nassert canary([], 0.01, 3) == -1, 'Нет этапов — нечего откатывать'\nassert canary([0.03], 0.01, 3) == -1, 'Ровно порог — ещё не превышение'\nassert canary([0.031], 0.01, 3) == 0, 'Чуть выше порога — откат'",
+     "hint": {
+      "ru": "Порог считай один раз до цикла. Внутри <code>enumerate</code> сравнивай строго больше и сразу возвращай индекс. После цикла — <code>-1</code>.",
+      "uz": "Chegarani sikldan oldin bir marta hisoblang. <code>enumerate</code> ichida qat'iy katta deb solishtiring va indeksni darhol qaytaring. Sikldan keyin — <code>-1</code>.",
+      "en": "Compute the threshold once before the loop. Inside <code>enumerate</code> compare with a strict greater-than and return the index immediately. After the loop, <code>-1</code>."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "python",
+     "title": { "ru": "Перцентиль", "uz": "Protsentil", "en": "Percentile" },
+     "brief": { "ru": "Метрика, которая не врёт", "uz": "Aldamaydigan metrika", "en": "The metric that does not lie" },
+     "desc": {
+      "ru": "<p><code>percentile(values, p)</code> возвращает значение, ниже которого лежит <code>p</code> процентов измерений.</p><p>Отсортируй список, возьми элемент с индексом <code>int(len * p / 100)</code> и обязательно ограничь индекс последним элементом. Для пустого списка верни <code>0</code>.</p>",
+      "uz": "<p><code>percentile(values, p)</code> o'lchovlarning <code>p</code> foizi pastida yotgan qiymatni qaytaradi.</p><p>Ro'yxatni saralang, <code>int(len * p / 100)</code> indeksli elementni oling va indeksni albatta oxirgi element bilan cheklang. Bo'sh ro'yxat uchun <code>0</code> qaytaring.</p>",
+      "en": "<p><code>percentile(values, p)</code> returns the value below which <code>p</code> percent of the measurements lie.</p><p>Sort the list, take the element at index <code>int(len * p / 100)</code> and be sure to clamp the index to the last element. For an empty list return <code>0</code>.</p>"
+     },
+     "starter": "def percentile(values, p):\n    # твой код\n    pass\n\nprint(percentile([10, 20, 30, 40, 100], 50))\n",
+     "tests": "assert percentile([10, 20, 30, 40, 100], 50) == 30, 'Медиана пяти значений'\nassert percentile([10, 20, 30, 40, 100], 100) == 100, 'Сотый перцентиль — максимум'\nassert percentile([5], 95) == 5, 'Одно значение'\nassert percentile([], 95) == 0, 'Пустой список'\nassert percentile([3, 1, 2], 0) == 1, 'Нулевой перцентиль — минимум, список сортируется'\nassert percentile([1, 2, 3, 4], 50) == 3, 'Индекс 2 у отсортированного списка из четырёх'",
+     "hint": {
+      "ru": "Сначала <code>sorted</code>, потом индекс <code>int(len(ordered) * p / 100)</code>, затем <code>min(idx, len(ordered) - 1)</code>. Пустой список отсеки до всего остального.",
+      "uz": "Avval <code>sorted</code>, keyin <code>int(len(ordered) * p / 100)</code> indeksi, so'ng <code>min(idx, len(ordered) - 1)</code>. Bo'sh ro'yxatni hammasidan oldin ajrating.",
+      "en": "First <code>sorted</code>, then the index <code>int(len(ordered) * p / 100)</code>, then <code>min(idx, len(ordered) - 1)</code>. Filter out the empty list before anything else."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "python",
+     "title": { "ru": "Бюджет простоя", "uz": "To'xtash byudjeti", "en": "The downtime budget" },
+     "brief": { "ru": "Сколько можно лежать по SLO", "uz": "SLO bo'yicha qancha yotish mumkin", "en": "How long you may be down under an SLO" },
+     "desc": {
+      "ru": "<p><code>budget(slo, days)</code> считает, сколько минут простоя допускает цель доступности <code>slo</code> (в процентах) за <code>days</code> суток.</p><p>Формула: <code>days · 24 · 60 · (100 − slo) / 100</code>. Верни число с плавающей точкой. Отрицательное количество дней даёт <code>0.0</code>.</p>",
+      "uz": "<p><code>budget(slo, days)</code> <code>slo</code> ochiqlik maqsadi (foizda) <code>days</code> kunda necha daqiqa to'xtashga ruxsat berishini hisoblaydi.</p><p>Formula: <code>days · 24 · 60 · (100 − slo) / 100</code>. Suzuvchi nuqtali son qaytaring. Manfiy kunlar soni <code>0.0</code> beradi.</p>",
+      "en": "<p><code>budget(slo, days)</code> computes how many minutes of downtime an availability target <code>slo</code> (in percent) allows over <code>days</code> days.</p><p>Formula: <code>days · 24 · 60 · (100 − slo) / 100</code>. Return a float. A negative number of days gives <code>0.0</code>.</p>"
+     },
+     "starter": "def budget(slo, days):\n    # твой код\n    pass\n\nprint(budget(99.9, 30))\n",
+     "tests": "assert abs(budget(99.9, 30) - 43.2) < 1e-9, 'Три девятки за месяц — 43.2 минуты'\nassert abs(budget(99.0, 30) - 432.0) < 1e-9, 'Две девятки — в десять раз больше'\nassert abs(budget(100.0, 30)) < 1e-9, 'Стопроцентная цель не оставляет бюджета'\nassert budget(99.9, 0) == 0.0, 'Ноль дней — ноль минут'\nassert budget(99.9, -5) == 0.0, 'Отрицательный срок бессмыслен'\nassert isinstance(budget(99.99, 1), float), 'Результат — число с плавающей точкой'",
+     "hint": {
+      "ru": "Отсеки <code>days &lt;= 0</code> и верни <code>0.0</code>. Иначе одна строка по формуле — не забудь, что она уже даёт float.",
+      "uz": "<code>days &lt;= 0</code> ni ajrating va <code>0.0</code> qaytaring. Aks holda formula bo'yicha bir qator — u allaqachon float berishini unutmang.",
+      "en": "Filter out <code>days &lt;= 0</code> and return <code>0.0</code>. Otherwise one line from the formula — note it already yields a float."
+     }
+    }
+   ],
+   "exam": {
+    "time": 540,
+    "questions": [
+     {
+      "q": { "ru": "Среднее время ответа 190 мс, медиана 90 мс. О чём это говорит?", "uz": "O'rtacha javob vaqti 190 ms, mediana 90 ms. Bu nima haqida gapiradi?", "en": "The mean response time is 190 ms, the median 90 ms. What does this tell you?" },
+      "options": [
+       { "ru": "Сервис работает ровно", "uz": "Xizmat bir tekis ishlaydi", "en": "The service performs evenly" },
+       { "ru": "Есть редкие очень медленные запросы, которые тянут среднее вверх", "uz": "O'rtachani yuqoriga tortadigan kam uchraydigan juda sekin so'rovlar bor", "en": "There are rare very slow requests dragging the mean up" },
+       { "ru": "Медиана посчитана неверно", "uz": "Mediana noto'g'ri hisoblangan", "en": "The median is computed incorrectly" },
+       { "ru": "Запросов слишком мало", "uz": "So'rovlar juda kam", "en": "There are too few requests" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Команда получает 200 алертов в день. Чем это опасно?", "uz": "Jamoa kuniga 200 ta ogohlantirish oladi. Bu nimasi bilan xavfli?", "en": "A team receives 200 alerts a day. Why is that dangerous?" },
+      "options": [
+       { "ru": "Растёт нагрузка на сеть", "uz": "Tarmoqqa yuk ortadi", "en": "Network load grows" },
+       { "ru": "Алерты перестают читать, и настоящая авария теряется среди шума", "uz": "Ogohlantirishlar o'qilmay qoladi va haqiqiy avariya shovqin ichida yo'qoladi", "en": "Alerts stop being read and a real outage is lost in the noise" },
+       { "ru": "Заканчивается место на диске", "uz": "Diskda joy tugaydi", "en": "Disk space runs out" },
+       { "ru": "Ничем, чем больше, тем лучше", "uz": "Hech nimasi bilan, qancha ko'p bo'lsa shuncha yaxshi", "en": "It is not; more is better" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Инцидент: началось в 14:03, заметили в 14:18, починили в 14:51. Что улучшать в первую очередь?", "uz": "Insident: 14:03 da boshlandi, 14:18 da sezildi, 14:51 da tuzatildi. Birinchi navbatda nimani yaxshilash kerak?", "en": "Incident: started 14:03, noticed 14:18, fixed 14:51. What do you improve first?" },
+      "options": [
+       { "ru": "Скорость починки", "uz": "Tuzatish tezligini", "en": "The speed of the fix" },
+       { "ru": "Обнаружение: пятнадцать минут никто не знал о проблеме", "uz": "Aniqlashni: o'n besh daqiqa hech kim muammoni bilmadi", "en": "Detection: for fifteen minutes nobody knew about the problem" },
+       { "ru": "Ничего, всё нормально", "uz": "Hech nimani, hammasi normal", "en": "Nothing, it is fine" },
+       { "ru": "Количество серверов", "uz": "Serverlar sonini", "en": "The number of servers" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Что из этого — метрика, а не лог?", "uz": "Bulardan qaysi biri log emas, metrika?", "en": "Which of these is a metric rather than a log?" },
+      "options": [
+       { "ru": "«Запрос 8f21 упал с ошибкой базы»", "uz": "«8f21 so'rov baza xatosi bilan yiqildi»", "en": "“Request 8f21 failed with a database error”" },
+       { "ru": "«Доля ошибок за минуту: 0,4%»", "uz": "«Daqiqadagi xatolar ulushi: 0,4%»", "en": "“Error rate over the last minute: 0.4%”" },
+       { "ru": "«Пользователь вошёл в систему»", "uz": "«Foydalanuvchi tizimga kirdi»", "en": "“User signed in”" },
+       { "ru": "«Не удалось прочитать файл конфигурации»", "uz": "«Konfiguratsiya faylini o'qib bo'lmadi»", "en": "“Failed to read the configuration file”" }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "python",
+      "title": { "ru": "Здоровье релиза", "uz": "Reliz salomatligi", "en": "Release health" },
+      "desc": {
+       "ru": "<p>Собери решение о выкладке из настоящих измерений. <code>release_ok(times, errors, p, max_ms, max_error)</code> получает:</p><ul><li><code>times</code> — времена ответа в миллисекундах</li><li><code>errors</code> — список из нулей и единиц: была ли ошибка в запросе</li><li><code>p</code> — какой перцентиль проверять</li><li><code>max_ms</code> и <code>max_error</code> — пороги</li></ul><p>Верни <code>True</code>, если перцентиль <code>p</code> по <code>times</code> не превышает <code>max_ms</code> <b>и</b> доля ошибок не превышает <code>max_error</code>. Иначе <code>False</code>.</p><p>Пустые измерения считай успехом: проверять нечего.</p>",
+       "uz": "<p>Yoyish qarorini haqiqiy o'lchovlardan yig'ing. <code>release_ok(times, errors, p, max_ms, max_error)</code> oladi:</p><ul><li><code>times</code> — millisekundlardagi javob vaqtlari</li><li><code>errors</code> — nol va birlar ro'yxati: so'rovda xato bo'lganmi</li><li><code>p</code> — qaysi protsentilni tekshirish</li><li><code>max_ms</code> va <code>max_error</code> — chegaralar</li></ul><p><code>times</code> bo'yicha <code>p</code> protsentili <code>max_ms</code> dan oshmasa <b>va</b> xatolar ulushi <code>max_error</code> dan oshmasa <code>True</code> qaytaring. Aks holda <code>False</code>.</p><p>Bo'sh o'lchovlarni muvaffaqiyat deb hisoblang: tekshiradigan narsa yo'q.</p>",
+       "en": "<p>Assemble a deployment decision from real measurements. <code>release_ok(times, errors, p, max_ms, max_error)</code> receives:</p><ul><li><code>times</code> — response times in milliseconds</li><li><code>errors</code> — a list of zeros and ones: whether the request failed</li><li><code>p</code> — which percentile to check</li><li><code>max_ms</code> and <code>max_error</code> — the thresholds</li></ul><p>Return <code>True</code> if the <code>p</code> percentile of <code>times</code> does not exceed <code>max_ms</code> <b>and</b> the error rate does not exceed <code>max_error</code>. Otherwise <code>False</code>.</p><p>Treat empty measurements as a pass: there is nothing to check.</p>"
+      },
+      "starter": "def release_ok(times, errors, p, max_ms, max_error):\n    # перцентиль по времени и доля ошибок — оба должны уложиться\n    pass\n\nprint(release_ok([80, 90, 95, 2100], [0, 0, 0, 1], 50, 200, 0.3))\n",
+      "tests": "assert release_ok([80, 90, 95, 100], [0, 0, 0, 0], 95, 200, 0.05) is True, 'Быстро и без ошибок'\nassert release_ok([80, 90, 95, 5000], [0, 0, 0, 0], 95, 200, 0.05) is False, 'Хвост превысил порог'\nassert release_ok([80, 90], [1, 1], 95, 200, 0.05) is False, 'Сплошные ошибки'\nassert release_ok([], [], 95, 200, 0.05) is True, 'Нет измерений — нечего запрещать'\nassert release_ok([100, 100], [0, 0], 95, 100, 0.05) is True, 'Ровно на пороге — ещё проходим'\nassert release_ok([80, 90, 95, 100], [0, 0, 0, 1], 50, 200, 0.25) is True, 'Четверть ошибок при пороге 0.25 — ровно на грани'",
+      "hint": {
+       "ru": "Перцентиль возьми из задачи 2. Доля ошибок — <code>sum(errors) / len(errors)</code>, пустой список обработай отдельно. Сравнения делай нестрогими: ровно на пороге — ещё успех.",
+       "uz": "Protsentilni 2-vazifadan oling. Xatolar ulushi — <code>sum(errors) / len(errors)</code>, bo'sh ro'yxatni alohida qayta ishlang. Solishtirishni qat'iy bo'lmagan qiling: aynan chegarada — hali muvaffaqiyat.",
+       "en": "Take the percentile from task 2. The error rate is <code>sum(errors) / len(errors)</code>; handle the empty list separately. Use non-strict comparisons: exactly at the threshold still passes."
+      }
+     }
+    ]
+   }
   }
  ]
 }
