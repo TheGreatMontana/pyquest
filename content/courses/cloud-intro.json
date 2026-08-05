@@ -1,0 +1,540 @@
+{
+ "id": "cloud-intro",
+ "schema": 2,
+ "modules": [
+  {
+   "id": "cl-01",
+   "title": {
+    "ru": "Аренда вместо покупки",
+    "uz": "Sotib olish o'rniga ijara",
+    "en": "Renting instead of buying"
+   },
+   "tagline": {
+    "ru": "Что арендуют, сколько это стоит и как не разориться",
+    "uz": "Nima ijaraga olinadi, qancha turadi va qanday xonavayron bo'lmaslik",
+    "en": "What you rent, what it costs and how not to go broke"
+   },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": {
+      "ru": "Что такое облако",
+      "uz": "Bulut nima",
+      "en": "What the cloud is"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>«Облако» — чужие серверы, которые сдают в аренду по часам. Никакого волшебства: те же машины в дата-центре, только покупать и обслуживать их не тебе.</p><p>Меняется не техника, а экономика. Раньше под новый проект покупали сервер на три года вперёд — с запасом, который девять месяцев простаивал. Теперь берут ровно столько, сколько нужно сегодня, и меняют завтра одной командой.</p><p>Арендуют три вещи: <b>вычисления</b> (процессор и память), <b>хранилище</b> (диски и файлы) и <b>готовые сервисы</b> — базы, очереди, почту, которые не надо настраивать самому.</p>",
+        "uz": "<p>«Bulut» — soatlab ijaraga beriladigan begona serverlar. Hech qanday sehr yo'q: o'sha ma'lumot markazidagi mashinalar, faqat ularni sotib olish va xizmat ko'rsatish sizning ishingiz emas.</p><p>Texnika emas, iqtisod o'zgaradi. Ilgari yangi loyihaga uch yil oldinga server sotib olinardi — to'qqiz oy bo'sh turadigan zaxira bilan. Endi bugun kerak bo'lganicha olinadi va ertaga bitta buyruq bilan o'zgartiriladi.</p><p>Uchta narsa ijaraga olinadi: <b>hisoblash</b> (protsessor va xotira), <b>saqlash</b> (disklar va fayllar) va <b>tayyor xizmatlar</b> — o'zingiz sozlashingiz shart bo'lmagan bazalar, navbatlar, pochta.</p>",
+        "en": "<p>“The cloud” means someone else's servers rented by the hour. No magic: the same machines in a data centre, only you do not buy or maintain them.</p><p>What changes is not the technology but the economics. A new project used to require buying a server three years ahead — with headroom that sat idle for nine months. Now you take exactly what you need today and change it tomorrow with one command.</p><p>You rent three things: <b>compute</b> (processor and memory), <b>storage</b> (disks and files) and <b>managed services</b> — databases, queues, mail that you do not have to configure yourself.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "# сравним покупку сервера и аренду на тот же срок\nOWN_PRICE = 3000        # покупка сервера, долларов\nOWN_YEARS = 3\nRENT_HOUR = 0.12        # аренда похожей машины, долларов в час\n\nhours_per_year = 365 * 24\nown_per_year = OWN_PRICE / OWN_YEARS\n\nfor load in [0.1, 0.5, 1.0]:      # доля времени, когда сервер реально нужен\n    rent = RENT_HOUR * hours_per_year * load\n    print(f\"загрузка {int(load*100):3}%: аренда {rent:7.0f} против покупки {own_per_year:.0f}\")"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Видно главное правило: облако выигрывает, когда нагрузка неровная. Если сервер нужен круглосуточно и годами — аренда обходится дороже покупки. Поэтому крупные компании часто держат своё железо под постоянную нагрузку, а в облако выносят пики.</p>",
+        "uz": "<p>Asosiy qoida ko'rinadi: bulut yuk notekis bo'lganda yutadi. Server kecha-kunduz va yillab kerak bo'lsa — ijara sotib olishdan qimmatga tushadi. Shuning uchun yirik kompaniyalar doimiy yuk uchun ko'pincha o'z temirini saqlaydi, cho'qqilarni esa bulutga chiqaradi.</p>",
+        "en": "<p>The main rule is visible: the cloud wins when load is uneven. If a server is needed round the clock for years, renting costs more than buying. That is why large companies often keep their own hardware for the steady load and push the peaks to the cloud.</p>"
+       }
+      },
+      {
+       "type": "checkpoint",
+       "q": {
+        "ru": "Когда облако выгоднее собственного сервера?",
+        "uz": "Bulut o'z serveridan qachon foydaliroq?",
+        "en": "When is the cloud cheaper than your own server?"
+       },
+       "options": [
+        {
+         "ru": "Всегда",
+         "uz": "Doim",
+         "en": "Always"
+        },
+        {
+         "ru": "Когда нагрузка неровная и большую часть времени невысока",
+         "uz": "Yuk notekis va ko'p vaqt past bo'lganda",
+         "en": "When load is uneven and low most of the time"
+        },
+        {
+         "ru": "Когда сервер нужен круглосуточно годами",
+         "uz": "Server yillab kecha-kunduz kerak bo'lganda",
+         "en": "When a server is needed round the clock for years"
+        }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Платишь за использованное. Если используешь всё время на полную — платишь всё время на полную.",
+        "uz": "Ishlatilganiga to'laysiz. Doim to'liq ishlatsangiz — doim to'liq to'laysiz.",
+        "en": "You pay for what you use. If you use it fully all the time, you pay fully all the time."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": {
+      "ru": "Масштабирование",
+      "uz": "Miqyoslash",
+      "en": "Scaling"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Нагрузка выросла — есть два пути:</p><ul><li><b>Вверх</b> — взять машину помощнее. Просто, но упирается в потолок и требует перезапуска</li><li><b>Вширь</b> — добавить машин и раскидать запросы между ними. Сложнее, но потолка почти нет</li></ul><p>Автомасштабирование делает второе само: следит за нагрузкой и добавляет или убирает машины по правилу. Например: держать загрузку около 60%, но не меньше двух машин и не больше десяти.</p>",
+        "uz": "<p>Yuk oshdi — ikki yo'l bor:</p><ul><li><b>Yuqoriga</b> — kuchliroq mashina olish. Oddiy, lekin shiftga tegadi va qayta ishga tushirishni talab qiladi</li><li><b>Kengaygа</b> — mashina qo'shib, so'rovlarni ular orasida taqsimlash. Murakkabroq, lekin shift deyarli yo'q</li></ul><p>Avtomiqyoslash ikkinchisini o'zi qiladi: yukni kuzatadi va qoida bo'yicha mashina qo'shadi yoki olib tashlaydi. Masalan: yukni 60% atrofida ushlash, lekin ikkitadan kam va o'ntadan ko'p emas.</p>",
+        "en": "<p>Load grew — there are two routes:</p><ul><li><b>Up</b> — take a bigger machine. Simple, but it hits a ceiling and needs a restart</li><li><b>Out</b> — add machines and spread requests across them. Harder, but almost no ceiling</li></ul><p>Autoscaling does the second for you: it watches load and adds or removes machines by a rule. For example: keep utilisation near 60%, but never fewer than two machines and never more than ten.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "def needed_machines(rps, per_machine, min_n=2, max_n=10):\n    \"\"\"Сколько машин нужно под нагрузку rps запросов в секунду.\"\"\"\n    raw = -(-rps // per_machine)          # деление с округлением вверх\n    return max(min_n, min(max_n, raw))\n\nfor rps in [10, 100, 450, 5000]:\n    n = needed_machines(rps, 120)\n    print(f\"{rps:5} запросов/с -> {n} машин\")"
+      },
+      {
+       "type": "note",
+       "kind": "trap",
+       "html": {
+        "ru": "Верхний предел ставят не из жадности, а от испуга. Ошибка в коде или наплыв ботов способны за ночь поднять тысячу машин — и счёт на десятки тысяч долларов. Лимит превращает катастрофу в просто плохую ночь.",
+        "uz": "Yuqori chegara ochko'zlikdan emas, qo'rquvdan qo'yiladi. Koddagi xato yoki botlar oqimi bir kechada ming mashina ko'tarishi mumkin — va o'n minglab dollarlik hisob. Cheklov falokatni shunchaki yomon kechaga aylantiradi.",
+        "en": "The upper limit is set out of fear, not greed. A bug or a bot surge can spin up a thousand machines overnight — and a bill in the tens of thousands. A cap turns a catastrophe into merely a bad night."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": {
+      "ru": "Надёжность и инфраструктура как код",
+      "uz": "Ishonchlilik va infratuzilma kod sifatida",
+      "en": "Reliability and infrastructure as code"
+     },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Одна машина рано или поздно умрёт — это не пессимизм, а статистика. Поэтому важные сервисы держат в нескольких <b>зонах доступности</b>: это отдельные здания дата-центра со своим питанием и сетью. Пожар в одном не тронет второе.</p><p>Настраивать всё это мышкой в панели — путь к тому, что через год никто не вспомнит, почему один сервер отличается от другого. Поэтому инфраструктуру описывают файлом и хранят в Git, как обычный код: видно историю изменений, можно откатиться и поднять копию окружения одной командой.</p>",
+        "uz": "<p>Bitta mashina ertami-kechmi o'ladi — bu pessimizm emas, statistika. Shuning uchun muhim xizmatlar bir nechta <b>mavjudlik zonasida</b> saqlanadi: bular o'z quvvati va tarmog'i bo'lgan alohida ma'lumot markazi binolari. Biridagi yong'in ikkinchisiga tegmaydi.</p><p>Bularning hammasini panelda sichqoncha bilan sozlash — bir yildan keyin hech kim nega bir server boshqasidan farq qilishini eslamasligiga olib boradi. Shuning uchun infratuzilma fayl bilan tasvirlanadi va oddiy kod kabi Git da saqlanadi: o'zgarishlar tarixi ko'rinadi, orqaga qaytish va muhit nusxasini bitta buyruq bilan ko'tarish mumkin.</p>",
+        "en": "<p>One machine will die sooner or later — that is statistics, not pessimism. So important services are spread across several <b>availability zones</b>: separate data-centre buildings with their own power and network. A fire in one does not touch the other.</p><p>Configuring all of that by clicking in a panel leads to nobody remembering, a year later, why one server differs from another. So infrastructure is described in a file and kept in Git like ordinary code: you get a change history, you can roll back, and you can raise a copy of the environment with one command.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "# считаем, переживёт ли сервис отказ одной зоны\ndef survives(zones, need_total):\n    \"\"\"zones — сколько машин в каждой зоне, need_total — сколько нужно для работы.\"\"\"\n    worst = max(zones)                       # худший случай: падает самая большая зона\n    return sum(zones) - worst >= need_total\n\ncases = [\n    ([4, 0, 0], 3, 'все машины в одной зоне'),\n    ([2, 2, 0], 3, 'две зоны'),\n    ([2, 2, 2], 3, 'три зоны'),\n]\nfor zones, need, label in cases:\n    ok = survives(zones, need)\n    print(f\"{label:22} -> {'переживёт' if ok else 'ляжет'}\")"
+      },
+      {
+       "type": "summary",
+       "items": [
+        {
+         "ru": "Облако — аренда чужих серверов по факту использования",
+         "uz": "Bulut — begona serverlarni ishlatilganiga qarab ijaraga olish",
+         "en": "The cloud is renting someone else's servers by usage"
+        },
+        {
+         "ru": "Выгодно при неровной нагрузке, дорого при постоянной",
+         "uz": "Notekis yukda foydali, doimiysida qimmat",
+         "en": "Cheap for uneven load, expensive for constant load"
+        },
+        {
+         "ru": "Вширь надёжнее, чем вверх: у высоты есть потолок",
+         "uz": "Kengayish yuqoriga chiqishdan ishonchliroq: balandlikning shifti bor",
+         "en": "Scaling out beats scaling up: height has a ceiling"
+        },
+        {
+         "ru": "Верхний лимит машин защищает от счёта за ошибку",
+         "uz": "Mashinalarning yuqori chegarasi xato uchun hisobdan himoya qiladi",
+         "en": "An upper machine limit protects you from a bill for a bug"
+        },
+        {
+         "ru": "Инфраструктуру описывают кодом и хранят в Git",
+         "uz": "Infratuzilma kod bilan tasvirlanadi va Git da saqlanadi",
+         "en": "Infrastructure is described as code and kept in Git"
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": {
+      "ru": "Что такое облако простыми словами?",
+      "uz": "Oddiy so'z bilan bulut nima?",
+      "en": "What is the cloud in plain words?"
+     },
+     "options": [
+      {
+       "ru": "Особая технология хранения данных",
+       "uz": "Ma'lumot saqlashning maxsus texnologiyasi",
+       "en": "A special data-storage technology"
+      },
+      {
+       "ru": "Чужие серверы, которые сдают в аренду по использованию",
+       "uz": "Ishlatilganiga qarab ijaraga beriladigan begona serverlar",
+       "en": "Someone else's servers rented by usage"
+      },
+      {
+       "ru": "Программа для резервных копий",
+       "uz": "Zaxira nusxalari uchun dastur",
+       "en": "A backup program"
+      },
+      {
+       "ru": "Интернет вообще",
+       "uz": "Umuman internet",
+       "en": "The internet in general"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Те же машины в дата-центре — меняется не техника, а способ платить за неё.",
+      "uz": "O'sha ma'lumot markazidagi mashinalar — texnika emas, unga to'lash usuli o'zgaradi.",
+      "en": "The same machines in a data centre — what changes is not the hardware but how you pay for it."
+     }
+    },
+    {
+     "q": {
+      "ru": "Масштабирование вширь — это…",
+      "uz": "Kengayib miqyoslash — bu…",
+      "en": "Scaling out means…"
+     },
+     "options": [
+      {
+       "ru": "взять машину помощнее",
+       "uz": "kuchliroq mashina olish",
+       "en": "taking a bigger machine"
+      },
+      {
+       "ru": "добавить машин и распределить нагрузку",
+       "uz": "mashina qo'shib, yukni taqsimlash",
+       "en": "adding machines and spreading the load"
+      },
+      {
+       "ru": "уменьшить объём данных",
+       "uz": "ma'lumot hajmini kamaytirish",
+       "en": "reducing the amount of data"
+      },
+      {
+       "ru": "перенести сервис в другой регион",
+       "uz": "xizmatni boshqa mintaqaga ko'chirish",
+       "en": "moving the service to another region"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Вверх — та же машина, но мощнее. Вширь — много обычных машин, и потолка почти нет.",
+      "uz": "Yuqoriga — o'sha mashina, lekin kuchliroq. Kengayga — ko'p oddiy mashina, shift deyarli yo'q.",
+      "en": "Up is the same machine but stronger. Out is many ordinary machines, with almost no ceiling."
+     }
+    },
+    {
+     "q": {
+      "ru": "Зачем ставят верхний предел числа машин?",
+      "uz": "Nega mashinalar sonining yuqori chegarasi qo'yiladi?",
+      "en": "Why set an upper limit on machines?"
+     },
+     "options": [
+      {
+       "ru": "Так требует провайдер",
+       "uz": "Provayder shuni talab qiladi",
+       "en": "The provider requires it"
+      },
+      {
+       "ru": "Чтобы ошибка или наплыв ботов не выставили огромный счёт",
+       "uz": "Xato yoki botlar oqimi katta hisob chiqarmasligi uchun",
+       "en": "So a bug or bot surge does not produce a huge bill"
+      },
+      {
+       "ru": "Чтобы сервис работал быстрее",
+       "uz": "Xizmat tezroq ishlashi uchun",
+       "en": "To make the service faster"
+      },
+      {
+       "ru": "Чтобы экономить память",
+       "uz": "Xotira tejash uchun",
+       "en": "To save memory"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Автомасштабирование не отличает настоящих пользователей от бесконечного цикла в коде.",
+      "uz": "Avtomiqyoslash haqiqiy foydalanuvchilarni koddagi cheksiz sikldan farqlamaydi.",
+      "en": "Autoscaling cannot tell real users from an infinite loop in your code."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что такое зона доступности?",
+      "uz": "Mavjudlik zonasi nima?",
+      "en": "What is an availability zone?"
+     },
+     "options": [
+      {
+       "ru": "Уровень тарифа",
+       "uz": "Tarif darajasi",
+       "en": "A pricing tier"
+      },
+      {
+       "ru": "Отдельная площадка со своим питанием и сетью",
+       "uz": "O'z quvvati va tarmog'i bo'lgan alohida maydon",
+       "en": "A separate site with its own power and network"
+      },
+      {
+       "ru": "Регион страны",
+       "uz": "Mamlakat mintaqasi",
+       "en": "A region of a country"
+      },
+      {
+       "ru": "Группа пользователей",
+       "uz": "Foydalanuvchilar guruhi",
+       "en": "A group of users"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Смысл в том, чтобы авария в одной зоне не задела вторую. Все машины в одной зоне — это отсутствие резервирования.",
+      "uz": "Ma'nosi shundaki, bir zonadagi avariya ikkinchisiga tegmasligi kerak. Barcha mashinalar bitta zonada bo'lsa — zaxiralash yo'q degani.",
+      "en": "The point is that an outage in one zone does not touch the other. All machines in one zone means no redundancy at all."
+     }
+    },
+    {
+     "q": {
+      "ru": "Почему инфраструктуру описывают кодом?",
+      "uz": "Nega infratuzilma kod bilan tasvirlanadi?",
+      "en": "Why describe infrastructure as code?"
+     },
+     "options": [
+      {
+       "ru": "Так дешевле",
+       "uz": "Shunday arzonroq",
+       "en": "It is cheaper"
+      },
+      {
+       "ru": "Видна история изменений и можно повторить окружение",
+       "uz": "O'zgarishlar tarixi ko'rinadi va muhitni takrorlash mumkin",
+       "en": "You get a change history and can reproduce the environment"
+      },
+      {
+       "ru": "Панель управления работает медленно",
+       "uz": "Boshqaruv paneli sekin ishlaydi",
+       "en": "The control panel is slow"
+      },
+      {
+       "ru": "Иначе облако не запустится",
+       "uz": "Aks holda bulut ishga tushmaydi",
+       "en": "Otherwise the cloud will not start"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Настройки, сделанные мышкой, живут только в памяти того, кто их делал — и увольняются вместе с ним.",
+      "uz": "Sichqoncha bilan qilingan sozlamalar faqat uni qilgan odam xotirasida yashaydi — va u bilan birga ishdan ketadi.",
+      "en": "Settings made by clicking live only in the memory of whoever made them — and leave with that person."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "python",
+     "title": {
+      "ru": "Счёт за аренду",
+      "uz": "Ijara hisobi",
+      "en": "The rental bill"
+     },
+     "brief": {
+      "ru": "Считаем стоимость",
+      "uz": "Narxni hisoblaymiz",
+      "en": "Computing the cost"
+     },
+     "desc": {
+      "ru": "<p><code>monthly_cost(machines, price_per_hour)</code> возвращает стоимость аренды за 30 суток непрерывной работы. Округли до двух знаков через <code>round</code>.</p>",
+      "uz": "<p><code>monthly_cost(machines, price_per_hour)</code> 30 kunlik uzluksiz ishlash uchun ijara narxini qaytaradi. <code>round</code> bilan ikki xonagacha yaxlitlang.</p>",
+      "en": "<p><code>monthly_cost(machines, price_per_hour)</code> returns the rental cost for 30 days of continuous operation. Round to two decimals with <code>round</code>.</p>"
+     },
+     "starter": "def monthly_cost(machines, price_per_hour):\n    # твой код\n    pass\n\nprint(monthly_cost(2, 0.1))\n",
+     "tests": "assert monthly_cost(2, 0.1) == 144.0, '2 машины по 0.1 за 720 часов'\nassert monthly_cost(0, 5) == 0, 'Нет машин — нет счёта'\nassert monthly_cost(1, 0) == 0, 'Бесплатная машина'\nassert monthly_cost(10, 0.05) == 360.0, 'Десять дешёвых машин'",
+     "hint": {
+      "ru": "В 30 сутках 720 часов. Умножь количество машин на цену и на 720.",
+      "uz": "30 kunda 720 soat bor. Mashinalar sonini narxga va 720 ga ko'paytiring.",
+      "en": "There are 720 hours in 30 days. Multiply machines by price by 720."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "python",
+     "title": {
+      "ru": "Сколько машин поднять",
+      "uz": "Nechta mashina ko'tarish",
+      "en": "How many machines to run"
+     },
+     "brief": {
+      "ru": "Автомасштабирование",
+      "uz": "Avtomiqyoslash",
+      "en": "Autoscaling"
+     },
+     "desc": {
+      "ru": "<p><code>needed(rps, per_machine, min_n, max_n)</code> возвращает число машин под нагрузку <code>rps</code>, если одна тянет <code>per_machine</code> запросов в секунду.</p><p>Округляй вверх, но не выходи за пределы <code>min_n</code> и <code>max_n</code>.</p>",
+      "uz": "<p><code>needed(rps, per_machine, min_n, max_n)</code> bitta mashina soniyasiga <code>per_machine</code> so'rovni ko'tarsa, <code>rps</code> yuk uchun mashinalar sonini qaytaradi.</p><p>Yuqoriga yaxlitlang, lekin <code>min_n</code> va <code>max_n</code> chegarasidan chiqmang.</p>",
+      "en": "<p><code>needed(rps, per_machine, min_n, max_n)</code> returns the number of machines for a load of <code>rps</code>, given one machine handles <code>per_machine</code> requests per second.</p><p>Round up, but stay within <code>min_n</code> and <code>max_n</code>.</p>"
+     },
+     "starter": "def needed(rps, per_machine, min_n, max_n):\n    # твой код\n    pass\n\nprint(needed(450, 120, 2, 10))\n",
+     "tests": "assert needed(450, 120, 2, 10) == 4, '450 / 120 = 3.75 → округляем вверх до 4'\nassert needed(10, 120, 2, 10) == 2, 'Меньше минимума — берём минимум'\nassert needed(50000, 120, 2, 10) == 10, 'Больше максимума — упираемся в потолок'\nassert needed(240, 120, 1, 10) == 2, 'Ровное деление без округления'\nassert needed(0, 100, 2, 10) == 2, 'Нет нагрузки — всё равно держим минимум'",
+     "hint": {
+      "ru": "Округление вверх: <code>-(-rps // per_machine)</code>. Потом зажми результат между границами через <code>max</code> и <code>min</code>.",
+      "uz": "Yuqoriga yaxlitlash: <code>-(-rps // per_machine)</code>. Keyin natijani <code>max</code> va <code>min</code> bilan chegaralar orasiga siqing.",
+      "en": "Round up with <code>-(-rps // per_machine)</code>. Then clamp the result between the bounds using <code>max</code> and <code>min</code>."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "python",
+     "title": {
+      "ru": "Переживёт ли отказ зоны",
+      "uz": "Zona ishdan chiqishiga chidaydimi",
+      "en": "Will it survive a zone failure"
+     },
+     "brief": {
+      "ru": "Резервирование",
+      "uz": "Zaxiralash",
+      "en": "Redundancy"
+     },
+     "desc": {
+      "ru": "<p><code>survives(zones, need)</code> принимает список — сколько машин в каждой зоне — и требуемое число рабочих машин. Возвращает <code>True</code>, если сервис выживет при отказе <b>любой одной</b> зоны.</p>",
+      "uz": "<p><code>survives(zones, need)</code> ro'yxatni — har bir zonada nechta mashina — va kerakli ishchi mashinalar sonini oladi. <b>Istalgan bitta</b> zona ishdan chiqqanda xizmat omon qolsa <code>True</code> qaytaradi.</p>",
+      "en": "<p><code>survives(zones, need)</code> takes a list of how many machines are in each zone plus the number of working machines required. It returns <code>True</code> if the service survives the loss of <b>any single</b> zone.</p>"
+     },
+     "starter": "def survives(zones, need):\n    # твой код\n    pass\n\nprint(survives([2, 2, 2], 3))\n",
+     "tests": "assert survives([2, 2, 2], 3) is True, 'Останется 4 машины из 6'\nassert survives([4, 0, 0], 3) is False, 'Все машины в одной зоне — не переживёт'\nassert survives([2, 2], 3) is False, 'Останется только 2 при нужных 3'\nassert survives([], 1) is False, 'Зон нет вовсе'\nassert survives([5, 5], 5) is True, 'Оставшейся зоны хватает'",
+     "hint": {
+      "ru": "Худший случай — падает самая большая зона. Проверь <code>sum(zones) - max(zones) &gt;= need</code>, не забыв про пустой список.",
+      "uz": "Eng yomon holat — eng katta zona quladi. <code>sum(zones) - max(zones) &gt;= need</code> ni tekshiring, bo'sh ro'yxatni unutmang.",
+      "en": "The worst case is losing the largest zone. Check <code>sum(zones) - max(zones) &gt;= need</code>, remembering the empty list."
+     }
+    }
+   ],
+   "exam": {
+    "time": 420,
+    "questions": [
+     {
+      "q": {
+       "ru": "Что арендуют в облаке?",
+       "uz": "Bulutda nima ijaraga olinadi?",
+       "en": "What do you rent in the cloud?"
+      },
+      "options": [
+       {
+        "ru": "Только диски",
+        "uz": "Faqat disklar",
+        "en": "Only disks"
+       },
+       {
+        "ru": "Вычисления, хранилище и готовые сервисы",
+        "uz": "Hisoblash, saqlash va tayyor xizmatlar",
+        "en": "Compute, storage and managed services"
+       },
+       {
+        "ru": "Только программы",
+        "uz": "Faqat dasturlar",
+        "en": "Only software"
+       },
+       {
+        "ru": "Интернет-канал",
+        "uz": "Internet kanali",
+        "en": "Internet bandwidth"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "У какого способа масштабирования есть жёсткий потолок?",
+       "uz": "Qaysi miqyoslash usulida qat'iy shift bor?",
+       "en": "Which scaling approach has a hard ceiling?"
+      },
+      "options": [
+       {
+        "ru": "Вширь",
+        "uz": "Kengayga",
+        "en": "Out"
+       },
+       {
+        "ru": "Вверх",
+        "uz": "Yuqoriga",
+        "en": "Up"
+       },
+       {
+        "ru": "У обоих",
+        "uz": "Ikkalasida",
+        "en": "Both"
+       },
+       {
+        "ru": "Ни у одного",
+        "uz": "Hech qaysida",
+        "en": "Neither"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "Все машины сервиса в одной зоне доступности — это…",
+       "uz": "Xizmatning barcha mashinalari bitta mavjudlik zonasida — bu…",
+       "en": "All of a service's machines in one availability zone is…"
+      },
+      "options": [
+       {
+        "ru": "нормально, зоны надёжны",
+        "uz": "normal, zonalar ishonchli",
+        "en": "fine, zones are reliable"
+       },
+       {
+        "ru": "отсутствие резервирования: авария зоны уронит сервис",
+        "uz": "zaxiralash yo'q: zona avariyasi xizmatni qulatadi",
+        "en": "no redundancy: a zone outage takes the service down"
+       },
+       {
+        "ru": "дешевле и потому правильно",
+        "uz": "arzonroq va shuning uchun to'g'ri",
+        "en": "cheaper and therefore correct"
+       },
+       {
+        "ru": "требование провайдера",
+        "uz": "provayder talabi",
+        "en": "a provider requirement"
+       }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "python",
+      "title": {
+       "ru": "Счёт с автомасштабированием",
+       "uz": "Avtomiqyoslashli hisob",
+       "en": "A bill with autoscaling"
+      },
+      "desc": {
+       "ru": "<p><code>bill(loads, per_machine, price_per_hour, min_n, max_n)</code> принимает список почасовых нагрузок (запросов в секунду). Для каждого часа считает нужное число машин по тем же правилам, что и раньше, и суммирует стоимость.</p><p>Округли итог до двух знаков.</p>",
+       "uz": "<p><code>bill(loads, per_machine, price_per_hour, min_n, max_n)</code> soatlik yuklar (soniyasiga so'rovlar) ro'yxatini oladi. Har bir soat uchun oldingi qoidalar bo'yicha kerakli mashinalar sonini hisoblaydi va narxni yig'adi.</p><p>Natijani ikki xonagacha yaxlitlang.</p>",
+       "en": "<p><code>bill(loads, per_machine, price_per_hour, min_n, max_n)</code> takes a list of hourly loads (requests per second). For each hour it computes the machines needed by the same rules as before and sums the cost.</p><p>Round the total to two decimals.</p>"
+      },
+      "starter": "def bill(loads, per_machine, price_per_hour, min_n, max_n):\n    # твой код\n    pass\n\nprint(bill([10, 500, 10], 120, 0.1, 2, 10))\n",
+      "tests": "assert bill([10, 500, 10], 120, 0.1, 2, 10) == 0.9, '2 + 5 + 2 = 9 машино-часов по 0.1'\nassert bill([], 100, 1, 1, 5) == 0, 'Нет часов — нет счёта'\nassert bill([0, 0], 100, 0.5, 2, 10) == 2.0, 'Минимум держится даже без нагрузки'\nassert bill([100000], 100, 0.1, 1, 3) == 0.3, 'Упираемся в потолок в три машины'",
+      "hint": {
+       "ru": "Для каждой нагрузки посчитай машины той же формулой, сложи их и умножь на цену часа.",
+       "uz": "Har bir yuk uchun mashinalarni o'sha formula bilan hisoblang, qo'shing va soat narxiga ko'paytiring.",
+       "en": "For each load compute machines with the same formula, sum them and multiply by the hourly price."
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

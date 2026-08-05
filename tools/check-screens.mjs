@@ -85,10 +85,11 @@ check('дашборд: навыки отображаются', txt().includes('�
 
 /* --- каталог --- */
 catalogScreen.renderCatalog(app);
-check('каталог: 8 рабочих направлений карточками', app.querySelectorAll('.domain-card').length === 8, app.querySelectorAll('.domain-card').length);
-check('каталог: 8 будущих направлений компактной строкой', app.querySelectorAll('.domain-chip').length === 8, app.querySelectorAll('.domain-chip').length);
-check('каталог: 19 карточек курсов', app.querySelectorAll('.course-grid .course-card').length === 19, app.querySelectorAll('.course-grid .course-card').length);
-check('каталог: незаполненные направления честно отделены', !!app.querySelector('.planned-row'));
+check('каталог: 16 рабочих направлений карточками', app.querySelectorAll('.domain-card').length === 16, app.querySelectorAll('.domain-card').length);
+check('каталог: 0 будущих направлений компактной строкой', app.querySelectorAll('.domain-chip').length === 0, app.querySelectorAll('.domain-chip').length);
+check('каталог: 26 карточек курсов', app.querySelectorAll('.course-grid .course-card').length === 26, app.querySelectorAll('.course-grid .course-card').length);
+/* Пустых направлений не осталось — строка «в разработке» и не должна появляться */
+check('каталог: строки «в разработке» нет, все направления заполнены', !app.querySelector('.planned-row'));
 
 /* --- страница направления (визуальный путь) --- */
 catalogScreen.renderDomain(app, 'data-engineering');
@@ -102,8 +103,8 @@ check('направление: рассказ «что это за работа�
 check('направление: три блока рассказа', app.querySelectorAll('.about-block').length === 3, app.querySelectorAll('.about-block').length);
 
 catalogScreen.renderDomain(app, 'ai');
-check('направление в разработке: плашка статуса', !!app.querySelector('.notice'));
-check('направление в разработке: рассказ о нём всё равно есть', !!app.querySelector('.about-domain'));
+check('направление AI: есть путь с курсами', app.querySelectorAll('.rm-node').length > 0, app.querySelectorAll('.rm-node').length);
+check('направление AI: рассказ о работе на месте', !!app.querySelector('.about-domain'));
 
 /* --- страница курса --- */
 await courseScreen.renderCourse(app, 'python-basics');

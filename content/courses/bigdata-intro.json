@@ -1,0 +1,295 @@
+{
+ "id": "bigdata-intro",
+ "schema": 2,
+ "modules": [
+  {
+   "id": "bd-01",
+   "title": { "ru": "Когда данные не помещаются", "uz": "Ma'lumot sig'may qolganda", "en": "When the data does not fit" },
+   "tagline": { "ru": "Разделение, map-reduce и перекос", "uz": "Bo'lish, map-reduce va qiyshiqlik", "en": "Partitioning, map-reduce and skew" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "Граница одной машины", "uz": "Bitta mashina chegarasi", "en": "The limit of one machine" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Пока данные помещаются в память, всё просто: прочитал файл, посчитал, вывел. Big Data начинается там, где не помещаются — ни в память, ни на диск одной машины.</p><p>Первая мысль «купим машину помощнее» работает недолго: цена растёт быстрее мощности, а потолок всё равно есть. Поэтому идут другим путём — берут много обычных машин и делят работу между ними.</p><p>Появляется новая арифметика: сто машин обрабатывают данные не в сто раз быстрее. Часть времени уходит на пересылку данных между ними, и эта часть иногда съедает весь выигрыш.</p>",
+        "uz": "<p>Ma'lumot xotiraga sig'ar ekan, hammasi oddiy: faylni o'qidi, hisobladi, chiqardi. Big Data ular sig'may qolgan joyda — na xotiraga, na bitta mashina diskiga sig'maganda boshlanadi.</p><p>«Kuchliroq mashina sotib olamiz» degan birinchi fikr uzoq ishlamaydi: narx quvvatdan tezroq o'sadi, shift esa baribir bor. Shuning uchun boshqa yo'ldan borishadi — ko'p oddiy mashina olib, ish ular orasida bo'linadi.</p><p>Yangi arifmetika paydo bo'ladi: yuzta mashina ma'lumotni yuz barobar tez qayta ishlamaydi. Vaqtning bir qismi ular orasida ma'lumot uzatishga ketadi va bu qism ba'zan butun yutuqni yeb qo'yadi.</p>",
+        "en": "<p>While the data fits in memory, everything is simple: read the file, compute, print. Big data begins where it does not fit — neither in memory nor on one machine's disk.</p><p>The first thought, “let's buy a bigger machine”, works only for a while: price grows faster than power, and there is a ceiling anyway. So people take another route — many ordinary machines with the work split between them.</p><p>A new arithmetic appears: a hundred machines do not process data a hundred times faster. Part of the time goes on shuffling data between them, and sometimes that part eats the entire gain.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "TOTAL_GB = 1000        # объём данных\nSPEED_GB = 0.5         # одна машина обрабатывает 0.5 ГБ в секунду\nOVERHEAD = 4           # секунды на координацию каждой машины\n\ndef estimate(machines):\n    work = TOTAL_GB / SPEED_GB / machines\n    return work + OVERHEAD * machines\n\nfor n in [1, 10, 50, 100, 300]:\n    print(f\"{n:3} машин: {estimate(n):7.1f} с\")"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Видно главное: до какого-то момента добавлять машины выгодно, а потом накладные расходы начинают перевешивать. Планировать кластер «на глазок» — верный способ платить за простаивающее железо.</p>",
+        "uz": "<p>Asosiysi ko'rinadi: ma'lum nuqtagacha mashina qo'shish foydali, keyin qo'shimcha xarajatlar ustun kela boshlaydi. Klasterni «ko'z bilan» rejalashtirish — bo'sh turgan temirga pul to'lashning ishonchli yo'li.</p>",
+        "en": "<p>The key point is visible: up to a point adding machines pays off, after which the overhead starts to dominate. Sizing a cluster by gut feeling is a reliable way to pay for idle hardware.</p>"
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "Map и reduce", "uz": "Map va reduce", "en": "Map and reduce" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Чтобы работу можно было разделить, её раскладывают на два шага:</p><ul><li><b>map</b> — обработать свой кусок данных независимо от других. Машины друг с другом не общаются</li><li><b>reduce</b> — свести частичные результаты в общий</li></ul><p>Классический пример — подсчёт слов. Каждая машина считает слова в своей части, потом счётчики складываются. Именно так устроены и Hadoop, и Spark, хотя интерфейс у них удобнее.</p>",
+        "uz": "<p>Ishni bo'lish mumkin bo'lishi uchun uni ikki qadamga ajratishadi:</p><ul><li><b>map</b> — o'z ma'lumot bo'lagini boshqalardan mustaqil qayta ishlash. Mashinalar bir-biri bilan gaplashmaydi</li><li><b>reduce</b> — qisman natijalarni umumiysiga keltirish</li></ul><p>Klassik misol — so'zlarni sanash. Har bir mashina o'z qismidagi so'zlarni sanaydi, keyin hisoblagichlar qo'shiladi. Hadoop ham, Spark ham aynan shunday tuzilgan, garchi interfeysi qulayroq bo'lsa ham.</p>",
+        "en": "<p>To make work splittable, it is broken into two steps:</p><ul><li><b>map</b> — process your own chunk independently of the others. Machines do not talk to each other</li><li><b>reduce</b> — combine the partial results into a total</li></ul><p>The classic example is counting words. Each machine counts words in its own part, then the counters are added up. Hadoop and Spark work exactly this way, only with a friendlier interface.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "chunks = [\n    'python sql python',\n    'sql python java',\n    'java python',\n]\n\ndef map_step(chunk):\n    counts = {}\n    for word in chunk.split():\n        counts[word] = counts.get(word, 0) + 1\n    return counts\n\ndef reduce_step(partials):\n    total = {}\n    for part in partials:\n        for word, n in part.items():\n            total[word] = total.get(word, 0) + n\n    return total\n\npartials = [map_step(c) for c in chunks]        # это делают разные машины\nfor i, p in enumerate(partials):\n    print(f\"машина {i}: {p}\")\n\nprint('итог:  ', reduce_step(partials))"
+      },
+      {
+       "type": "checkpoint",
+       "q": { "ru": "Почему на шаге map машины не общаются между собой?", "uz": "Nega map qadamida mashinalar bir-biri bilan gaplashmaydi?", "en": "Why do machines not talk to each other during map?" },
+       "options": [
+        { "ru": "Это запрещено настройками сети", "uz": "Bu tarmoq sozlamalarida taqiqlangan", "en": "The network settings forbid it" },
+        { "ru": "Независимость и позволяет считать параллельно", "uz": "Mustaqillik aynan parallel hisoblash imkonini beradi", "en": "Independence is exactly what allows parallel computation" },
+        { "ru": "Они общаются, просто медленно", "uz": "Ular gaplashadi, faqat sekin", "en": "They do talk, just slowly" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Как только кускам нужно знать друг о друге, появляется пересылка данных — самая дорогая часть распределённых вычислений.",
+        "uz": "Bo'laklar bir-biri haqida bilishi kerak bo'lishi bilanoq ma'lumot uzatish paydo bo'ladi — taqsimlangan hisoblashning eng qimmat qismi.",
+        "en": "As soon as chunks need to know about each other, you get data shuffling — the most expensive part of distributed computing."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "Разделение и перекос", "uz": "Bo'lish va qiyshiqlik", "en": "Partitioning and skew" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Данные делят на части — <b>партиции</b>. Обычно по хешу ключа: одинаковые ключи всегда попадают в одну партицию, а значит, на одну машину.</p><p>Отсюда главная беда распределённых систем — <b>перекос</b>. Если один ключ встречается в половине записей, его партиция окажется огромной. Девяносто девять машин закончат за минуту и будут ждать сотую полчаса. Скорость всей задачи равна скорости самой медленной части.</p>",
+        "uz": "<p>Ma'lumot qismlarga — <b>partitsiyalarga</b> bo'linadi. Odatda kalit xeshi bo'yicha: bir xil kalitlar doim bitta partitsiyaga, demak bitta mashinaga tushadi.</p><p>Shundan taqsimlangan tizimlarning asosiy balosi — <b>qiyshiqlik</b>. Agar bitta kalit yozuvlarning yarmida uchrasa, uning partitsiyasi juda katta bo'ladi. To'qson to'qqiz mashina bir daqiqada tugatadi va yuzinchisini yarim soat kutadi. Butun vazifa tezligi eng sekin qism tezligiga teng.</p>",
+        "en": "<p>Data is split into <b>partitions</b>. Usually by the hash of a key: identical keys always land in the same partition, and therefore on the same machine.</p><p>Hence the main plague of distributed systems — <b>skew</b>. If one key appears in half the records, its partition becomes enormous. Ninety-nine machines finish in a minute and then wait half an hour for the hundredth. The speed of the whole job equals the speed of its slowest part.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "records = ['msk'] * 70 + ['spb'] * 15 + ['kzn'] * 10 + ['ufa'] * 5\n\ndef partition(records, n):\n    parts = [[] for _ in range(n)]\n    for r in records:\n        parts[hash(r) % n].append(r)\n    return parts\n\nparts = partition(records, 4)\nsizes = [len(p) for p in parts]\nprint('размеры партиций:', sizes)\nprint('самая большая:', max(sizes), 'самая маленькая:', min(sizes))\nprint('перекос:', round(max(sizes) / (sum(sizes) / len(sizes)), 2), 'раза от среднего')"
+      },
+      {
+       "type": "note",
+       "kind": "trap",
+       "html": {
+        "ru": "Перекос почти всегда идёт от данных, а не от кода: город-миллионник, самый популярный товар, значение <code>NULL</code> вместо ключа. Лечится изменением ключа разделения — например, добавлением случайного суффикса к слишком частому значению.",
+        "uz": "Qiyshiqlik deyarli har doim koddan emas, ma'lumotdan keladi: millionli shahar, eng ommabop tovar, kalit o'rniga <code>NULL</code> qiymati. Bo'lish kalitini o'zgartirish bilan davolanadi — masalan, juda tez-tez uchraydigan qiymatga tasodifiy qo'shimcha qo'shish bilan.",
+        "en": "Skew almost always comes from the data, not the code: a huge city, the most popular product, a <code>NULL</code> instead of a key. The cure is changing the partitioning key — for example adding a random suffix to the over-frequent value."
+       }
+      },
+      {
+       "type": "summary",
+       "items": [
+        { "ru": "Big Data начинается там, где данные не помещаются на одну машину", "uz": "Big Data ma'lumot bitta mashinaga sig'magan joyda boshlanadi", "en": "Big data begins where data does not fit on one machine" },
+        { "ru": "Больше машин — не всегда быстрее: пересылка тоже стоит времени", "uz": "Ko'proq mashina — doim tezroq emas: uzatish ham vaqt oladi", "en": "More machines is not always faster: shuffling costs time too" },
+        { "ru": "map считает независимо, reduce сводит результаты", "uz": "map mustaqil hisoblaydi, reduce natijalarni yig'adi", "en": "map computes independently, reduce combines the results" },
+        { "ru": "Перекос: одна перегруженная партиция тормозит всю задачу", "uz": "Qiyshiqlik: bitta ortiqcha yuklangan partitsiya butun vazifani sekinlashtiradi", "en": "Skew: one overloaded partition slows the whole job" }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": { "ru": "Когда начинается Big Data?", "uz": "Big Data qachon boshlanadi?", "en": "When does big data begin?" },
+     "options": [
+      { "ru": "Когда данных больше гигабайта", "uz": "Ma'lumot gigabaytdan ko'p bo'lganda", "en": "When there is more than a gigabyte" },
+      { "ru": "Когда данные не помещаются на одну машину", "uz": "Ma'lumot bitta mashinaga sig'maganda", "en": "When the data does not fit on one machine" },
+      { "ru": "Когда используется Hadoop", "uz": "Hadoop ishlatilganda", "en": "When you use Hadoop" },
+      { "ru": "Когда есть таблицы", "uz": "Jadvallar bo'lganda", "en": "When there are tables" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Дело не в абсолютном объёме, а в том, справляется ли одна машина. Иногда 200 ГБ — обычная задача, а иногда 20 ГБ уже нет.",
+      "uz": "Gap mutlaq hajmda emas, bitta mashina uddalay oladimi-yo'qmi. Ba'zan 200 GB oddiy vazifa, ba'zan 20 GB ham yo'q.",
+      "en": "It is not about absolute volume but whether one machine copes. Sometimes 200 GB is routine; sometimes 20 GB is not."
+     }
+    },
+    {
+     "q": { "ru": "Что делает шаг map?", "uz": "map qadami nima qiladi?", "en": "What does the map step do?" },
+     "options": [
+      { "ru": "Сводит результаты в один", "uz": "Natijalarni bittaga keltiradi", "en": "Combines results into one" },
+      { "ru": "Обрабатывает свой кусок данных независимо", "uz": "O'z ma'lumot bo'lagini mustaqil qayta ishlaydi", "en": "Processes its own chunk independently" },
+      { "ru": "Сортирует всю таблицу", "uz": "Butun jadvalni saralaydi", "en": "Sorts the whole table" },
+      { "ru": "Копирует данные между машинами", "uz": "Ma'lumotni mashinalar orasida nusxalaydi", "en": "Copies data between machines" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Именно независимость позволяет запустить map на сотне машин одновременно.",
+      "uz": "Aynan mustaqillik map ni yuzta mashinada bir vaqtda ishga tushirish imkonini beradi.",
+      "en": "It is precisely that independence that lets map run on a hundred machines at once."
+     }
+    },
+    {
+     "q": { "ru": "Что такое перекос партиций?", "uz": "Partitsiyalar qiyshiqligi nima?", "en": "What is partition skew?" },
+     "options": [
+      { "ru": "Ошибка в коде", "uz": "Koddagi xato", "en": "A bug in the code" },
+      { "ru": "Одна партиция намного больше остальных", "uz": "Bitta partitsiya qolganlaridan ancha katta", "en": "One partition is far larger than the rest" },
+      { "ru": "Потеря данных", "uz": "Ma'lumot yo'qolishi", "en": "Data loss" },
+      { "ru": "Медленная сеть", "uz": "Sekin tarmoq", "en": "A slow network" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Остальные машины простаивают, ожидая перегруженную. Общее время равно времени самой медленной части.",
+      "uz": "Qolgan mashinalar ortiqcha yuklanganini kutib bo'sh turadi. Umumiy vaqt eng sekin qism vaqtiga teng.",
+      "en": "The other machines idle while waiting for the overloaded one. Total time equals the slowest part."
+     }
+    },
+    {
+     "q": { "ru": "Сто машин обработают данные…", "uz": "Yuzta mashina ma'lumotni…", "en": "A hundred machines will process data…" },
+     "options": [
+      { "ru": "ровно в сто раз быстрее", "uz": "roppa-rosa yuz barobar tez", "en": "exactly a hundred times faster" },
+      { "ru": "быстрее, но не в сто раз — часть времени уходит на координацию", "uz": "tezroq, lekin yuz barobar emas — vaqtning bir qismi muvofiqlashtirishga ketadi", "en": "faster, but not a hundredfold — some time goes on coordination" },
+      { "ru": "медленнее одной", "uz": "bittasidan sekinroq", "en": "slower than one" },
+      { "ru": "за то же время", "uz": "o'sha vaqtda", "en": "in the same time" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "После некоторого числа машин накладные расходы начинают перевешивать выигрыш от параллельности.",
+      "uz": "Ma'lum sondagi mashinadan keyin qo'shimcha xarajatlar parallellik yutug'idan ustun kela boshlaydi.",
+      "en": "Past a certain number of machines, the overhead starts to outweigh the parallel gain."
+     }
+    },
+    {
+     "q": { "ru": "Откуда обычно берётся перекос?", "uz": "Qiyshiqlik odatda qayerdan keladi?", "en": "Where does skew usually come from?" },
+     "options": [
+      { "ru": "Из неправильного кода", "uz": "Noto'g'ri koddan", "en": "From incorrect code" },
+      { "ru": "Из самих данных: слишком частое значение ключа", "uz": "Ma'lumotning o'zidan: kalitning juda tez-tez uchraydigan qiymati", "en": "From the data itself: an over-frequent key value" },
+      { "ru": "Из медленных дисков", "uz": "Sekin disklardan", "en": "From slow disks" },
+      { "ru": "Из версии Python", "uz": "Python versiyasidan", "en": "From the Python version" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Классика — <code>NULL</code> вместо ключа или город-миллионник среди десятка посёлков.",
+      "uz": "Klassika — kalit o'rniga <code>NULL</code> yoki o'nlab qishloq orasidagi millionli shahar.",
+      "en": "Classics: a <code>NULL</code> instead of a key, or one huge city among a dozen villages."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "python",
+     "title": { "ru": "Шаг map", "uz": "map qadami", "en": "The map step" },
+     "brief": { "ru": "Подсчёт слов в куске", "uz": "Bo'lakdagi so'zlarni sanash", "en": "Counting words in a chunk" },
+     "desc": {
+      "ru": "<p><code>map_step(chunk)</code> принимает строку и возвращает словарь «слово → количество». Слова разделены пробелами.</p>",
+      "uz": "<p><code>map_step(chunk)</code> satrni oladi va «so'z → soni» lug'atini qaytaradi. So'zlar bo'sh joy bilan ajratilgan.</p>",
+      "en": "<p><code>map_step(chunk)</code> takes a string and returns a dictionary of “word → count”. Words are separated by spaces.</p>"
+     },
+     "starter": "def map_step(chunk):\n    # твой код\n    pass\n\nprint(map_step('a b a'))\n",
+     "tests": "assert map_step('a b a') == {'a': 2, 'b': 1}, 'Считаем повторы'\nassert map_step('') == {}, 'Пустая строка — пустой словарь'\nassert map_step('x') == {'x': 1}, 'Одно слово'\nassert map_step('a  a') == {'a': 2}, 'Лишние пробелы не мешают'",
+     "hint": {
+      "ru": "<code>chunk.split()</code> сам справляется с лишними пробелами. Дальше обычный счётчик через <code>get</code>.",
+      "uz": "<code>chunk.split()</code> ortiqcha bo'sh joylar bilan o'zi uddalaydi. Keyin <code>get</code> orqali oddiy hisoblagich.",
+      "en": "<code>chunk.split()</code> handles extra spaces on its own. Then an ordinary counter with <code>get</code>."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "python",
+     "title": { "ru": "Шаг reduce", "uz": "reduce qadami", "en": "The reduce step" },
+     "brief": { "ru": "Сложить частичные результаты", "uz": "Qisman natijalarni qo'shish", "en": "Summing partial results" },
+     "desc": {
+      "ru": "<p><code>reduce_step(partials)</code> принимает список словарей от разных машин и возвращает один общий словарь, где счётчики сложены.</p>",
+      "uz": "<p><code>reduce_step(partials)</code> turli mashinalardan kelgan lug'atlar ro'yxatini oladi va hisoblagichlar qo'shilgan bitta umumiy lug'atni qaytaradi.</p>",
+      "en": "<p><code>reduce_step(partials)</code> takes a list of dictionaries from different machines and returns one combined dictionary with the counters summed.</p>"
+     },
+     "starter": "def reduce_step(partials):\n    # твой код\n    pass\n\nprint(reduce_step([{'a': 1}, {'a': 2, 'b': 1}]))\n",
+     "tests": "assert reduce_step([{'a': 1}, {'a': 2, 'b': 1}]) == {'a': 3, 'b': 1}, 'Счётчики складываются'\nassert reduce_step([]) == {}, 'Нет частичных результатов'\nassert reduce_step([{}, {}]) == {}, 'Пустые словари'\nassert reduce_step([{'x': 5}]) == {'x': 5}, 'Один результат остаётся как есть'",
+     "hint": {
+      "ru": "Два вложенных цикла: по словарям и по их парам ключ-значение. Складывай через <code>total.get(word, 0) + n</code>.",
+      "uz": "Ikkita ichma-ich sikl: lug'atlar va ularning kalit-qiymat juftlari bo'yicha. <code>total.get(word, 0) + n</code> orqali qo'shing.",
+      "en": "Two nested loops: over the dictionaries and over their key-value pairs. Add with <code>total.get(word, 0) + n</code>."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "python",
+     "title": { "ru": "Поиск перекоса", "uz": "Qiyshiqlikni topish", "en": "Detecting skew" },
+     "brief": { "ru": "Насколько партиции неравные", "uz": "Partitsiyalar qanchalik notekis", "en": "How uneven the partitions are" },
+     "desc": {
+      "ru": "<p><code>skew(sizes)</code> принимает список размеров партиций и возвращает отношение самой большой к среднему. Идеально ровное разделение даёт <code>1.0</code>.</p><p>Для пустого списка и для списка из одних нулей верни <code>0.0</code>.</p>",
+      "uz": "<p><code>skew(sizes)</code> partitsiyalar o'lchamlari ro'yxatini oladi va eng kattasining o'rtachaga nisbatini qaytaradi. Mukammal tekis bo'lish <code>1.0</code> beradi.</p><p>Bo'sh ro'yxat va faqat nollardan iborat ro'yxat uchun <code>0.0</code> qaytaring.</p>",
+      "en": "<p><code>skew(sizes)</code> takes a list of partition sizes and returns the ratio of the largest to the average. A perfectly even split gives <code>1.0</code>.</p><p>For an empty list and for a list of all zeros, return <code>0.0</code>.</p>"
+     },
+     "starter": "def skew(sizes):\n    # твой код\n    pass\n\nprint(skew([10, 10, 10, 10]))\n",
+     "tests": "assert skew([10, 10, 10, 10]) == 1.0, 'Ровное разделение'\nassert skew([]) == 0.0, 'Пустой список'\nassert skew([0, 0]) == 0.0, 'Все партиции пустые'\nassert skew([70, 10, 10, 10]) == 2.8, 'Одна партиция сильно больше'\nassert skew([5]) == 1.0, 'Одна партиция всегда равна среднему'",
+     "hint": {
+      "ru": "Среднее — <code>sum(sizes) / len(sizes)</code>. Если оно равно нулю, вернуть <code>0.0</code>, иначе <code>max(sizes) / среднее</code>.",
+      "uz": "O'rtacha — <code>sum(sizes) / len(sizes)</code>. Agar u nolga teng bo'lsa <code>0.0</code>, aks holda <code>max(sizes) / o'rtacha</code> qaytaring.",
+      "en": "The average is <code>sum(sizes) / len(sizes)</code>. If it is zero return <code>0.0</code>, otherwise <code>max(sizes) / average</code>."
+     }
+    }
+   ],
+   "exam": {
+    "time": 420,
+    "questions": [
+     {
+      "q": { "ru": "Какой шаг можно выполнять параллельно без общения между машинами?", "uz": "Qaysi qadamni mashinalar o'zaro gaplashmasdan parallel bajarish mumkin?", "en": "Which step runs in parallel without machines talking?" },
+      "options": [
+       { "ru": "reduce", "uz": "reduce", "en": "reduce" },
+       { "ru": "map", "uz": "map", "en": "map" },
+       { "ru": "оба", "uz": "ikkalasi", "en": "both" },
+       { "ru": "ни один", "uz": "hech qaysi", "en": "neither" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Время выполнения распределённой задачи определяется…", "uz": "Taqsimlangan vazifa bajarilish vaqti nima bilan belgilanadi…", "en": "The runtime of a distributed job is determined by…" },
+      "options": [
+       { "ru": "средним по машинам", "uz": "mashinalar bo'yicha o'rtacha bilan", "en": "the average across machines" },
+       { "ru": "самой медленной частью", "uz": "eng sekin qism bilan", "en": "the slowest part" },
+       { "ru": "количеством машин", "uz": "mashinalar soni bilan", "en": "the number of machines" },
+       { "ru": "объёмом памяти", "uz": "xotira hajmi bilan", "en": "the amount of memory" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Как чаще всего лечат перекос?", "uz": "Qiyshiqlik ko'pincha qanday davolanadi?", "en": "How is skew usually cured?" },
+      "options": [
+       { "ru": "Добавляют машины", "uz": "Mashina qo'shishadi", "en": "Add more machines" },
+       { "ru": "Меняют ключ разделения", "uz": "Bo'lish kalitini o'zgartirishadi", "en": "Change the partitioning key" },
+       { "ru": "Уменьшают объём данных", "uz": "Ma'lumot hajmini kamaytirishadi", "en": "Reduce the amount of data" },
+       { "ru": "Никак", "uz": "Hech qanday", "en": "It cannot be cured" }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "python",
+      "title": { "ru": "Полный подсчёт слов", "uz": "To'liq so'z sanash", "en": "Full word count" },
+      "desc": {
+       "ru": "<p>Собери map и reduce вместе: <code>word_count(chunks)</code> принимает список строк-кусков и возвращает общий словарь «слово → количество» по всем кускам.</p>",
+       "uz": "<p>map va reduce ni birlashtiring: <code>word_count(chunks)</code> bo'lak-satrlar ro'yxatini oladi va barcha bo'laklar bo'yicha umumiy «so'z → soni» lug'atini qaytaradi.</p>",
+       "en": "<p>Put map and reduce together: <code>word_count(chunks)</code> takes a list of chunk strings and returns one combined “word → count” dictionary across all chunks.</p>"
+      },
+      "starter": "def word_count(chunks):\n    # твой код\n    pass\n\nprint(word_count(['a b', 'b c']))\n",
+      "tests": "assert word_count(['a b', 'b c']) == {'a': 1, 'b': 2, 'c': 1}, 'Слова сложены по всем кускам'\nassert word_count([]) == {}, 'Нет кусков'\nassert word_count(['', '']) == {}, 'Пустые куски'\nassert word_count(['x x x']) == {'x': 3}, 'Один кусок с повторами'",
+      "hint": {
+       "ru": "Внутри можно вызвать те же две функции: сначала посчитать каждый кусок, потом сложить результаты.",
+       "uz": "Ichida o'sha ikkita funksiyani chaqirsa bo'ladi: avval har bir bo'lakni sanash, keyin natijalarni qo'shish.",
+       "en": "Inside you can reuse the same two functions: count each chunk first, then sum the results."
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

@@ -1,0 +1,307 @@
+{
+ "id": "cv-intro",
+ "schema": 2,
+ "modules": [
+  {
+   "id": "cv-01",
+   "title": { "ru": "Изображение как числа", "uz": "Tasvir son sifatida", "en": "An image as numbers" },
+   "tagline": { "ru": "Пиксели, яркость и свёртка — руками, без библиотек", "uz": "Piksellar, yorqinlik va konvolyutsiya — kutubxonalarsiz, qo'lda", "en": "Pixels, brightness and convolution — by hand, no libraries" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "Что видит компьютер", "uz": "Kompyuter nimani ko'radi", "en": "What a computer sees" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Для человека картинка — кот. Для программы это таблица чисел. Чёрно-белое изображение — прямоугольник яркостей от 0 (чёрный) до 255 (белый). Цветное — три таких таблицы: красная, зелёная, синяя.</p><p>Всё компьютерное зрение стоит на этом: любая операция над картинкой — это операция над числами в таблице.</p>",
+        "uz": "<p>Odam uchun rasm — mushuk. Dastur uchun bu sonlar jadvali. Oq-qora tasvir — 0 (qora) dan 255 (oq) gacha yorqinliklar to'rtburchagi. Rangli — shunday uchta jadval: qizil, yashil, ko'k.</p><p>Butun kompyuter ko'rishi shunga asoslanadi: rasm ustidagi har qanday amal — jadvaldagi sonlar ustidagi amal.</p>",
+        "en": "<p>To a human, a picture is a cat. To a program it is a table of numbers. A greyscale image is a rectangle of brightness values from 0 (black) to 255 (white). A colour image is three such tables: red, green, blue.</p><p>All of computer vision rests on this: any operation on an image is an operation on numbers in a table.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "# маленькое чёрно-белое изображение 4×4\nimage = [\n    [0,   50,  100, 150],\n    [50,  100, 150, 200],\n    [100, 150, 200, 250],\n    [150, 200, 250, 255],\n]\n\ndef show(img):\n    chars = ' .:-=+*#%@'          # от тёмного к светлому\n    for row in img:\n        print(''.join(chars[min(p, 255) * (len(chars) - 1) // 255] for p in row))\n\nshow(image)\nprint('размер:', len(image), 'на', len(image[0]))"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Раз это просто числа, простые эффекты получаются арифметикой:</p><ul><li>прибавить ко всем пикселям — картинка станет светлее</li><li>вычесть каждый из 255 — получится негатив</li><li>сравнить с порогом — останутся только чёрный и белый</li></ul>",
+        "uz": "<p>Bu shunchaki sonlar ekan, oddiy effektlar arifmetika bilan chiqadi:</p><ul><li>barcha piksellarga qo'shsak — rasm yorug'roq bo'ladi</li><li>har birini 255 dan ayirsak — negativ chiqadi</li><li>bo'sag'a bilan solishtirsak — faqat qora va oq qoladi</li></ul>",
+        "en": "<p>Since it is just numbers, simple effects come from arithmetic:</p><ul><li>add to every pixel — the image gets brighter</li><li>subtract each from 255 — you get a negative</li><li>compare with a threshold — only black and white remain</li></ul>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "image = [[0, 80, 160], [80, 160, 240], [160, 240, 255]]\n\ndef invert(img):\n    return [[255 - p for p in row] for row in img]\n\ndef threshold(img, level):\n    return [[255 if p >= level else 0 for p in row] for row in img]\n\nprint('исходник:', image)\nprint('негатив: ', invert(image))\nprint('порог 150:', threshold(image, 150))"
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "Свёртка: как находят края", "uz": "Konvolyutsiya: chekkalar qanday topiladi", "en": "Convolution: how edges are found" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Самая важная операция в компьютерном зрении — <b>свёртка</b>. Берём маленькую табличку чисел (её называют ядром или фильтром) и прикладываем к каждому кусочку изображения: перемножаем числа, складываем, записываем результат.</p><p>Разные ядра дают разные эффекты. Ядро, где соседние числа противоположны по знаку, отвечает на резкий перепад яркости — то есть находит <b>границу объекта</b>.</p>",
+        "uz": "<p>Kompyuter ko'rishidagi eng muhim amal — <b>konvolyutsiya</b>. Kichkina sonlar jadvalchasini (yadro yoki filtr deyiladi) olib, tasvirning har bir bo'lagiga qo'yamiz: sonlarni ko'paytiramiz, qo'shamiz, natijani yozamiz.</p><p>Turli yadrolar turli effekt beradi. Qo'shni sonlari qarama-qarshi ishorali yadro yorqinlikning keskin o'zgarishiga javob beradi — ya'ni <b>obyekt chegarasini</b> topadi.</p>",
+        "en": "<p>The most important operation in computer vision is <b>convolution</b>. Take a small table of numbers (a kernel, or filter) and apply it to every patch of the image: multiply the numbers, sum them, write down the result.</p><p>Different kernels give different effects. A kernel whose neighbouring numbers have opposite signs responds to a sharp change in brightness — that is, it finds an <b>object's edge</b>.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "# вертикальная граница: слева темно, справа светло\nimage = [\n    [0, 0, 255, 255],\n    [0, 0, 255, 255],\n    [0, 0, 255, 255],\n]\n\n# ядро реагирует на перепад по горизонтали\nkernel = [-1, 0, 1]\n\ndef edges(img, k):\n    out = []\n    for row in img:\n        line = []\n        for i in range(1, len(row) - 1):\n            value = row[i - 1] * k[0] + row[i] * k[1] + row[i + 1] * k[2]\n            line.append(value)\n        out.append(line)\n    return out\n\nfor row in edges(image, kernel):\n    print(row)"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Там, где яркость не менялась, получился ноль. На границе — большое число. Именно так классические алгоритмы находят контуры.</p><p>Дальше идея развивается: нейросеть не получает ядра от человека, а <b>подбирает их сама</b> при обучении. Первые слои обычно находят простые края, следующие — узоры из этих краёв, ещё дальше — целые объекты.</p>",
+        "uz": "<p>Yorqinlik o'zgarmagan joyda nol chiqdi. Chegarada — katta son. Klassik algoritmlar konturlarni aynan shunday topadi.</p><p>Keyin fikr rivojlanadi: neyrotarmoq yadrolarni odamdan olmaydi, o'qitishda <b>o'zi tanlaydi</b>. Birinchi qatlamlar odatda oddiy chekkalarni, keyingilari shu chekkalardan naqshlarni, undan keyin butun obyektlarni topadi.</p>",
+        "en": "<p>Where brightness did not change the result is zero. At the edge it is large. This is exactly how classical algorithms find contours.</p><p>Then the idea develops: a neural network is not handed kernels by a human — it <b>learns them itself</b>. The first layers usually find simple edges, the next ones patterns made of those edges, and further on whole objects.</p>"
+       }
+      },
+      {
+       "type": "checkpoint",
+       "q": { "ru": "Что даст свёртка с ядром <code>[-1, 0, 1]</code> на ровном сером фоне?", "uz": "Tekis kulrang fonda <code>[-1, 0, 1]</code> yadrosi bilan konvolyutsiya nima beradi?", "en": "What does convolution with the kernel <code>[-1, 0, 1]</code> give on flat grey?" },
+       "options": [
+        { "ru": "Большие значения", "uz": "Katta qiymatlar", "en": "Large values" },
+        { "ru": "Нули", "uz": "Nollar", "en": "Zeros" },
+        { "ru": "Случайные числа", "uz": "Tasodifiy sonlar", "en": "Random numbers" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Соседние пиксели одинаковые, поэтому <code>-x + x = 0</code>. Фильтр реагирует именно на перепад, а не на саму яркость.",
+        "uz": "Qo'shni piksellar bir xil, shuning uchun <code>-x + x = 0</code>. Filtr yorqinlikning o'ziga emas, aynan o'zgarishga javob beradi.",
+        "en": "Neighbouring pixels are equal, so <code>-x + x = 0</code>. The filter responds to change, not to brightness itself."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "Задачи компьютерного зрения", "uz": "Kompyuter ko'rishi vazifalari", "en": "Computer vision tasks" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Практические задачи различаются тем, насколько подробный ответ нужен:</p><ul><li><b>Классификация</b> — что на картинке. Ответ: одно слово</li><li><b>Детекция</b> — где именно объект. Ответ: прямоугольник и класс</li><li><b>Сегментация</b> — какие пиксели принадлежат объекту. Ответ: маска по пикселям</li></ul><p>Чем подробнее ответ, тем дороже разметка данных. Поставить метку «кот» — секунда. Обвести кота по контуру — минуты. Умножь на десять тысяч картинок.</p>",
+        "uz": "<p>Amaliy vazifalar javob qanchalik batafsil kerakligi bilan farq qiladi:</p><ul><li><b>Tasniflash</b> — rasmda nima bor. Javob: bitta so'z</li><li><b>Detektsiya</b> — obyekt aynan qayerda. Javob: to'rtburchak va sinf</li><li><b>Segmentatsiya</b> — qaysi piksellar obyektga tegishli. Javob: piksellar bo'yicha niqob</li></ul><p>Javob qanchalik batafsil bo'lsa, ma'lumotni belgilash shunchalik qimmat. «Mushuk» yorlig'ini qo'yish — bir soniya. Mushukni kontur bo'ylab chizish — daqiqalar. O'n ming rasmga ko'paytiring.</p>",
+        "en": "<p>Practical tasks differ in how detailed an answer you need:</p><ul><li><b>Classification</b> — what is in the picture. Answer: one word</li><li><b>Detection</b> — where exactly the object is. Answer: a box and a class</li><li><b>Segmentation</b> — which pixels belong to the object. Answer: a per-pixel mask</li></ul><p>The more detailed the answer, the more expensive the labelling. Tagging “cat” takes a second. Outlining the cat takes minutes. Multiply by ten thousand images.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "# простейшая «детекция»: где на картинке светлое пятно\nimage = [\n    [0,   0,   0,   0,  0],\n    [0, 200, 220,   0,  0],\n    [0, 210, 230,   0,  0],\n    [0,   0,   0,   0,  0],\n]\n\ndef find_bright(img, level=150):\n    points = [(y, x) for y, row in enumerate(img)\n                     for x, p in enumerate(row) if p >= level]\n    if not points:\n        return None\n    ys = [p[0] for p in points]\n    xs = [p[1] for p in points]\n    return {'top': min(ys), 'left': min(xs), 'bottom': max(ys), 'right': max(xs)}\n\nprint('рамка вокруг объекта:', find_bright(image))"
+      },
+      {
+       "type": "note",
+       "kind": "trap",
+       "html": {
+        "ru": "Главная ошибка новичков в компьютерном зрении — тратить всё время на модель и почти не смотреть на данные. На практике аккуратная разметка и разнообразие снимков дают больше, чем замена одной архитектуры на другую.",
+        "uz": "Kompyuter ko'rishida yangi boshlovchilarning asosiy xatosi — butun vaqtni modelga sarflab, ma'lumotga deyarli qaramaslik. Amalda puxta belgilash va suratlar rang-barangligi bir arxitekturani boshqasiga almashtirishdan ko'ra ko'proq foyda beradi.",
+        "en": "The classic beginner mistake in computer vision is spending all the time on the model and barely looking at the data. In practice, careful labelling and varied images give more than swapping one architecture for another."
+       }
+      },
+      {
+       "type": "summary",
+       "items": [
+        { "ru": "Изображение — таблица чисел, цвет — три таблицы", "uz": "Tasvir — sonlar jadvali, rang — uchta jadval", "en": "An image is a table of numbers; colour is three tables" },
+        { "ru": "Яркость, негатив, порог — обычная арифметика над пикселями", "uz": "Yorqinlik, negativ, bo'sag'a — piksellar ustida oddiy arifmetika", "en": "Brightness, negative and threshold are plain arithmetic on pixels" },
+        { "ru": "Свёртка реагирует на перепад, поэтому находит края", "uz": "Konvolyutsiya o'zgarishga javob beradi, shuning uchun chekkalarni topadi", "en": "Convolution responds to change, so it finds edges" },
+        { "ru": "Классификация, детекция, сегментация — разная цена разметки", "uz": "Tasniflash, detektsiya, segmentatsiya — belgilash narxi har xil", "en": "Classification, detection, segmentation — labelling costs differ" }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": { "ru": "Как хранится чёрно-белое изображение?", "uz": "Oq-qora tasvir qanday saqlanadi?", "en": "How is a greyscale image stored?" },
+     "options": [
+      { "ru": "Как текст с описанием", "uz": "Tavsifli matn sifatida", "en": "As descriptive text" },
+      { "ru": "Как таблица чисел яркости", "uz": "Yorqinlik sonlari jadvali sifatida", "en": "As a table of brightness numbers" },
+      { "ru": "Как список объектов", "uz": "Obyektlar ro'yxati sifatida", "en": "As a list of objects" },
+      { "ru": "Как формула", "uz": "Formula sifatida", "en": "As a formula" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Обычно от 0 до 255 на пиксель. Цветное — три такие таблицы для красного, зелёного и синего.",
+      "uz": "Odatda pikselga 0 dan 255 gacha. Rangli — qizil, yashil va ko'k uchun shunday uchta jadval.",
+      "en": "Usually 0 to 255 per pixel. Colour is three such tables for red, green and blue."
+     }
+    },
+    {
+     "q": { "ru": "Как получить негатив?", "uz": "Negativni qanday olish mumkin?", "en": "How do you get a negative?" },
+     "options": [
+      { "ru": "Умножить каждый пиксель на -1", "uz": "Har bir pikselni -1 ga ko'paytirish", "en": "Multiply every pixel by -1" },
+      { "ru": "Вычесть каждый пиксель из 255", "uz": "Har bir pikselni 255 dan ayirish", "en": "Subtract every pixel from 255" },
+      { "ru": "Отсортировать пиксели", "uz": "Piksellarni saralash", "en": "Sort the pixels" },
+      { "ru": "Перевернуть таблицу", "uz": "Jadvalni ag'darish", "en": "Flip the table" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Тогда чёрное (0) станет белым (255) и наоборот, а значения останутся в допустимом диапазоне.",
+      "uz": "Shunda qora (0) oq (255) bo'ladi va aksincha, qiymatlar esa ruxsat etilgan diapazonda qoladi.",
+      "en": "Black (0) becomes white (255) and vice versa, and values stay inside the valid range."
+     }
+    },
+    {
+     "q": { "ru": "На что реагирует свёртка с ядром <code>[-1, 0, 1]</code>?", "uz": "<code>[-1, 0, 1]</code> yadrosi bilan konvolyutsiya nimaga javob beradi?", "en": "What does convolution with <code>[-1, 0, 1]</code> respond to?" },
+     "options": [
+      { "ru": "На общую яркость", "uz": "Umumiy yorqinlikka", "en": "Overall brightness" },
+      { "ru": "На перепад яркости между соседями", "uz": "Qo'shnilar orasidagi yorqinlik o'zgarishiga", "en": "A change in brightness between neighbours" },
+      { "ru": "На цвет", "uz": "Rangga", "en": "Colour" },
+      { "ru": "На размер картинки", "uz": "Rasm o'lchamiga", "en": "Image size" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "На ровном фоне такой фильтр даёт ноль, а на границе объекта — большое значение.",
+      "uz": "Tekis fonda bunday filtr nol beradi, obyekt chegarasida esa katta qiymat.",
+      "en": "On a flat background such a filter gives zero; at an object's edge it gives a large value."
+     }
+    },
+    {
+     "q": { "ru": "Чем детекция отличается от классификации?", "uz": "Detektsiya tasniflashdan nimasi bilan farq qiladi?", "en": "How does detection differ from classification?" },
+     "options": [
+      { "ru": "Ничем", "uz": "Hech nimasi bilan", "en": "In no way" },
+      { "ru": "Детекция говорит ещё и где находится объект", "uz": "Detektsiya obyekt qayerdaligini ham aytadi", "en": "Detection also says where the object is" },
+      { "ru": "Детекция работает только с видео", "uz": "Detektsiya faqat video bilan ishlaydi", "en": "Detection only works with video" },
+      { "ru": "Классификация точнее", "uz": "Tasniflash aniqroq", "en": "Classification is more accurate" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Классификация: «на картинке кот». Детекция: «кот вот в этом прямоугольнике». Сегментация: «вот эти пиксели — кот».",
+      "uz": "Tasniflash: «rasmda mushuk». Detektsiya: «mushuk mana shu to'rtburchakda». Segmentatsiya: «mana bu piksellar — mushuk».",
+      "en": "Classification: “there is a cat”. Detection: “the cat is in this box”. Segmentation: “these exact pixels are the cat”."
+     }
+    },
+    {
+     "q": { "ru": "Что в свёрточной сети берётся из данных, а не задаётся человеком?", "uz": "Konvolyutsion tarmoqda nima odam tomonidan berilmaydi, ma'lumotdan olinadi?", "en": "In a convolutional network, what comes from data rather than a human?" },
+     "options": [
+      { "ru": "Размер изображения", "uz": "Tasvir o'lchami", "en": "The image size" },
+      { "ru": "Сами ядра фильтров", "uz": "Filtr yadrolarining o'zi", "en": "The filter kernels themselves" },
+      { "ru": "Количество цветов", "uz": "Ranglar soni", "en": "The number of colours" },
+      { "ru": "Формат файла", "uz": "Fayl formati", "en": "The file format" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "В классическом подходе ядро придумывал инженер. Сеть подбирает ядра сама при обучении — в этом и была главная перемена.",
+      "uz": "Klassik yondashuvda yadroni muhandis o'ylab topardi. Tarmoq yadrolarni o'qitishda o'zi tanlaydi — asosiy o'zgarish shunda edi.",
+      "en": "In the classical approach an engineer designed the kernel. A network learns the kernels itself — that was the key shift."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "python",
+     "title": { "ru": "Негатив", "uz": "Negativ", "en": "Negative" },
+     "brief": { "ru": "Арифметика над пикселями", "uz": "Piksellar ustida arifmetika", "en": "Arithmetic on pixels" },
+     "desc": {
+      "ru": "<p><code>invert(image)</code> принимает список списков (значения 0–255) и возвращает негатив: каждый пиксель заменён на <code>255 - p</code>. Исходное изображение менять нельзя.</p>",
+      "uz": "<p><code>invert(image)</code> ro'yxatlar ro'yxatini (0–255 qiymatlar) oladi va negativni qaytaradi: har bir piksel <code>255 - p</code> ga almashtiriladi. Asl tasvirni o'zgartirib bo'lmaydi.</p>",
+      "en": "<p><code>invert(image)</code> takes a list of lists (values 0–255) and returns the negative: each pixel replaced by <code>255 - p</code>. The original image must not be modified.</p>"
+     },
+     "starter": "def invert(image):\n    # твой код\n    pass\n\nprint(invert([[0, 255], [100, 200]]))\n",
+     "tests": "assert invert([[0, 255]]) == [[255, 0]], 'Чёрное становится белым и наоборот'\nassert invert([[100, 200]]) == [[155, 55]], 'Обычные значения'\nassert invert([]) == [], 'Пустое изображение'\nsrc = [[10, 20]]\ninvert(src)\nassert src == [[10, 20]], 'Исходник не должен меняться'",
+     "hint": {
+      "ru": "Вложенное включение: <code>[[255 - p for p in row] for row in image]</code>.",
+      "uz": "Ichma-ich generator: <code>[[255 - p for p in row] for row in image]</code>.",
+      "en": "A nested comprehension: <code>[[255 - p for p in row] for row in image]</code>."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "python",
+     "title": { "ru": "Порог", "uz": "Bo'sag'a", "en": "Threshold" },
+     "brief": { "ru": "Только чёрное и белое", "uz": "Faqat qora va oq", "en": "Black and white only" },
+     "desc": {
+      "ru": "<p><code>threshold(image, level)</code> возвращает изображение, где пиксель становится <code>255</code>, если он больше или равен <code>level</code>, и <code>0</code> в противном случае.</p>",
+      "uz": "<p><code>threshold(image, level)</code> shunday tasvir qaytaradi: piksel <code>level</code> dan katta yoki teng bo'lsa <code>255</code>, aks holda <code>0</code>.</p>",
+      "en": "<p><code>threshold(image, level)</code> returns an image where a pixel becomes <code>255</code> if it is greater than or equal to <code>level</code>, and <code>0</code> otherwise.</p>"
+     },
+     "starter": "def threshold(image, level):\n    # твой код\n    pass\n\nprint(threshold([[10, 200]], 150))\n",
+     "tests": "assert threshold([[10, 200]], 150) == [[0, 255]], 'Меньше порога — 0, больше — 255'\nassert threshold([[150]], 150) == [[255]], 'Ровно порог считается светлым'\nassert threshold([[0, 0]], 1) == [[0, 0]], 'Всё темнее порога'\nassert threshold([], 100) == [], 'Пустое изображение'",
+     "hint": {
+      "ru": "Сравнение <code>p &gt;= level</code> в том же вложенном включении.",
+      "uz": "O'sha ichma-ich generatorda <code>p &gt;= level</code> solishtiruvi.",
+      "en": "The comparison <code>p &gt;= level</code> inside the same nested comprehension."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "python",
+     "title": { "ru": "Поиск края", "uz": "Chekkani topish", "en": "Edge detection" },
+     "brief": { "ru": "Свёртка ядром [-1, 0, 1]", "uz": "[-1, 0, 1] yadrosi bilan konvolyutsiya", "en": "Convolution with [-1, 0, 1]" },
+     "desc": {
+      "ru": "<p><code>edges(image)</code> применяет к каждой строке ядро <code>[-1, 0, 1]</code>: для каждого пикселя, кроме крайних, результат равен <code>справа − слева</code>.</p><p>Строка длины N даёт строку длины N−2. Строки короче трёх пикселей дают пустой список.</p>",
+      "uz": "<p><code>edges(image)</code> har bir qatorga <code>[-1, 0, 1]</code> yadrosini qo'llaydi: chetkilaridan tashqari har bir piksel uchun natija <code>o'ngdagi − chapdagi</code> ga teng.</p><p>Uzunligi N bo'lgan qator N−2 uzunlikdagi qator beradi. Uch pikseldan qisqa qatorlar bo'sh ro'yxat beradi.</p>",
+      "en": "<p><code>edges(image)</code> applies the kernel <code>[-1, 0, 1]</code> to every row: for each pixel except the outermost ones, the result is <code>right − left</code>.</p><p>A row of length N yields a row of length N−2. Rows shorter than three pixels yield an empty list.</p>"
+     },
+     "starter": "def edges(image):\n    # твой код\n    pass\n\nprint(edges([[0, 0, 255, 255]]))\n",
+     "tests": "assert edges([[0, 0, 255, 255]]) == [[255, 255]], 'Перепад даёт большие значения'\nassert edges([[100, 100, 100]]) == [[0]], 'Ровный фон даёт ноль'\nassert edges([[1, 2]]) == [[]], 'Строка короче трёх — пустой результат'\nassert edges([]) == [], 'Пустое изображение'\nassert edges([[0, 0, 0, 255]]) == [[0, 255]], 'Край только справа'",
+     "hint": {
+      "ru": "Для каждой строки пройди индексы от 1 до <code>len(row) - 2</code> и посчитай <code>row[i + 1] - row[i - 1]</code>.",
+      "uz": "Har bir qator uchun 1 dan <code>len(row) - 2</code> gacha indekslar bo'ylab yuring va <code>row[i + 1] - row[i - 1]</code> ni hisoblang.",
+      "en": "For each row walk indices from 1 to <code>len(row) - 2</code> and compute <code>row[i + 1] - row[i - 1]</code>."
+     }
+    }
+   ],
+   "exam": {
+    "time": 420,
+    "questions": [
+     {
+      "q": { "ru": "Сколько таблиц чисел у цветного изображения?", "uz": "Rangli tasvirda nechta sonlar jadvali bor?", "en": "How many number tables does a colour image have?" },
+      "options": [
+       { "ru": "Одна", "uz": "Bitta", "en": "One" },
+       { "ru": "Три", "uz": "Uchta", "en": "Three" },
+       { "ru": "Столько, сколько пикселей", "uz": "Piksellar soniga teng", "en": "As many as there are pixels" },
+       { "ru": "Зависит от формата", "uz": "Formatga bog'liq", "en": "It depends on the format" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Что дороже всего размечать?", "uz": "Nimani belgilash eng qimmat?", "en": "Which labelling is the most expensive?" },
+      "options": [
+       { "ru": "Классификацию", "uz": "Tasniflashni", "en": "Classification" },
+       { "ru": "Сегментацию по пикселям", "uz": "Piksellar bo'yicha segmentatsiyani", "en": "Per-pixel segmentation" },
+       { "ru": "Ничего, разметка бесплатна", "uz": "Hech nimani, belgilash bepul", "en": "Nothing, labelling is free" },
+       { "ru": "Всё одинаково", "uz": "Hammasi bir xil", "en": "They all cost the same" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Свёртка — это…", "uz": "Konvolyutsiya — bu…", "en": "Convolution is…" },
+      "options": [
+       { "ru": "сжатие файла", "uz": "faylni siqish", "en": "file compression" },
+       { "ru": "применение маленького ядра к каждому кусочку изображения", "uz": "kichik yadroni tasvirning har bir bo'lagiga qo'llash", "en": "applying a small kernel to every patch of the image" },
+       { "ru": "поворот картинки", "uz": "rasmni burish", "en": "rotating the picture" },
+       { "ru": "изменение размера", "uz": "o'lchamni o'zgartirish", "en": "resizing" }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "python",
+      "title": { "ru": "Рамка вокруг объекта", "uz": "Obyekt atrofidagi ramka", "en": "A box around the object" },
+      "desc": {
+       "ru": "<p><code>bounding_box(image, level)</code> находит все пиксели ярче или равные <code>level</code> и возвращает словарь <code>{'top', 'left', 'bottom', 'right'}</code> — границы прямоугольника, в который они все помещаются.</p><p>Если таких пикселей нет — верни <code>None</code>.</p>",
+       "uz": "<p><code>bounding_box(image, level)</code> <code>level</code> dan yorug'roq yoki teng barcha piksellarni topadi va <code>{'top', 'left', 'bottom', 'right'}</code> lug'atini qaytaradi — ularning hammasi sig'adigan to'rtburchak chegaralari.</p><p>Bunday piksellar bo'lmasa — <code>None</code> qaytaring.</p>",
+       "en": "<p><code>bounding_box(image, level)</code> finds every pixel at or above <code>level</code> and returns a dictionary <code>{'top', 'left', 'bottom', 'right'}</code> — the bounds of the rectangle containing them all.</p><p>If there are no such pixels, return <code>None</code>.</p>"
+      },
+      "starter": "def bounding_box(image, level):\n    # твой код\n    pass\n\nprint(bounding_box([[0, 0], [0, 200]], 150))\n",
+      "tests": "assert bounding_box([[0, 0], [0, 200]], 150) == {'top': 1, 'left': 1, 'bottom': 1, 'right': 1}, 'Один яркий пиксель'\nassert bounding_box([[0, 0], [0, 0]], 150) is None, 'Нет ярких пикселей — None'\nbox = bounding_box([[200, 0, 200]], 150)\nassert box == {'top': 0, 'left': 0, 'bottom': 0, 'right': 2}, 'Рамка охватывает оба пикселя'\nassert bounding_box([], 100) is None, 'Пустое изображение'",
+      "hint": {
+       "ru": "Собери координаты подходящих пикселей через <code>enumerate</code>, затем возьми <code>min</code> и <code>max</code> отдельно по строкам и по столбцам.",
+       "uz": "<code>enumerate</code> orqali mos piksellar koordinatalarini yig'ing, keyin qator va ustunlar bo'yicha alohida <code>min</code> va <code>max</code> oling.",
+       "en": "Collect the coordinates of matching pixels with <code>enumerate</code>, then take <code>min</code> and <code>max</code> separately for rows and columns."
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

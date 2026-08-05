@@ -1,0 +1,296 @@
+{
+ "id": "infosec-intro",
+ "schema": 2,
+ "modules": [
+  {
+   "id": "is-01",
+   "title": { "ru": "Управление защитой", "uz": "Himoyani boshqarish", "en": "Managing protection" },
+   "tagline": { "ru": "Риски, права доступа и что делать при инциденте", "uz": "Risklar, kirish huquqlari va hodisada nima qilish", "en": "Risk, access rights and what to do in an incident" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "Защищать всё не получится", "uz": "Hammasini himoya qilib bo'lmaydi", "en": "You cannot protect everything" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Кибербезопасность ищет уязвимости в коде. Информационная безопасность отвечает на другой вопрос: <b>что защищать в первую очередь</b>, когда денег и людей на всё не хватает.</p><p>Инструмент здесь один — оценка риска. Риск считают как <b>вероятность × ущерб</b>. Утечка базы клиентов маловероятна, но катастрофична. Забытый пароль у сотрудника случается каждую неделю, но стоит десять минут поддержки. Заниматься надо первым, хотя второе раздражает чаще.</p>",
+        "uz": "<p>Kiberxavfsizlik koddagi zaifliklarni qidiradi. Axborot xavfsizligi boshqa savolga javob beradi: pul va odam hammasiga yetmaganda <b>birinchi navbatda nimani himoya qilish</b>.</p><p>Bu yerda bitta vosita bor — riskni baholash. Risk <b>ehtimollik × zarar</b> deb hisoblanadi. Mijozlar bazasining sizib chiqishi ehtimoli kam, lekin falokatli. Xodimning parolni unutishi har hafta bo'ladi, lekin o'n daqiqa yordamga turadi. Birinchisi bilan shug'ullanish kerak, garchi ikkinchisi tez-tez asabga tegsa ham.</p>",
+        "en": "<p>Cybersecurity hunts for vulnerabilities in code. Information security answers a different question: <b>what to protect first</b> when there is not enough money or people for everything.</p><p>There is one tool here — risk assessment. Risk is <b>likelihood × impact</b>. A customer-database leak is unlikely but catastrophic. An employee forgetting a password happens weekly but costs ten minutes of support. You work on the first, even though the second annoys you more often.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "risks = [\n    ('утечка базы клиентов',   0.05, 100),   # вероятность в год, ущерб в условных единицах\n    ('забытый пароль',          0.90,   1),\n    ('отказ единственного сервера', 0.30,  40),\n    ('фишинг сотрудника',       0.40,  25),\n]\n\nscored = [(name, round(p * damage, 2)) for name, p, damage in risks]\nfor name, score in sorted(scored, key=lambda x: -x[1]):\n    print(f\"{score:6.2f}  {name}\")"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Порядок получился неочевидный: фишинг обошёл утечку базы, хотя ущерб от него вчетверо меньше. Именно поэтому риски считают, а не оценивают на глаз — интуиция систематически переоценивает редкие страшные события и недооценивает частые мелкие.</p>",
+        "uz": "<p>Tartib kutilmagan chiqdi: fishing bazaning sizib chiqishidan o'zib ketdi, garchi undan zarar to'rt barobar kam bo'lsa ham. Aynan shuning uchun risklar ko'z bilan baholanmaydi, hisoblanadi — sezgi kamdan-kam uchraydigan dahshatli hodisalarni muntazam ravishda ortiqcha, tez-tez uchraydigan mayda hodisalarni esa kam baholaydi.</p>",
+        "en": "<p>The ordering is not obvious: phishing overtook the database leak even though its impact is four times smaller. This is exactly why risk is computed rather than eyeballed — intuition systematically overrates rare frightening events and underrates frequent small ones.</p>"
+       }
+      },
+      {
+       "type": "checkpoint",
+       "q": { "ru": "Как считают величину риска?", "uz": "Risk kattaligi qanday hisoblanadi?", "en": "How is risk magnitude computed?" },
+       "options": [
+        { "ru": "По размеру возможного ущерба", "uz": "Mumkin bo'lgan zarar hajmi bo'yicha", "en": "By the size of the possible damage" },
+        { "ru": "Вероятность умножить на ущерб", "uz": "Ehtimollikni zararga ko'paytirib", "en": "Likelihood multiplied by impact" },
+        { "ru": "По количеству упоминаний в новостях", "uz": "Yangiliklardagi eslatishlar soni bo'yicha", "en": "By how often it appears in the news" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Только ущерб — и все силы уйдут на защиту от маловероятной катастрофы, пока обычные проблемы копятся.",
+        "uz": "Faqat zarar bo'lsa — butun kuch ehtimoli kam falokatdan himoyaga ketadi, oddiy muammolar esa to'planaveradi.",
+        "en": "Impact alone sends all your effort towards an unlikely catastrophe while ordinary problems pile up."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "Права доступа", "uz": "Kirish huquqlari", "en": "Access rights" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Главный принцип называется <b>наименьшими правами</b>: у человека и у программы должно быть ровно столько доступа, сколько нужно для работы. Ни битом больше.</p><p>Звучит очевидно, а нарушается постоянно: новому сотруднику выдают права «как у Ивана», потому что так быстрее. Через год у половины компании доступ к бухгалтерии, и никто не помнит почему.</p><p>Практический подход — раздавать доступ не людям, а <b>ролям</b>. Человек получает роль, роль несёт список прав. Тогда «что может бухгалтер» — один понятный список, а не двадцать индивидуальных настроек.</p>",
+        "uz": "<p>Asosiy tamoyil <b>eng kam huquqlar</b> deyiladi: odamda ham, dasturda ham ish uchun qancha kerak bo'lsa, shuncha kirish bo'lishi kerak. Bir bit ham ortiq emas.</p><p>Ravshan eshitiladi, lekin doim buziladi: yangi xodimga «Ivandagidek» huquq beriladi, chunki shunday tezroq. Bir yildan keyin kompaniyaning yarmida buxgalteriyaga kirish bor va nega ekanini hech kim eslamaydi.</p><p>Amaliy yondashuv — kirishni odamlarga emas, <b>rollarga</b> berish. Odam rol oladi, rol huquqlar ro'yxatini olib yuradi. Shunda «buxgalter nima qila oladi» — yigirmata alohida sozlama emas, bitta tushunarli ro'yxat.</p>",
+        "en": "<p>The core principle is <b>least privilege</b>: a person and a program should have exactly as much access as the job requires. Not one bit more.</p><p>It sounds obvious and is violated constantly: a new hire is given “the same rights as Ivan” because that is faster. A year later half the company can see the accounts and nobody remembers why.</p><p>The practical approach is granting access to <b>roles</b> rather than people. A person gets a role, the role carries a list of rights. Then “what an accountant can do” is one readable list instead of twenty individual settings.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "ROLES = {\n    'читатель':   {'read'},\n    'редактор':   {'read', 'write'},\n    'админ':      {'read', 'write', 'delete', 'grant'},\n}\n\nusers = {'Азиз': 'редактор', 'Али': 'читатель'}\n\ndef can(user, action):\n    role = users.get(user)\n    return action in ROLES.get(role, set())\n\nfor user in ['Азиз', 'Али', 'Неизвестный']:\n    for action in ['read', 'delete']:\n        mark = 'да ' if can(user, action) else 'нет'\n        print(f\"{user:12} {action:7} {mark}\")"
+      },
+      {
+       "type": "note",
+       "kind": "trap",
+       "html": {
+        "ru": "Обрати внимание на неизвестного пользователя: он не получил доступа. Так и надо — система по умолчанию должна <b>запрещать</b>, а разрешать только явно. Обратный порядок («всё можно, кроме перечисленного») означает, что любая забытая настройка становится дырой.",
+        "uz": "Noma'lum foydalanuvchiga e'tibor bering: u kirish olmadi. Shunday bo'lishi kerak — tizim sukut bo'yicha <b>taqiqlashi</b>, faqat aniq ruxsat berishi lozim. Teskari tartib («sanab o'tilganidan tashqari hammasi mumkin») har bir unutilgan sozlama teshikka aylanishini anglatadi.",
+        "en": "Note the unknown user: they got nothing. That is the point — a system should <b>deny by default</b> and allow only explicitly. The reverse order (“everything is allowed except the listed items”) means every forgotten setting becomes a hole."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "Инцидент", "uz": "Hodisa", "en": "The incident" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Инцидент — не «если», а «когда». Готовность к нему измеряется тем, есть ли written план, а не тем, насколько уверенно все кивают на совещании.</p><p>Порядок действий обычно такой:</p><ol><li><b>Обнаружить</b> — заметить, что что-то не так</li><li><b>Локализовать</b> — отрезать поражённую часть, чтобы не расползлось</li><li><b>Устранить</b> — убрать причину</li><li><b>Восстановить</b> — вернуть работу</li><li><b>Разобрать</b> — понять, почему это стало возможным</li></ol><p>Последний шаг пропускают чаще всего — и потому наступают на те же грабли. Разбор должен искать причину в процессе, а не виноватого среди людей: если один человек мог случайно удалить продакшн, проблема не в человеке.</p>",
+        "uz": "<p>Hodisa — «agar» emas, «qachon». Unga tayyorlik yig'ilishda hamma qanchalik ishonch bilan bosh irg'ashi bilan emas, yozma reja bor-yo'qligi bilan o'lchanadi.</p><p>Harakatlar tartibi odatda shunday:</p><ol><li><b>Aniqlash</b> — nimadir noto'g'ri ekanini sezish</li><li><b>Cheklash</b> — tarqalmasligi uchun zararlangan qismni ajratish</li><li><b>Bartaraf etish</b> — sababni yo'qotish</li><li><b>Tiklash</b> — ishni qaytarish</li><li><b>Tahlil qilish</b> — bu nega mumkin bo'lganini tushunish</li></ol><p>Oxirgi qadam ko'pincha o'tkazib yuboriladi — shuning uchun o'sha xatoga qayta yo'liqishadi. Tahlil aybdorni odamlar orasidan emas, sababni jarayondan qidirishi kerak: bitta odam tasodifan ishlab chiqarishni o'chira olgan bo'lsa, muammo odamda emas.</p>",
+        "en": "<p>An incident is not “if” but “when”. Readiness is measured by whether a written plan exists, not by how confidently everyone nods in the meeting.</p><p>The usual order is:</p><ol><li><b>Detect</b> — notice something is wrong</li><li><b>Contain</b> — cut off the affected part so it does not spread</li><li><b>Eradicate</b> — remove the cause</li><li><b>Recover</b> — bring service back</li><li><b>Review</b> — understand why this was possible</li></ol><p>The last step is skipped most often — which is why the same rake gets stepped on again. A review must look for the cause in the process, not for a culprit among people: if one person could accidentally delete production, the problem is not the person.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "STAGES = ['обнаружение', 'локализация', 'устранение', 'восстановление', 'разбор']\n\ndef next_stage(done):\n    for s in STAGES:\n        if s not in done:\n            return s\n    return None\n\ndone = ['обнаружение', 'локализация']\nprint('сделано:', done)\nprint('дальше: ', next_stage(done))\nprint('после всего:', next_stage(STAGES))"
+      },
+      {
+       "type": "summary",
+       "items": [
+        { "ru": "Риск = вероятность × ущерб, а не только ущерб", "uz": "Risk = ehtimollik × zarar, faqat zarar emas", "en": "Risk is likelihood × impact, not impact alone" },
+        { "ru": "Наименьшие права: доступа ровно столько, сколько нужно", "uz": "Eng kam huquqlar: kirish qancha kerak bo'lsa, shuncha", "en": "Least privilege: exactly as much access as the job needs" },
+        { "ru": "Доступ выдают ролям, а не людям поимённо", "uz": "Kirish odamlarga emas, rollarga beriladi", "en": "Access is granted to roles, not to people by name" },
+        { "ru": "По умолчанию запрещено, разрешено только явно", "uz": "Sukut bo'yicha taqiqlangan, faqat aniq ruxsat etilgan", "en": "Deny by default, allow only explicitly" },
+        { "ru": "Разбор ищет причину в процессе, а не виноватого", "uz": "Tahlil aybdorni emas, jarayondagi sababni qidiradi", "en": "A review looks for a cause in the process, not a culprit" }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": { "ru": "Чем информационная безопасность отличается от кибербезопасности?", "uz": "Axborot xavfsizligi kiberxavfsizlikdan nimasi bilan farq qiladi?", "en": "How does information security differ from cybersecurity?" },
+     "options": [
+      { "ru": "Ничем, это синонимы", "uz": "Hech nimasi bilan, sinonim", "en": "In no way, they are synonyms" },
+      { "ru": "Она про процессы и приоритеты, а не только про технику", "uz": "U faqat texnika emas, jarayonlar va ustuvorliklar haqida", "en": "It is about processes and priorities, not only technology" },
+      { "ru": "Она занимается только паролями", "uz": "U faqat parollar bilan shug'ullanadi", "en": "It only deals with passwords" },
+      { "ru": "Она работает без компьютеров", "uz": "U kompyutersiz ishlaydi", "en": "It works without computers" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Найти уязвимость — техническая задача. Решить, чем заниматься в первую очередь при ограниченном бюджете, — управленческая.",
+      "uz": "Zaiflik topish — texnik vazifa. Cheklangan byudjetda birinchi navbatda nima bilan shug'ullanishni hal qilish — boshqaruv vazifasi.",
+      "en": "Finding a vulnerability is a technical task. Deciding what to tackle first on a limited budget is a management one."
+     }
+    },
+    {
+     "q": { "ru": "Что означает принцип наименьших прав?", "uz": "Eng kam huquqlar tamoyili nimani anglatadi?", "en": "What does least privilege mean?" },
+     "options": [
+      { "ru": "Всем выдавать минимальную зарплату", "uz": "Hammaga minimal maosh berish", "en": "Paying everyone the minimum salary" },
+      { "ru": "Доступа ровно столько, сколько нужно для работы", "uz": "Ish uchun qancha kerak bo'lsa, shuncha kirish", "en": "Exactly as much access as the job requires" },
+      { "ru": "Ограничить число сотрудников", "uz": "Xodimlar sonini cheklash", "en": "Limiting the number of employees" },
+      { "ru": "Запретить всё всем", "uz": "Hammaga hamma narsani taqiqlash", "en": "Forbidding everything to everyone" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Смысл в том, чтобы взлом одной учётной записи не открывал доступ ко всей компании.",
+      "uz": "Ma'nosi shundaki, bitta hisobning buzilishi butun kompaniyaga kirish ochmasligi kerak.",
+      "en": "The point is that compromising one account should not open the whole company."
+     }
+    },
+    {
+     "q": { "ru": "Почему доступ выдают ролям, а не людям?", "uz": "Nega kirish odamlarga emas, rollarga beriladi?", "en": "Why grant access to roles rather than people?" },
+     "options": [
+      { "ru": "Так работает быстрее", "uz": "Shunday tezroq ishlaydi", "en": "It works faster" },
+      { "ru": "Права становятся понятным списком, а не набором частных случаев", "uz": "Huquqlar alohida holatlar to'plami emas, tushunarli ro'yxat bo'ladi", "en": "Rights become a readable list instead of a pile of special cases" },
+      { "ru": "Роли требует закон", "uz": "Rollarni qonun talab qiladi", "en": "The law requires roles" },
+      { "ru": "Люди меняются реже ролей", "uz": "Odamlar rollardan kamroq o'zgaradi", "en": "People change less often than roles" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Иначе через год никто не сможет ответить, почему у конкретного человека есть конкретный доступ.",
+      "uz": "Aks holda bir yildan keyin hech kim aniq odamda aniq kirish nega borligini ayta olmaydi.",
+      "en": "Otherwise, a year later nobody can answer why a particular person has a particular access."
+     }
+    },
+    {
+     "q": { "ru": "Как должна вести себя система с неизвестным пользователем?", "uz": "Tizim noma'lum foydalanuvchi bilan qanday yo'l tutishi kerak?", "en": "How should a system treat an unknown user?" },
+     "options": [
+      { "ru": "Дать базовый доступ", "uz": "Asosiy kirish berish", "en": "Grant basic access" },
+      { "ru": "Отказать: по умолчанию запрещено", "uz": "Rad etish: sukut bo'yicha taqiqlangan", "en": "Deny: forbidden by default" },
+      { "ru": "Спросить у администратора", "uz": "Administratordan so'rash", "en": "Ask an administrator" },
+      { "ru": "Дать те же права, что и последнему вошедшему", "uz": "Oxirgi kirganning huquqlarini berish", "en": "Give the same rights as the last person who logged in" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "При обратном подходе любая забытая настройка автоматически превращается в открытую дверь.",
+      "uz": "Teskari yondashuvda har bir unutilgan sozlama avtomatik ravishda ochiq eshikka aylanadi.",
+      "en": "With the opposite approach, every forgotten setting silently becomes an open door."
+     }
+    },
+    {
+     "q": { "ru": "Какой шаг разбора инцидента пропускают чаще всего?", "uz": "Hodisa tahlilining qaysi qadami ko'pincha o'tkazib yuboriladi?", "en": "Which incident step is skipped most often?" },
+     "options": [
+      { "ru": "Обнаружение", "uz": "Aniqlash", "en": "Detection" },
+      { "ru": "Разбор причин после восстановления", "uz": "Tiklashdan keyin sabablarni tahlil qilish", "en": "The post-recovery review" },
+      { "ru": "Восстановление", "uz": "Tiklash", "en": "Recovery" },
+      { "ru": "Локализацию", "uz": "Cheklash", "en": "Containment" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Когда всё заработало, разбираться уже не хочется — и та же авария повторяется через полгода.",
+      "uz": "Hammasi ishlagach, tahlil qilgisi kelmaydi — va o'sha avariya olti oydan keyin takrorlanadi.",
+      "en": "Once things work again nobody wants to dig — and the same outage returns six months later."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "python",
+     "title": { "ru": "Оценка риска", "uz": "Riskni baholash", "en": "Scoring risk" },
+     "brief": { "ru": "Вероятность × ущерб", "uz": "Ehtimollik × zarar", "en": "Likelihood × impact" },
+     "desc": {
+      "ru": "<p><code>top_risk(risks)</code> принимает список троек <code>(название, вероятность, ущерб)</code> и возвращает название риска с наибольшим произведением. Для пустого списка — <code>None</code>.</p>",
+      "uz": "<p><code>top_risk(risks)</code> <code>(nom, ehtimollik, zarar)</code> uchliklar ro'yxatini oladi va ko'paytmasi eng katta risk nomini qaytaradi. Bo'sh ro'yxat uchun — <code>None</code>.</p>",
+      "en": "<p><code>top_risk(risks)</code> takes a list of triples <code>(name, likelihood, impact)</code> and returns the name of the risk with the largest product. For an empty list, return <code>None</code>.</p>"
+     },
+     "starter": "def top_risk(risks):\n    # твой код\n    pass\n\nprint(top_risk([('утечка', 0.05, 100), ('фишинг', 0.4, 25)]))\n",
+     "tests": "assert top_risk([('утечка', 0.05, 100), ('фишинг', 0.4, 25)]) == 'фишинг', '0.4*25=10 больше, чем 0.05*100=5'\nassert top_risk([]) is None, 'Пустой список'\nassert top_risk([('один', 0.1, 1)]) == 'один', 'Единственный риск'\nassert top_risk([('a', 1.0, 5), ('b', 0.5, 5)]) == 'a', 'Выше вероятность при том же ущербе'",
+     "hint": {
+      "ru": "<code>max(risks, key=lambda r: r[1] * r[2])[0]</code>, не забыв проверку на пустой список.",
+      "uz": "<code>max(risks, key=lambda r: r[1] * r[2])[0]</code>, bo'sh ro'yxat tekshiruvini unutmang.",
+      "en": "<code>max(risks, key=lambda r: r[1] * r[2])[0]</code>, remembering the empty-list check."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "python",
+     "title": { "ru": "Проверка прав", "uz": "Huquqlarni tekshirish", "en": "Checking rights" },
+     "brief": { "ru": "Роли и действия", "uz": "Rollar va harakatlar", "en": "Roles and actions" },
+     "desc": {
+      "ru": "<p><code>can(user, action, users, roles)</code> возвращает <code>True</code>, если роль пользователя разрешает действие. Неизвестный пользователь и неизвестная роль означают отказ.</p>",
+      "uz": "<p><code>can(user, action, users, roles)</code> foydalanuvchi roli harakatga ruxsat bersa <code>True</code> qaytaradi. Noma'lum foydalanuvchi va noma'lum rol rad etishni bildiradi.</p>",
+      "en": "<p><code>can(user, action, users, roles)</code> returns <code>True</code> if the user's role permits the action. An unknown user or unknown role means denial.</p>"
+     },
+     "starter": "def can(user, action, users, roles):\n    # твой код\n    pass\n\nUSERS = {'Азиз': 'редактор'}\nROLES = {'редактор': {'read', 'write'}}\nprint(can('Азиз', 'write', USERS, ROLES))\n",
+     "tests": "USERS = {'Азиз': 'редактор', 'Али': 'читатель'}\nROLES = {'редактор': {'read', 'write'}, 'читатель': {'read'}}\nassert can('Азиз', 'write', USERS, ROLES) is True, 'Редактор может писать'\nassert can('Али', 'write', USERS, ROLES) is False, 'Читатель писать не может'\nassert can('Никто', 'read', USERS, ROLES) is False, 'Неизвестный пользователь — отказ'\nassert can('Азиз', 'delete', USERS, ROLES) is False, 'Действия нет в роли'\nassert can('Азиз', 'read', {'Азиз': 'призрак'}, ROLES) is False, 'Неизвестная роль — отказ'",
+     "hint": {
+      "ru": "Возьми роль через <code>users.get(user)</code>, затем набор прав через <code>roles.get(role, set())</code> и проверь вхождение действия.",
+      "uz": "Rolni <code>users.get(user)</code> orqali, huquqlar to'plamini <code>roles.get(role, set())</code> orqali oling va harakat borligini tekshiring.",
+      "en": "Get the role with <code>users.get(user)</code>, then the rights with <code>roles.get(role, set())</code> and test membership."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "python",
+     "title": { "ru": "Лишние права", "uz": "Ortiqcha huquqlar", "en": "Excess rights" },
+     "brief": { "ru": "Аудит доступа", "uz": "Kirish auditi", "en": "Access audit" },
+     "desc": {
+      "ru": "<p><code>excess(granted, needed)</code> принимает два множества прав и возвращает <b>отсортированный список</b> тех, что выданы, но не нужны для работы.</p>",
+      "uz": "<p><code>excess(granted, needed)</code> ikkita huquqlar to'plamini oladi va berilgan, lekin ish uchun kerak bo'lmaganlarining <b>saralangan ro'yxatini</b> qaytaradi.</p>",
+      "en": "<p><code>excess(granted, needed)</code> takes two sets of rights and returns a <b>sorted list</b> of those granted but not needed for the job.</p>"
+     },
+     "starter": "def excess(granted, needed):\n    # твой код\n    pass\n\nprint(excess({'read', 'write', 'delete'}, {'read', 'write'}))\n",
+     "tests": "assert excess({'read', 'write', 'delete'}, {'read', 'write'}) == ['delete'], 'Лишнее право одно'\nassert excess({'read'}, {'read', 'write'}) == [], 'Прав меньше нужного — лишних нет'\nassert excess(set(), set()) == [], 'Пустые множества'\nassert excess({'b', 'a'}, set()) == ['a', 'b'], 'Результат отсортирован'",
+     "hint": {
+      "ru": "Разность множеств <code>granted - needed</code>, затем <code>sorted()</code>.",
+      "uz": "To'plamlar ayirmasi <code>granted - needed</code>, keyin <code>sorted()</code>.",
+      "en": "The set difference <code>granted - needed</code>, then <code>sorted()</code>."
+     }
+    }
+   ],
+   "exam": {
+    "time": 420,
+    "questions": [
+     {
+      "q": { "ru": "Риск считают как…", "uz": "Risk qanday hisoblanadi…", "en": "Risk is computed as…" },
+      "options": [
+       { "ru": "ущерб", "uz": "zarar", "en": "impact" },
+       { "ru": "вероятность × ущерб", "uz": "ehtimollik × zarar", "en": "likelihood × impact" },
+       { "ru": "вероятность", "uz": "ehtimollik", "en": "likelihood" },
+       { "ru": "количество инцидентов", "uz": "hodisalar soni", "en": "the number of incidents" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Какой порядок правильный?", "uz": "Qaysi tartib to'g'ri?", "en": "Which order is correct?" },
+      "options": [
+       { "ru": "Устранить → обнаружить → разобрать", "uz": "Bartaraf etish → aniqlash → tahlil", "en": "Eradicate → detect → review" },
+       { "ru": "Обнаружить → локализовать → устранить → восстановить → разобрать", "uz": "Aniqlash → cheklash → bartaraf etish → tiklash → tahlil", "en": "Detect → contain → eradicate → recover → review" },
+       { "ru": "Разобрать → восстановить → обнаружить", "uz": "Tahlil → tiklash → aniqlash", "en": "Review → recover → detect" },
+       { "ru": "Порядок не важен", "uz": "Tartib muhim emas", "en": "Order does not matter" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Если один человек мог случайно удалить продакшн, проблема…", "uz": "Bitta odam tasodifan ishlab chiqarishni o'chira olgan bo'lsa, muammo…", "en": "If one person could accidentally delete production, the problem is…" },
+      "options": [
+       { "ru": "в этом человеке", "uz": "shu odamda", "en": "that person" },
+       { "ru": "в процессе, который это допускает", "uz": "bunga yo'l qo'yadigan jarayonda", "en": "the process that allows it" },
+       { "ru": "в инструменте", "uz": "vositada", "en": "the tool" },
+       { "ru": "проблемы нет", "uz": "muammo yo'q", "en": "there is no problem" }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "python",
+      "title": { "ru": "Аудит компании", "uz": "Kompaniya auditi", "en": "Auditing a company" },
+      "desc": {
+       "ru": "<p><code>audit(users, roles, required)</code> проверяет всех сотрудников. Возвращает <b>отсортированный список имён</b> тех, у кого есть права сверх необходимых для их работы.</p><p><code>required</code> — словарь «роль → множество действительно нужных прав».</p>",
+       "uz": "<p><code>audit(users, roles, required)</code> barcha xodimlarni tekshiradi. Ishi uchun kerakli huquqlardan ortiqchasi bor odamlarning <b>saralangan ismlar ro'yxatini</b> qaytaradi.</p><p><code>required</code> — «rol → haqiqatan kerakli huquqlar to'plami» lug'ati.</p>",
+       "en": "<p><code>audit(users, roles, required)</code> checks every employee. It returns a <b>sorted list of names</b> of those holding rights beyond what their job needs.</p><p><code>required</code> is a dictionary of “role → the set of rights actually needed”.</p>"
+      },
+      "starter": "def audit(users, roles, required):\n    # твой код\n    pass\n\nUSERS = {'Азиз': 'админ'}\nROLES = {'админ': {'read', 'write', 'delete'}}\nNEED = {'админ': {'read', 'write'}}\nprint(audit(USERS, ROLES, NEED))\n",
+      "tests": "USERS = {'Азиз': 'админ', 'Али': 'читатель', 'Вали': 'призрак'}\nROLES = {'админ': {'read', 'write', 'delete'}, 'читатель': {'read'}}\nNEED = {'админ': {'read', 'write'}, 'читатель': {'read'}}\nassert audit(USERS, ROLES, NEED) == ['Азиз'], 'Только у админа есть лишнее право'\nassert audit({}, ROLES, NEED) == [], 'Нет сотрудников'\nassert audit({'Али': 'читатель'}, ROLES, NEED) == [], 'Права ровно по работе'\nres = audit({'Б': 'админ', 'А': 'админ'}, ROLES, NEED)\nassert res == ['А', 'Б'], 'Результат отсортирован по именам'",
+      "hint": {
+       "ru": "Для каждого сотрудника возьми права его роли и нужные права той же роли, посчитай разность. Неизвестная роль даёт пустое множество — лишних прав нет.",
+       "uz": "Har bir xodim uchun uning roli huquqlarini va o'sha rolning kerakli huquqlarini oling, ayirmani hisoblang. Noma'lum rol bo'sh to'plam beradi — ortiqcha huquq yo'q.",
+       "en": "For each employee take their role's rights and that role's needed rights, and compute the difference. An unknown role yields an empty set — no excess."
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

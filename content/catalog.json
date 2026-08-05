@@ -283,6 +283,62 @@
     "uz": "Mashinali o‘rganish asoslari",
     "en": "Machine learning basics"
    }
+  },
+  {
+   "id": "dl-basics",
+   "title": {
+    "ru": "Основы нейросетей",
+    "uz": "Neyrotarmoq asoslari",
+    "en": "Neural network basics"
+   }
+  },
+  {
+   "id": "nlp-basics",
+   "title": {
+    "ru": "Обработка текста",
+    "uz": "Matnni qayta ishlash",
+    "en": "Text processing"
+   }
+  },
+  {
+   "id": "cv-basics",
+   "title": {
+    "ru": "Обработка изображений",
+    "uz": "Tasvirlarni qayta ishlash",
+    "en": "Image processing"
+   }
+  },
+  {
+   "id": "devops-basics",
+   "title": {
+    "ru": "Основы DevOps",
+    "uz": "DevOps asoslari",
+    "en": "DevOps basics"
+   }
+  },
+  {
+   "id": "bigdata-basics",
+   "title": {
+    "ru": "Распределённая обработка",
+    "uz": "Taqsimlangan qayta ishlash",
+    "en": "Distributed processing"
+   }
+  },
+  {
+   "id": "cloud-basics",
+   "title": {
+    "ru": "Основы облаков",
+    "uz": "Bulut asoslari",
+    "en": "Cloud basics"
+   }
+  },
+  {
+   "id": "infosec-basics",
+   "title": {
+    "ru": "Управление рисками и доступом",
+    "uz": "Risk va kirishni boshqarish",
+    "en": "Risk and access management"
+   }
   }
  ],
  "courses": [
@@ -817,6 +873,195 @@
    "legacyIds": [],
    "moduleCount": 1,
    "runner": "python"
+  },
+  {
+   "id": "dl-intro",
+   "title": {
+    "ru": "Глубокое обучение: введение",
+    "uz": "Chuqur o‘rganish: kirish",
+    "en": "Deep Learning: Introduction"
+   },
+   "description": {
+    "ru": "Нейрон, слой, прямой проход и градиентный спуск — всё на живом Python, который можно запустить и потрогать.",
+    "uz": "Neyron, qatlam, to‘g‘ri o‘tish va gradiyent tushish — hammasi ishga tushirib ko‘rish mumkin bo‘lgan tirik Python da.",
+    "en": "Neuron, layer, forward pass and gradient descent — all in live Python you can run and poke at."
+   },
+   "glyph": "brain",
+   "color": "#c084fc",
+   "level": "intermediate",
+   "status": "full",
+   "estimatedHours": 10,
+   "requires": [
+    "ml-basics"
+   ],
+   "grants": [
+    "dl-basics"
+   ],
+   "legacyIds": [],
+   "moduleCount": 1,
+   "runner": "python"
+  },
+  {
+   "id": "nlp-intro",
+   "title": {
+    "ru": "Обработка текста: введение",
+    "uz": "Matnni qayta ishlash: kirish",
+    "en": "Text Processing: Introduction"
+   },
+   "description": {
+    "ru": "Токены, мешок слов, косинусная близость и как на самом деле работает языковая модель.",
+    "uz": "Tokenlar, so‘zlar qopi, kosinus yaqinligi va til modeli aslida qanday ishlaydi.",
+    "en": "Tokens, bag of words, cosine similarity and how a language model actually works."
+   },
+   "glyph": "book",
+   "color": "#38bdf8",
+   "level": "intermediate",
+   "status": "full",
+   "estimatedHours": 9,
+   "requires": [
+    "python-collections"
+   ],
+   "grants": [
+    "nlp-basics"
+   ],
+   "legacyIds": [],
+   "moduleCount": 1,
+   "runner": "python"
+  },
+  {
+   "id": "cv-intro",
+   "title": {
+    "ru": "Компьютерное зрение: введение",
+    "uz": "Kompyuter ko‘rishi: kirish",
+    "en": "Computer Vision: Introduction"
+   },
+   "description": {
+    "ru": "Изображение как таблица чисел: яркость, негатив, порог и свёртка, которая находит границы объектов.",
+    "uz": "Tasvir sonlar jadvali sifatida: yorqinlik, negativ, bo‘sag‘a va obyekt chegaralarini topadigan konvolyutsiya.",
+    "en": "An image as a table of numbers: brightness, negative, threshold and the convolution that finds edges."
+   },
+   "glyph": "eye",
+   "color": "#22d3ee",
+   "level": "intermediate",
+   "status": "full",
+   "estimatedHours": 9,
+   "requires": [
+    "python-collections"
+   ],
+   "grants": [
+    "cv-basics"
+   ],
+   "legacyIds": [],
+   "moduleCount": 1,
+   "runner": "python"
+  },
+  {
+   "id": "devops-intro",
+   "title": {
+    "ru": "DevOps: введение",
+    "uz": "DevOps: kirish",
+    "en": "DevOps: Introduction"
+   },
+   "description": {
+    "ru": "Конвейер сборки и выкладки, контейнеры и что делать, когда продакшн упал.",
+    "uz": "Yig‘ish va joylashtirish konveyeri, konteynerlar va ishlab chiqarish qulaganda nima qilish.",
+    "en": "The build-and-deploy pipeline, containers, and what to do when production falls over."
+   },
+   "glyph": "layers",
+   "color": "#34d399",
+   "level": "intermediate",
+   "status": "full",
+   "estimatedHours": 9,
+   "requires": [
+    "python-collections"
+   ],
+   "grants": [
+    "devops-basics"
+   ],
+   "legacyIds": [],
+   "moduleCount": 1,
+   "runner": "python"
+  },
+  {
+   "id": "bigdata-intro",
+   "title": {
+    "ru": "Big Data: введение",
+    "uz": "Big Data: kirish",
+    "en": "Big Data: Introduction"
+   },
+   "description": {
+    "ru": "Что делать, когда данные не помещаются на одну машину: разделение, map-reduce и перекос партиций.",
+    "uz": "Ma‘lumot bitta mashinaga sig‘maganda nima qilish: bo‘lish, map-reduce va partitsiyalar qiyshiqligi.",
+    "en": "What to do when data outgrows one machine: partitioning, map-reduce and skew."
+   },
+   "glyph": "db",
+   "color": "#f59e0b",
+   "level": "intermediate",
+   "status": "full",
+   "estimatedHours": 9,
+   "requires": [
+    "python-collections"
+   ],
+   "grants": [
+    "bigdata-basics"
+   ],
+   "legacyIds": [],
+   "moduleCount": 1,
+   "runner": "python"
+  },
+  {
+   "id": "cloud-intro",
+   "title": {
+    "ru": "Облака: введение",
+    "uz": "Bulutlar: kirish",
+    "en": "Cloud: Introduction"
+   },
+   "description": {
+    "ru": "Аренда вместо покупки: за что платят, как масштабируются и почему ставят лимит на число машин.",
+    "uz": "Sotib olish o‘rniga ijara: nimaga to‘lanadi, qanday miqyoslanadi va nega mashinalar soniga chegara qo‘yiladi.",
+    "en": "Renting instead of buying: what you pay for, how scaling works and why machine limits exist."
+   },
+   "glyph": "cloud",
+   "color": "#60a5fa",
+   "level": "intermediate",
+   "status": "full",
+   "estimatedHours": 8,
+   "requires": [
+    "python-collections"
+   ],
+   "grants": [
+    "cloud-basics"
+   ],
+   "legacyIds": [],
+   "moduleCount": 1,
+   "runner": "python"
+  },
+  {
+   "id": "infosec-intro",
+   "title": {
+    "ru": "Информационная безопасность: введение",
+    "uz": "Axborot xavfsizligi: kirish",
+    "en": "Information Security: Introduction"
+   },
+   "description": {
+    "ru": "Оценка рисков, права доступа по ролям и порядок действий при инциденте.",
+    "uz": "Risklarni baholash, rollar bo‘yicha kirish huquqlari va hodisadagi harakatlar tartibi.",
+    "en": "Risk assessment, role-based access rights and the order of actions during an incident."
+   },
+   "glyph": "shield",
+   "color": "#f87171",
+   "level": "intermediate",
+   "status": "full",
+   "estimatedHours": 8,
+   "requires": [
+    "security-basics"
+   ],
+   "grants": [
+    "infosec-basics"
+   ],
+   "legacyIds": [],
+   "moduleCount": 1,
+   "runner": "python"
   }
  ],
  "careerPaths": [
@@ -1256,6 +1501,374 @@
      ]
     }
    ]
+  },
+  {
+   "id": "ai-path",
+   "stages": [
+    {
+     "id": "ai-st1",
+     "title": {
+      "ru": "Язык и данные",
+      "uz": "Til va ma’lumot",
+      "en": "Language and data"
+     },
+     "courses": [
+      "python-basics",
+      "python-intermediate"
+     ]
+    },
+    {
+     "id": "ai-st2",
+     "title": {
+      "ru": "Как машина учится",
+      "uz": "Mashina qanday o‘rganadi",
+      "en": "How a machine learns"
+     },
+     "courses": [
+      "ml-intro"
+     ]
+    },
+    {
+     "id": "ai-st3",
+     "title": {
+      "ru": "Нейросети",
+      "uz": "Neyrotarmoqlar",
+      "en": "Neural networks"
+     },
+     "courses": [
+      "dl-intro"
+     ]
+    },
+    {
+     "id": "ai-st4",
+     "title": {
+      "ru": "Текст и язык",
+      "uz": "Matn va til",
+      "en": "Text and language"
+     },
+     "courses": [
+      "nlp-intro"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "dl-path",
+   "stages": [
+    {
+     "id": "dlp-st1",
+     "title": {
+      "ru": "Python для расчётов",
+      "uz": "Hisoblar uchun Python",
+      "en": "Python for computation"
+     },
+     "courses": [
+      "python-basics",
+      "python-intermediate"
+     ]
+    },
+    {
+     "id": "dlp-st2",
+     "title": {
+      "ru": "Основы обучения",
+      "uz": "O‘qitish asoslari",
+      "en": "Learning fundamentals"
+     },
+     "courses": [
+      "ml-intro"
+     ]
+    },
+    {
+     "id": "dlp-st3",
+     "title": {
+      "ru": "Нейрон и сеть",
+      "uz": "Neyron va tarmoq",
+      "en": "Neuron and network"
+     },
+     "courses": [
+      "dl-intro"
+     ]
+    },
+    {
+     "id": "dlp-st4",
+     "title": {
+      "ru": "Применения",
+      "uz": "Qo‘llanishlar",
+      "en": "Applications"
+     },
+     "courses": [
+      "cv-intro",
+      "nlp-intro"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "nlp-path",
+   "stages": [
+    {
+     "id": "nlp-st1",
+     "title": {
+      "ru": "Python и коллекции",
+      "uz": "Python va kolleksiyalar",
+      "en": "Python and collections"
+     },
+     "courses": [
+      "python-basics",
+      "python-intermediate"
+     ]
+    },
+    {
+     "id": "nlp-st2",
+     "title": {
+      "ru": "Текст как числа",
+      "uz": "Matn son sifatida",
+      "en": "Text as numbers"
+     },
+     "courses": [
+      "nlp-intro"
+     ]
+    },
+    {
+     "id": "nlp-st3",
+     "title": {
+      "ru": "Модели",
+      "uz": "Modellar",
+      "en": "Models"
+     },
+     "courses": [
+      "ml-intro",
+      "dl-intro"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "cv-path",
+   "stages": [
+    {
+     "id": "cvp-st1",
+     "title": {
+      "ru": "Python и коллекции",
+      "uz": "Python va kolleksiyalar",
+      "en": "Python and collections"
+     },
+     "courses": [
+      "python-basics",
+      "python-intermediate"
+     ]
+    },
+    {
+     "id": "cvp-st2",
+     "title": {
+      "ru": "Изображение как числа",
+      "uz": "Tasvir son sifatida",
+      "en": "Images as numbers"
+     },
+     "courses": [
+      "cv-intro"
+     ]
+    },
+    {
+     "id": "cvp-st3",
+     "title": {
+      "ru": "Обучаемые модели",
+      "uz": "O‘qitiladigan modellar",
+      "en": "Learned models"
+     },
+     "courses": [
+      "ml-intro",
+      "dl-intro"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "devops-path",
+   "stages": [
+    {
+     "id": "do-st1",
+     "title": {
+      "ru": "Основы кода",
+      "uz": "Kod asoslari",
+      "en": "Code fundamentals"
+     },
+     "courses": [
+      "python-basics"
+     ]
+    },
+    {
+     "id": "do-st2",
+     "title": {
+      "ru": "Инженерная дисциплина",
+      "uz": "Muhandislik intizomi",
+      "en": "Engineering discipline"
+     },
+     "courses": [
+      "algorithms"
+     ]
+    },
+    {
+     "id": "do-st3",
+     "title": {
+      "ru": "Путь до пользователя",
+      "uz": "Foydalanuvchigacha yo‘l",
+      "en": "The path to the user"
+     },
+     "courses": [
+      "devops-intro"
+     ]
+    },
+    {
+     "id": "do-st4",
+     "title": {
+      "ru": "Что вы выкладываете",
+      "uz": "Nimani joylashtirasiz",
+      "en": "What you are deploying"
+     },
+     "courses": [
+      "backend-intro"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "bigdata-path",
+   "stages": [
+    {
+     "id": "bd-st1",
+     "title": {
+      "ru": "Python и SQL",
+      "uz": "Python va SQL",
+      "en": "Python and SQL"
+     },
+     "courses": [
+      "python-basics",
+      "sql-basics"
+     ]
+    },
+    {
+     "id": "bd-st2",
+     "title": {
+      "ru": "Инженерия данных",
+      "uz": "Ma‘lumotlar muhandisligi",
+      "en": "Data engineering"
+     },
+     "courses": [
+      "de-tools"
+     ]
+    },
+    {
+     "id": "bd-st3",
+     "title": {
+      "ru": "Когда данные не помещаются",
+      "uz": "Ma‘lumot sig‘maganda",
+      "en": "When data does not fit"
+     },
+     "courses": [
+      "bigdata-intro"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "cloud-path",
+   "stages": [
+    {
+     "id": "cl-st1",
+     "title": {
+      "ru": "Основы кода",
+      "uz": "Kod asoslari",
+      "en": "Code fundamentals"
+     },
+     "courses": [
+      "python-basics"
+     ]
+    },
+    {
+     "id": "cl-st2",
+     "title": {
+      "ru": "Что вы размещаете",
+      "uz": "Nimani joylashtirasiz",
+      "en": "What you are hosting"
+     },
+     "courses": [
+      "backend-intro"
+     ]
+    },
+    {
+     "id": "cl-st3",
+     "title": {
+      "ru": "Аренда и масштаб",
+      "uz": "Ijara va miqyos",
+      "en": "Renting and scale"
+     },
+     "courses": [
+      "cloud-intro"
+     ]
+    },
+    {
+     "id": "cl-st4",
+     "title": {
+      "ru": "Доставка до продакшна",
+      "uz": "Ishlab chiqarishgacha yetkazish",
+      "en": "Delivery to production"
+     },
+     "courses": [
+      "devops-intro"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "infosec-path",
+   "stages": [
+    {
+     "id": "is-st1",
+     "title": {
+      "ru": "Основы кода",
+      "uz": "Kod asoslari",
+      "en": "Code fundamentals"
+     },
+     "courses": [
+      "python-basics"
+     ]
+    },
+    {
+     "id": "is-st2",
+     "title": {
+      "ru": "Технические угрозы",
+      "uz": "Texnik tahdidlar",
+      "en": "Technical threats"
+     },
+     "courses": [
+      "security-intro"
+     ]
+    },
+    {
+     "id": "is-st3",
+     "title": {
+      "ru": "Управление защитой",
+      "uz": "Himoyani boshqarish",
+      "en": "Managing protection"
+     },
+     "courses": [
+      "infosec-intro"
+     ]
+    },
+    {
+     "id": "is-st4",
+     "title": {
+      "ru": "Инфраструктура",
+      "uz": "Infratuzilma",
+      "en": "Infrastructure"
+     },
+     "courses": [
+      "cloud-intro",
+      "devops-intro"
+     ]
+    }
+   ]
   }
  ],
  "domains": [
@@ -1478,7 +2091,7 @@
    "id": "ai",
    "glyph": "brain",
    "color": "#c084fc",
-   "status": "planned",
+   "status": "starter",
    "title": {
     "ru": "Искусственный интеллект",
     "uz": "Sun'iy intellekt",
@@ -1523,7 +2136,8 @@
       "Honest evaluation, and why a model is confidently wrong"
      ]
     }
-   }
+   },
+   "careerPath": "ai-path"
   },
   {
    "id": "machine-learning",
@@ -1581,7 +2195,7 @@
    "id": "deep-learning",
    "glyph": "brain",
    "color": "#c084fc",
-   "status": "planned",
+   "status": "starter",
    "title": {
     "ru": "Глубокое обучение",
     "uz": "Chuqur o'qitish",
@@ -1626,13 +2240,14 @@
       "Fine-tuning existing models instead of training from scratch"
      ]
     }
-   }
+   },
+   "careerPath": "dl-path"
   },
   {
    "id": "nlp",
    "glyph": "brain",
    "color": "#c084fc",
-   "status": "planned",
+   "status": "starter",
    "title": {
     "ru": "Обработка языка (NLP)",
     "uz": "Tabiiy tilni qayta ishlash",
@@ -1677,13 +2292,14 @@
       "Evaluating quality where there is no single right answer"
      ]
     }
-   }
+   },
+   "careerPath": "nlp-path"
   },
   {
    "id": "computer-vision",
    "glyph": "eye",
    "color": "#c084fc",
-   "status": "planned",
+   "status": "starter",
    "title": {
     "ru": "Компьютерное зрение",
     "uz": "Kompyuter ko'rish",
@@ -1728,13 +2344,14 @@
       "Pre-trained models and fine-tuning for your own task"
      ]
     }
-   }
+   },
+   "careerPath": "cv-path"
   },
   {
    "id": "infosec",
    "glyph": "shield",
    "color": "#f87171",
-   "status": "planned",
+   "status": "starter",
    "title": {
     "ru": "Информационная безопасность",
     "uz": "Axborot xavfsizligi",
@@ -1779,7 +2396,8 @@
       "The human factor: why technology alone does not save you"
      ]
     }
-   }
+   },
+   "careerPath": "infosec-path"
   },
   {
    "id": "frontend",
@@ -1892,7 +2510,7 @@
    "id": "big-data",
    "glyph": "db",
    "color": "#f59e0b",
-   "status": "planned",
+   "status": "starter",
    "title": {
     "ru": "Big Data",
     "uz": "Big Data",
@@ -1937,13 +2555,14 @@
       "Fault tolerance: the system survives dead nodes"
      ]
     }
-   }
+   },
+   "careerPath": "bigdata-path"
   },
   {
    "id": "cloud",
    "glyph": "cloud",
    "color": "#60a5fa",
-   "status": "planned",
+   "status": "starter",
    "title": {
     "ru": "Облачная инженерия",
     "uz": "Bulutli muhandislik",
@@ -1988,13 +2607,14 @@
       "Reliability: redundancy and recovery"
      ]
     }
-   }
+   },
+   "careerPath": "cloud-path"
   },
   {
    "id": "devops",
    "glyph": "layers",
    "color": "#34d399",
-   "status": "planned",
+   "status": "starter",
    "title": {
     "ru": "DevOps",
     "uz": "DevOps",
@@ -2039,7 +2659,8 @@
       "Configuration and secrets management"
      ]
     }
-   }
+   },
+   "careerPath": "devops-path"
   },
   {
    "id": "software-engineering",

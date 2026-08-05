@@ -95,10 +95,10 @@ await i18n.setLang('ru');
 /* ---------- каталог ---------- */
 const cat = await content.loadCatalog();
 check('каталог: 16 направлений', cat.domains.length === 16, cat.domains.length);
-check('каталог: 19 курсов', cat.courses.length === 19, cat.courses.length);
+check('каталог: 26 курсов', cat.courses.length === 26, cat.courses.length);
 check('каталог: legacyMap на 21 запись', Object.keys(cat.legacyMap).length === 21);
 check('каталог: Data Engineering — полный статус', content.domain('data-engineering').status === 'full');
-check('каталог: python-basics переиспользуется в 7 путях', content.domainsUsingCourse('python-basics').length === 7, content.domainsUsingCourse('python-basics').length);
+check('каталог: python-basics переиспользуется в 15 путях', content.domainsUsingCourse('python-basics').length === 15, content.domainsUsingCourse('python-basics').length);
 
 /* ---------- МИГРАЦИЯ ПРОГРЕССА (критично) ---------- */
 const migrated = state.migrate(LEGACY);

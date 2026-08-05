@@ -1,0 +1,300 @@
+{
+ "id": "devops-intro",
+ "schema": 2,
+ "modules": [
+  {
+   "id": "do-01",
+   "title": { "ru": "Путь кода до пользователя", "uz": "Kodning foydalanuvchigacha yo'li", "en": "The path from code to user" },
+   "tagline": { "ru": "Сборка, тесты, выкладка и откат", "uz": "Yig'ish, testlar, joylashtirish va orqaga qaytish", "en": "Build, test, deploy and roll back" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "Зачем автоматизировать выкладку", "uz": "Joylashtirishni nima uchun avtomatlashtirish", "en": "Why automate deployment" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Пока проект маленький, выкладка выглядит просто: скопировал файлы на сервер, перезапустил. Проблемы начинаются, когда людей становится больше одного.</p><ul><li>«У меня работает» — а на сервере другая версия Python</li><li>Кто-то забыл прогнать тесты</li><li>Выложили в пятницу, что-то сломалось, а как вернуть — никто не помнит</li></ul><p>DevOps отвечает на это одним принципом: <b>всё, что делается руками дважды, должно быть записано как код</b>. Тогда выкладка перестаёт быть событием, которого боятся.</p>",
+        "uz": "<p>Loyiha kichik ekan, joylashtirish oddiy ko'rinadi: fayllarni serverga nusxaladi, qayta ishga tushirdi. Muammolar odam bittadan ko'p bo'lganda boshlanadi.</p><ul><li>«Menda ishlayapti» — serverda esa boshqa Python versiyasi</li><li>Kimdir testlarni o'tkazishni unutdi</li><li>Juma kuni joylashtirildi, nimadir buzildi, qanday qaytarishni esa hech kim eslamaydi</li></ul><p>DevOps bunga bitta tamoyil bilan javob beradi: <b>ikki marta qo'lda qilinadigan hamma narsa kod sifatida yozilishi kerak</b>. Shunda joylashtirish qo'rqiladigan hodisa bo'lishdan to'xtaydi.</p>",
+        "en": "<p>While a project is small, deployment looks simple: copy the files to the server, restart. The trouble starts when there is more than one person.</p><ul><li>“Works on my machine” — but the server has a different Python</li><li>Someone forgot to run the tests</li><li>You deployed on Friday, something broke, and nobody remembers how to go back</li></ul><p>DevOps answers this with one principle: <b>anything done by hand twice should be written as code</b>. Then releasing stops being an event people fear.</p>"
+       }
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Типовой конвейер (его называют CI/CD) выглядит так:</p><pre><code>код → сборка → тесты → выкладка на тестовый → выкладка в продакшн</code></pre><p>Каждый шаг может остановить конвейер. Не прошли тесты — до продакшна изменения не доедут. В этом весь смысл: ошибку ловит машина, а не пользователь.</p>",
+        "uz": "<p>Odatiy konveyer (CI/CD deyiladi) shunday ko'rinadi:</p><pre><code>kod → yig'ish → testlar → sinov muhitiga → ishlab chiqarishga</code></pre><p>Har bir qadam konveyerni to'xtata oladi. Testlar o'tmasa — o'zgarishlar ishlab chiqarishgacha yetmaydi. Butun ma'no shunda: xatoni foydalanuvchi emas, mashina tutadi.</p>",
+        "en": "<p>A typical pipeline (called CI/CD) looks like this:</p><pre><code>code → build → tests → deploy to staging → deploy to production</code></pre><p>Any step can stop the pipeline. Tests failed — the change never reaches production. That is the whole point: the machine catches the mistake, not the user.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "# конвейер как обычный список шагов\nsteps = [\n    ('сборка',   True),\n    ('тесты',    False),      # здесь упало\n    ('выкладка', True),\n]\n\nfor name, ok in steps:\n    if not ok:\n        print(f\"✗ {name}: конвейер остановлен\")\n        break\n    print(f\"✓ {name}\")\nelse:\n    print(\"всё прошло, изменения в продакшне\")"
+      },
+      {
+       "type": "checkpoint",
+       "q": { "ru": "Что произойдёт, если тесты в конвейере упали?", "uz": "Konveyerdagi testlar qulasa nima bo'ladi?", "en": "What happens if the tests in the pipeline fail?" },
+       "options": [
+        { "ru": "Выкладка продолжится, ошибку исправят потом", "uz": "Joylashtirish davom etadi, xato keyin tuzatiladi", "en": "Deployment continues; the bug is fixed later" },
+        { "ru": "Конвейер останавливается, изменения не попадут в продакшн", "uz": "Konveyer to'xtaydi, o'zgarishlar ishlab chiqarishga tushmaydi", "en": "The pipeline stops and the change never reaches production" },
+        { "ru": "Тесты запустятся заново автоматически", "uz": "Testlar avtomatik qayta ishga tushadi", "en": "The tests restart automatically" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Смысл автоматической проверки в том, чтобы плохое изменение остановилось до пользователей, а не после.",
+        "uz": "Avtomatik tekshiruvning ma'nosi shundaki, yomon o'zgarish foydalanuvchilardan keyin emas, oldin to'xtashi kerak.",
+        "en": "The point of an automatic check is for a bad change to stop before the users, not after."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "Контейнеры", "uz": "Konteynerlar", "en": "Containers" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>«У меня работает» — вечная проблема: у разработчика одна версия библиотеки, на сервере другая. Контейнер решает её грубо и надёжно: приложение упаковывается вместе со своим окружением.</p><p>Образ — рецепт (какая система, какие зависимости, какая команда запуска). Контейнер — запущенный экземпляр этого образа. Один образ можно запустить на ноутбуке, на сервере и в облаке — поведение будет одинаковым.</p>",
+        "uz": "<p>«Menda ishlayapti» — abadiy muammo: dasturchida kutubxonaning bir versiyasi, serverda boshqasi. Konteyner buni qo'pol va ishonchli hal qiladi: ilova o'z muhiti bilan birga qadoqlanadi.</p><p>Obraz — retsept (qaysi tizim, qaysi bog'liqliklar, qaysi ishga tushirish buyrug'i). Konteyner — shu obrazning ishga tushgan nusxasi. Bitta obrazni noutbukda, serverda va bulutda ishga tushirsa bo'ladi — xatti-harakat bir xil bo'ladi.</p>",
+        "en": "<p>“Works on my machine” is an eternal problem: the developer has one library version, the server another. A container solves it bluntly and reliably: the application is packaged together with its environment.</p><p>An image is the recipe (which system, which dependencies, which start command). A container is a running instance of that image. The same image runs on a laptop, on a server and in the cloud — and behaves the same.</p>"
+       }
+      },
+      {
+       "type": "code",
+       "lang": "text",
+       "code": "FROM python:3.11-slim\nWORKDIR /app\nCOPY requirements.txt .\nRUN pip install -r requirements.txt\nCOPY . .\nCMD [\"python\", \"app.py\"]"
+      },
+      {
+       "type": "note",
+       "kind": "tip",
+       "html": {
+        "ru": "Порядок строк в этом файле не случаен. Зависимости копируются и ставятся <b>до</b> остального кода: пока <code>requirements.txt</code> не менялся, этот тяжёлый шаг берётся из кэша, и пересборка занимает секунды вместо минут.",
+        "uz": "Bu fayldagi qatorlar tartibi tasodifiy emas. Bog'liqliklar qolgan koddan <b>oldin</b> nusxalanadi va o'rnatiladi: <code>requirements.txt</code> o'zgarmagan ekan, bu og'ir qadam keshdan olinadi va qayta yig'ish daqiqalar o'rniga soniyalar oladi.",
+        "en": "The order of the lines is not accidental. Dependencies are copied and installed <b>before</b> the rest of the code: while <code>requirements.txt</code> is unchanged, that heavy step comes from cache and rebuilds take seconds instead of minutes."
+       }
+      },
+      {
+       "type": "run",
+       "code": "# проверим, сработает ли кэш при пересборке\ndef rebuild(changed_files):\n    steps = ['базовый образ', 'зависимости', 'код приложения']\n    invalidated = False\n    for step in steps:\n        if step == 'зависимости' and 'requirements.txt' in changed_files:\n            invalidated = True\n        if step == 'код приложения' and changed_files - {'requirements.txt'}:\n            invalidated = True\n        print(f\"{step}: {'пересобираем' if invalidated else 'из кэша'}\")\n\nprint('— изменили только код:')\nrebuild({'app.py'})\nprint()\nprint('— изменили зависимости:')\nrebuild({'requirements.txt'})"
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "Когда всё сломалось", "uz": "Hammasi buzilganda", "en": "When everything breaks" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Ломается всё и у всех. Разница между хорошей и плохой командой не в том, случаются ли аварии, а в том, сколько времени проходит до восстановления.</p><p>Два инструмента отвечают за это:</p><ul><li><b>Мониторинг и логи</b> — узнать о поломке раньше пользователя. Если о сбое сообщает клиент, мониторинга фактически нет</li><li><b>Откат</b> — вернуть предыдущую рабочую версию одной командой. Чинить на горячую под нагрузкой почти всегда хуже, чем откатиться и разобраться спокойно</li></ul>",
+        "uz": "<p>Hammada va hamma narsa buziladi. Yaxshi va yomon jamoa orasidagi farq avariya bo'ladimi-yo'qmi emas, balki tiklanishgacha qancha vaqt o'tishida.</p><p>Bunga ikkita vosita javob beradi:</p><ul><li><b>Monitoring va loglar</b> — nosozlik haqida foydalanuvchidan oldin bilish. Sboy haqida mijoz xabar bersa, monitoring aslida yo'q</li><li><b>Orqaga qaytish</b> — oldingi ishlaydigan versiyani bitta buyruq bilan qaytarish. Yuk ostida issiqligicha tuzatish deyarli har doim qaytib, xotirjam o'ylashdan yomonroq</li></ul>",
+        "en": "<p>Everything breaks for everyone. The difference between a good and a bad team is not whether incidents happen, but how long it takes to recover.</p><p>Two tools handle this:</p><ul><li><b>Monitoring and logs</b> — learn about a failure before the user does. If a customer reports the outage, you effectively have no monitoring</li><li><b>Rollback</b> — restore the previous working version with one command. Fixing live under load is almost always worse than rolling back and investigating calmly</li></ul>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "log = [\n    '2026-08-04 10:00:01 INFO  запрос /api/users 200',\n    '2026-08-04 10:00:02 ERROR база недоступна',\n    '2026-08-04 10:00:03 INFO  запрос /api/users 200',\n    '2026-08-04 10:00:04 ERROR таймаут платежа',\n    '2026-08-04 10:00:05 WARN  очередь растёт',\n]\n\ndef count_levels(lines):\n    counts = {}\n    for line in lines:\n        for level in ('ERROR', 'WARN', 'INFO'):\n            if f' {level} ' in line or f' {level}  ' in line:\n                counts[level] = counts.get(level, 0) + 1\n                break\n    return counts\n\nstats = count_levels(log)\nprint(stats)\nprint('ошибок:', stats.get('ERROR', 0))\nif stats.get('ERROR', 0) >= 2:\n    print('порог превышен — поднимаем тревогу')"
+      },
+      {
+       "type": "summary",
+       "items": [
+        { "ru": "Всё, что делается руками дважды, стоит записать как код", "uz": "Ikki marta qo'lda qilinadigan narsani kod sifatida yozgan ma'qul", "en": "Anything done by hand twice is worth writing as code" },
+        { "ru": "Конвейер останавливается на первом упавшем шаге", "uz": "Konveyer birinchi qulagan qadamda to'xtaydi", "en": "The pipeline stops at the first failing step" },
+        { "ru": "Контейнер везёт окружение вместе с приложением", "uz": "Konteyner muhitni ilova bilan birga olib yuradi", "en": "A container carries the environment along with the app" },
+        { "ru": "Важна не безаварийность, а время восстановления", "uz": "Avariyasizlik emas, tiklanish vaqti muhim", "en": "What matters is not avoiding incidents but recovery time" }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": { "ru": "Что означает CI/CD?", "uz": "CI/CD nimani anglatadi?", "en": "What does CI/CD mean?" },
+     "options": [
+      { "ru": "Название облачного сервиса", "uz": "Bulut xizmati nomi", "en": "The name of a cloud service" },
+      { "ru": "Автоматические сборка, проверка и выкладка изменений", "uz": "O'zgarishlarni avtomatik yig'ish, tekshirish va joylashtirish", "en": "Automatic building, checking and deploying of changes" },
+      { "ru": "Способ хранения кода", "uz": "Kodni saqlash usuli", "en": "A way of storing code" },
+      { "ru": "Язык программирования", "uz": "Dasturlash tili", "en": "A programming language" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Идея в том, чтобы каждое изменение проходило один и тот же путь автоматически, а не по памяти дежурного разработчика.",
+      "uz": "Fikr shundaki, har bir o'zgarish navbatchi dasturchining xotirasi bo'yicha emas, bir xil yo'ldan avtomatik o'tishi kerak.",
+      "en": "The idea is that every change goes through the same path automatically, rather than from the on-duty developer's memory."
+     }
+    },
+    {
+     "q": { "ru": "Зачем нужен контейнер?", "uz": "Konteyner nima uchun kerak?", "en": "What is a container for?" },
+     "options": [
+      { "ru": "Чтобы код работал быстрее", "uz": "Kod tezroq ishlashi uchun", "en": "To make the code run faster" },
+      { "ru": "Чтобы окружение было одинаковым везде", "uz": "Muhit hamma joyda bir xil bo'lishi uchun", "en": "So the environment is the same everywhere" },
+      { "ru": "Чтобы уменьшить размер кода", "uz": "Kod hajmini kamaytirish uchun", "en": "To reduce the size of the code" },
+      { "ru": "Чтобы не писать тесты", "uz": "Test yozmaslik uchun", "en": "To avoid writing tests" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Приложение едет вместе со своими зависимостями, поэтому «у меня работает» перестаёт быть аргументом.",
+      "uz": "Ilova o'z bog'liqliklari bilan birga ketadi, shuning uchun «menda ishlayapti» dalil bo'lmay qoladi.",
+      "en": "The app travels with its dependencies, so “works on my machine” stops being an argument."
+     }
+    },
+    {
+     "q": { "ru": "Почему зависимости в образе ставят до копирования кода?", "uz": "Nega obrazda bog'liqliklar kod nusxalanishidan oldin o'rnatiladi?", "en": "Why install dependencies before copying the code?" },
+     "options": [
+      { "ru": "Иначе не соберётся", "uz": "Aks holda yig'ilmaydi", "en": "Otherwise the build fails" },
+      { "ru": "Чтобы этот тяжёлый шаг брался из кэша при правках кода", "uz": "Kod tahrirlanganda bu og'ir qadam keshdan olinishi uchun", "en": "So that heavy step comes from cache when only code changes" },
+      { "ru": "Так требует стандарт", "uz": "Standart shuni talab qiladi", "en": "The standard requires it" },
+      { "ru": "Разницы нет", "uz": "Farqi yo'q", "en": "It makes no difference" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Код меняется каждый день, зависимости — раз в месяц. Правильный порядок экономит минуты на каждой сборке.",
+      "uz": "Kod har kuni o'zgaradi, bog'liqliklar oyiga bir marta. To'g'ri tartib har yig'ishda daqiqalarni tejaydi.",
+      "en": "Code changes daily, dependencies monthly. The right order saves minutes on every build."
+     }
+    },
+    {
+     "q": { "ru": "Что важнее при аварии?", "uz": "Avariyada nima muhimroq?", "en": "What matters most during an incident?" },
+     "options": [
+      { "ru": "Найти виноватого", "uz": "Aybdorni topish", "en": "Finding who is to blame" },
+      { "ru": "Быстро вернуть рабочее состояние, а разбираться потом", "uz": "Ishchi holatni tez qaytarish, keyin o'ylash", "en": "Restoring service quickly and investigating afterwards" },
+      { "ru": "Сразу переписать код", "uz": "Kodni darhol qayta yozish", "en": "Rewriting the code immediately" },
+      { "ru": "Дождаться, пока само пройдёт", "uz": "O'zi o'tishini kutish", "en": "Waiting for it to pass" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Поэтому откат до предыдущей версии — базовая возможность, а не роскошь.",
+      "uz": "Shuning uchun oldingi versiyaga qaytish — hashamat emas, asosiy imkoniyat.",
+      "en": "That is why rolling back to the previous version is a baseline capability, not a luxury."
+     }
+    },
+    {
+     "q": { "ru": "Если о сбое первым сообщает клиент, это значит…", "uz": "Sboy haqida birinchi mijoz xabar bersa, bu…", "en": "If a customer is the first to report an outage, it means…" },
+     "options": [
+      { "ru": "всё в порядке, клиенты внимательные", "uz": "hammasi joyida, mijozlar e'tiborli", "en": "everything is fine, the customers are attentive" },
+      { "ru": "мониторинга фактически нет", "uz": "monitoring aslida yo'q", "en": "there is effectively no monitoring" },
+      { "ru": "нужно больше серверов", "uz": "ko'proq server kerak", "en": "you need more servers" },
+      { "ru": "нужно отключить логи", "uz": "loglarni o'chirish kerak", "en": "you should turn off logging" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Смысл мониторинга — узнать о проблеме до того, как её заметят снаружи.",
+      "uz": "Monitoringning ma'nosi — muammoni tashqaridan sezilgunga qadar bilish.",
+      "en": "The point of monitoring is to learn about the problem before anyone outside notices."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "python",
+     "title": { "ru": "Конвейер", "uz": "Konveyer", "en": "The pipeline" },
+     "brief": { "ru": "Остановка на первой ошибке", "uz": "Birinchi xatoda to'xtash", "en": "Stop at the first failure" },
+     "desc": {
+      "ru": "<p><code>run_pipeline(steps)</code> принимает список пар <code>(имя, успех)</code> и возвращает имя <b>первого</b> упавшего шага. Если все прошли — верни <code>None</code>.</p>",
+      "uz": "<p><code>run_pipeline(steps)</code> <code>(nom, muvaffaqiyat)</code> juftliklar ro'yxatini oladi va <b>birinchi</b> qulagan qadam nomini qaytaradi. Hammasi o'tsa — <code>None</code> qaytaring.</p>",
+      "en": "<p><code>run_pipeline(steps)</code> takes a list of <code>(name, success)</code> pairs and returns the name of the <b>first</b> failing step. If all pass, return <code>None</code>.</p>"
+     },
+     "starter": "def run_pipeline(steps):\n    # твой код\n    pass\n\nprint(run_pipeline([('сборка', True), ('тесты', False)]))\n",
+     "tests": "assert run_pipeline([('сборка', True), ('тесты', False)]) == 'тесты', 'Возвращаем первый упавший шаг'\nassert run_pipeline([('a', True), ('b', True)]) is None, 'Всё прошло — None'\nassert run_pipeline([]) is None, 'Пустой конвейер'\nassert run_pipeline([('a', False), ('b', False)]) == 'a', 'Именно первый, а не последний'",
+     "hint": {
+      "ru": "Пройди список и верни имя сразу, как встретишь <code>False</code>. После цикла — <code>None</code>.",
+      "uz": "Ro'yxat bo'ylab yuring va <code>False</code> uchraganda nomni darhol qaytaring. Sikldan keyin — <code>None</code>.",
+      "en": "Walk the list and return the name as soon as you meet <code>False</code>. After the loop, <code>None</code>."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "python",
+     "title": { "ru": "Разбор логов", "uz": "Loglarni tahlil qilish", "en": "Parsing logs" },
+     "brief": { "ru": "Считаем ошибки", "uz": "Xatolarni sanaymiz", "en": "Counting errors" },
+     "desc": {
+      "ru": "<p><code>count_errors(lines)</code> возвращает количество строк, содержащих слово <code>ERROR</code>.</p>",
+      "uz": "<p><code>count_errors(lines)</code> tarkibida <code>ERROR</code> so'zi bo'lgan qatorlar sonini qaytaradi.</p>",
+      "en": "<p><code>count_errors(lines)</code> returns the number of lines containing the word <code>ERROR</code>.</p>"
+     },
+     "starter": "def count_errors(lines):\n    # твой код\n    pass\n\nprint(count_errors(['INFO ok', 'ERROR упало']))\n",
+     "tests": "assert count_errors(['INFO ok', 'ERROR упало']) == 1, 'Одна строка с ошибкой'\nassert count_errors([]) == 0, 'Пустой лог'\nassert count_errors(['ERROR a', 'ERROR b']) == 2, 'Две ошибки'\nassert count_errors(['INFO error в тексте']) == 0, 'Регистр важен: error не ERROR'",
+     "hint": {
+      "ru": "<code>sum(1 for line in lines if 'ERROR' in line)</code>",
+      "uz": "<code>sum(1 for line in lines if 'ERROR' in line)</code>",
+      "en": "<code>sum(1 for line in lines if 'ERROR' in line)</code>"
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "python",
+     "title": { "ru": "Выбор версии для отката", "uz": "Qaytish uchun versiyani tanlash", "en": "Choosing a rollback version" },
+     "brief": { "ru": "Последняя удачная выкладка", "uz": "Oxirgi muvaffaqiyatli joylashtirish", "en": "The last good deploy" },
+     "desc": {
+      "ru": "<p><code>last_good(deploys)</code> принимает список пар <code>(версия, успех)</code> в порядке от старых к новым и возвращает версию <b>последней успешной</b> выкладки. Если успешных не было — <code>None</code>.</p>",
+      "uz": "<p><code>last_good(deploys)</code> eskidan yangiga tartibda <code>(versiya, muvaffaqiyat)</code> juftliklar ro'yxatini oladi va <b>oxirgi muvaffaqiyatli</b> joylashtirish versiyasini qaytaradi. Muvaffaqiyatlisi bo'lmasa — <code>None</code>.</p>",
+      "en": "<p><code>last_good(deploys)</code> takes a list of <code>(version, success)</code> pairs from oldest to newest and returns the version of the <b>last successful</b> deploy. If there were none, return <code>None</code>.</p>"
+     },
+     "starter": "def last_good(deploys):\n    # твой код\n    pass\n\nprint(last_good([('v1', True), ('v2', True), ('v3', False)]))\n",
+     "tests": "assert last_good([('v1', True), ('v2', True), ('v3', False)]) == 'v2', 'Откатываемся на v2'\nassert last_good([('v1', False)]) is None, 'Успешных не было'\nassert last_good([]) is None, 'Пустой список'\nassert last_good([('v1', True)]) == 'v1', 'Единственная удачная'\nassert last_good([('v1', True), ('v2', False), ('v3', True)]) == 'v3', 'Берём самую свежую удачную'",
+     "hint": {
+      "ru": "Иди по списку с конца через <code>reversed()</code> и верни первую версию с успехом.",
+      "uz": "<code>reversed()</code> orqali ro'yxat oxiridan yuring va muvaffaqiyatli birinchi versiyani qaytaring.",
+      "en": "Walk the list backwards with <code>reversed()</code> and return the first successful version."
+     }
+    }
+   ],
+   "exam": {
+    "time": 420,
+    "questions": [
+     {
+      "q": { "ru": "Главный принцип DevOps?", "uz": "DevOps ning asosiy tamoyili?", "en": "The main principle of DevOps?" },
+      "options": [
+       { "ru": "Выкладывать пореже", "uz": "Kamroq joylashtirish", "en": "Deploy as rarely as possible" },
+       { "ru": "Повторяющуюся ручную работу превращать в код", "uz": "Takrorlanuvchi qo'l mehnatini kodga aylantirish", "en": "Turn repeated manual work into code" },
+       { "ru": "Держать всё в одном сервере", "uz": "Hammasini bitta serverda saqlash", "en": "Keep everything on one server" },
+       { "ru": "Писать больше документации", "uz": "Ko'proq hujjat yozish", "en": "Write more documentation" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Образ и контейнер соотносятся как…", "uz": "Obraz va konteyner qanday bog'liq…", "en": "An image and a container relate as…" },
+      "options": [
+       { "ru": "одно и то же", "uz": "bir xil narsa", "en": "the same thing" },
+       { "ru": "рецепт и приготовленное по нему блюдо", "uz": "retsept va unga ko'ra tayyorlangan taom", "en": "a recipe and a dish cooked from it" },
+       { "ru": "сервер и сеть", "uz": "server va tarmoq", "en": "a server and a network" },
+       { "ru": "код и тесты", "uz": "kod va testlar", "en": "code and tests" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Что делают в первую очередь при поломке в продакшне?", "uz": "Ishlab chiqarishda nosozlikda birinchi navbatda nima qilinadi?", "en": "What do you do first when production breaks?" },
+      "options": [
+       { "ru": "Ищут причину в коде", "uz": "Sababni koddan qidiradi", "en": "Look for the cause in the code" },
+       { "ru": "Возвращают предыдущую рабочую версию", "uz": "Oldingi ishchi versiyani qaytaradi", "en": "Restore the previous working version" },
+       { "ru": "Перезагружают все серверы", "uz": "Barcha serverlarni qayta yuklaydi", "en": "Reboot every server" },
+       { "ru": "Пишут пользователям письмо", "uz": "Foydalanuvchilarga xat yozadi", "en": "Email the users" }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "python",
+      "title": { "ru": "Решение о тревоге", "uz": "Ogohlantirish haqida qaror", "en": "Deciding to raise an alert" },
+      "desc": {
+       "ru": "<p><code>should_alert(lines, threshold)</code> возвращает <code>True</code>, если доля строк с <code>ERROR</code> среди всех строк <b>строго больше</b> порога <code>threshold</code> (от 0 до 1).</p><p>Для пустого лога — <code>False</code>.</p>",
+       "uz": "<p><code>should_alert(lines, threshold)</code> barcha qatorlar orasida <code>ERROR</code> li qatorlar ulushi <code>threshold</code> (0 dan 1 gacha) dan <b>qat'iy katta</b> bo'lsa <code>True</code> qaytaradi.</p><p>Bo'sh log uchun — <code>False</code>.</p>",
+       "en": "<p><code>should_alert(lines, threshold)</code> returns <code>True</code> if the share of lines containing <code>ERROR</code> is <b>strictly greater</b> than <code>threshold</code> (0 to 1).</p><p>For an empty log, return <code>False</code>.</p>"
+      },
+      "starter": "def should_alert(lines, threshold):\n    # твой код\n    pass\n\nprint(should_alert(['ERROR a', 'INFO b'], 0.4))\n",
+      "tests": "assert should_alert(['ERROR a', 'INFO b'], 0.4) is True, 'Половина ошибок больше порога 0.4'\nassert should_alert(['ERROR a', 'INFO b'], 0.5) is False, 'Ровно порог — тревоги нет'\nassert should_alert([], 0.1) is False, 'Пустой лог'\nassert should_alert(['INFO a'], 0.0) is False, 'Ошибок нет вовсе'\nassert should_alert(['ERROR a'], 0.0) is True, 'Единственная строка — ошибка'",
+      "hint": {
+       "ru": "Посчитай долю как <code>errors / len(lines)</code> и сравни строго через <code>&gt;</code>. Пустой список обработай отдельно.",
+       "uz": "Ulushni <code>errors / len(lines)</code> deb hisoblang va <code>&gt;</code> bilan qat'iy solishtiring. Bo'sh ro'yxatni alohida qayta ishlang.",
+       "en": "Compute the share as <code>errors / len(lines)</code> and compare strictly with <code>&gt;</code>. Handle the empty list separately."
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

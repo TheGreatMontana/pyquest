@@ -1,0 +1,304 @@
+{
+ "id": "nlp-intro",
+ "schema": 2,
+ "modules": [
+  {
+   "id": "nl-01",
+   "title": { "ru": "Текст как числа", "uz": "Matn son sifatida", "en": "Text as numbers" },
+   "tagline": { "ru": "Токены, мешок слов и поиск по смыслу", "uz": "Tokenlar, so'zlar qopi va ma'no bo'yicha qidiruv", "en": "Tokens, bag of words and search by meaning" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "Токенизация", "uz": "Tokenlash", "en": "Tokenisation" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Модель не умеет работать с буквами — только с числами. Первый шаг всегда один: разрезать текст на кусочки и заменить их номерами. Кусочки называют <b>токенами</b>.</p><p>Токен не равен слову. В современных моделях длинное слово рвётся на части, а частое остаётся целым. Поэтому «программирование» может занять четыре токена, а «дом» — один.</p>",
+        "uz": "<p>Model harflar bilan ishlay olmaydi — faqat sonlar bilan. Birinchi qadam doim bitta: matnni bo'laklarga kesib, ularni raqamlar bilan almashtirish. Bo'laklar <b>tokenlar</b> deyiladi.</p><p>Token so'zga teng emas. Zamonaviy modellarda uzun so'z bo'laklarga bo'linadi, tez-tez uchraydigani butun qoladi. Shuning uchun «dasturlash» to'rtta token olishi mumkin, «uy» esa bitta.</p>",
+        "en": "<p>A model cannot work with letters — only numbers. The first step is always the same: cut the text into pieces and replace them with ids. The pieces are called <b>tokens</b>.</p><p>A token is not a word. In modern models a long word is split into parts while a frequent one stays whole. So “programming” may take four tokens and “home” just one.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "def tokenize(text):\n    \"\"\"Простейшая токенизация: нижний регистр, только буквы и цифры.\"\"\"\n    clean = ''.join(ch.lower() if ch.isalnum() else ' ' for ch in text)\n    return [w for w in clean.split() if w]\n\nprint(tokenize(\"Привет, мир! Python — это просто.\"))\nprint(tokenize(\"SQL и SQL, снова SQL?\"))"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Дальше каждому токену выдают номер — получается <b>словарь</b>. Одно и то же слово всегда превращается в одно и то же число, иначе модель не сможет их сопоставить.</p>",
+        "uz": "<p>Keyin har bir tokenga raqam beriladi — <b>lug'at</b> hosil bo'ladi. Bir xil so'z doim bir xil songa aylanadi, aks holda model ularni solishtira olmaydi.</p>",
+        "en": "<p>Then each token gets an id — that forms the <b>vocabulary</b>. The same word must always map to the same number, otherwise the model cannot relate them.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "def build_vocab(tokens):\n    vocab = {}\n    for t in tokens:\n        if t not in vocab:\n            vocab[t] = len(vocab)\n    return vocab\n\ntokens = ['я', 'учу', 'python', 'и', 'учу', 'sql']\nvocab = build_vocab(tokens)\nprint(vocab)\nprint('в числах:', [vocab[t] for t in tokens])"
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "Мешок слов и близость текстов", "uz": "So'zlar qopi va matnlar yaqinligi", "en": "Bag of words and text similarity" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Самый простой способ превратить текст в вектор — посчитать, сколько раз встретилось каждое слово. Это называется <b>мешок слов</b>: порядок теряется, остаются только частоты.</p><p>Звучит грубо, но для многих задач хватает: определить тему письма, отличить спам, найти похожие документы.</p>",
+        "uz": "<p>Matnni vektorga aylantirishning eng oddiy usuli — har bir so'z necha marta uchraganini sanash. Bu <b>so'zlar qopi</b> deyiladi: tartib yo'qoladi, faqat chastotalar qoladi.</p><p>Qo'pol eshitiladi, lekin ko'p vazifalar uchun yetarli: xat mavzusini aniqlash, spamni ajratish, o'xshash hujjatlarni topish.</p>",
+        "en": "<p>The simplest way to turn text into a vector is to count how often each word appears. This is the <b>bag of words</b>: order is lost, only frequencies remain.</p><p>It sounds crude, but for many tasks it is enough: identifying an email's topic, separating spam, finding similar documents.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "def bag_of_words(tokens):\n    counts = {}\n    for t in tokens:\n        counts[t] = counts.get(t, 0) + 1\n    return counts\n\na = bag_of_words(['python', 'быстрый', 'python', 'простой'])\nb = bag_of_words(['sql', 'быстрый', 'sql'])\nprint('текст A:', a)\nprint('текст B:', b)\n\n# сколько общих слов\ncommon = set(a) & set(b)\nprint('общие слова:', common)"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Чтобы измерить похожесть, векторы сравнивают по углу между ними — это <b>косинусная близость</b>. Значение от 0 (ничего общего) до 1 (одинаковые по составу).</p><p>Угол, а не расстояние, выбран специально: длинный документ и короткий на ту же тему должны считаться похожими, хотя чисел в них разное количество.</p>",
+        "uz": "<p>O'xshashlikni o'lchash uchun vektorlar orasidagi burchak bo'yicha solishtiriladi — bu <b>kosinus yaqinligi</b>. Qiymat 0 (umumiylik yo'q) dan 1 (tarkibi bir xil) gacha.</p><p>Masofa emas, burchak ataylab tanlangan: uzun va qisqa hujjat bir mavzuda bo'lsa, ichidagi sonlar miqdori har xil bo'lsa ham, o'xshash hisoblanishi kerak.</p>",
+        "en": "<p>To measure similarity, vectors are compared by the angle between them — <b>cosine similarity</b>. It ranges from 0 (nothing in common) to 1 (identical in composition).</p><p>The angle rather than the distance is chosen deliberately: a long document and a short one on the same topic should count as similar even though their numbers differ in magnitude.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "import math\n\ndef cosine(a, b):\n    keys = set(a) | set(b)\n    dot = sum(a.get(k, 0) * b.get(k, 0) for k in keys)\n    na = math.sqrt(sum(v * v for v in a.values()))\n    nb = math.sqrt(sum(v * v for v in b.values()))\n    return dot / (na * nb) if na and nb else 0.0\n\ndoc1 = {'python': 2, 'код': 1}\ndoc2 = {'python': 4, 'код': 2}       # та же тема, текст длиннее\ndoc3 = {'борщ': 3, 'рецепт': 1}\n\nprint(f\"1 и 2: {cosine(doc1, doc2):.2f}\")\nprint(f\"1 и 3: {cosine(doc1, doc3):.2f}\")"
+      },
+      {
+       "type": "note",
+       "kind": "tip",
+       "html": {
+        "ru": "Мешок слов не понимает синонимов: «машина» и «автомобиль» для него разные слова. Именно поэтому появились векторные представления — там близкие по смыслу слова получают близкие координаты, и поиск начинает работать по смыслу, а не по буквам.",
+        "uz": "So'zlar qopi sinonimlarni tushunmaydi: «mashina» va «avtomobil» uning uchun boshqa so'zlar. Aynan shuning uchun vektor tasvirlari paydo bo'ldi — u yerda ma'nosi yaqin so'zlar yaqin koordinatalar oladi va qidiruv harflar bo'yicha emas, ma'no bo'yicha ishlay boshlaydi.",
+        "en": "A bag of words knows nothing about synonyms: “car” and “automobile” are different words to it. That is exactly why embeddings appeared — there, words close in meaning get close coordinates, and search starts working by meaning rather than by letters."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "Языковая модель и контекст", "uz": "Til modeli va kontekst", "en": "Language models and context" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Большая языковая модель делает одну вещь: по цепочке токенов предсказывает следующий. Всё остальное — ответы, перевод, код — следствие этого умения, повторённого много раз подряд.</p><p>Отсюда два практических ограничения:</p><ul><li><b>Контекст ограничен.</b> Модель видит только последние N токенов. Что не поместилось — для неё не существует</li><li><b>Модель не знает, что она не знает.</b> Она подбирает правдоподобное продолжение, а не проверяет факты — и ошибается уверенно</li></ul>",
+        "uz": "<p>Katta til modeli bitta ish qiladi: tokenlar zanjiri bo'yicha keyingisini bashorat qiladi. Qolgan hamma narsa — javoblar, tarjima, kod — ketma-ket ko'p marta takrorlangan shu malakaning natijasi.</p><p>Shundan ikkita amaliy cheklov:</p><ul><li><b>Kontekst cheklangan.</b> Model faqat oxirgi N tokenni ko'radi. Sig'magani u uchun mavjud emas</li><li><b>Model nimani bilmasligini bilmaydi.</b> U faktlarni tekshirmaydi, ishonarli davomni tanlaydi — va ishonch bilan xato qiladi</li></ul>",
+        "en": "<p>A large language model does one thing: given a chain of tokens, predict the next one. Everything else — answers, translation, code — follows from that ability repeated many times over.</p><p>Two practical limits follow:</p><ul><li><b>Context is finite.</b> The model sees only the last N tokens. Whatever did not fit does not exist for it</li><li><b>The model does not know what it does not know.</b> It picks a plausible continuation rather than checking facts — and is confidently wrong</li></ul>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "# грубая модель «предскажи следующее слово» на частотах пар\ntext = 'я учу python я учу sql я пишу код'\nwords = text.split()\n\npairs = {}\nfor a, b in zip(words, words[1:]):\n    pairs.setdefault(a, {})\n    pairs[a][b] = pairs[a].get(b, 0) + 1\n\ndef predict(word):\n    options = pairs.get(word)\n    if not options:\n        return None\n    return max(options, key=options.get)\n\nfor w in ['я', 'учу', 'пишу']:\n    print(f\"после '{w}' вероятнее всего: {predict(w)}\")"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Настоящая модель делает то же самое, только вместо счётчика пар — миллиарды весов и учёт всего контекста, а не одного предыдущего слова. Идея при этом не меняется: подобрать самое вероятное продолжение.</p>",
+        "uz": "<p>Haqiqiy model xuddi shuni qiladi, faqat juftliklar hisoblagichi o'rniga — milliardlab og'irlik va bitta oldingi so'z emas, butun kontekstni hisobga olish. Fikr esa o'zgarmaydi: eng ehtimolli davomni tanlash.</p>",
+        "en": "<p>A real model does the same thing, except instead of a pair counter it has billions of weights and takes the whole context into account rather than one previous word. The idea does not change: pick the most likely continuation.</p>"
+       }
+      },
+      {
+       "type": "summary",
+       "items": [
+        { "ru": "Текст превращают в токены, токены — в числа", "uz": "Matn tokenlarga, tokenlar sonlarga aylantiriladi", "en": "Text becomes tokens, tokens become numbers" },
+        { "ru": "Мешок слов теряет порядок, но для многих задач достаточен", "uz": "So'zlar qopi tartibni yo'qotadi, lekin ko'p vazifaga yetarli", "en": "A bag of words loses order but suffices for many tasks" },
+        { "ru": "Косинусная близость сравнивает тексты по углу между векторами", "uz": "Kosinus yaqinligi matnlarni vektorlar burchagi bo'yicha solishtiradi", "en": "Cosine similarity compares texts by the angle between vectors" },
+        { "ru": "Языковая модель предсказывает следующий токен и ограничена контекстом", "uz": "Til modeli keyingi tokenni bashorat qiladi va kontekst bilan cheklangan", "en": "A language model predicts the next token and is bounded by context" }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": { "ru": "Что такое токен?", "uz": "Token nima?", "en": "What is a token?" },
+     "options": [
+      { "ru": "Всегда одно слово", "uz": "Doim bitta so'z", "en": "Always one word" },
+      { "ru": "Кусок текста, которому сопоставлен номер", "uz": "Raqam biriktirilgan matn bo'lagi", "en": "A piece of text mapped to an id" },
+      { "ru": "Символ юникода", "uz": "Yunikod belgisi", "en": "A Unicode character" },
+      { "ru": "Ключ доступа к модели", "uz": "Modelga kirish kaliti", "en": "An access key for the model" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Длинное слово может разбиться на несколько токенов, а частое короткое — остаться одним.",
+      "uz": "Uzun so'z bir necha tokenga bo'linishi, tez-tez uchraydigan qisqasi esa bitta qolishi mumkin.",
+      "en": "A long word may split into several tokens, while a frequent short one stays as one."
+     }
+    },
+    {
+     "q": { "ru": "Что теряет мешок слов?", "uz": "So'zlar qopi nimani yo'qotadi?", "en": "What does a bag of words lose?" },
+     "options": [
+      { "ru": "Частоты слов", "uz": "So'zlar chastotasini", "en": "Word frequencies" },
+      { "ru": "Порядок слов", "uz": "So'zlar tartibini", "en": "Word order" },
+      { "ru": "Сами слова", "uz": "So'zlarning o'zini", "en": "The words themselves" },
+      { "ru": "Ничего", "uz": "Hech nimani", "en": "Nothing" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "«Собака укусила человека» и «человек укусил собаку» дают одинаковый мешок слов — в этом его главная слабость.",
+      "uz": "«It odamni tishladi» va «odam itni tishladi» bir xil so'zlar qopini beradi — uning asosiy zaifligi shu.",
+      "en": "“Dog bites man” and “man bites dog” produce the same bag — that is its main weakness."
+     }
+    },
+    {
+     "q": { "ru": "Что означает косинусная близость 1?", "uz": "Kosinus yaqinligi 1 nimani anglatadi?", "en": "What does a cosine similarity of 1 mean?" },
+     "options": [
+      { "ru": "Тексты не связаны", "uz": "Matnlar bog'liq emas", "en": "The texts are unrelated" },
+      { "ru": "Векторы направлены одинаково — состав совпадает", "uz": "Vektorlar bir xil yo'nalgan — tarkibi mos", "en": "The vectors point the same way — the composition matches" },
+      { "ru": "Тексты одинаковой длины", "uz": "Matnlar bir xil uzunlikda", "en": "The texts are the same length" },
+      { "ru": "Ошибка вычисления", "uz": "Hisoblash xatosi", "en": "A computation error" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Длина текста на угол не влияет, поэтому короткий и длинный тексты об одном и том же дают близость около единицы.",
+      "uz": "Matn uzunligi burchakka ta'sir qilmaydi, shuning uchun bir mavzudagi qisqa va uzun matnlar birga yaqin qiymat beradi.",
+      "en": "Length does not affect the angle, so a short and a long text on the same subject score near one."
+     }
+    },
+    {
+     "q": { "ru": "Что делает языковая модель по сути?", "uz": "Til modeli mohiyatan nima qiladi?", "en": "What does a language model essentially do?" },
+     "options": [
+      { "ru": "Ищет ответ в базе данных", "uz": "Javobni ma'lumotlar bazasidan qidiradi", "en": "Looks the answer up in a database" },
+      { "ru": "Предсказывает следующий токен", "uz": "Keyingi tokenni bashorat qiladi", "en": "Predicts the next token" },
+      { "ru": "Переводит текст в звук", "uz": "Matnni ovozga aylantiradi", "en": "Converts text to speech" },
+      { "ru": "Проверяет факты", "uz": "Faktlarni tekshiradi", "en": "Verifies facts" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Ответ на вопрос — это просто много раз подряд предсказанный следующий токен.",
+      "uz": "Savolga javob — bu ketma-ket ko'p marta bashorat qilingan keyingi token, xolos.",
+      "en": "An answer to a question is simply the next token predicted many times in a row."
+     }
+    },
+    {
+     "q": { "ru": "Почему модель уверенно выдаёт неверные факты?", "uz": "Nega model noto'g'ri faktlarni ishonch bilan beradi?", "en": "Why does a model state wrong facts confidently?" },
+     "options": [
+      { "ru": "Она специально обманывает", "uz": "U ataylab aldaydi", "en": "It deliberately lies" },
+      { "ru": "Она подбирает правдоподобное продолжение, а не проверяет истинность", "uz": "U haqiqatni tekshirmaydi, ishonarli davomni tanlaydi", "en": "It picks a plausible continuation rather than checking truth" },
+      { "ru": "У неё сломан контекст", "uz": "Uning konteksti buzilgan", "en": "Its context is broken" },
+      { "ru": "Так задумано разработчиками", "uz": "Dasturchilar shunday o'ylagan", "en": "The developers designed it that way" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Правдоподобие и правда — разные вещи. Поэтому важные факты всегда проверяют вне модели.",
+      "uz": "Ishonarlilik va haqiqat — boshqa narsalar. Shuning uchun muhim faktlar doim modeldan tashqarida tekshiriladi.",
+      "en": "Plausibility and truth are different things. That is why important facts are always checked outside the model."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "python",
+     "title": { "ru": "Токенизация", "uz": "Tokenlash", "en": "Tokenisation" },
+     "brief": { "ru": "Разрезать текст на слова", "uz": "Matnni so'zlarga kesish", "en": "Cut text into words" },
+     "desc": {
+      "ru": "<p><code>tokenize(text)</code> возвращает список слов в нижнем регистре. Всё, что не буква и не цифра, считается разделителем. Пустых элементов быть не должно.</p>",
+      "uz": "<p><code>tokenize(text)</code> kichik harfdagi so'zlar ro'yxatini qaytaradi. Harf va raqam bo'lmagan hamma narsa ajratuvchi hisoblanadi. Bo'sh elementlar bo'lmasligi kerak.</p>",
+      "en": "<p><code>tokenize(text)</code> returns a list of lower-case words. Anything that is not a letter or digit counts as a separator. There must be no empty elements.</p>"
+     },
+     "starter": "def tokenize(text):\n    # твой код\n    pass\n\nprint(tokenize(\"Привет, мир!\"))\n",
+     "tests": "assert tokenize('Привет, мир!') == ['привет', 'мир'], 'Знаки препинания — разделители'\nassert tokenize('SQL и SQL') == ['sql', 'и', 'sql'], 'Нижний регистр, повторы сохраняются'\nassert tokenize('') == [], 'Пустая строка даёт пустой список'\nassert tokenize('a1 b2') == ['a1', 'b2'], 'Цифры остаются частью слова'\nassert tokenize('   ') == [], 'Только пробелы — пустой список'",
+     "hint": {
+      "ru": "Замени все не-<code>isalnum()</code> символы на пробел, приведи к нижнему регистру и вызови <code>split()</code>.",
+      "uz": "<code>isalnum()</code> bo'lmagan barcha belgilarni bo'sh joyga almashtiring, kichik harfga keltiring va <code>split()</code> chaqiring.",
+      "en": "Replace every non-<code>isalnum()</code> character with a space, lower-case it and call <code>split()</code>."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "python",
+     "title": { "ru": "Мешок слов", "uz": "So'zlar qopi", "en": "Bag of words" },
+     "brief": { "ru": "Частоты слов", "uz": "So'zlar chastotasi", "en": "Word frequencies" },
+     "desc": {
+      "ru": "<p><code>bag(tokens)</code> возвращает словарь «слово → сколько раз встретилось».</p>",
+      "uz": "<p><code>bag(tokens)</code> «so'z → necha marta uchradi» lug'atini qaytaradi.</p>",
+      "en": "<p><code>bag(tokens)</code> returns a dictionary of “word → how many times it appeared”.</p>"
+     },
+     "starter": "def bag(tokens):\n    # твой код\n    pass\n\nprint(bag(['a', 'b', 'a']))\n",
+     "tests": "assert bag(['a', 'b', 'a']) == {'a': 2, 'b': 1}, 'Считаем повторы'\nassert bag([]) == {}, 'Пустой список — пустой словарь'\nassert bag(['x']) == {'x': 1}, 'Одно слово'\nassert bag(['a', 'a', 'a']) == {'a': 3}, 'Три одинаковых'",
+     "hint": {
+      "ru": "Проходи по списку и увеличивай счётчик через <code>counts.get(t, 0) + 1</code>.",
+      "uz": "Ro'yxat bo'ylab yuring va <code>counts.get(t, 0) + 1</code> orqali hisoblagichni oshiring.",
+      "en": "Walk the list and increment the counter with <code>counts.get(t, 0) + 1</code>."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "python",
+     "title": { "ru": "Косинусная близость", "uz": "Kosinus yaqinligi", "en": "Cosine similarity" },
+     "brief": { "ru": "Насколько тексты похожи", "uz": "Matnlar qanchalik o'xshash", "en": "How similar two texts are" },
+     "desc": {
+      "ru": "<p><code>cosine(a, b)</code> принимает два мешка слов и возвращает косинусную близость: скалярное произведение, делённое на произведение длин векторов. Если любой из векторов пустой — верни <code>0.0</code>.</p>",
+      "uz": "<p><code>cosine(a, b)</code> ikkita so'zlar qopini oladi va kosinus yaqinligini qaytaradi: skalyar ko'paytma vektorlar uzunliklari ko'paytmasiga bo'lingan. Vektorlardan biri bo'sh bo'lsa — <code>0.0</code> qaytaring.</p>",
+      "en": "<p><code>cosine(a, b)</code> takes two bags of words and returns the cosine similarity: the dot product divided by the product of the vector lengths. If either vector is empty, return <code>0.0</code>.</p>"
+     },
+     "starter": "import math\n\ndef cosine(a, b):\n    # твой код\n    pass\n\nprint(cosine({'x': 1}, {'x': 2}))\n",
+     "tests": "assert abs(cosine({'x': 1}, {'x': 2}) - 1.0) < 1e-9, 'Одинаковое направление даёт 1'\nassert cosine({'x': 1}, {'y': 1}) == 0.0, 'Нет общих слов — ноль'\nassert cosine({}, {'x': 1}) == 0.0, 'Пустой вектор даёт 0.0'\nassert cosine({}, {}) == 0.0, 'Оба пустые — тоже 0.0'\nv = cosine({'a': 1, 'b': 1}, {'a': 1})\nassert 0 < v < 1, 'Частичное совпадение даёт значение строго между 0 и 1'",
+     "hint": {
+      "ru": "Скалярное произведение — сумма <code>a[k] * b[k]</code> по общим ключам. Длина вектора — корень из суммы квадратов значений.",
+      "uz": "Skalyar ko'paytma — umumiy kalitlar bo'yicha <code>a[k] * b[k]</code> yig'indisi. Vektor uzunligi — qiymatlar kvadratlari yig'indisidan ildiz.",
+      "en": "The dot product is the sum of <code>a[k] * b[k]</code> over shared keys. A vector's length is the square root of the sum of squared values."
+     }
+    }
+   ],
+   "exam": {
+    "time": 420,
+    "questions": [
+     {
+      "q": { "ru": "Первый шаг любой обработки текста — это…", "uz": "Har qanday matnni qayta ishlashning birinchi qadami — bu…", "en": "The first step of any text processing is…" },
+      "options": [
+       { "ru": "перевод на английский", "uz": "ingliz tiliga tarjima", "en": "translating to English" },
+       { "ru": "разрезать текст на токены", "uz": "matnni tokenlarga kesish", "en": "cutting the text into tokens" },
+       { "ru": "сортировка слов", "uz": "so'zlarni saralash", "en": "sorting the words" },
+       { "ru": "удаление всех цифр", "uz": "barcha raqamlarni o'chirish", "en": "removing all digits" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Почему для сравнения текстов берут угол, а не расстояние?", "uz": "Nega matnlarni solishtirishda masofa emas, burchak olinadi?", "en": "Why compare texts by angle rather than distance?" },
+      "options": [
+       { "ru": "Так быстрее считать", "uz": "Shunday hisoblash tezroq", "en": "It is faster to compute" },
+       { "ru": "Чтобы длина текста не влияла на похожесть", "uz": "Matn uzunligi o'xshashlikka ta'sir qilmasligi uchun", "en": "So the length of a text does not affect similarity" },
+       { "ru": "Расстояние нельзя посчитать", "uz": "Masofani hisoblab bo'lmaydi", "en": "Distance cannot be computed" },
+       { "ru": "Так требует библиотека", "uz": "Kutubxona shuni talab qiladi", "en": "The library requires it" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Что произойдёт, если текст не помещается в контекст модели?", "uz": "Matn model kontekstiga sig'masa nima bo'ladi?", "en": "What happens if a text does not fit in the model's context?" },
+      "options": [
+       { "ru": "Модель прочитает его целиком медленнее", "uz": "Model uni butunlay sekinroq o'qiydi", "en": "The model reads all of it, just slower" },
+       { "ru": "Лишнее просто не увидят — для модели его нет", "uz": "Ortiqchasini ko'rmaydi — model uchun u yo'q", "en": "The excess is simply unseen — it does not exist for the model" },
+       { "ru": "Модель выдаст ошибку и остановится", "uz": "Model xato beradi va to'xtaydi", "en": "The model raises an error and stops" },
+       { "ru": "Контекст расширится сам", "uz": "Kontekst o'zi kengayadi", "en": "The context expands on its own" }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "python",
+      "title": { "ru": "Поиск похожего документа", "uz": "O'xshash hujjatni qidirish", "en": "Finding the closest document" },
+      "desc": {
+       "ru": "<p>Собери всё вместе: <code>most_similar(query, docs)</code> принимает строку запроса и список строк-документов, а возвращает <b>индекс</b> самого похожего документа.</p><p>Сравнивай мешки слов косинусной близостью. Если список пуст — верни <code>-1</code>. При равенстве бери документ с меньшим индексом.</p>",
+       "uz": "<p>Hammasini birlashtiring: <code>most_similar(query, docs)</code> so'rov satri va hujjat-satrlar ro'yxatini oladi, eng o'xshash hujjat <b>indeksini</b> qaytaradi.</p><p>So'zlar qoplarini kosinus yaqinligi bilan solishtiring. Ro'yxat bo'sh bo'lsa — <code>-1</code> qaytaring. Tenglikda kichikroq indeksli hujjatni oling.</p>",
+       "en": "<p>Put it together: <code>most_similar(query, docs)</code> takes a query string and a list of document strings, and returns the <b>index</b> of the most similar document.</p><p>Compare bags of words with cosine similarity. If the list is empty, return <code>-1</code>. On a tie, take the lower index.</p>"
+      },
+      "starter": "import math\n\ndef most_similar(query, docs):\n    # токенизируй, посчитай мешки, сравни\n    pass\n\nprint(most_similar('python код', ['борщ рецепт', 'python простой код']))\n",
+      "tests": "assert most_similar('python код', ['борщ рецепт', 'python простой код']) == 1, 'Второй документ ближе'\nassert most_similar('что угодно', []) == -1, 'Пустой список документов'\nassert most_similar('sql', ['sql', 'python']) == 0, 'Точное совпадение выигрывает'\nassert most_similar('кот', ['собака', 'рыба']) == 0, 'Если общего нет, берём первый'",
+      "hint": {
+       "ru": "Три шага: токенизировать всё, построить мешки, пройти по документам с запоминанием максимума. Строгое сравнение <code>&gt;</code> само даст меньший индекс при равенстве.",
+       "uz": "Uch qadam: hammasini tokenlash, qoplarni qurish, maksimumni eslab hujjatlar bo'ylab yurish. Qat'iy <code>&gt;</code> solishtiruvi tenglikda kichikroq indeksni o'zi beradi.",
+       "en": "Three steps: tokenise everything, build the bags, walk the documents tracking the maximum. A strict <code>&gt;</code> comparison naturally keeps the lower index on ties."
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

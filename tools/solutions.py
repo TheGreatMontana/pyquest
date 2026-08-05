@@ -124,4 +124,236 @@ print(split([1, 2, 3, 4, 5], 0.6))""",
     return float(sum(abs(k * x - y) for x, y in test) / len(test))
 
 print(evaluate([(1, 2), (2, 4), (3, 6), (4, 8)], 0.5))""",
+
+# ===== dl-intro =====
+'dl-intro/dl-01/t1': """def neuron(inputs, weights, bias):
+    return sum(x * w for x, w in zip(inputs, weights)) + bias
+
+print(neuron([1, 2], [0.5, -1], 0))""",
+'dl-intro/dl-01/t2': """def layer(inputs, weights_list, biases):
+    out = []
+    for weights, bias in zip(weights_list, biases):
+        total = bias + sum(x * w for x, w in zip(inputs, weights))
+        out.append(max(0, total))
+    return out
+
+print(layer([1, 2], [[0.5, -1], [1, 1]], [0, 0]))""",
+'dl-intro/dl-01/t3': """def step(w, data, lr):
+    if not data:
+        return w
+    grad = sum(2 * (w * x - y) * x for x, y in data) / len(data)
+    return w - lr * grad
+
+print(step(0.0, [(1, 3), (2, 6)], 0.1))""",
+'dl-intro/dl-01/exam0': """def train(data, lr, steps):
+    w = 0.0
+    for _ in range(steps):
+        if not data:
+            break
+        grad = sum(2 * (w * x - y) * x for x, y in data) / len(data)
+        w -= lr * grad
+    return w
+
+print(train([(1, 3), (2, 6), (3, 9)], 0.05, 50))""",
+
+# ===== nlp-intro =====
+'nlp-intro/nl-01/t1': """def tokenize(text):
+    clean = ''.join(ch.lower() if ch.isalnum() else ' ' for ch in text)
+    return [w for w in clean.split() if w]
+
+print(tokenize('Привет, мир!'))""",
+'nlp-intro/nl-01/t2': """def bag(tokens):
+    counts = {}
+    for t in tokens:
+        counts[t] = counts.get(t, 0) + 1
+    return counts
+
+print(bag(['a', 'b', 'a']))""",
+'nlp-intro/nl-01/t3': """import math
+
+def cosine(a, b):
+    keys = set(a) | set(b)
+    dot = sum(a.get(k, 0) * b.get(k, 0) for k in keys)
+    na = math.sqrt(sum(v * v for v in a.values()))
+    nb = math.sqrt(sum(v * v for v in b.values()))
+    return dot / (na * nb) if na and nb else 0.0
+
+print(cosine({'x': 1}, {'x': 2}))""",
+'nlp-intro/nl-01/exam0': """import math
+
+def most_similar(query, docs):
+    def tokenize(text):
+        clean = ''.join(ch.lower() if ch.isalnum() else ' ' for ch in text)
+        return [w for w in clean.split() if w]
+
+    def bag(tokens):
+        counts = {}
+        for t in tokens:
+            counts[t] = counts.get(t, 0) + 1
+        return counts
+
+    def cosine(a, b):
+        keys = set(a) | set(b)
+        dot = sum(a.get(k, 0) * b.get(k, 0) for k in keys)
+        na = math.sqrt(sum(v * v for v in a.values()))
+        nb = math.sqrt(sum(v * v for v in b.values()))
+        return dot / (na * nb) if na and nb else 0.0
+
+    if not docs:
+        return -1
+    q = bag(tokenize(query))
+    best, best_score = 0, -1.0
+    for i, doc in enumerate(docs):
+        score = cosine(q, bag(tokenize(doc)))
+        if score > best_score:
+            best_score = score
+            best = i
+    return best
+
+print(most_similar('python код', ['борщ рецепт', 'python простой код']))""",
+
+# ===== cv-intro =====
+'cv-intro/cv-01/t1': """def invert(image):
+    return [[255 - p for p in row] for row in image]
+
+print(invert([[0, 255], [100, 200]]))""",
+'cv-intro/cv-01/t2': """def threshold(image, level):
+    return [[255 if p >= level else 0 for p in row] for row in image]
+
+print(threshold([[10, 200]], 150))""",
+'cv-intro/cv-01/t3': """def edges(image):
+    out = []
+    for row in image:
+        out.append([row[i + 1] - row[i - 1] for i in range(1, len(row) - 1)])
+    return out
+
+print(edges([[0, 0, 255, 255]]))""",
+'cv-intro/cv-01/exam0': """def bounding_box(image, level):
+    points = [(y, x) for y, row in enumerate(image)
+                     for x, p in enumerate(row) if p >= level]
+    if not points:
+        return None
+    ys = [p[0] for p in points]
+    xs = [p[1] for p in points]
+    return {'top': min(ys), 'left': min(xs), 'bottom': max(ys), 'right': max(xs)}
+
+print(bounding_box([[0, 0], [0, 200]], 150))""",
+
+# ===== devops-intro =====
+'devops-intro/do-01/t1': """def run_pipeline(steps):
+    for name, ok in steps:
+        if not ok:
+            return name
+    return None
+
+print(run_pipeline([('сборка', True), ('тесты', False)]))""",
+'devops-intro/do-01/t2': """def count_errors(lines):
+    return sum(1 for line in lines if 'ERROR' in line)
+
+print(count_errors(['INFO ok', 'ERROR упало']))""",
+'devops-intro/do-01/t3': """def last_good(deploys):
+    for version, ok in reversed(deploys):
+        if ok:
+            return version
+    return None
+
+print(last_good([('v1', True), ('v2', True), ('v3', False)]))""",
+'devops-intro/do-01/exam0': """def should_alert(lines, threshold):
+    if not lines:
+        return False
+    errors = sum(1 for line in lines if 'ERROR' in line)
+    return errors / len(lines) > threshold
+
+print(should_alert(['ERROR a', 'INFO b'], 0.4))""",
+
+# ===== bigdata-intro =====
+'bigdata-intro/bd-01/t1': """def map_step(chunk):
+    counts = {}
+    for word in chunk.split():
+        counts[word] = counts.get(word, 0) + 1
+    return counts
+
+print(map_step('a b a'))""",
+'bigdata-intro/bd-01/t2': """def reduce_step(partials):
+    total = {}
+    for part in partials:
+        for word, n in part.items():
+            total[word] = total.get(word, 0) + n
+    return total
+
+print(reduce_step([{'a': 1}, {'a': 2, 'b': 1}]))""",
+'bigdata-intro/bd-01/t3': """def skew(sizes):
+    if not sizes:
+        return 0.0
+    average = sum(sizes) / len(sizes)
+    if average == 0:
+        return 0.0
+    return max(sizes) / average
+
+print(skew([10, 10, 10, 10]))""",
+'bigdata-intro/bd-01/exam0': """def word_count(chunks):
+    total = {}
+    for chunk in chunks:
+        for word in chunk.split():
+            total[word] = total.get(word, 0) + 1
+    return total
+
+print(word_count(['a b', 'b c']))""",
+
+# ===== cloud-intro =====
+'cloud-intro/cl-01/t1': """def monthly_cost(machines, price_per_hour):
+    return round(machines * price_per_hour * 720, 2)
+
+print(monthly_cost(2, 0.1))""",
+'cloud-intro/cl-01/t2': """def needed(rps, per_machine, min_n, max_n):
+    raw = -(-rps // per_machine)
+    return max(min_n, min(max_n, raw))
+
+print(needed(450, 120, 2, 10))""",
+'cloud-intro/cl-01/t3': """def survives(zones, need):
+    if not zones:
+        return False
+    return sum(zones) - max(zones) >= need
+
+print(survives([2, 2, 2], 3))""",
+'cloud-intro/cl-01/exam0': """def bill(loads, per_machine, price_per_hour, min_n, max_n):
+    total = 0
+    for rps in loads:
+        raw = -(-rps // per_machine)
+        total += max(min_n, min(max_n, raw))
+    return round(total * price_per_hour, 2)
+
+print(bill([10, 500, 10], 120, 0.1, 2, 10))""",
+
+# ===== infosec-intro =====
+'infosec-intro/is-01/t1': """def top_risk(risks):
+    if not risks:
+        return None
+    return max(risks, key=lambda r: r[1] * r[2])[0]
+
+print(top_risk([('утечка', 0.05, 100), ('фишинг', 0.4, 25)]))""",
+'infosec-intro/is-01/t2': """def can(user, action, users, roles):
+    role = users.get(user)
+    return action in roles.get(role, set())
+
+USERS = {'Азиз': 'редактор'}
+ROLES = {'редактор': {'read', 'write'}}
+print(can('Азиз', 'write', USERS, ROLES))""",
+'infosec-intro/is-01/t3': """def excess(granted, needed):
+    return sorted(granted - needed)
+
+print(excess({'read', 'write', 'delete'}, {'read', 'write'}))""",
+'infosec-intro/is-01/exam0': """def audit(users, roles, required):
+    flagged = []
+    for name, role in users.items():
+        granted = roles.get(role, set())
+        needed = required.get(role, set())
+        if granted - needed:
+            flagged.append(name)
+    return sorted(flagged)
+
+USERS = {'Азиз': 'админ'}
+ROLES = {'админ': {'read', 'write', 'delete'}}
+NEED = {'админ': {'read', 'write'}}
+print(audit(USERS, ROLES, NEED))""",
 }

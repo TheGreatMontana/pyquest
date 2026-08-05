@@ -1,0 +1,308 @@
+{
+ "id": "dl-intro",
+ "schema": 2,
+ "modules": [
+  {
+   "id": "dl-01",
+   "title": { "ru": "Нейрон и сеть", "uz": "Neyron va tarmoq", "en": "The neuron and the network" },
+   "tagline": { "ru": "Что происходит внутри — на числах, а не на схемах", "uz": "Ichkarida nima bo'ladi — sxemalarda emas, sonlarda", "en": "What happens inside — in numbers, not diagrams" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "Один нейрон", "uz": "Bitta neyron", "en": "A single neuron" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Слово «нейрон» звучит внушительно, но внутри — три действия: умножить входы на веса, сложить, добавить сдвиг. Всё.</p><p><code>output = x₁·w₁ + x₂·w₂ + b</code></p><p>Веса <code>w</code> и сдвиг <code>b</code> — те самые числа, которые модель подбирает при обучении. Один нейрон умеет только проводить прямую линию между двумя классами. Сила появляется, когда их много и они соединены слоями.</p>",
+        "uz": "<p>«Neyron» so'zi salobatli eshitiladi, lekin ichida uchta amal: kirishlarni og'irliklarga ko'paytirish, qo'shish, siljish qo'shish. Hammasi shu.</p><p><code>output = x₁·w₁ + x₂·w₂ + b</code></p><p>Og'irliklar <code>w</code> va siljish <code>b</code> — model o'qitishda tanlaydigan o'sha sonlar. Bitta neyron faqat ikki sinf orasidan to'g'ri chiziq o'tkaza oladi. Kuch ular ko'p bo'lib, qatlamlar bilan bog'langanda paydo bo'ladi.</p>",
+        "en": "<p>The word “neuron” sounds impressive, but inside there are three operations: multiply the inputs by weights, add them up, add a bias. That is all.</p><p><code>output = x₁·w₁ + x₂·w₂ + b</code></p><p>The weights <code>w</code> and bias <code>b</code> are exactly the numbers the model fits during training. A single neuron can only draw a straight line between two classes. The power appears when there are many of them, connected in layers.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "def neuron(inputs, weights, bias):\n    total = bias\n    for x, w in zip(inputs, weights):\n        total += x * w\n    return total\n\n# два входа, два веса\nprint(neuron([1, 2], [0.5, -1], 0))     # 1*0.5 + 2*(-1) = -1.5\nprint(neuron([1, 2], [0.5, -1], 2))     # со сдвигом +2"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Если оставить так, сеть из любого числа слоёв схлопнется в одну линию: сумма линейных функций — снова линейная функция. Поэтому после каждого нейрона ставят <b>функцию активации</b> — что-нибудь нелинейное.</p><p>Самая распространённая — ReLU: отрицательное превращает в ноль, положительное оставляет как есть. Проще некуда, а работает лучше сложных вариантов.</p>",
+        "uz": "<p>Shunday qoldirilsa, istalgan qatlamli tarmoq bitta chiziqqa aylanadi: chiziqli funksiyalar yig'indisi yana chiziqli funksiya. Shuning uchun har bir neyrondan keyin <b>faollashtirish funksiyasi</b> — chiziqli bo'lmagan narsa qo'yiladi.</p><p>Eng keng tarqalgani — ReLU: manfiyni nolga aylantiradi, musbatni o'zidek qoldiradi. Bundan oddiyroq yo'q, lekin murakkab variantlardan yaxshiroq ishlaydi.</p>",
+        "en": "<p>Left like this, a network of any depth collapses into a single line: a sum of linear functions is again linear. So after each neuron comes an <b>activation function</b> — something non-linear.</p><p>The most common one is ReLU: turn negatives into zero, keep positives as they are. It could not be simpler, and it works better than fancier options.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "def relu(x):\n    return x if x > 0 else 0\n\nfor value in [-3, -0.5, 0, 2, 7]:\n    print(f\"relu({value}) = {relu(value)}\")"
+      },
+      {
+       "type": "checkpoint",
+       "q": { "ru": "Зачем нужна функция активации?", "uz": "Faollashtirish funksiyasi nima uchun kerak?", "en": "Why is an activation function needed?" },
+       "options": [
+        { "ru": "Чтобы ускорить вычисления", "uz": "Hisoblashni tezlashtirish uchun", "en": "To speed up computation" },
+        { "ru": "Чтобы сеть не схлопнулась в одну линейную функцию", "uz": "Tarmoq bitta chiziqli funksiyaga aylanmasligi uchun", "en": "So the network does not collapse into one linear function" },
+        { "ru": "Чтобы уменьшить число весов", "uz": "Og'irliklar sonini kamaytirish uchun", "en": "To reduce the number of weights" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Без нелинейности сто слоёв ничем не лучше одного — они сворачиваются в одну прямую.",
+        "uz": "Chiziqsizliksiz yuzta qatlam bittadan yaxshi emas — ular bitta to'g'ri chiziqqa yig'iladi.",
+        "en": "Without non-linearity a hundred layers are no better than one — they fold into a single straight line."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "Слой и прямой проход", "uz": "Qatlam va to'g'ri o'tish", "en": "A layer and the forward pass" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><b>Слой</b> — просто несколько нейронов, получающих одни и те же входы. Каждый со своими весами, поэтому каждый смотрит на данные под своим углом.</p><p>Проход данных от входа к ответу называют <b>прямым проходом</b>. Выход одного слоя становится входом следующего — так и получается «глубокая» сеть.</p>",
+        "uz": "<p><b>Qatlam</b> — bir xil kirishlarni oladigan bir necha neyron. Har biri o'z og'irliklari bilan, shuning uchun har biri ma'lumotga o'z burchagidan qaraydi.</p><p>Ma'lumotning kirishdan javobgacha o'tishi <b>to'g'ri o'tish</b> deyiladi. Bir qatlam chiqishi keyingisining kirishi bo'ladi — «chuqur» tarmoq shunday hosil bo'ladi.</p>",
+        "en": "<p>A <b>layer</b> is simply several neurons receiving the same inputs. Each has its own weights, so each looks at the data from a different angle.</p><p>Data travelling from input to answer is called the <b>forward pass</b>. One layer's output becomes the next layer's input — that is how a network becomes “deep”.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "def relu(x):\n    return x if x > 0 else 0\n\ndef layer(inputs, weights_list, biases):\n    \"\"\"Один слой: по нейрону на каждый набор весов.\"\"\"\n    out = []\n    for weights, bias in zip(weights_list, biases):\n        total = bias + sum(x * w for x, w in zip(inputs, weights))\n        out.append(relu(total))\n    return out\n\nx = [1.0, 2.0]\n\n# скрытый слой из трёх нейронов\nhidden = layer(x, [[0.5, -1], [1, 1], [-2, 0.5]], [0, -1, 1])\nprint(\"скрытый слой:\", hidden)\n\n# выходной слой из одного нейрона\nout = layer(hidden, [[1, 1, 1]], [0])\nprint(\"ответ сети:  \", out)"
+      },
+      {
+       "type": "note",
+       "kind": "note",
+       "html": {
+        "ru": "На настоящих задачах эти же вычисления делают библиотеки на видеокарте — там миллионы весов и матричные операции. Но математика ровно та, что ты сейчас видел: умножить, сложить, применить нелинейность.",
+        "uz": "Haqiqiy vazifalarda shu hisoblarni videokartadagi kutubxonalar bajaradi — u yerda millionlab og'irlik va matritsa amallari. Lekin matematika aynan siz ko'rgan narsa: ko'paytirish, qo'shish, chiziqsizlik qo'llash.",
+        "en": "On real tasks the same computation is done by libraries on a GPU — millions of weights and matrix operations. But the mathematics is exactly what you just saw: multiply, add, apply a non-linearity."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "Как сеть учится", "uz": "Tarmoq qanday o'rganadi", "en": "How a network learns" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Обучение — цикл из трёх шагов, повторённый тысячи раз:</p><ol><li>прогнать пример вперёд и получить ответ</li><li>посчитать, насколько он расходится с правильным (это потери)</li><li>чуть-чуть подвинуть веса в сторону, где потери меньше</li></ol><p>Направление сдвига подсказывает <b>градиент</b> — производная потерь по каждому весу. Размер шага задаёт <b>скорость обучения</b>: слишком маленькая — учиться будем вечно, слишком большая — проскочим мимо минимума.</p>",
+        "uz": "<p>O'qitish — ming marta takrorlanadigan uch qadamli sikl:</p><ol><li>misolni oldinga o'tkazib javob olish</li><li>u to'g'risidan qanchalik farq qilishini hisoblash (bu yo'qotish)</li><li>og'irliklarni yo'qotish kamroq tomonga ozgina surish</li></ol><p>Surish yo'nalishini <b>gradiyent</b> aytadi — har bir og'irlik bo'yicha yo'qotish hosilasi. Qadam o'lchamini <b>o'qitish tezligi</b> beradi: juda kichik bo'lsa abadiy o'rganamiz, juda katta bo'lsa minimumdan o'tib ketamiz.</p>",
+        "en": "<p>Training is a three-step loop repeated thousands of times:</p><ol><li>run an example forward and get an answer</li><li>compute how far it is from the right one (that is the loss)</li><li>nudge the weights slightly towards where the loss is smaller</li></ol><p>The direction of the nudge comes from the <b>gradient</b> — the derivative of the loss with respect to each weight. The step size is the <b>learning rate</b>: too small and training takes forever, too large and you overshoot the minimum.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "# учим один вес модели y = w * x на данных, где на самом деле w = 3\ndata = [(1, 3), (2, 6), (3, 9)]\n\nw = 0.0            # начальное значение\nlr = 0.05          # скорость обучения\n\nfor step in range(1, 21):\n    grad = 0\n    loss = 0\n    for x, y in data:\n        pred = w * x\n        loss += (pred - y) ** 2\n        grad += 2 * (pred - y) * x     # производная квадрата ошибки\n    w -= lr * grad / len(data)\n    if step % 5 == 0:\n        print(f\"шаг {step:2}: w = {w:.3f}, потери = {loss / len(data):.4f}\")"
+      },
+      {
+       "type": "note",
+       "kind": "trap",
+       "html": {
+        "ru": "Поставь скорость обучения 1.0 в этом же примере — веса разлетятся в бесконечность за несколько шагов. Это самая частая причина, по которой «сеть не учится»: дело не в архитектуре, а в слишком большом шаге.",
+        "uz": "Shu misolda o'qitish tezligini 1.0 qilib qo'ying — og'irliklar bir necha qadamda cheksizlikka uchib ketadi. «Tarmoq o'rganmayapti» degan gapning eng keng tarqalgan sababi shu: arxitektura emas, juda katta qadam.",
+        "en": "Set the learning rate to 1.0 in this same example — the weights fly off to infinity within a few steps. This is the most common reason “the network is not learning”: not the architecture, just too big a step."
+       }
+      },
+      {
+       "type": "summary",
+       "items": [
+        { "ru": "Нейрон = входы × веса + сдвиг, потом нелинейность", "uz": "Neyron = kirishlar × og'irliklar + siljish, keyin chiziqsizlik", "en": "A neuron is inputs × weights + bias, then a non-linearity" },
+        { "ru": "Без активации любая глубина схлопывается в одну линию", "uz": "Faollashtirishsiz istalgan chuqurlik bitta chiziqqa yig'iladi", "en": "Without activation, any depth collapses into one line" },
+        { "ru": "Прямой проход — путь данных от входа к ответу", "uz": "To'g'ri o'tish — ma'lumotning kirishdan javobgacha yo'li", "en": "The forward pass is data travelling from input to answer" },
+        { "ru": "Обучение: прогнать, измерить ошибку, подвинуть веса", "uz": "O'qitish: o'tkazish, xatoni o'lchash, og'irliklarni surish", "en": "Training: run, measure the error, nudge the weights" }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": { "ru": "Что делает нейрон с входами?", "uz": "Neyron kirishlar bilan nima qiladi?", "en": "What does a neuron do with its inputs?" },
+     "options": [
+      { "ru": "Сравнивает их между собой", "uz": "Ularni bir-biri bilan solishtiradi", "en": "Compares them with each other" },
+      { "ru": "Умножает на веса, складывает и добавляет сдвиг", "uz": "Og'irliklarga ko'paytiradi, qo'shadi va siljish qo'shadi", "en": "Multiplies by weights, sums them and adds a bias" },
+      { "ru": "Сортирует их", "uz": "Ularni saralaydi", "en": "Sorts them" },
+      { "ru": "Запоминает их", "uz": "Ularni eslab qoladi", "en": "Memorises them" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Дальше результат проходит через функцию активации — и это всё, что происходит в одном нейроне.",
+      "uz": "Keyin natija faollashtirish funksiyasidan o'tadi — bitta neyronda sodir bo'ladigan hamma narsa shu.",
+      "en": "The result then passes through an activation function — and that is everything one neuron does."
+     }
+    },
+    {
+     "q": { "ru": "Что вернёт <code>relu(-4)</code>?", "uz": "<code>relu(-4)</code> nima qaytaradi?", "en": "What does <code>relu(-4)</code> return?" },
+     "options": [
+      { "ru": "-4", "uz": "-4", "en": "-4" },
+      { "ru": "0", "uz": "0", "en": "0" },
+      { "ru": "4", "uz": "4", "en": "4" },
+      { "ru": "Ошибку", "uz": "Xato", "en": "An error" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "ReLU обнуляет отрицательные значения и не трогает положительные.",
+      "uz": "ReLU manfiy qiymatlarni nolga aylantiradi, musbatlarga tegmaydi.",
+      "en": "ReLU zeroes negatives and leaves positives untouched."
+     }
+    },
+    {
+     "q": { "ru": "Что задаёт скорость обучения?", "uz": "O'qitish tezligi nimani belgilaydi?", "en": "What does the learning rate control?" },
+     "options": [
+      { "ru": "Сколько слоёв в сети", "uz": "Tarmoqda nechta qatlam", "en": "How many layers the network has" },
+      { "ru": "Насколько сильно двигаются веса на каждом шаге", "uz": "Har qadamda og'irliklar qanchalik kuchli suriladi", "en": "How far the weights move on each step" },
+      { "ru": "Сколько данных нужно", "uz": "Qancha ma'lumot kerakligini", "en": "How much data is needed" },
+      { "ru": "Скорость работы видеокарты", "uz": "Videokarta ishlash tezligini", "en": "The speed of the GPU" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Слишком большая — веса улетают в бесконечность, слишком маленькая — обучение тянется бесконечно.",
+      "uz": "Juda katta bo'lsa og'irliklar cheksizlikka uchadi, juda kichik bo'lsa o'qitish cheksiz cho'ziladi.",
+      "en": "Too large and the weights blow up; too small and training drags on forever."
+     }
+    },
+    {
+     "q": { "ru": "Чем глубокое обучение отличается от обычного машинного?", "uz": "Chuqur o'rganish oddiy mashinalidan nimasi bilan farq qiladi?", "en": "How does deep learning differ from ordinary machine learning?" },
+     "options": [
+      { "ru": "Работает без данных", "uz": "Ma'lumotsiz ishlaydi", "en": "It works without data" },
+      { "ru": "Признаки находит сама сеть, а не придумывает человек", "uz": "Belgilarni odam emas, tarmoqning o'zi topadi", "en": "The network finds the features itself instead of a human designing them" },
+      { "ru": "Не требует обучения", "uz": "O'qitishni talab qilmaydi", "en": "It needs no training" },
+      { "ru": "Всегда точнее", "uz": "Doim aniqroq", "en": "It is always more accurate" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "За это платят данными и вычислениями: там, где обычной модели хватит тысячи строк, сети нужны сотни тысяч примеров.",
+      "uz": "Buning uchun ma'lumot va hisoblash bilan to'lanadi: oddiy modelga ming qator yetadigan joyda tarmoqqa yuz minglab misol kerak.",
+      "en": "The price is data and compute: where an ordinary model needs a thousand rows, a network wants hundreds of thousands of examples."
+     }
+    },
+    {
+     "q": { "ru": "Что такое прямой проход?", "uz": "To'g'ri o'tish nima?", "en": "What is the forward pass?" },
+     "options": [
+      { "ru": "Обновление весов", "uz": "Og'irliklarni yangilash", "en": "Updating the weights" },
+      { "ru": "Путь данных от входа сети к её ответу", "uz": "Ma'lumotning tarmoq kirishidan javobigacha yo'li", "en": "Data travelling from the network's input to its answer" },
+      { "ru": "Загрузка данных с диска", "uz": "Ma'lumotni diskdan yuklash", "en": "Loading data from disk" },
+      { "ru": "Проверка на тестовой выборке", "uz": "Test namunasida tekshirish", "en": "Evaluating on the test set" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Обратный проход — это уже подсчёт градиентов и обновление весов.",
+      "uz": "Teskari o'tish — bu gradiyentlarni hisoblash va og'irliklarni yangilash.",
+      "en": "The backward pass is the one that computes gradients and updates the weights."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "python",
+     "title": { "ru": "Один нейрон", "uz": "Bitta neyron", "en": "One neuron" },
+     "brief": { "ru": "Входы, веса, сдвиг", "uz": "Kirishlar, og'irliklar, siljish", "en": "Inputs, weights, bias" },
+     "desc": {
+      "ru": "<p>Напиши <code>neuron(inputs, weights, bias)</code>: сумма произведений входов на веса плюс сдвиг. Для пустых списков верни сам <code>bias</code>.</p>",
+      "uz": "<p><code>neuron(inputs, weights, bias)</code> yozing: kirishlarning og'irliklarga ko'paytmalari yig'indisi plyus siljish. Bo'sh ro'yxatlar uchun <code>bias</code> ning o'zini qaytaring.</p>",
+      "en": "<p>Write <code>neuron(inputs, weights, bias)</code>: the sum of inputs times weights, plus the bias. For empty lists return the <code>bias</code> itself.</p>"
+     },
+     "starter": "def neuron(inputs, weights, bias):\n    # твой код\n    pass\n\nprint(neuron([1, 2], [0.5, -1], 0))\n",
+     "tests": "assert neuron([1, 2], [0.5, -1], 0) == -1.5, '1*0.5 + 2*(-1) = -1.5'\nassert neuron([1, 2], [0.5, -1], 2) == 0.5, 'Со сдвигом +2'\nassert neuron([], [], 3) == 3, 'Без входов остаётся только сдвиг'\nassert neuron([2, 2, 2], [1, 1, 1], 0) == 6, 'Три единичных веса'",
+     "hint": {
+      "ru": "<code>sum(x * w for x, w in zip(inputs, weights)) + bias</code>",
+      "uz": "<code>sum(x * w for x, w in zip(inputs, weights)) + bias</code>",
+      "en": "<code>sum(x * w for x, w in zip(inputs, weights)) + bias</code>"
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "python",
+     "title": { "ru": "Слой нейронов", "uz": "Neyronlar qatlami", "en": "A layer of neurons" },
+     "brief": { "ru": "Несколько нейронов разом", "uz": "Bir vaqtda bir necha neyron", "en": "Several neurons at once" },
+     "desc": {
+      "ru": "<p><code>layer(inputs, weights_list, biases)</code> возвращает список выходов: по нейрону на каждый набор весов, к каждому применён ReLU (отрицательное → 0).</p>",
+      "uz": "<p><code>layer(inputs, weights_list, biases)</code> chiqishlar ro'yxatini qaytaradi: har bir og'irliklar to'plamiga bitta neyron, har biriga ReLU qo'llangan (manfiy → 0).</p>",
+      "en": "<p><code>layer(inputs, weights_list, biases)</code> returns a list of outputs: one neuron per set of weights, each passed through ReLU (negative → 0).</p>"
+     },
+     "starter": "def layer(inputs, weights_list, biases):\n    # твой код\n    pass\n\nprint(layer([1, 2], [[0.5, -1], [1, 1]], [0, 0]))\n",
+     "tests": "assert layer([1, 2], [[0.5, -1], [1, 1]], [0, 0]) == [0, 3], 'Первый нейрон даёт -1.5 → 0, второй 3'\nassert layer([1], [[2]], [1]) == [3], 'Один нейрон со сдвигом'\nassert layer([1], [[-5]], [0]) == [0], 'ReLU обнуляет отрицательный выход'\nassert len(layer([1, 1], [[1, 1], [2, 2], [3, 3]], [0, 0, 0])) == 3, 'Выходов столько же, сколько наборов весов'",
+     "hint": {
+      "ru": "Пройди по парам <code>zip(weights_list, biases)</code>, посчитай нейрон и примени <code>max(0, total)</code>.",
+      "uz": "<code>zip(weights_list, biases)</code> juftlari bo'ylab yuring, neyronni hisoblang va <code>max(0, total)</code> qo'llang.",
+      "en": "Walk the pairs of <code>zip(weights_list, biases)</code>, compute the neuron and apply <code>max(0, total)</code>."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "python",
+     "title": { "ru": "Один шаг обучения", "uz": "Bitta o'qitish qadami", "en": "One training step" },
+     "brief": { "ru": "Градиент и сдвиг веса", "uz": "Gradiyent va og'irlik surilishi", "en": "Gradient and weight update" },
+     "desc": {
+      "ru": "<p>Модель <code>y = w · x</code>. Функция <code>step(w, data, lr)</code> делает <b>один</b> шаг обучения и возвращает новое значение веса.</p><p>Градиент: среднее по данным от <code>2 · (w·x − y) · x</code>. Новый вес: <code>w − lr · градиент</code>. Для пустых данных верни <code>w</code> без изменений.</p>",
+      "uz": "<p>Model <code>y = w · x</code>. <code>step(w, data, lr)</code> funksiyasi <b>bitta</b> o'qitish qadamini bajaradi va og'irlikning yangi qiymatini qaytaradi.</p><p>Gradiyent: ma'lumot bo'yicha <code>2 · (w·x − y) · x</code> o'rtachasi. Yangi og'irlik: <code>w − lr · gradiyent</code>. Bo'sh ma'lumot uchun <code>w</code> ni o'zgarishsiz qaytaring.</p>",
+      "en": "<p>The model is <code>y = w · x</code>. The function <code>step(w, data, lr)</code> performs <b>one</b> training step and returns the new weight.</p><p>Gradient: the average over the data of <code>2 · (w·x − y) · x</code>. New weight: <code>w − lr · gradient</code>. For empty data return <code>w</code> unchanged.</p>"
+     },
+     "starter": "def step(w, data, lr):\n    # твой код\n    pass\n\nprint(step(0.0, [(1, 3), (2, 6)], 0.1))\n",
+     "tests": "assert step(3.0, [(1, 3), (2, 6)], 0.1) == 3.0, 'Если модель уже точна, вес не меняется'\nassert step(0.0, [], 0.1) == 0.0, 'Без данных вес остаётся прежним'\nw1 = step(0.0, [(1, 3)], 0.1)\nassert w1 > 0, 'Вес должен двинуться в сторону правильного значения'\nw2 = step(w1, [(1, 3)], 0.1)\nassert abs(w2 - 3) < abs(w1 - 3), 'Второй шаг подводит ближе к трём'",
+     "hint": {
+      "ru": "Сначала посчитай сумму <code>2 * (w * x - y) * x</code> по всем парам, раздели на количество, потом отними <code>lr * grad</code> от <code>w</code>.",
+      "uz": "Avval barcha juftlar bo'yicha <code>2 * (w * x - y) * x</code> yig'indisini hisoblang, songa bo'ling, keyin <code>w</code> dan <code>lr * grad</code> ni ayiring.",
+      "en": "First sum <code>2 * (w * x - y) * x</code> over all pairs, divide by the count, then subtract <code>lr * grad</code> from <code>w</code>."
+     }
+    }
+   ],
+   "exam": {
+    "time": 420,
+    "questions": [
+     {
+      "q": { "ru": "Сеть без функций активации эквивалентна…", "uz": "Faollashtirish funksiyalarisiz tarmoq nimaga teng…", "en": "A network without activation functions is equivalent to…" },
+      "options": [
+       { "ru": "случайному предсказанию", "uz": "tasodifiy bashoratga", "en": "a random guess" },
+       { "ru": "одной линейной функции", "uz": "bitta chiziqli funksiyaga", "en": "a single linear function" },
+       { "ru": "дереву решений", "uz": "qaror daraxtiga", "en": "a decision tree" },
+       { "ru": "ничему, она не работает", "uz": "hech nimaga, u ishlamaydi", "en": "nothing, it does not work" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Что подсказывает градиент?", "uz": "Gradiyent nimani aytadi?", "en": "What does the gradient tell you?" },
+      "options": [
+       { "ru": "Сколько нужно слоёв", "uz": "Nechta qatlam kerakligini", "en": "How many layers you need" },
+       { "ru": "В какую сторону двигать веса, чтобы потери упали", "uz": "Yo'qotish tushishi uchun og'irliklarni qaysi tomonga surishni", "en": "Which way to move the weights so the loss goes down" },
+       { "ru": "Правильный ответ", "uz": "To'g'ri javobni", "en": "The correct answer" },
+       { "ru": "Размер выборки", "uz": "Namuna hajmini", "en": "The sample size" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Слишком большая скорость обучения приводит к…", "uz": "Juda katta o'qitish tezligi nimaga olib keladi…", "en": "Too large a learning rate leads to…" },
+      "options": [
+       { "ru": "более точной модели", "uz": "aniqroq modelga", "en": "a more accurate model" },
+       { "ru": "тому, что веса разлетаются и обучение ломается", "uz": "og'irliklar uchib ketishi va o'qitish buzilishiga", "en": "weights blowing up and training breaking" },
+       { "ru": "экономии памяти", "uz": "xotira tejashga", "en": "saving memory" },
+       { "ru": "ничему", "uz": "hech nimaga", "en": "nothing" }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "python",
+      "title": { "ru": "Обучение до сходимости", "uz": "Yaqinlashguncha o'qitish", "en": "Training to convergence" },
+      "desc": {
+       "ru": "<p><code>train(data, lr, steps)</code> начинает с веса <code>0.0</code>, делает <code>steps</code> шагов градиентного спуска для модели <code>y = w · x</code> и возвращает итоговый вес.</p><p>Формулы те же, что в третьей задаче.</p>",
+       "uz": "<p><code>train(data, lr, steps)</code> <code>0.0</code> og'irlikdan boshlaydi, <code>y = w · x</code> modeli uchun <code>steps</code> ta gradiyent tushish qadamini bajaradi va yakuniy og'irlikni qaytaradi.</p><p>Formulalar uchinchi topshiriqdagi bilan bir xil.</p>",
+       "en": "<p><code>train(data, lr, steps)</code> starts from weight <code>0.0</code>, performs <code>steps</code> gradient-descent steps for the model <code>y = w · x</code> and returns the final weight.</p><p>The formulas are the same as in the third task.</p>"
+      },
+      "starter": "def train(data, lr, steps):\n    # твой код\n    pass\n\nprint(train([(1, 3), (2, 6), (3, 9)], 0.05, 50))\n",
+      "tests": "w = train([(1, 3), (2, 6), (3, 9)], 0.05, 100)\nassert abs(w - 3) < 0.01, f'Должно сойтись примерно к 3, а получилось {w}'\nassert train([], 0.1, 10) == 0.0, 'Без данных вес остаётся нулевым'\nassert train([(1, 5)], 0.1, 0) == 0.0, 'Ноль шагов — вес не менялся'\nw2 = train([(1, 2), (2, 4)], 0.05, 100)\nassert abs(w2 - 2) < 0.01, 'Для y = 2x должно сойтись к 2'",
+      "hint": {
+       "ru": "Цикл на <code>steps</code> повторений, внутри — тот же расчёт градиента и обновление веса, что в задаче про один шаг.",
+       "uz": "<code>steps</code> marta takrorlanuvchi sikl, ichida — bitta qadam topshirig'idagi gradiyent hisobi va og'irlikni yangilash.",
+       "en": "A loop of <code>steps</code> iterations, inside it the same gradient computation and weight update as in the single-step task."
+      }
+     }
+    ]
+   }
+  }
+ ]
+}
