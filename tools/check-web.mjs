@@ -40,6 +40,10 @@ const SOLUTIONS = {
   'tailwind-basics/tw-01.task[t2]': '<header class="flex justify-between items-center p-4"><span>Логотип</span><span>Меню</span></header>',
   'tailwind-basics/tw-01.task[t3]': '<div class="max-w-sm mx-auto bg-white rounded-xl p-6"><h2 class="text-xl font-bold">Заголовок</h2></div>',
   'tailwind-basics/tw-01.exam.task0': '<div class="grid grid-cols-1 md:grid-cols-3 gap-4"><div class="p-4">Одна</div><div class="p-4">Две</div><div class="p-4">Три</div></div>',
+  'tailwind-basics/tw-02.task[t1]': '<section class="grid grid-cols-3 gap-4">\n <div class="bg-white p-4 rounded-lg">Первая</div>\n <div class="bg-white p-4 rounded-lg">Вторая</div>\n <div class="bg-white p-4 rounded-lg">Третья</div>\n</section>',
+  'tailwind-basics/tw-02.task[t2]': '<button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 focus-visible:ring-2 disabled:opacity-50">Сохранить</button>',
+  'tailwind-basics/tw-02.task[t3]': '<article class="flex flex-col justify-between h-48 p-4 bg-white rounded-xl">\n <h3>Python с нуля</h3>\n <button>Начать</button>\n</article>',
+  'tailwind-basics/tw-02.exam.task0': '<section class="grid md:grid-cols-2 gap-4">\n <article class="flex flex-col justify-between h-48 p-4 bg-white rounded-xl">\n  <h3 class="font-bold">Python с нуля</h3>\n  <button class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700">Начать</button>\n </article>\n <article class="flex flex-col justify-between h-48 p-4 bg-white rounded-xl">\n  <h3 class="font-bold">SQL для аналитики</h3>\n  <button class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700">Начать</button>\n </article>\n</section>',
 };
 
 const CHROME = ['C:/Program Files/Google/Chrome/Application/chrome.exe',

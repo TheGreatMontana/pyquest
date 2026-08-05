@@ -673,6 +673,362 @@
      }
     ]
    }
+  },
+  {
+   "id": "cs-02",
+   "title": { "ru": "Коллекции, обобщения и ошибки", "uz": "To'plamlar, umumlashtirishlar va xatolar", "en": "Collections, generics and errors" },
+   "tagline": { "ru": "List и Dictionary, свой обобщённый тип, интерфейсы и честная работа с исключениями", "uz": "List va Dictionary, o'z umumiy turingiz, interfeyslar va istisnolar bilan halol ish", "en": "List and Dictionary, your own generic type, interfaces and honest exception handling" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "Рабочие коллекции", "uz": "Ishchi to'plamlar", "en": "The working collections" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Массив в C# фиксированной длины: создал на десять элементов — десять и осталось. В реальном коде почти всегда нужны две другие коллекции.</p><ul><li><b><code>List&lt;T&gt;</code></b> — растущий список. Добавляй сколько угодно, обращайся по индексу, спрашивай <code>Count</code>.</li><li><b><code>Dictionary&lt;K, V&gt;</code></b> — пары «ключ → значение». Поиск по ключу мгновенный независимо от размера.</li></ul><p>Обе <b>обобщённые</b>: <code>&lt;T&gt;</code> в угловых скобках — это тип элементов, который ты задаёшь при создании. <code>List&lt;int&gt;</code> хранит только числа, и компилятор не даст положить туда строку.</p><p>Это и есть главная разница со списком в Python: там ошибка типа всплывёт при выполнении, здесь — не соберётся вовсе.</p>",
+        "uz": "<p>C# dagi massiv qat'iy uzunlikda: o'nta element uchun yaratdingiz — o'nta bo'lib qoladi. Haqiqiy kodda deyarli doim boshqa ikki to'plam kerak.</p><ul><li><b><code>List&lt;T&gt;</code></b> — o'suvchi ro'yxat. Xohlagancha qo'shing, indeks bo'yicha murojaat qiling, <code>Count</code> ni so'rang.</li><li><b><code>Dictionary&lt;K, V&gt;</code></b> — «kalit → qiymat» juftliklari. Kalit bo'yicha qidiruv hajmdan qat'i nazar bir zumda.</li></ul><p>Ikkalasi ham <b>umumlashgan</b>: burchak qavslardagi <code>&lt;T&gt;</code> — yaratishda siz beradigan elementlar turi. <code>List&lt;int&gt;</code> faqat sonlarni saqlaydi va kompilyator u yerga satr qo'yishga yo'l qo'ymaydi.</p><p>Python dagi ro'yxatdan asosiy farqi shu: u yerda tur xatosi bajarilishda chiqadi, bu yerda esa umuman yig'ilmaydi.</p>",
+        "en": "<p>An array in C# has a fixed length: create it for ten elements and ten it stays. Real code almost always needs two other collections.</p><ul><li><b><code>List&lt;T&gt;</code></b> — a growing list. Add as much as you like, index into it, ask for <code>Count</code>.</li><li><b><code>Dictionary&lt;K, V&gt;</code></b> — key-to-value pairs. Lookup by key is instant regardless of size.</li></ul><p>Both are <b>generic</b>: the <code>&lt;T&gt;</code> in angle brackets is the element type you specify at creation. A <code>List&lt;int&gt;</code> holds numbers only, and the compiler will not let you put a string in it.</p><p>That is the main difference from a Python list: there a type error surfaces at runtime, here it does not compile at all.</p>"
+       }
+      },
+      {
+       "type": "code",
+       "lang": "csharp",
+       "code": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static void Main()\n    {\n        var langs = new List<string> { \"C#\", \"Python\" };\n        langs.Add(\"SQL\");\n        langs.Insert(0, \"Java\");\n        langs.Remove(\"Python\");\n\n        Console.WriteLine(string.Join(\", \", langs));   // Java, C#, SQL\n        Console.WriteLine(langs.Count);                // 3\n        Console.WriteLine(langs.Contains(\"SQL\"));      // True\n\n        var prices = new Dictionary<string, int>\n        {\n            [\"кофе\"] = 25000,\n            [\"чай\"] = 15000,\n        };\n        prices[\"сок\"] = 18000;          // добавляет\n        prices[\"чай\"] = 16000;          // перезаписывает\n\n        // безопасное чтение: без исключения, если ключа нет\n        if (prices.TryGetValue(\"кофе\", out int p))\n            Console.WriteLine($\"кофе стоит {p}\");\n\n        Console.WriteLine(prices.ContainsKey(\"пиво\"));  // False\n    }\n}"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Обрати внимание на <code>TryGetValue</code>. Обращение <code>prices[\"пиво\"]</code> к несуществующему ключу выбросит исключение и уронит программу. <code>TryGetValue</code> возвращает <code>false</code> и не бросает ничего.</p><p>Это общий приём C#: рядом с методом, который может упасть, обычно есть пара <code>Try…</code>, которая вместо исключения возвращает <code>bool</code>. Так устроены <code>int.TryParse</code>, <code>DateTime.TryParse</code> и десятки других.</p><p>Ключевое слово <code>out</code> здесь означает, что переменная <b>заполняется методом</b>, а не передаётся в него. Объявить её можно прямо в вызове — <code>out int p</code>.</p>",
+        "uz": "<p><code>TryGetValue</code> ga e'tibor bering. Mavjud bo'lmagan kalitga <code>prices[\"пиво\"]</code> murojaati istisno tashlaydi va dasturni yiqitadi. <code>TryGetValue</code> esa <code>false</code> qaytaradi va hech nima tashlamaydi.</p><p>Bu C# ning umumiy usuli: yiqilishi mumkin bo'lgan metod yonida odatda istisno o'rniga <code>bool</code> qaytaradigan <code>Try…</code> juftligi bo'ladi. <code>int.TryParse</code>, <code>DateTime.TryParse</code> va o'nlab boshqalari shunday tuzilgan.</p><p>Bu yerdagi <code>out</code> kalit so'zi o'zgaruvchi metodga uzatilmasdan, <b>metod tomonidan to'ldirilishini</b> bildiradi. Uni to'g'ridan-to'g'ri chaqiruvda e'lon qilish mumkin — <code>out int p</code>.</p>",
+        "en": "<p>Note <code>TryGetValue</code>. Accessing <code>prices[\"beer\"]</code> for a missing key throws and crashes the program. <code>TryGetValue</code> returns <code>false</code> and throws nothing.</p><p>This is a general C# pattern: next to a method that can fail there is usually a <code>Try…</code> counterpart returning a <code>bool</code> instead of throwing. That is how <code>int.TryParse</code>, <code>DateTime.TryParse</code> and dozens of others work.</p><p>The <code>out</code> keyword here means the variable is <b>filled in by the method</b> rather than passed into it. You can declare it right in the call — <code>out int p</code>.</p>"
+       }
+      },
+      {
+       "type": "predict",
+       "lang": "csharp",
+       "code": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static void Main()\n    {\n        var d = new Dictionary<string, int>();\n        d[\"a\"] = 1;\n        d[\"a\"] = 2;\n        d[\"b\"] = 3;\n        Console.WriteLine(d.Count);\n    }\n}",
+       "options": [
+        { "ru": "3", "uz": "3", "en": "3" },
+        { "ru": "2", "uz": "2", "en": "2" },
+        { "ru": "1", "uz": "1", "en": "1" },
+        { "ru": "Ошибка компиляции", "uz": "Kompilyatsiya xatosi", "en": "A compile error" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Второе присваивание по ключу <code>\"a\"</code> не добавляет пару, а перезаписывает существующую. Ключи в словаре уникальны, поэтому их два.",
+        "uz": "<code>\"a\"</code> kaliti bo'yicha ikkinchi tayinlash juftlik qo'shmaydi, mavjudini qayta yozadi. Lug'atdagi kalitlar noyob, shuning uchun ular ikkita.",
+        "en": "The second assignment to key <code>\"a\"</code> does not add a pair, it overwrites the existing one. Dictionary keys are unique, so there are two."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "Свои обобщения и интерфейсы", "uz": "O'z umumlashtirishlaringiz va interfeyslar", "en": "Your own generics and interfaces" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Обобщения не только для готовых коллекций — их пишут сами. Задача та же: <b>один код для разных типов, но без потери проверки типов</b>.</p><p>Без обобщений выход один — хранить <code>object</code> и приводить обратно вручную. Компилятор при этом молчит, а ошибка вылезает при выполнении. Обобщение убирает и приведение, и риск.</p><p>Интерфейс — вторая половина той же идеи. Он описывает, <b>что тип умеет</b>, ничего не говоря о том, как. Классы, реализующие один интерфейс, становятся взаимозаменяемыми.</p><p>Вместе это даёт код, который работает с любым типом, лишь бы тот умел нужное: <code>where T : IComparable&lt;T&gt;</code> читается как «T — любой тип, который умеет сравнивать себя с себе подобным».</p>",
+        "uz": "<p>Umumlashtirishlar faqat tayyor to'plamlar uchun emas — ularni o'zingiz ham yozasiz. Vazifa o'sha: <b>turli turlar uchun bitta kod, lekin tur tekshiruvini yo'qotmasdan</b>.</p><p>Umumlashtirishsiz yagona yo'l — <code>object</code> saqlab, qo'lda qaytarib keltirish. Kompilyator bunda jim, xato esa bajarilishda chiqadi. Umumlashtirish keltirishni ham, xavfni ham olib tashlaydi.</p><p>Interfeys — o'sha g'oyaning ikkinchi yarmi. U turning <b>nima qila olishini</b> tasvirlaydi, qanday qilishi haqida hech nima demaydi. Bitta interfeysni amalga oshiruvchi sinflar o'zaro almashinuvchan bo'ladi.</p><p>Birgalikda bu istalgan tur bilan ishlaydigan kod beradi, faqat u kerakli narsani qila olsa: <code>where T : IComparable&lt;T&gt;</code> «T — o'ziga o'xshashi bilan solishtira oladigan har qanday tur» deb o'qiladi.</p>",
+        "en": "<p>Generics are not only for ready-made collections — you write your own. The goal is the same: <b>one piece of code for different types without losing type checking</b>.</p><p>Without generics the only way out is storing <code>object</code> and casting back by hand. The compiler stays silent and the error surfaces at runtime. A generic removes both the cast and the risk.</p><p>An interface is the second half of the same idea. It describes <b>what a type can do</b>, saying nothing about how. Classes implementing one interface become interchangeable.</p><p>Together they give code that works with any type as long as it can do what is needed: <code>where T : IComparable&lt;T&gt;</code> reads as “T is any type that can compare itself with its own kind”.</p>"
+       }
+      },
+      {
+       "type": "code",
+       "lang": "csharp",
+       "code": "using System;\nusing System.Collections.Generic;\n\n// собственный обобщённый тип: стопка чего угодно\nclass Stack<T>\n{\n    private readonly List<T> items = new List<T>();\n\n    public int Count => items.Count;\n\n    public void Push(T item) => items.Add(item);\n\n    public T Pop()\n    {\n        if (items.Count == 0)\n            throw new InvalidOperationException(\"стопка пуста\");\n        T last = items[items.Count - 1];\n        items.RemoveAt(items.Count - 1);\n        return last;\n    }\n}\n\n// обобщённый метод с ограничением: T должен уметь сравнивать себя\nstatic class Util\n{\n    public static T Max<T>(T a, T b) where T : IComparable<T>\n        => a.CompareTo(b) >= 0 ? a : b;\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var numbers = new Stack<int>();\n        numbers.Push(1);\n        numbers.Push(2);\n        Console.WriteLine(numbers.Pop());     // 2\n        Console.WriteLine(numbers.Count);     // 1\n\n        var words = new Stack<string>();      // тот же класс, другой тип\n        words.Push(\"привет\");\n        Console.WriteLine(words.Pop());       // привет\n\n        Console.WriteLine(Util.Max(3, 7));            // 7\n        Console.WriteLine(Util.Max(\"яблоко\", \"груша\"));  // яблоко\n    }\n}"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Один класс <code>Stack&lt;T&gt;</code> обслужил и числа, и строки. Компилятор для каждого использования проверил типы отдельно: <code>numbers.Push(\"текст\")</code> просто не соберётся.</p><p>Заметь синтаксис <code>public int Count =&gt; items.Count;</code> — это свойство-выражение, короткая запись для свойства только на чтение. Так же записан и метод <code>Push</code>. Стрелка <code>=&gt;</code> в C# означает «телом является одно выражение».</p>",
+        "uz": "<p>Bitta <code>Stack&lt;T&gt;</code> sinfi sonlarga ham, satrlarga ham xizmat qildi. Kompilyator har foydalanish uchun turlarni alohida tekshirdi: <code>numbers.Push(\"matn\")</code> shunchaki yig'ilmaydi.</p><p><code>public int Count =&gt; items.Count;</code> sintaksisiga e'tibor bering — bu ifoda-xususiyat, faqat o'qish uchun xususiyatning qisqa yozuvi. <code>Push</code> metodi ham shunday yozilgan. C# dagi <code>=&gt;</code> strelkasi «tanasi bitta ifoda» degani.</p>",
+        "en": "<p>One <code>Stack&lt;T&gt;</code> class served both numbers and strings. The compiler checked the types separately for each use: <code>numbers.Push(\"text\")</code> simply will not compile.</p><p>Note the syntax <code>public int Count =&gt; items.Count;</code> — an expression-bodied property, the short form of a read-only property. The <code>Push</code> method is written the same way. The <code>=&gt;</code> arrow in C# means “the body is a single expression”.</p>"
+       }
+      },
+      {
+       "type": "match",
+       "pairs": [
+        { "left": { "ru": "List&lt;T&gt;", "uz": "List&lt;T&gt;", "en": "List&lt;T&gt;" }, "right": { "ru": "Растущий список одного типа", "uz": "Bir turdagi o'suvchi ro'yxat", "en": "A growing list of one type" } },
+        { "left": { "ru": "Dictionary&lt;K, V&gt;", "uz": "Dictionary&lt;K, V&gt;", "en": "Dictionary&lt;K, V&gt;" }, "right": { "ru": "Пары «ключ — значение» с быстрым поиском", "uz": "Tez qidiruvli «kalit — qiymat» juftliklari", "en": "Key-value pairs with fast lookup" } },
+        { "left": { "ru": "where T : IComparable&lt;T&gt;", "uz": "where T : IComparable&lt;T&gt;", "en": "where T : IComparable&lt;T&gt;" }, "right": { "ru": "Ограничение: тип обязан уметь сравниваться", "uz": "Cheklov: tur solishtira olishi shart", "en": "A constraint: the type must be comparable" } },
+        { "left": { "ru": "TryGetValue", "uz": "TryGetValue", "en": "TryGetValue" }, "right": { "ru": "Читает значение без исключения при отсутствии ключа", "uz": "Kalit bo'lmaganda istisnosiz qiymat o'qiydi", "en": "Reads a value without throwing when the key is missing" } },
+        { "left": { "ru": "=&gt;", "uz": "=&gt;", "en": "=&gt;" }, "right": { "ru": "Телом метода или свойства служит одно выражение", "uz": "Metod yoki xususiyat tanasi bitta ifoda", "en": "The method or property body is a single expression" } }
+       ]
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "Исключения и записи", "uz": "Istisnolar va yozuvlar", "en": "Exceptions and records" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Исключение — это сообщение «дальше я работать не могу». Ловят их конструкцией <code>try / catch / finally</code>, и здесь легко сделать хуже, чем было.</p><p>Три правила:</p><ul><li><b>Лови конкретное.</b> <code>catch (FormatException)</code> лучше, чем <code>catch (Exception)</code>: последний проглотит и опечатку в коде, и нехватку памяти.</li><li><b>Не глотай молча.</b> Пустой <code>catch { }</code> превращает поломку в тихое неправильное поведение — искать такое потом невозможно.</li><li><b>Не используй исключения для ожидаемого.</b> Пользователь ввёл не число — это норма жизни, а не исключительная ситуация. Для этого есть <code>TryParse</code>.</li></ul><p>Блок <code>finally</code> выполняется всегда — и при ошибке, и при успехе. В него кладут освобождение ресурсов.</p>",
+        "uz": "<p>Istisno — bu «bundan keyin ishlay olmayman» xabari. Ular <code>try / catch / finally</code> konstruksiyasi bilan tutiladi va bu yerda bo'lganidan yomonroq qilish oson.</p><p>Uch qoida:</p><ul><li><b>Aniqni tuting.</b> <code>catch (FormatException)</code> <code>catch (Exception)</code> dan yaxshi: oxirgisi koddagi xatoni ham, xotira yetishmasligini ham yutib yuboradi.</li><li><b>Jimgina yutmang.</b> Bo'sh <code>catch { }</code> nosozlikni jim noto'g'ri xatti-harakatga aylantiradi — keyin buni topib bo'lmaydi.</li><li><b>Kutilgan narsa uchun istisno ishlatmang.</b> Foydalanuvchi son kiritmadi — bu hayot normasi, istisno vaziyat emas. Buning uchun <code>TryParse</code> bor.</li></ul><p><code>finally</code> bloki doim bajariladi — xatoda ham, muvaffaqiyatda ham. Unga resurslarni bo'shatish qo'yiladi.</p>",
+        "en": "<p>An exception is a message saying “I cannot continue”. They are caught with <code>try / catch / finally</code>, and it is easy to make things worse here than they were.</p><p>Three rules:</p><ul><li><b>Catch the specific one.</b> <code>catch (FormatException)</code> beats <code>catch (Exception)</code>: the latter swallows both a typo in your code and an out-of-memory condition.</li><li><b>Do not swallow silently.</b> An empty <code>catch { }</code> turns a failure into quiet wrong behaviour — and that is impossible to find later.</li><li><b>Do not use exceptions for the expected.</b> A user typing a non-number is a fact of life, not an exceptional situation. That is what <code>TryParse</code> is for.</li></ul><p>The <code>finally</code> block always runs — on error and on success alike. Releasing resources goes there.</p>"
+       }
+      },
+      {
+       "type": "code",
+       "lang": "csharp",
+       "code": "using System;\n\nclass Program\n{\n    // ожидаемая ситуация: обрабатываем без исключений\n    static int ParseAge(string input)\n    {\n        if (int.TryParse(input, out int age) && age >= 0 && age <= 130)\n            return age;\n        return -1;              // -1 значит «не разобрали»\n    }\n\n    // исключительная ситуация: сообщаем наверх\n    static int Divide(int a, int b)\n    {\n        if (b == 0)\n            throw new ArgumentException(\"деление на ноль\");\n        return a / b;\n    }\n\n    static void Main()\n    {\n        Console.WriteLine(ParseAge(\"42\"));       // 42\n        Console.WriteLine(ParseAge(\"сорок\"));    // -1\n        Console.WriteLine(ParseAge(\"500\"));      // -1\n\n        try\n        {\n            Console.WriteLine(Divide(10, 2));\n            Console.WriteLine(Divide(1, 0));\n        }\n        catch (ArgumentException e)              // ловим конкретный тип\n        {\n            Console.WriteLine($\"поймали: {e.Message}\");\n        }\n        finally\n        {\n            Console.WriteLine(\"finally выполняется всегда\");\n        }\n    }\n}"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Теперь про <b>записи</b> (<code>record</code>). Это классы для данных, у которых компилятор сам пишет всё скучное: конструктор, сравнение по значению, читаемый <code>ToString</code>.</p><p>Ключевая разница с обычным классом — <b>сравнение</b>. Два класса с одинаковыми полями не равны, потому что это разные объекты в памяти. Две записи с одинаковыми полями равны, потому что record сравнивает содержимое.</p><p>Записи по умолчанию неизменяемые: поля задаются при создании и потом не меняются. Для описания заказа, точки, координаты или строки ответа API это ровно то, что нужно.</p>",
+        "uz": "<p>Endi <b>yozuvlar</b> (<code>record</code>) haqida. Bu ma'lumot uchun sinflar bo'lib, ularda kompilyator barcha zerikarli narsani o'zi yozadi: konstruktor, qiymat bo'yicha solishtirish, o'qiladigan <code>ToString</code>.</p><p>Oddiy sinfdan asosiy farqi — <b>solishtirish</b>. Bir xil maydonli ikki sinf teng emas, chunki bu xotiradagi turli obyektlar. Bir xil maydonli ikki yozuv teng, chunki record mazmunni solishtiradi.</p><p>Yozuvlar sukut bo'yicha o'zgarmas: maydonlar yaratishda beriladi va keyin o'zgarmaydi. Buyurtma, nuqta, koordinata yoki API javob qatorini tasvirlash uchun bu aynan kerakli narsa.</p>",
+        "en": "<p>Now about <b>records</b>. These are classes for data where the compiler writes all the boring parts itself: the constructor, value equality, a readable <code>ToString</code>.</p><p>The key difference from an ordinary class is <b>comparison</b>. Two class instances with identical fields are not equal, because they are different objects in memory. Two records with identical fields are equal, because a record compares contents.</p><p>Records are immutable by default: fields are set at creation and never change afterwards. For describing an order, a point, a coordinate or an API response row this is exactly what you want.</p>"
+       }
+      },
+      {
+       "type": "code",
+       "lang": "csharp",
+       "code": "using System;\n\nrecord Point(int X, int Y);\n\nclass PointClass\n{\n    public int X;\n    public int Y;\n    public PointClass(int x, int y) { X = x; Y = y; }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var a = new Point(1, 2);\n        var b = new Point(1, 2);\n        Console.WriteLine(a == b);            // True: сравнение по значению\n        Console.WriteLine(a);                 // Point { X = 1, Y = 2 }\n\n        var c = a with { Y = 99 };            // копия с изменением одного поля\n        Console.WriteLine(c);                 // Point { X = 1, Y = 99 }\n        Console.WriteLine(a);                 // исходная не изменилась\n\n        var p1 = new PointClass(1, 2);\n        var p2 = new PointClass(1, 2);\n        Console.WriteLine(p1 == p2);          // False: разные объекты\n    }\n}"
+      },
+      {
+       "type": "note",
+       "kind": "trap",
+       "html": {
+        "ru": "Выражение <code>a with { Y = 99 }</code> создаёт <b>новый</b> объект, а не меняет старый. Забыть присвоить результат — типичная ошибка: код выглядит рабочим, а ничего не происходит. То же самое верно для всех методов <code>string</code>: <code>s.Trim()</code> без присваивания не делает ничего.",
+        "uz": "<code>a with { Y = 99 }</code> ifodasi eskisini o'zgartirmaydi, <b>yangi</b> obyekt yaratadi. Natijani tayinlashni unutish — odatiy xato: kod ishlaydigandek ko'rinadi, hech nima bo'lmaydi. Barcha <code>string</code> metodlari uchun ham shunday: tayinlashsiz <code>s.Trim()</code> hech nima qilmaydi.",
+        "en": "The expression <code>a with { Y = 99 }</code> creates a <b>new</b> object rather than changing the old one. Forgetting to assign the result is the classic mistake: the code looks like it works and nothing happens. The same is true of every <code>string</code> method: <code>s.Trim()</code> without an assignment does nothing."
+       }
+      },
+      {
+       "type": "summary",
+       "items": [
+        { "ru": "List&lt;T&gt; растёт, Dictionary&lt;K,V&gt; ищет по ключу мгновенно", "uz": "List&lt;T&gt; o'sadi, Dictionary&lt;K,V&gt; kalit bo'yicha bir zumda qidiradi", "en": "List&lt;T&gt; grows, Dictionary&lt;K,V&gt; looks up by key instantly" },
+        { "ru": "Обращение к отсутствующему ключу бросает — используй TryGetValue", "uz": "Yo'q kalitga murojaat istisno tashlaydi — TryGetValue ishlating", "en": "Accessing a missing key throws — use TryGetValue" },
+        { "ru": "Обобщения дают один код для разных типов без потери проверки", "uz": "Umumlashtirishlar tekshiruvni yo'qotmasdan turli turlar uchun bitta kod beradi", "en": "Generics give one code path for many types without losing checking" },
+        { "ru": "where задаёт, что тип обязан уметь", "uz": "where tur nima qila olishi shartligini beradi", "en": "where states what the type must be able to do" },
+        { "ru": "Лови конкретное исключение и никогда не глотай молча", "uz": "Aniq istisnoni tuting va hech qachon jimgina yutmang", "en": "Catch the specific exception and never swallow it silently" },
+        { "ru": "Ожидаемые ситуации обрабатывай через TryParse, а не через catch", "uz": "Kutilgan vaziyatlarni catch emas, TryParse orqali qayta ishlang", "en": "Handle expected situations with TryParse, not with catch" },
+        { "ru": "record сравнивается по значению, class — по ссылке", "uz": "record qiymat bo'yicha, class havola bo'yicha solishtiriladi", "en": "A record compares by value, a class by reference" }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": { "ru": "Что произойдёт при <code>prices[\"нет-такого\"]</code>, если ключа нет?", "uz": "Kalit bo'lmasa <code>prices[\"yo'q\"]</code> da nima bo'ladi?", "en": "What happens with <code>prices[\"missing\"]</code> when the key is absent?" },
+     "options": [
+      { "ru": "Вернётся 0", "uz": "0 qaytadi", "en": "It returns 0" },
+      { "ru": "Будет выброшено исключение", "uz": "Istisno tashlanadi", "en": "An exception is thrown" },
+      { "ru": "Вернётся null", "uz": "null qaytadi", "en": "It returns null" },
+      { "ru": "Ключ создастся сам", "uz": "Kalit o'zi yaratiladi", "en": "The key is created automatically" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "В отличие от Python, где тоже исключение, но с другим именем, здесь это <code>KeyNotFoundException</code>. Безопасно читать через <code>TryGetValue</code>.",
+      "uz": "Python dagi kabi istisno, lekin boshqa nom bilan — bu yerda <code>KeyNotFoundException</code>. Xavfsiz o'qish <code>TryGetValue</code> orqali.",
+      "en": "Like Python it throws, but under a different name — here it is <code>KeyNotFoundException</code>. Read safely with <code>TryGetValue</code>."
+     }
+    },
+    {
+     "q": { "ru": "Зачем нужен <code>&lt;T&gt;</code> в <code>List&lt;T&gt;</code>?", "uz": "<code>List&lt;T&gt;</code> dagi <code>&lt;T&gt;</code> nima uchun kerak?", "en": "What is the <code>&lt;T&gt;</code> in <code>List&lt;T&gt;</code> for?" },
+     "options": [
+      { "ru": "Это часть имени класса", "uz": "Bu sinf nomining qismi", "en": "It is part of the class name" },
+      { "ru": "Задаёт тип элементов, и компилятор проверяет его при сборке", "uz": "Elementlar turini beradi va kompilyator uni yig'ishda tekshiradi", "en": "It sets the element type, checked by the compiler at build time" },
+      { "ru": "Ограничивает длину списка", "uz": "Ro'yxat uzunligini cheklaydi", "en": "It limits the list length" },
+      { "ru": "Ускоряет работу", "uz": "Ishni tezlashtiradi", "en": "It makes it faster" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Именно это отличает <code>List&lt;int&gt;</code> от списка в Python: положить строку не выйдет — код не соберётся.",
+      "uz": "Aynan shu <code>List&lt;int&gt;</code> ni Python ro'yxatidan farqlaydi: satr qo'yib bo'lmaydi — kod yig'ilmaydi.",
+      "en": "This is exactly what distinguishes <code>List&lt;int&gt;</code> from a Python list: you cannot put a string in — the code will not compile."
+     }
+    },
+    {
+     "q": { "ru": "Что означает <code>where T : IComparable&lt;T&gt;</code>?", "uz": "<code>where T : IComparable&lt;T&gt;</code> nimani anglatadi?", "en": "What does <code>where T : IComparable&lt;T&gt;</code> mean?" },
+     "options": [
+      { "ru": "T обязательно число", "uz": "T albatta son", "en": "T must be a number" },
+      { "ru": "T — любой тип, умеющий сравнивать себя с себе подобным", "uz": "T — o'ziga o'xshashi bilan solishtira oladigan har qanday tur", "en": "T is any type able to compare itself with its own kind" },
+      { "ru": "T нельзя использовать в списках", "uz": "T ni ro'yxatlarda ishlatib bo'lmaydi", "en": "T cannot be used in lists" },
+      { "ru": "T всегда строка", "uz": "T doim satr", "en": "T is always a string" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Ограничение позволяет компилятору разрешить вызов <code>CompareTo</code> внутри обобщённого метода. Без него он не знал бы, что этот метод существует.",
+      "uz": "Cheklov kompilyatorga umumiy metod ichida <code>CompareTo</code> chaqiruviga ruxsat berish imkonini beradi. Usiz u bu metod borligini bilmasdi.",
+      "en": "The constraint lets the compiler allow the <code>CompareTo</code> call inside the generic method. Without it, it would not know the method exists."
+     }
+    },
+    {
+     "q": { "ru": "Пользователь ввёл «сорок» вместо числа. Как правильно это обработать?", "uz": "Foydalanuvchi son o'rniga «qirq» kiritdi. Buni qanday to'g'ri qayta ishlash kerak?", "en": "A user typed “forty” instead of a number. What is the right way to handle it?" },
+     "options": [
+      { "ru": "Обернуть <code>int.Parse</code> в try/catch", "uz": "<code>int.Parse</code> ni try/catch ga o'rash", "en": "Wrap <code>int.Parse</code> in try/catch" },
+      { "ru": "Использовать <code>int.TryParse</code> — это ожидаемая ситуация, а не исключительная", "uz": "<code>int.TryParse</code> ishlatish — bu kutilgan vaziyat, istisno emas", "en": "Use <code>int.TryParse</code> — this is expected, not exceptional" },
+      { "ru": "Обрушить программу", "uz": "Dasturni yiqitish", "en": "Crash the program" },
+      { "ru": "Игнорировать ввод молча", "uz": "Kiritishni jimgina e'tiborsiz qoldirish", "en": "Silently ignore the input" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Исключения дороги по времени и предназначены для того, чего не ждали. Неверный ввод пользователя ждут всегда.",
+      "uz": "Istisnolar vaqt jihatidan qimmat va kutilmagan narsa uchun mo'ljallangan. Foydalanuvchining noto'g'ri kiritishi esa doim kutiladi.",
+      "en": "Exceptions are expensive and meant for the unexpected. Bad user input is always expected."
+     }
+    },
+    {
+     "q": { "ru": "Чем плох пустой <code>catch { }</code>?", "uz": "Bo'sh <code>catch { }</code> nimasi bilan yomon?", "en": "What is wrong with an empty <code>catch { }</code>?" },
+     "options": [
+      { "ru": "Он медленный", "uz": "U sekin", "en": "It is slow" },
+      { "ru": "Ошибка исчезает бесследно, и программа тихо работает неправильно", "uz": "Xato izsiz yo'qoladi va dastur jimgina noto'g'ri ishlaydi", "en": "The error vanishes without a trace and the program quietly misbehaves" },
+      { "ru": "Он не компилируется", "uz": "U kompilyatsiya qilinmaydi", "en": "It does not compile" },
+      { "ru": "Ничем не плох", "uz": "Hech nimasi bilan yomon emas", "en": "Nothing is wrong with it" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Упавшая программа хотя бы честна. Молча проглоченная ошибка приводит к неверным данным, которые обнаружат через месяцы.",
+      "uz": "Yiqilgan dastur hech bo'lmasa halol. Jimgina yutilgan xato oylardan keyin topiladigan noto'g'ri ma'lumotga olib keladi.",
+      "en": "A crashed program is at least honest. A silently swallowed error yields wrong data discovered months later."
+     }
+    },
+    {
+     "q": { "ru": "Две записи <code>record Point(int X, int Y)</code> с одинаковыми значениями. Что даст <code>a == b</code>?", "uz": "Bir xil qiymatli ikki <code>record Point(int X, int Y)</code> yozuvi. <code>a == b</code> nima beradi?", "en": "Two <code>record Point(int X, int Y)</code> values with identical fields. What is <code>a == b</code>?" },
+     "options": [
+      { "ru": "False — это разные объекты", "uz": "False — bu turli obyektlar", "en": "False — they are different objects" },
+      { "ru": "True — записи сравниваются по содержимому", "uz": "True — yozuvlar mazmun bo'yicha solishtiriladi", "en": "True — records compare by content" },
+      { "ru": "Ошибка компиляции", "uz": "Kompilyatsiya xatosi", "en": "A compile error" },
+      { "ru": "Зависит от порядка создания", "uz": "Yaratish tartibiga bog'liq", "en": "It depends on the creation order" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Для обычного <code>class</code> ответ был бы <code>False</code>. Это главная причина выбирать record для данных.",
+      "uz": "Oddiy <code>class</code> uchun javob <code>False</code> bo'lardi. Ma'lumot uchun record tanlashning asosiy sababi shu.",
+      "en": "For an ordinary <code>class</code> the answer would be <code>False</code>. That is the main reason to choose a record for data."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "csharp",
+     "title": { "ru": "Словарь и подсчёт", "uz": "Lug'at va hisoblash", "en": "A dictionary and a count" },
+     "brief": { "ru": "Dictionary и TryGetValue", "uz": "Dictionary va TryGetValue", "en": "Dictionary and TryGetValue" },
+     "desc": {
+      "ru": "<p>Напиши метод <code>static Dictionary&lt;string, int&gt; Count(string[] words)</code>, который считает, сколько раз встретилось каждое слово.</p><p>Регистр приводи к нижнему. Затем выведи через <code>Console.WriteLine</code> количество разных слов и число вхождений слова <code>\"код\"</code>, каждое на своей строке.</p>",
+      "uz": "<p><code>static Dictionary&lt;string, int&gt; Count(string[] words)</code> metodini yozing — u har so'z necha marta uchraganini sanaydi.</p><p>Registrni kichik harfga keltiring. So'ng <code>Console.WriteLine</code> orqali turli so'zlar sonini va <code>\"код\"</code> so'zining uchrash sonini har birini alohida qatorda chiqaring.</p>",
+      "en": "<p>Write a method <code>static Dictionary&lt;string, int&gt; Count(string[] words)</code> that counts how many times each word occurs.</p><p>Lowercase the words. Then print with <code>Console.WriteLine</code> the number of distinct words and the count of the word <code>\"код\"</code>, each on its own line.</p>"
+     },
+     "starter": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static Dictionary<string, int> Count(string[] words)\n    {\n        // твой код\n        return new Dictionary<string, int>();\n    }\n\n    static void Main()\n    {\n        var words = new[] { \"Код\", \"тест\", \"код\", \"КОД\", \"тест\" };\n        var counts = Count(words);\n\n        Console.WriteLine(counts.Count);\n        Console.WriteLine(counts[\"код\"]);\n    }\n}\n",
+     "solution": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static Dictionary<string, int> Count(string[] words)\n    {\n        var result = new Dictionary<string, int>();\n        foreach (var word in words)\n        {\n            var key = word.ToLower();\n            // TryGetValue вместо обращения по ключу: отсутствующий ключ не бросит\n            result.TryGetValue(key, out int seen);\n            result[key] = seen + 1;\n        }\n        return result;\n    }\n\n    static void Main()\n    {\n        var words = new[] { \"Код\", \"тест\", \"код\", \"КОД\", \"тест\" };\n        var counts = Count(words);\n\n        Console.WriteLine(counts.Count);\n        Console.WriteLine(counts[\"код\"]);\n    }\n}\n",
+     "expected": "2\n3",
+     "hint": {
+      "ru": "Пройди по массиву в <code>foreach</code>. Ключ — <code>word.ToLower()</code>. Читай текущее значение через <code>TryGetValue(key, out int seen)</code>: если ключа нет, <code>seen</code> станет нулём, и можно сразу писать <code>result[key] = seen + 1</code>.",
+      "uz": "Massiv bo'ylab <code>foreach</code> da yuring. Kalit — <code>word.ToLower()</code>. Joriy qiymatni <code>TryGetValue(key, out int seen)</code> orqali o'qing: kalit bo'lmasa, <code>seen</code> nol bo'ladi va darhol <code>result[key] = seen + 1</code> yozish mumkin.",
+      "en": "Walk the array with <code>foreach</code>. The key is <code>word.ToLower()</code>. Read the current value with <code>TryGetValue(key, out int seen)</code>: when the key is absent <code>seen</code> becomes zero, so you can write <code>result[key] = seen + 1</code> straight away."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "csharp",
+     "title": { "ru": "Своя обобщённая пара", "uz": "O'z umumiy juftligingiz", "en": "Your own generic pair" },
+     "brief": { "ru": "Класс с параметром типа", "uz": "Tur parametrli sinf", "en": "A class with a type parameter" },
+     "desc": {
+      "ru": "<p>Напиши обобщённый класс <code>Pair&lt;T&gt;</code>: конструктор принимает два значения типа <code>T</code>, свойства <code>First</code> и <code>Second</code> доступны на чтение, метод <code>Swap()</code> возвращает <b>новую</b> пару с переставленными местами значениями.</p><p>Класс должен работать и с <code>int</code>, и со <code>string</code> — <code>Main</code> в заготовке это проверяет.</p>",
+      "uz": "<p><code>Pair&lt;T&gt;</code> umumiy sinfini yozing: konstruktor <code>T</code> turidagi ikki qiymat oladi, <code>First</code> va <code>Second</code> xususiyatlari o'qish uchun ochiq, <code>Swap()</code> metodi qiymatlari joyi almashgan <b>yangi</b> juftlikni qaytaradi.</p><p>Sinf <code>int</code> bilan ham, <code>string</code> bilan ham ishlashi kerak — zagotovkadagi <code>Main</code> buni tekshiradi.</p>",
+      "en": "<p>Write a generic class <code>Pair&lt;T&gt;</code>: the constructor takes two values of type <code>T</code>, the properties <code>First</code> and <code>Second</code> are readable, and the method <code>Swap()</code> returns a <b>new</b> pair with the values exchanged.</p><p>The class must work with both <code>int</code> and <code>string</code> — the <code>Main</code> in the starter checks that.</p>"
+     },
+     "starter": "using System;\n\n// твой код: class Pair<T>\n\nclass Program\n{\n    static void Main()\n    {\n        var numbers = new Pair<int>(1, 2);\n        Console.WriteLine(numbers.First);\n\n        var swapped = numbers.Swap();\n        Console.WriteLine(swapped.First);\n        Console.WriteLine(numbers.First);      // исходная пара не изменилась\n\n        var words = new Pair<string>(\"да\", \"нет\");\n        Console.WriteLine(words.Swap().First);\n    }\n}\n",
+     "solution": "using System;\n\nclass Pair<T>\n{\n    public T First { get; }\n    public T Second { get; }\n\n    public Pair(T first, T second)\n    {\n        First = first;\n        Second = second;\n    }\n\n    // возвращаем новую пару: исходная остаётся нетронутой\n    public Pair<T> Swap() => new Pair<T>(Second, First);\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var numbers = new Pair<int>(1, 2);\n        Console.WriteLine(numbers.First);\n\n        var swapped = numbers.Swap();\n        Console.WriteLine(swapped.First);\n        Console.WriteLine(numbers.First);\n\n        var words = new Pair<string>(\"да\", \"нет\");\n        Console.WriteLine(words.Swap().First);\n    }\n}\n",
+     "expected": "1\n2\n1\nнет",
+     "hint": {
+      "ru": "Свойства только на чтение записываются как <code>public T First { get; }</code> — присвоить их можно лишь в конструкторе. <code>Swap</code> должен создавать <code>new Pair&lt;T&gt;(Second, First)</code>, а не менять поля у себя.",
+      "uz": "Faqat o'qish uchun xususiyatlar <code>public T First { get; }</code> deb yoziladi — ularni faqat konstruktorda tayinlash mumkin. <code>Swap</code> o'z maydonlarini o'zgartirmasdan <code>new Pair&lt;T&gt;(Second, First)</code> yaratishi kerak.",
+      "en": "Read-only properties are written <code>public T First { get; }</code> — they can only be assigned in the constructor. <code>Swap</code> must create <code>new Pair&lt;T&gt;(Second, First)</code> rather than mutate its own fields."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "csharp",
+     "title": { "ru": "Разбор ввода без падений", "uz": "Yiqilishsiz kiritishni tahlil qilish", "en": "Parsing input without crashes" },
+     "brief": { "ru": "TryParse и конкретный catch", "uz": "TryParse va aniq catch", "en": "TryParse and a specific catch" },
+     "desc": {
+      "ru": "<p>Напиши два метода.</p><ul><li><code>static int SafeSum(string[] parts)</code> — складывает только те строки, которые разбираются в <code>int</code>. Остальные молча пропускает. Никаких исключений.</li><li><code>static string Describe(int a, int b)</code> — возвращает <code>a / b</code> в виде строки, а при делении на ноль ловит <code>DivideByZeroException</code> и возвращает <code>\"ошибка\"</code>.</li></ul>",
+      "uz": "<p>Ikki metod yozing.</p><ul><li><code>static int SafeSum(string[] parts)</code> — faqat <code>int</code> ga aylanadigan satrlarni qo'shadi. Qolganini jimgina o'tkazib yuboradi. Hech qanday istisno yo'q.</li><li><code>static string Describe(int a, int b)</code> — <code>a / b</code> ni satr ko'rinishida qaytaradi, nolga bo'lishda esa <code>DivideByZeroException</code> ni tutib, <code>\"ошибка\"</code> qaytaradi.</li></ul>",
+      "en": "<p>Write two methods.</p><ul><li><code>static int SafeSum(string[] parts)</code> — sums only the strings that parse as <code>int</code>. It silently skips the rest. No exceptions.</li><li><code>static string Describe(int a, int b)</code> — returns <code>a / b</code> as a string, and on division by zero catches <code>DivideByZeroException</code> and returns <code>\"ошибка\"</code>.</li></ul>"
+     },
+     "starter": "using System;\n\nclass Program\n{\n    static int SafeSum(string[] parts)\n    {\n        // твой код\n        return 0;\n    }\n\n    static string Describe(int a, int b)\n    {\n        // твой код\n        return \"\";\n    }\n\n    static void Main()\n    {\n        Console.WriteLine(SafeSum(new[] { \"10\", \"два\", \"32\", \"\" }));\n        Console.WriteLine(Describe(10, 2));\n        Console.WriteLine(Describe(10, 0));\n    }\n}\n",
+     "solution": "using System;\n\nclass Program\n{\n    static int SafeSum(string[] parts)\n    {\n        int total = 0;\n        foreach (var part in parts)\n        {\n            // ожидаемая ситуация - обрабатываем без исключений\n            if (int.TryParse(part, out int value))\n                total += value;\n        }\n        return total;\n    }\n\n    static string Describe(int a, int b)\n    {\n        try\n        {\n            return (a / b).ToString();\n        }\n        catch (DivideByZeroException)   // ловим конкретный тип, а не Exception\n        {\n            return \"ошибка\";\n        }\n    }\n\n    static void Main()\n    {\n        Console.WriteLine(SafeSum(new[] { \"10\", \"два\", \"32\", \"\" }));\n        Console.WriteLine(Describe(10, 2));\n        Console.WriteLine(Describe(10, 0));\n    }\n}\n",
+     "expected": "42\n5\nошибка",
+     "hint": {
+      "ru": "В <code>SafeSum</code> — <code>foreach</code> и <code>if (int.TryParse(part, out int value))</code>. В <code>Describe</code> — <code>try</code> с <code>return (a / b).ToString();</code> и <code>catch (DivideByZeroException)</code>. Общий <code>catch (Exception)</code> здесь считается плохим стилем.",
+      "uz": "<code>SafeSum</code> da — <code>foreach</code> va <code>if (int.TryParse(part, out int value))</code>. <code>Describe</code> da — <code>return (a / b).ToString();</code> bilan <code>try</code> va <code>catch (DivideByZeroException)</code>. Umumiy <code>catch (Exception)</code> bu yerda yomon uslub hisoblanadi.",
+      "en": "In <code>SafeSum</code> use <code>foreach</code> and <code>if (int.TryParse(part, out int value))</code>. In <code>Describe</code> use <code>try</code> with <code>return (a / b).ToString();</code> and <code>catch (DivideByZeroException)</code>. A blanket <code>catch (Exception)</code> counts as bad style here."
+     }
+    }
+   ],
+   "exam": {
+    "time": 600,
+    "questions": [
+     {
+      "q": { "ru": "Какая коллекция подойдёт для «имя пользователя → его баланс»?", "uz": "«Foydalanuvchi nomi → uning balansi» uchun qaysi to'plam mos?", "en": "Which collection fits “user name → their balance”?" },
+      "options": [
+       { "ru": "Массив", "uz": "Massiv", "en": "An array" },
+       { "ru": "Dictionary&lt;string, int&gt;", "uz": "Dictionary&lt;string, int&gt;", "en": "Dictionary&lt;string, int&gt;" },
+       { "ru": "List&lt;int&gt;", "uz": "List&lt;int&gt;", "en": "List&lt;int&gt;" },
+       { "ru": "string", "uz": "string", "en": "string" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Что делает <code>out</code> в <code>TryGetValue(key, out int p)</code>?", "uz": "<code>TryGetValue(key, out int p)</code> dagi <code>out</code> nima qiladi?", "en": "What does <code>out</code> do in <code>TryGetValue(key, out int p)</code>?" },
+      "options": [
+       { "ru": "Передаёт значение в метод", "uz": "Qiymatni metodga uzatadi", "en": "Passes a value into the method" },
+       { "ru": "Объявляет переменную, которую заполнит сам метод", "uz": "Metodning o'zi to'ldiradigan o'zgaruvchini e'lon qiladi", "en": "Declares a variable the method itself fills in" },
+       { "ru": "Копирует словарь", "uz": "Lug'atni nusxalaydi", "en": "Copies the dictionary" },
+       { "ru": "Ничего, это необязательное слово", "uz": "Hech nima, bu ixtiyoriy so'z", "en": "Nothing, it is an optional word" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Когда стоит писать <code>catch (Exception)</code>?", "uz": "<code>catch (Exception)</code> ni qachon yozish kerak?", "en": "When should you write <code>catch (Exception)</code>?" },
+      "options": [
+       { "ru": "Всегда, так надёжнее", "uz": "Doim, shunday ishonchliroq", "en": "Always, it is safer" },
+       { "ru": "Почти никогда: он проглотит и те ошибки, которых ты не ждал", "uz": "Deyarli hech qachon: u kutmagan xatolaringizni ham yutadi", "en": "Almost never: it swallows errors you never anticipated" },
+       { "ru": "Только внутри циклов", "uz": "Faqat sikllar ichida", "en": "Only inside loops" },
+       { "ru": "Когда лень писать конкретный тип", "uz": "Aniq turni yozishga eringanda", "en": "When you cannot be bothered to name the type" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "<code>var b = a with { Y = 99 };</code>. Что стало с <code>a</code>?", "uz": "<code>var b = a with { Y = 99 };</code>. <code>a</code> ga nima bo'ldi?", "en": "<code>var b = a with { Y = 99 };</code>. What happened to <code>a</code>?" },
+      "options": [
+       { "ru": "У неё изменилось Y", "uz": "Uning Y i o'zgardi", "en": "Its Y changed" },
+       { "ru": "Ничего: создана новая запись, исходная не тронута", "uz": "Hech nima: yangi yozuv yaratildi, asli tegilmadi", "en": "Nothing: a new record was created, the original is untouched" },
+       { "ru": "Она стала null", "uz": "U null bo'ldi", "en": "It became null" },
+       { "ru": "Ошибка компиляции", "uz": "Kompilyatsiya xatosi", "en": "A compile error" }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "kind": "csharp",
+      "title": { "ru": "Каталог товаров", "uz": "Mahsulotlar katalogi", "en": "A product catalogue" },
+      "desc": {
+       "ru": "<p>Собери всё вместе.</p><ol><li>Объяви запись <code>record Item(string Name, int Price)</code>.</li><li>Метод <code>static Dictionary&lt;string, int&gt; Cheapest(List&lt;Item&gt; items)</code> возвращает для каждого имени <b>минимальную</b> цену.</li><li>Метод <code>static string Find(Dictionary&lt;string, int&gt; prices, string name)</code> возвращает цену строкой, а если товара нет — <code>\"нет в каталоге\"</code>. Исключений быть не должно.</li></ol><p><code>Main</code> в заготовке уже написан и менять его не нужно.</p>",
+       "uz": "<p>Hammasini birlashtiring.</p><ol><li><code>record Item(string Name, int Price)</code> yozuvini e'lon qiling.</li><li><code>static Dictionary&lt;string, int&gt; Cheapest(List&lt;Item&gt; items)</code> metodi har nom uchun <b>minimal</b> narxni qaytaradi.</li><li><code>static string Find(Dictionary&lt;string, int&gt; prices, string name)</code> metodi narxni satr bilan qaytaradi, mahsulot bo'lmasa — <code>\"нет в каталоге\"</code>. Istisno bo'lmasligi kerak.</li></ol><p>Zagotovkadagi <code>Main</code> allaqachon yozilgan va uni o'zgartirish shart emas.</p>",
+       "en": "<p>Put it all together.</p><ol><li>Declare a record <code>record Item(string Name, int Price)</code>.</li><li>The method <code>static Dictionary&lt;string, int&gt; Cheapest(List&lt;Item&gt; items)</code> returns the <b>minimum</b> price for each name.</li><li>The method <code>static string Find(Dictionary&lt;string, int&gt; prices, string name)</code> returns the price as a string, or <code>\"нет в каталоге\"</code> when the product is absent. No exceptions allowed.</li></ol><p>The <code>Main</code> in the starter is already written and needs no changes.</p>"
+      },
+      "starter": "using System;\nusing System.Collections.Generic;\n\n// твой код: record Item и два метода\n\nclass Program\n{\n    static void Main()\n    {\n        var items = new List<Item>\n        {\n            new Item(\"кофе\", 25000),\n            new Item(\"чай\", 15000),\n            new Item(\"кофе\", 21000),\n            new Item(\"чай\", 17000),\n        };\n\n        var prices = Cheapest(items);\n        Console.WriteLine(prices.Count);\n        Console.WriteLine(Find(prices, \"кофе\"));\n        Console.WriteLine(Find(prices, \"чай\"));\n        Console.WriteLine(Find(prices, \"сок\"));\n        Console.WriteLine(new Item(\"кофе\", 21000) == new Item(\"кофе\", 21000));\n    }\n}\n",
+      "solution": "using System;\nusing System.Collections.Generic;\n\nrecord Item(string Name, int Price);\n\nclass Program\n{\n    static Dictionary<string, int> Cheapest(List<Item> items)\n    {\n        var result = new Dictionary<string, int>();\n        foreach (var item in items)\n        {\n            // если имя уже встречалось, оставляем меньшую цену\n            if (result.TryGetValue(item.Name, out int known) && known <= item.Price)\n                continue;\n            result[item.Name] = item.Price;\n        }\n        return result;\n    }\n\n    static string Find(Dictionary<string, int> prices, string name)\n    {\n        if (prices.TryGetValue(name, out int price))\n            return price.ToString();\n        return \"нет в каталоге\";\n    }\n\n    static void Main()\n    {\n        var items = new List<Item>\n        {\n            new Item(\"кофе\", 25000),\n            new Item(\"чай\", 15000),\n            new Item(\"кофе\", 21000),\n            new Item(\"чай\", 17000),\n        };\n\n        var prices = Cheapest(items);\n        Console.WriteLine(prices.Count);\n        Console.WriteLine(Find(prices, \"кофе\"));\n        Console.WriteLine(Find(prices, \"чай\"));\n        Console.WriteLine(Find(prices, \"сок\"));\n        Console.WriteLine(new Item(\"кофе\", 21000) == new Item(\"кофе\", 21000));\n    }\n}\n",
+      "expected": "2\n21000\n15000\nнет в каталоге\nTrue",
+      "hint": {
+       "ru": "Запись объявляется одной строкой: <code>record Item(string Name, int Price);</code> — вне класса <code>Program</code>. В <code>Cheapest</code> идёшь по списку и оставляешь меньшее из уже известного и текущего. В <code>Find</code> снова выручает <code>TryGetValue</code>.",
+       "uz": "Yozuv bir qatorda e'lon qilinadi: <code>record Item(string Name, int Price);</code> — <code>Program</code> sinfidan tashqarida. <code>Cheapest</code> da ro'yxat bo'ylab yurib, ma'lum va joriysining kichigini qoldirasiz. <code>Find</code> da yana <code>TryGetValue</code> yordam beradi.",
+       "en": "A record is declared in one line: <code>record Item(string Name, int Price);</code> — outside the <code>Program</code> class. In <code>Cheapest</code> walk the list keeping the smaller of the known and the current. In <code>Find</code>, <code>TryGetValue</code> helps again."
+      }
+     }
+    ]
+   }
   }
  ]
 }

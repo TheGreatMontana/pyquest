@@ -560,6 +560,350 @@
      }
     ]
    }
+  },
+  {
+   "id": "tw-02",
+   "title": { "ru": "Сетки, состояния и компоненты", "uz": "To'rlar, holatlar va komponentlar", "en": "Grids, states and components" },
+   "tagline": { "ru": "Grid и flex на утилитах, ховер и фокус, тёмная тема и как не утонуть в классах", "uz": "Utilitalarda Grid va flex, hover va fokus, qorong'i mavzu va sinflarda cho'kib ketmaslik", "en": "Grid and flex with utilities, hover and focus, dark mode, and how not to drown in classes" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "Сетка из утилит", "uz": "Utilitalardan to'r", "en": "A grid made of utilities" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Раскладка страницы в Tailwind — это те же CSS-свойства, только записанные классами. Знаешь CSS Grid — знаешь и это.</p><ul><li><code>grid</code> → <code>display: grid</code></li><li><code>grid-cols-3</code> → три колонки одинаковой ширины</li><li><code>gap-4</code> → расстояние между ячейками 1rem, то есть 16px</li><li><code>col-span-2</code> → элемент занимает две колонки</li></ul><p>Для flex всё так же: <code>flex</code>, <code>flex-col</code>, <code>items-center</code>, <code>justify-between</code>, <code>gap-2</code>.</p><p>Правило выбора простое: <b>grid — когда раскладка двумерная</b> (строки и колонки), <b>flex — когда элементы идут в одну линию</b> и надо распределить место между ними.</p>",
+        "uz": "<p>Tailwind dagi sahifa joylashuvi — o'sha CSS xususiyatlari, faqat sinflar bilan yozilgan. CSS Grid ni bilsangiz — buni ham bilasiz.</p><ul><li><code>grid</code> → <code>display: grid</code></li><li><code>grid-cols-3</code> → bir xil kenglikdagi uch ustun</li><li><code>gap-4</code> → kataklar orasidagi masofa 1rem, ya'ni 16px</li><li><code>col-span-2</code> → element ikki ustunni egallaydi</li></ul><p>Flex uchun ham xuddi shunday: <code>flex</code>, <code>flex-col</code>, <code>items-center</code>, <code>justify-between</code>, <code>gap-2</code>.</p><p>Tanlash qoidasi oddiy: <b>grid — joylashuv ikki o'lchovli bo'lganda</b> (qator va ustunlar), <b>flex — elementlar bir chiziqda ketganda</b> va ular orasida joy taqsimlash kerak bo'lganda.</p>",
+        "en": "<p>Page layout in Tailwind is the same CSS properties, only written as classes. If you know CSS Grid, you know this.</p><ul><li><code>grid</code> → <code>display: grid</code></li><li><code>grid-cols-3</code> → three equal-width columns</li><li><code>gap-4</code> → 1rem, that is 16px, between cells</li><li><code>col-span-2</code> → the element spans two columns</li></ul><p>For flex it is the same: <code>flex</code>, <code>flex-col</code>, <code>items-center</code>, <code>justify-between</code>, <code>gap-2</code>.</p><p>The choice is simple: <b>grid when the layout is two-dimensional</b> (rows and columns), <b>flex when items run in one line</b> and space must be distributed between them.</p>"
+       }
+      },
+      {
+       "type": "webrun",
+       "kind": "tailwind",
+       "code": "<div class=\"p-6 bg-slate-100\">\n\n  <h2 class=\"text-lg font-bold mb-3\">Сетка: три колонки</h2>\n  <div class=\"grid grid-cols-3 gap-4\">\n    <div class=\"bg-white rounded-lg p-4 text-center\">1</div>\n    <div class=\"bg-white rounded-lg p-4 text-center\">2</div>\n    <div class=\"bg-white rounded-lg p-4 text-center\">3</div>\n    <div class=\"bg-blue-600 text-white rounded-lg p-4 text-center col-span-2\">занимает две</div>\n    <div class=\"bg-white rounded-lg p-4 text-center\">5</div>\n  </div>\n\n  <h2 class=\"text-lg font-bold mt-6 mb-3\">Flex: шапка в одну линию</h2>\n  <header class=\"flex items-center justify-between bg-white rounded-lg p-4\">\n    <span class=\"font-semibold\">Логотип</span>\n    <nav class=\"flex gap-4 text-slate-600\">\n      <a href=\"#\">Курсы</a>\n      <a href=\"#\">О нас</a>\n    </nav>\n  </header>\n\n</div>"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Обрати внимание: <code>col-span-2</code> висит на самом элементе, а не на родителе. В Tailwind так всегда — <b>класс описывает поведение того тега, на котором он написан</b>. Родитель задаёт систему координат, ребёнок — своё место в ней.</p><p>Числа в <code>gap-4</code>, <code>p-6</code>, <code>mb-3</code> — это шкала из первого модуля: единица равна 0,25rem. Отсюда <code>gap-4</code> = 1rem = 16px.</p>",
+        "uz": "<p>E'tibor bering: <code>col-span-2</code> ota-onada emas, elementning o'zida turibdi. Tailwind da doim shunday — <b>sinf u yozilgan tegning xatti-harakatini tasvirlaydi</b>. Ota-ona koordinatalar tizimini, bola undagi o'z o'rnini beradi.</p><p><code>gap-4</code>, <code>p-6</code>, <code>mb-3</code> dagi sonlar — birinchi moduldagi shkala: birlik 0,25rem ga teng. Shundan <code>gap-4</code> = 1rem = 16px.</p>",
+        "en": "<p>Note that <code>col-span-2</code> sits on the element itself, not on the parent. In Tailwind it is always so — <b>a class describes the behaviour of the tag it is written on</b>. The parent sets the coordinate system, the child its place within it.</p><p>The numbers in <code>gap-4</code>, <code>p-6</code>, <code>mb-3</code> come from the scale in the first module: one unit is 0.25rem. Hence <code>gap-4</code> = 1rem = 16px.</p>"
+       }
+      },
+      {
+       "type": "checkpoint",
+       "q": { "ru": "Какому тегу нужно написать <code>grid-cols-3</code>?", "uz": "<code>grid-cols-3</code> ni qaysi tegga yozish kerak?", "en": "Which tag needs <code>grid-cols-3</code>?" },
+       "options": [
+        { "ru": "Каждой карточке внутри", "uz": "Ichidagi har kartochkaga", "en": "Every card inside" },
+        { "ru": "Контейнеру, у которого стоит класс <code>grid</code>", "uz": "<code>grid</code> sinfi turgan konteynerga", "en": "The container that has the <code>grid</code> class" },
+        { "ru": "Тегу <code>body</code>", "uz": "<code>body</code> tegiga", "en": "The <code>body</code> tag" },
+        { "ru": "Любому, разницы нет", "uz": "Har qandayiga, farqi yo'q", "en": "Any of them, it makes no difference" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Число колонок — свойство сетки, а сетка живёт на контейнере. Дети управляют только собой: <code>col-span-2</code>, <code>row-span-2</code>.",
+        "uz": "Ustunlar soni — to'r xususiyati, to'r esa konteynerda yashaydi. Bolalar faqat o'zini boshqaradi: <code>col-span-2</code>, <code>row-span-2</code>.",
+        "en": "The column count is a property of the grid, and the grid lives on the container. Children control only themselves: <code>col-span-2</code>, <code>row-span-2</code>."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "Состояния и тёмная тема", "uz": "Holatlar va qorong'i mavzu", "en": "States and dark mode" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>В обычном CSS ховер требует отдельного правила. В Tailwind это <b>приставка к классу</b>:</p><ul><li><code>hover:bg-blue-700</code> — фон при наведении</li><li><code>focus:ring-2</code> — кольцо при фокусе с клавиатуры</li><li><code>active:scale-95</code> — сжатие в момент нажатия</li><li><code>disabled:opacity-50</code> — вид выключенной кнопки</li></ul><p>Приставки складываются: <code>md:hover:bg-blue-700</code> означает «на экранах от средних и при наведении».</p><p>Отдельно стоит <b><code>focus-visible</code></b>. Обычный <code>focus</code> срабатывает и от мыши, из-за чего разработчики часто убирают обводку совсем — и ломают навигацию с клавиатуры. <code>focus-visible</code> показывает кольцо только тем, кто пришёл с клавиатуры. Это и есть правильный ответ на «обводка некрасивая».</p>",
+        "uz": "<p>Oddiy CSS da hover alohida qoida talab qiladi. Tailwind da bu <b>sinfga qo'shimcha</b>:</p><ul><li><code>hover:bg-blue-700</code> — sichqoncha ustiga kelgandagi fon</li><li><code>focus:ring-2</code> — klaviaturadan fokusda halqa</li><li><code>active:scale-95</code> — bosilgan paytda siqilish</li><li><code>disabled:opacity-50</code> — o'chirilgan tugma ko'rinishi</li></ul><p>Qo'shimchalar birlashadi: <code>md:hover:bg-blue-700</code> «o'rta va undan katta ekranlarda va sichqoncha ustiga kelganda» degani.</p><p>Alohida <b><code>focus-visible</code></b> turadi. Oddiy <code>focus</code> sichqonchadan ham ishlaydi, shuning uchun dasturchilar ko'pincha chegarani butunlay olib tashlaydi — va klaviatura bilan harakatni buzadi. <code>focus-visible</code> halqani faqat klaviaturadan kelganlarga ko'rsatadi. «Chegara chiroyli emas» ga to'g'ri javob shu.</p>",
+        "en": "<p>In plain CSS a hover needs its own rule. In Tailwind it is a <b>prefix on the class</b>:</p><ul><li><code>hover:bg-blue-700</code> — background on hover</li><li><code>focus:ring-2</code> — a ring on keyboard focus</li><li><code>active:scale-95</code> — a squeeze at the moment of the press</li><li><code>disabled:opacity-50</code> — the look of a disabled button</li></ul><p>Prefixes stack: <code>md:hover:bg-blue-700</code> means “on medium screens and up, while hovered”.</p><p><b><code>focus-visible</code></b> deserves a separate mention. Plain <code>focus</code> also fires for the mouse, which is why developers often remove the outline entirely — and break keyboard navigation. <code>focus-visible</code> shows the ring only to those who arrived by keyboard. That is the right answer to “the outline is ugly”.</p>"
+       }
+      },
+      {
+       "type": "webrun",
+       "kind": "tailwind",
+       "code": "<div class=\"p-6 bg-slate-100 flex flex-col gap-4 items-start\">\n\n  <button class=\"px-4 py-2 rounded-lg bg-blue-600 text-white font-medium\n                 transition hover:bg-blue-700 active:scale-95\n                 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400\">\n    Наведи на меня\n  </button>\n\n  <button disabled class=\"px-4 py-2 rounded-lg bg-blue-600 text-white font-medium\n                          disabled:opacity-50 disabled:cursor-not-allowed\">\n    Выключенная\n  </button>\n\n  <a href=\"#\" class=\"text-blue-600 underline decoration-transparent\n                     hover:decoration-blue-600 transition\">\n    Ссылка с подчёркиванием по наведению\n  </a>\n\n  <p class=\"text-sm text-slate-500\">\n    Нажми Tab — увидишь кольцо фокуса только у первой кнопки.\n  </p>\n\n</div>"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Теперь про <b>тёмную тему</b>. Приставка <code>dark:</code> работает так же: <code>bg-white dark:bg-slate-900</code> означает «белый фон, а в тёмной теме — почти чёрный».</p><p>Важно понимать, откуда берётся тёмная тема. По умолчанию Tailwind смотрит на системную настройку пользователя. Если нужен переключатель на сайте, тему переводят в режим класса: тогда <code>dark:</code> срабатывает от класса <code>dark</code> на теге <code>&lt;html&gt;</code>, а переключатель просто добавляет и убирает этот класс.</p><p>Практический совет: описывай пару цветов сразу, в момент написания элемента. Прикрутить тёмную тему к готовому проекту потом — это пройтись по каждому классу цвета вручную.</p>",
+        "uz": "<p>Endi <b>qorong'i mavzu</b> haqida. <code>dark:</code> qo'shimchasi xuddi shunday ishlaydi: <code>bg-white dark:bg-slate-900</code> «oq fon, qorong'i mavzuda esa deyarli qora» degani.</p><p>Qorong'i mavzu qayerdan kelishini tushunish muhim. Sukut bo'yicha Tailwind foydalanuvchining tizim sozlamasiga qaraydi. Saytda o'tkazgich kerak bo'lsa, mavzu sinf rejimiga o'tkaziladi: shunda <code>dark:</code> <code>&lt;html&gt;</code> tegidagi <code>dark</code> sinfidan ishlaydi, o'tkazgich esa shu sinfni qo'shib-olib turadi.</p><p>Amaliy maslahat: rang juftini elementni yozayotgan paytning o'zida bering. Tayyor loyihaga qorong'i mavzuni keyin ulash — har bir rang sinfini qo'lda aylanib chiqish demakdir.</p>",
+        "en": "<p>Now for <b>dark mode</b>. The <code>dark:</code> prefix works the same way: <code>bg-white dark:bg-slate-900</code> means “white background, and nearly black in dark mode”.</p><p>It matters where dark mode comes from. By default Tailwind follows the user's system setting. If you need a toggle on the site, the theme is switched to class mode: then <code>dark:</code> reacts to a <code>dark</code> class on the <code>&lt;html&gt;</code> tag and the toggle simply adds and removes that class.</p><p>Practical advice: write the colour pair at the moment you write the element. Bolting dark mode onto a finished project later means walking through every colour class by hand.</p>"
+       }
+      },
+      {
+       "type": "checkpoint",
+       "q": { "ru": "Чем <code>focus-visible:ring-2</code> лучше, чем <code>focus:ring-2</code>?", "uz": "<code>focus-visible:ring-2</code> <code>focus:ring-2</code> dan nimasi bilan yaxshi?", "en": "Why is <code>focus-visible:ring-2</code> better than <code>focus:ring-2</code>?" },
+       "options": [
+        { "ru": "Он быстрее работает", "uz": "U tezroq ishlaydi", "en": "It works faster" },
+        { "ru": "Кольцо видят только те, кто пришёл с клавиатуры", "uz": "Halqani faqat klaviaturadan kelganlar ko'radi", "en": "Only those navigating by keyboard see the ring" },
+        { "ru": "Он поддерживается старыми браузерами", "uz": "U eski brauzerlarda qo'llab-quvvatlanadi", "en": "It is supported by old browsers" },
+        { "ru": "Разницы нет", "uz": "Farqi yo'q", "en": "There is no difference" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Дизайнеру не мешает кольцо после клика мышью, а человеку с клавиатурой видно, где он находится. Убирать фокус совсем — значит сделать сайт непроходимым без мыши.",
+        "uz": "Dizaynerga sichqoncha bosilgandan keyingi halqa xalaqit bermaydi, klaviatura bilan ishlaydigan odam esa qayerdaligini ko'radi. Fokusni butunlay olib tashlash — saytni sichqonchasiz o'tib bo'lmaydigan qilish.",
+        "en": "The designer is not bothered by a ring after a mouse click, while a keyboard user can see where they are. Removing focus entirely makes the site impassable without a mouse."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "Когда классов становится слишком много", "uz": "Sinflar juda ko'payib ketganda", "en": "When there are too many classes" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Главная претензия к Tailwind справедлива: разметка распухает. Кнопка с состояниями легко набирает пятнадцать классов, а таких кнопок на сайте сорок.</p><p>Решают это не возвратом к CSS, а <b>переиспользованием разметки</b>. Порядок такой:</p><ol><li><b>Компонент.</b> В React, Vue или шаблонизаторе кнопку описывают один раз и вставляют по имени. Классы остаются в одном месте.</li><li><b>Извлечение класса.</b> Если фреймворка нет, повторяющийся набор выносят в собственный класс через <code>@apply</code> в своём CSS-файле.</li><li><b>Ничего не делать.</b> Если элемент встречается один раз, длинная строка классов — не проблема, а честное описание.</li></ol><p>Обрати внимание на порядок: сначала компонент, и только потом <code>@apply</code>. Злоупотребление <code>@apply</code> возвращает ровно ту проблему, от которой уходили — файл стилей, который никто не рискует трогать.</p>",
+        "uz": "<p>Tailwind ga asosiy e'tiroz o'rinli: разметка shishadi. Holatli tugma osongina o'n beshta sinf yig'adi, saytda esa bunday tugmalar qirqta.</p><p>Buni CSS ga qaytish bilan emas, <b>разметкани qayta ishlatish</b> bilan hal qilinadi. Tartib shunday:</p><ol><li><b>Komponent.</b> React, Vue yoki shablonizatorda tugma bir marta tasvirlanadi va nomi bo'yicha qo'yiladi. Sinflar bitta joyda qoladi.</li><li><b>Sinf chiqarish.</b> Freymvork bo'lmasa, takrorlanuvchi to'plam o'z CSS faylingizda <code>@apply</code> orqali alohida sinfga chiqariladi.</li><li><b>Hech nima qilmaslik.</b> Element bir marta uchrasa, uzun sinflar qatori muammo emas, halol tavsif.</li></ol><p>Tartibga e'tibor bering: avval komponent, keyingina <code>@apply</code>. <code>@apply</code> ni suiiste'mol qilish aynan ketilgan muammoni qaytaradi — hech kim tegishga jur'at qilmaydigan uslublar fayli.</p>",
+        "en": "<p>The main complaint about Tailwind is fair: the markup swells. A button with states easily collects fifteen classes, and the site has forty such buttons.</p><p>The fix is not a return to CSS but <b>reusing the markup</b>. In this order:</p><ol><li><b>A component.</b> In React, Vue or a template engine the button is described once and inserted by name. The classes stay in one place.</li><li><b>Extracting a class.</b> With no framework, a repeating set is pulled into your own class via <code>@apply</code> in your CSS file.</li><li><b>Doing nothing.</b> If an element appears once, a long class string is not a problem but an honest description.</li></ol><p>Note the order: the component first and <code>@apply</code> only after. Overusing <code>@apply</code> brings back exactly the problem you were escaping — a stylesheet nobody dares to touch.</p>"
+       }
+      },
+      {
+       "type": "webrun",
+       "kind": "tailwind",
+       "code": "<div class=\"p-6 bg-slate-100\">\n\n  <div class=\"grid grid-cols-2 gap-4\">\n\n    <article class=\"flex flex-col justify-between h-48 p-4 bg-white rounded-xl border border-slate-200\">\n      <div>\n        <h3 class=\"font-bold text-slate-900\">Python с нуля</h3>\n        <p class=\"mt-1 text-sm text-slate-600\">5 модулей, 26 уроков</p>\n      </div>\n      <button class=\"px-3 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium\n                     transition hover:bg-blue-700\">Начать</button>\n    </article>\n\n    <article class=\"flex flex-col justify-between h-48 p-4 bg-white rounded-xl border border-slate-200\">\n      <div>\n        <h3 class=\"font-bold text-slate-900\">SQL для аналитики</h3>\n        <p class=\"mt-1 text-sm text-slate-600\">Короткое описание</p>\n      </div>\n      <button class=\"px-3 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium\n                     transition hover:bg-blue-700\">Начать</button>\n    </article>\n\n  </div>\n\n  <p class=\"mt-4 text-sm text-slate-500\">\n    Карточки разной длины, а кнопки на одной линии — это делает justify-between\n    внутри flex-col с фиксированной высотой.\n  </p>\n\n</div>"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Приём с <code>flex flex-col justify-between</code> и заданной высотой стоит запомнить: он прижимает нижний элемент к низу карточки независимо от того, сколько текста сверху. Без него кнопки прыгали бы каждая на своей высоте, и сетка выглядела бы неаккуратно.</p><p>Второй способ добиться того же — <code>mt-auto</code> на кнопке: автоматический отступ сверху съедает всё свободное место. Работает и без фиксированной высоты, если карточки растягиваются по самой высокой.</p>",
+        "uz": "<p><code>flex flex-col justify-between</code> va berilgan balandlik bilan usulni eslab qolish kerak: u yuqorida qancha matn bo'lishidan qat'i nazar pastki elementni kartochka pastiga bosadi. Usiz tugmalar har biri o'z balandligida sakrardi va to'r betartib ko'rinardi.</p><p>Xuddi shunga erishishning ikkinchi yo'li — tugmada <code>mt-auto</code>: yuqoridagi avtomatik chekinish barcha bo'sh joyni yeydi. Kartochkalar eng balandiga cho'zilsa, qat'iy balandliksiz ham ishlaydi.</p>",
+        "en": "<p>The <code>flex flex-col justify-between</code> trick with a set height is worth remembering: it pins the bottom element to the bottom of the card regardless of how much text sits above. Without it the buttons would each sit at their own height and the grid would look sloppy.</p><p>The second way to the same result is <code>mt-auto</code> on the button: an automatic top margin eats all the free space. It works without a fixed height too, when cards stretch to the tallest one.</p>"
+       }
+      },
+      {
+       "type": "summary",
+       "items": [
+        { "ru": "grid-cols и gap живут на контейнере, col-span — на ребёнке", "uz": "grid-cols va gap konteynerda, col-span bolada yashaydi", "en": "grid-cols and gap live on the container, col-span on the child" },
+        { "ru": "grid — для двумерных раскладок, flex — для линии элементов", "uz": "grid — ikki o'lchovli joylashuv uchun, flex — elementlar chizig'i uchun", "en": "grid for two-dimensional layouts, flex for a line of items" },
+        { "ru": "Состояния — приставки: hover:, focus:, active:, disabled:", "uz": "Holatlar — qo'shimchalar: hover:, focus:, active:, disabled:", "en": "States are prefixes: hover:, focus:, active:, disabled:" },
+        { "ru": "focus-visible показывает кольцо только клавиатурным пользователям", "uz": "focus-visible halqani faqat klaviatura foydalanuvchilariga ko'rsatadi", "en": "focus-visible shows the ring only to keyboard users" },
+        { "ru": "dark: описывай сразу, а не прикручивай потом", "uz": "dark: ni keyin ulamang, darhol yozing", "en": "Write dark: from the start rather than bolting it on later" },
+        { "ru": "Против длинных строк классов помогает компонент, а не @apply", "uz": "Uzun sinf qatorlariga qarshi @apply emas, komponent yordam beradi", "en": "Against long class strings a component helps, not @apply" },
+        { "ru": "flex-col + justify-between прижимает кнопку к низу карточки", "uz": "flex-col + justify-between tugmani kartochka pastiga bosadi", "en": "flex-col plus justify-between pins the button to the card's bottom" }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": { "ru": "Сколько пикселей даёт <code>gap-4</code>?", "uz": "<code>gap-4</code> necha piksel beradi?", "en": "How many pixels is <code>gap-4</code>?" },
+     "options": [
+      { "ru": "4px", "uz": "4px", "en": "4px" },
+      { "ru": "16px", "uz": "16px", "en": "16px" },
+      { "ru": "40px", "uz": "40px", "en": "40px" },
+      { "ru": "Зависит от экрана", "uz": "Ekranga bog'liq", "en": "It depends on the screen" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Шкала Tailwind: одна единица равна 0,25rem. Четыре единицы — это 1rem, то есть 16px при обычном размере шрифта.",
+      "uz": "Tailwind shkalasi: bir birlik 0,25rem ga teng. To'rt birlik — 1rem, ya'ni odatiy shrift o'lchamida 16px.",
+      "en": "The Tailwind scale: one unit is 0.25rem. Four units make 1rem, that is 16px at the default font size."
+     }
+    },
+    {
+     "q": { "ru": "Где должен стоять класс <code>grid-cols-3</code>?", "uz": "<code>grid-cols-3</code> sinfi qayerda turishi kerak?", "en": "Where must the <code>grid-cols-3</code> class go?" },
+     "options": [
+      { "ru": "На каждом дочернем элементе", "uz": "Har bir bola elementda", "en": "On every child element" },
+      { "ru": "На контейнере с классом <code>grid</code>", "uz": "<code>grid</code> sinfli konteynerda", "en": "On the container with the <code>grid</code> class" },
+      { "ru": "На теге <code>html</code>", "uz": "<code>html</code> tegida", "en": "On the <code>html</code> tag" },
+      { "ru": "В отдельном CSS-файле", "uz": "Alohida CSS faylda", "en": "In a separate CSS file" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Сетку задаёт родитель. Ребёнок влияет только на себя — например, <code>col-span-2</code>.",
+      "uz": "To'rni ota-ona beradi. Bola faqat o'ziga ta'sir qiladi — masalan, <code>col-span-2</code>.",
+      "en": "The parent defines the grid. A child affects only itself — for example with <code>col-span-2</code>."
+     }
+    },
+    {
+     "q": { "ru": "Что означает <code>hover:bg-blue-700</code>?", "uz": "<code>hover:bg-blue-700</code> nimani anglatadi?", "en": "What does <code>hover:bg-blue-700</code> mean?" },
+     "options": [
+      { "ru": "Фон всегда синий", "uz": "Fon doim ko'k", "en": "The background is always blue" },
+      { "ru": "Фон становится синим при наведении курсора", "uz": "Kursor ustiga kelganda fon ko'k bo'ladi", "en": "The background turns blue on hover" },
+      { "ru": "Синий цвет текста", "uz": "Ko'k matn rangi", "en": "Blue text colour" },
+      { "ru": "Класс работает только на мобильных", "uz": "Sinf faqat mobil qurilmalarda ishlaydi", "en": "The class works only on mobile" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Приставка перед двоеточием — это условие. Их можно складывать: <code>md:hover:bg-blue-700</code>.",
+      "uz": "Ikki nuqta oldidagi qo'shimcha — bu shart. Ularni birlashtirish mumkin: <code>md:hover:bg-blue-700</code>.",
+      "en": "The prefix before the colon is a condition. They stack: <code>md:hover:bg-blue-700</code>."
+     }
+    },
+    {
+     "q": { "ru": "Дизайнер просит убрать обводку фокуса. Как поступить правильно?", "uz": "Dizayner fokus chegarasini olib tashlashni so'rayapti. To'g'ri qanday yo'l tutish kerak?", "en": "A designer asks to remove the focus outline. What is the right move?" },
+     "options": [
+      { "ru": "Убрать <code>outline</code> совсем", "uz": "<code>outline</code> ni butunlay olib tashlash", "en": "Remove the <code>outline</code> entirely" },
+      { "ru": "Заменить на <code>focus-visible:ring-2</code> — кольцо останется для клавиатуры", "uz": "<code>focus-visible:ring-2</code> ga almashtirish — halqa klaviatura uchun qoladi", "en": "Switch to <code>focus-visible:ring-2</code> — the ring stays for keyboard users" },
+      { "ru": "Сделать обводку прозрачной", "uz": "Chegarani shaffof qilish", "en": "Make the outline transparent" },
+      { "ru": "Отключить фокус у всех элементов", "uz": "Barcha elementlarda fokusni o'chirish", "en": "Disable focus on all elements" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Все варианты кроме второго делают сайт непроходимым без мыши — а это и часть аудитории, и требование доступности.",
+      "uz": "Ikkinchisidan boshqa barcha variantlar saytni sichqonchasiz o'tib bo'lmaydigan qiladi — bu ham auditoriyaning bir qismi, ham ochiqlik talabi.",
+      "en": "Every option but the second makes the site impassable without a mouse — that is both part of your audience and an accessibility requirement."
+     }
+    },
+    {
+     "q": { "ru": "Откуда Tailwind по умолчанию узнаёт про тёмную тему?", "uz": "Tailwind sukut bo'yicha qorong'i mavzu haqida qayerdan biladi?", "en": "Where does Tailwind learn about dark mode by default?" },
+     "options": [
+      { "ru": "Из времени суток", "uz": "Kun vaqtidan", "en": "From the time of day" },
+      { "ru": "Из системной настройки пользователя", "uz": "Foydalanuvchining tizim sozlamasidan", "en": "From the user's system setting" },
+      { "ru": "Из класса на теге body", "uz": "body tegidagi sinfdan", "en": "From a class on the body tag" },
+      { "ru": "Тёмной темы в Tailwind нет", "uz": "Tailwind da qorong'i mavzu yo'q", "en": "Tailwind has no dark mode" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Для переключателя на сайте тему переводят в режим класса, и тогда <code>dark:</code> реагирует на класс <code>dark</code> у <code>&lt;html&gt;</code>.",
+      "uz": "Saytdagi o'tkazgich uchun mavzu sinf rejimiga o'tkaziladi va shunda <code>dark:</code> <code>&lt;html&gt;</code> dagi <code>dark</code> sinfiga javob beradi.",
+      "en": "For a toggle on the site the theme is switched to class mode, and then <code>dark:</code> reacts to a <code>dark</code> class on <code>&lt;html&gt;</code>."
+     }
+    },
+    {
+     "q": { "ru": "Одна и та же кнопка с пятнадцатью классами встречается на сорока страницах. Что делать?", "uz": "O'n beshta sinfli bir xil tugma qirq sahifada uchraydi. Nima qilish kerak?", "en": "The same fifteen-class button appears on forty pages. What do you do?" },
+     "options": [
+      { "ru": "Скопировать сорок раз", "uz": "Qirq marta nusxalash", "en": "Copy it forty times" },
+      { "ru": "Сделать компонент и вставлять его по имени", "uz": "Komponent qilib, uni nomi bo'yicha qo'yish", "en": "Make a component and insert it by name" },
+      { "ru": "Вернуться к обычному CSS", "uz": "Oddiy CSS ga qaytish", "en": "Go back to plain CSS" },
+      { "ru": "Сократить количество классов вдвое", "uz": "Sinflar sonini ikki barobar qisqartirish", "en": "Halve the number of classes" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Компонент оставляет классы в одном месте и не создаёт стилевой файл, который потом боятся трогать. <code>@apply</code> — запасной вариант, когда фреймворка нет.",
+      "uz": "Komponent sinflarni bitta joyda qoldiradi va keyin tegishga qo'rqiladigan uslub fayli yaratmaydi. <code>@apply</code> — freymvork bo'lmaganda zaxira variant.",
+      "en": "A component keeps the classes in one place and does not create a stylesheet people later fear to touch. <code>@apply</code> is the fallback when there is no framework."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "tailwind",
+     "title": { "ru": "Сетка из трёх колонок", "uz": "Uch ustunli to'r", "en": "A three-column grid" },
+     "brief": { "ru": "grid, grid-cols, gap", "uz": "grid, grid-cols, gap", "en": "grid, grid-cols, gap" },
+     "desc": {
+      "ru": "<p>Сделай контейнер <code>&lt;section&gt;</code> сеткой из <b>трёх колонок</b> с расстоянием <code>gap-4</code> между ячейками.</p><p>Внутри уже лежат три <code>&lt;div&gt;</code> — добавь каждому белый фон <code>bg-white</code>, внутренний отступ <code>p-4</code> и скругление <code>rounded-lg</code>.</p>",
+      "uz": "<p><code>&lt;section&gt;</code> konteynerini kataklar orasida <code>gap-4</code> masofali <b>uch ustunli</b> to'r qiling.</p><p>Ichida allaqachon uchta <code>&lt;div&gt;</code> bor — har biriga oq fon <code>bg-white</code>, ichki chekinish <code>p-4</code> va yumaloqlash <code>rounded-lg</code> qo'shing.</p>",
+      "en": "<p>Turn the <code>&lt;section&gt;</code> container into a <b>three-column</b> grid with <code>gap-4</code> between cells.</p><p>Three <code>&lt;div&gt;</code> elements are already inside — give each a white background <code>bg-white</code>, padding <code>p-4</code> and rounding <code>rounded-lg</code>.</p>"
+     },
+     "starter": "<section class=\"\">\n  <div class=\"\">Первая</div>\n  <div class=\"\">Вторая</div>\n  <div class=\"\">Третья</div>\n</section>\n",
+     "tests": "var s = $('section');\nassert(s, 'Нет тега <section>');\nequal(style(s, 'display'), 'grid', 'display (класс grid)');\nequal(style(s, 'gap'), '16px', 'Расстояние между ячейками (gap-4)');\nvar cols = style(s, 'grid-template-columns').split(' ').filter(function(x){ return x; });\nequal(cols.length, 3, 'Количество колонок (grid-cols-3)');\nvar cards = $$('section > div');\nequal(cards.length, 3, 'Количество карточек');\ncards.forEach(function(c, i){\n  equal(style(c, 'background-color'), 'rgb(255, 255, 255)', 'Фон карточки ' + (i + 1) + ' (bg-white)');\n  equal(style(c, 'padding-top'), '16px', 'Отступ карточки ' + (i + 1) + ' (p-4)');\n  equal(style(c, 'border-top-left-radius'), '8px', 'Скругление карточки ' + (i + 1) + ' (rounded-lg)');\n});",
+     "hint": {
+      "ru": "На <code>&lt;section&gt;</code> нужны сразу три класса: <code>grid</code>, <code>grid-cols-3</code> и <code>gap-4</code>. Каждому <code>&lt;div&gt;</code> — <code>bg-white p-4 rounded-lg</code>.",
+      "uz": "<code>&lt;section&gt;</code> ga birdan uchta sinf kerak: <code>grid</code>, <code>grid-cols-3</code> va <code>gap-4</code>. Har bir <code>&lt;div&gt;</code> ga — <code>bg-white p-4 rounded-lg</code>.",
+      "en": "The <code>&lt;section&gt;</code> needs three classes at once: <code>grid</code>, <code>grid-cols-3</code> and <code>gap-4</code>. Each <code>&lt;div&gt;</code> gets <code>bg-white p-4 rounded-lg</code>."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "tailwind",
+     "title": { "ru": "Кнопка с состояниями", "uz": "Holatli tugma", "en": "A button with states" },
+     "brief": { "ru": "hover, focus-visible, disabled", "uz": "hover, focus-visible, disabled", "en": "hover, focus-visible, disabled" },
+     "desc": {
+      "ru": "<p>Оформи кнопку: фон <code>bg-blue-600</code>, белый текст, отступы <code>px-4</code> и <code>py-2</code>, скругление <code>rounded-lg</code>.</p><p>Добавь три состояния: <code>hover:bg-blue-700</code>, <code>focus-visible:ring-2</code> и <code>disabled:opacity-50</code>. Проверка смотрит и на вычисленные стили, и на наличие этих классов.</p>",
+      "uz": "<p>Tugmani bezang: fon <code>bg-blue-600</code>, oq matn, chekinishlar <code>px-4</code> va <code>py-2</code>, yumaloqlash <code>rounded-lg</code>.</p><p>Uch holat qo'shing: <code>hover:bg-blue-700</code>, <code>focus-visible:ring-2</code> va <code>disabled:opacity-50</code>. Tekshiruv hisoblangan uslublarga ham, shu sinflar borligiga ham qaraydi.</p>",
+      "en": "<p>Style the button: background <code>bg-blue-600</code>, white text, padding <code>px-4</code> and <code>py-2</code>, rounding <code>rounded-lg</code>.</p><p>Add three states: <code>hover:bg-blue-700</code>, <code>focus-visible:ring-2</code> and <code>disabled:opacity-50</code>. The check looks at both the computed styles and the presence of these classes.</p>"
+     },
+     "starter": "<button class=\"\">Сохранить</button>\n",
+     "tests": "var b = $('button');\nassert(b, 'Нет тега <button>');\nequal(style(b, 'background-color'), 'rgb(37, 99, 235)', 'Фон (bg-blue-600)');\nequal(style(b, 'color'), 'rgb(255, 255, 255)', 'Цвет текста (text-white)');\nequal(style(b, 'padding-left'), '16px', 'Отступ по горизонтали (px-4)');\nequal(style(b, 'padding-top'), '8px', 'Отступ по вертикали (py-2)');\nequal(style(b, 'border-top-left-radius'), '8px', 'Скругление (rounded-lg)');\nvar cls = b.className;\nassert(cls.indexOf('hover:bg-blue-700') !== -1, 'Нет класса hover:bg-blue-700');\nassert(cls.indexOf('focus-visible:ring-2') !== -1, 'Нет класса focus-visible:ring-2');\nassert(cls.indexOf('disabled:opacity-50') !== -1, 'Нет класса disabled:opacity-50');",
+     "hint": {
+      "ru": "Базовые классы и состояния пишутся в одну строку через пробел: <code>bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 focus-visible:ring-2 disabled:opacity-50</code>.",
+      "uz": "Asosiy sinflar va holatlar bir qatorda bo'shliq bilan yoziladi: <code>bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 focus-visible:ring-2 disabled:opacity-50</code>.",
+      "en": "Base classes and states go on one line separated by spaces: <code>bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 focus-visible:ring-2 disabled:opacity-50</code>."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "tailwind",
+     "title": { "ru": "Карточка с кнопкой внизу", "uz": "Pastda tugmali kartochka", "en": "A card with the button at the bottom" },
+     "brief": { "ru": "flex-col и justify-between", "uz": "flex-col va justify-between", "en": "flex-col and justify-between" },
+     "desc": {
+      "ru": "<p>Сделай <code>&lt;article&gt;</code> карточкой высотой <code>h-48</code>: колонка (<code>flex</code> + <code>flex-col</code>) с прижатой к низу кнопкой (<code>justify-between</code>).</p><p>Ещё нужны: белый фон, внутренний отступ <code>p-4</code> и скругление <code>rounded-xl</code>.</p>",
+      "uz": "<p><code>&lt;article&gt;</code> ni <code>h-48</code> balandlikdagi kartochka qiling: ustun (<code>flex</code> + <code>flex-col</code>) va pastga bosilgan tugma (<code>justify-between</code>).</p><p>Yana kerak: oq fon, ichki chekinish <code>p-4</code> va yumaloqlash <code>rounded-xl</code>.</p>",
+      "en": "<p>Turn the <code>&lt;article&gt;</code> into a card of height <code>h-48</code>: a column (<code>flex</code> plus <code>flex-col</code>) with the button pinned to the bottom (<code>justify-between</code>).</p><p>You also need a white background, padding <code>p-4</code> and rounding <code>rounded-xl</code>.</p>"
+     },
+     "starter": "<article class=\"\">\n  <h3>Python с нуля</h3>\n  <button>Начать</button>\n</article>\n",
+     "tests": "var a = $('article');\nassert(a, 'Нет тега <article>');\nequal(style(a, 'display'), 'flex', 'display (класс flex)');\nequal(style(a, 'flex-direction'), 'column', 'Направление (flex-col)');\nequal(style(a, 'justify-content'), 'space-between', 'Распределение (justify-between)');\nequal(style(a, 'height'), '192px', 'Высота (h-48)');\nequal(style(a, 'background-color'), 'rgb(255, 255, 255)', 'Фон (bg-white)');\nequal(style(a, 'padding-top'), '16px', 'Отступ (p-4)');\nequal(style(a, 'border-top-left-radius'), '12px', 'Скругление (rounded-xl)');\nassert($('article h3'), 'Заголовок должен остаться внутри');\nassert($('article button'), 'Кнопка должна остаться внутри');",
+     "hint": {
+      "ru": "Все классы идут на <code>&lt;article&gt;</code>: <code>flex flex-col justify-between h-48 p-4 bg-white rounded-xl</code>. Содержимое трогать не нужно.",
+      "uz": "Barcha sinflar <code>&lt;article&gt;</code> ga boradi: <code>flex flex-col justify-between h-48 p-4 bg-white rounded-xl</code>. Mazmunga tegish shart emas.",
+      "en": "All the classes go on the <code>&lt;article&gt;</code>: <code>flex flex-col justify-between h-48 p-4 bg-white rounded-xl</code>. The content needs no changes."
+     }
+    }
+   ],
+   "exam": {
+    "time": 600,
+    "questions": [
+     {
+      "q": { "ru": "<code>grid-cols-4 gap-6</code> — что получится?", "uz": "<code>grid-cols-4 gap-6</code> — nima chiqadi?", "en": "<code>grid-cols-4 gap-6</code> — what do you get?" },
+      "options": [
+       { "ru": "Четыре колонки с расстоянием 6px", "uz": "6px masofali to'rt ustun", "en": "Four columns with a 6px gap" },
+       { "ru": "Четыре колонки с расстоянием 24px", "uz": "24px masofali to'rt ustun", "en": "Four columns with a 24px gap" },
+       { "ru": "Шесть колонок с расстоянием 4px", "uz": "4px masofali olti ustun", "en": "Six columns with a 4px gap" },
+       { "ru": "Ошибка: такие классы не сочетаются", "uz": "Xato: bunday sinflar birlashmaydi", "en": "An error: these classes do not combine" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Что описывает <code>md:grid-cols-3</code>?", "uz": "<code>md:grid-cols-3</code> nimani tasvirlaydi?", "en": "What does <code>md:grid-cols-3</code> describe?" },
+      "options": [
+       { "ru": "Три колонки на всех экранах", "uz": "Barcha ekranlarda uch ustun", "en": "Three columns on every screen" },
+       { "ru": "Три колонки на экранах от средних и шире", "uz": "O'rta va undan keng ekranlarda uch ustun", "en": "Three columns on medium screens and wider" },
+       { "ru": "Три колонки только на телефонах", "uz": "Uch ustun faqat telefonlarda", "en": "Three columns on phones only" },
+       { "ru": "Максимум три колонки", "uz": "Ko'pi bilan uch ustun", "en": "At most three columns" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Кнопки в карточках разной высоты прыгают по вертикали. Что поможет?", "uz": "Turli balandlikdagi kartochkalardagi tugmalar vertikal bo'yicha sakraydi. Nima yordam beradi?", "en": "Buttons in cards of differing height sit at different levels. What helps?" },
+      "options": [
+       { "ru": "Убрать текст из карточек", "uz": "Kartochkalardan matnni olib tashlash", "en": "Remove the text from the cards" },
+       { "ru": "<code>flex flex-col justify-between</code> с заданной высотой или <code>mt-auto</code> на кнопке", "uz": "Berilgan balandlikli <code>flex flex-col justify-between</code> yoki tugmada <code>mt-auto</code>", "en": "<code>flex flex-col justify-between</code> with a set height, or <code>mt-auto</code> on the button" },
+       { "ru": "Сделать все тексты одинаковой длины", "uz": "Barcha matnlarni bir xil uzunlikda qilish", "en": "Make every text the same length" },
+       { "ru": "Использовать <code>position: absolute</code>", "uz": "<code>position: absolute</code> ishlatish", "en": "Use <code>position: absolute</code>" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Когда уместен <code>@apply</code>?", "uz": "<code>@apply</code> qachon o'rinli?", "en": "When is <code>@apply</code> appropriate?" },
+      "options": [
+       { "ru": "Всегда, чтобы разметка была короче", "uz": "Doim, разметка qisqaroq bo'lishi uchun", "en": "Always, to keep the markup short" },
+       { "ru": "Когда фреймворка с компонентами нет, а набор классов повторяется", "uz": "Komponentli freymvork bo'lmasa va sinflar to'plami takrorlansa", "en": "When there is no component framework and a class set repeats" },
+       { "ru": "Никогда", "uz": "Hech qachon", "en": "Never" },
+       { "ru": "Только для цветов", "uz": "Faqat ranglar uchun", "en": "For colours only" }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "tailwind",
+      "title": { "ru": "Адаптивная сетка карточек", "uz": "Moslashuvchan kartochkalar to'ri", "en": "A responsive card grid" },
+      "desc": {
+       "ru": "<p>Собери каталог курсов целиком.</p><ol><li><code>&lt;section&gt;</code> — сетка: одна колонка на телефоне, <b>две от средних экранов</b> (<code>md:grid-cols-2</code>), расстояние <code>gap-4</code>.</li><li>Каждая <code>&lt;article&gt;</code> — карточка высотой <code>h-48</code>: <code>flex flex-col justify-between</code>, белый фон, <code>p-4</code>, <code>rounded-xl</code>.</li><li>Каждая <code>&lt;button&gt;</code> — синяя: <code>bg-blue-600 text-white px-3 py-2 rounded-lg</code> и состояние <code>hover:bg-blue-700</code>.</li></ol>",
+       "uz": "<p>Kurslar katalogini to'liq yig'ing.</p><ol><li><code>&lt;section&gt;</code> — to'r: telefonda bitta ustun, <b>o'rta ekranlardan ikkita</b> (<code>md:grid-cols-2</code>), masofa <code>gap-4</code>.</li><li>Har bir <code>&lt;article&gt;</code> — <code>h-48</code> balandlikdagi kartochka: <code>flex flex-col justify-between</code>, oq fon, <code>p-4</code>, <code>rounded-xl</code>.</li><li>Har bir <code>&lt;button&gt;</code> — ko'k: <code>bg-blue-600 text-white px-3 py-2 rounded-lg</code> va <code>hover:bg-blue-700</code> holati.</li></ol>",
+       "en": "<p>Assemble the whole course catalogue.</p><ol><li>The <code>&lt;section&gt;</code> is a grid: one column on a phone, <b>two from medium screens up</b> (<code>md:grid-cols-2</code>), with <code>gap-4</code>.</li><li>Each <code>&lt;article&gt;</code> is a card of height <code>h-48</code>: <code>flex flex-col justify-between</code>, white background, <code>p-4</code>, <code>rounded-xl</code>.</li><li>Each <code>&lt;button&gt;</code> is blue: <code>bg-blue-600 text-white px-3 py-2 rounded-lg</code> plus the <code>hover:bg-blue-700</code> state.</li></ol>"
+      },
+      "starter": "<section class=\"\">\n\n  <article class=\"\">\n    <h3 class=\"font-bold\">Python с нуля</h3>\n    <button class=\"\">Начать</button>\n  </article>\n\n  <article class=\"\">\n    <h3 class=\"font-bold\">SQL для аналитики</h3>\n    <button class=\"\">Начать</button>\n  </article>\n\n</section>\n",
+      "tests": "var s = $('section');\nassert(s, 'Нет тега <section>');\nequal(style(s, 'display'), 'grid', 'Секция должна быть сеткой (grid)');\nequal(style(s, 'gap'), '16px', 'Расстояние между карточками (gap-4)');\nassert(s.className.indexOf('md:grid-cols-2') !== -1, 'Нет класса md:grid-cols-2');\nvar cards = $$('section > article');\nequal(cards.length, 2, 'Карточек должно быть две');\ncards.forEach(function(c, i){\n  var n = i + 1;\n  equal(style(c, 'display'), 'flex', 'Карточка ' + n + ': display (flex)');\n  equal(style(c, 'flex-direction'), 'column', 'Карточка ' + n + ': направление (flex-col)');\n  equal(style(c, 'justify-content'), 'space-between', 'Карточка ' + n + ': justify-between');\n  equal(style(c, 'height'), '192px', 'Карточка ' + n + ': высота (h-48)');\n  equal(style(c, 'background-color'), 'rgb(255, 255, 255)', 'Карточка ' + n + ': фон (bg-white)');\n  equal(style(c, 'padding-top'), '16px', 'Карточка ' + n + ': отступ (p-4)');\n  equal(style(c, 'border-top-left-radius'), '12px', 'Карточка ' + n + ': скругление (rounded-xl)');\n});\nvar buttons = $$('section article button');\nequal(buttons.length, 2, 'Кнопок должно быть две');\nbuttons.forEach(function(b, i){\n  var n = i + 1;\n  equal(style(b, 'background-color'), 'rgb(37, 99, 235)', 'Кнопка ' + n + ': фон (bg-blue-600)');\n  equal(style(b, 'color'), 'rgb(255, 255, 255)', 'Кнопка ' + n + ': цвет текста');\n  equal(style(b, 'padding-left'), '12px', 'Кнопка ' + n + ': отступ (px-3)');\n  equal(style(b, 'border-top-left-radius'), '8px', 'Кнопка ' + n + ': скругление (rounded-lg)');\n  assert(b.className.indexOf('hover:bg-blue-700') !== -1, 'Кнопка ' + n + ': нет класса hover:bg-blue-700');\n});",
+      "hint": {
+       "ru": "Секции — <code>grid md:grid-cols-2 gap-4</code>. Каждой карточке — <code>flex flex-col justify-between h-48 p-4 bg-white rounded-xl</code>. Каждой кнопке — <code>bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700</code>. Классы у обеих карточек одинаковые.",
+       "uz": "Seksiyaga — <code>grid md:grid-cols-2 gap-4</code>. Har kartochkaga — <code>flex flex-col justify-between h-48 p-4 bg-white rounded-xl</code>. Har tugmaga — <code>bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700</code>. Ikkala kartochkaning sinflari bir xil.",
+       "en": "The section gets <code>grid md:grid-cols-2 gap-4</code>. Each card gets <code>flex flex-col justify-between h-48 p-4 bg-white rounded-xl</code>. Each button gets <code>bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700</code>. Both cards use identical classes."
+      }
+     }
+    ]
+   }
   }
  ]
 }

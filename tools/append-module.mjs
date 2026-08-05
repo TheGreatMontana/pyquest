@@ -40,7 +40,11 @@ if (!tail.test(src)) {
 
 const eol = src.includes('\r\n') ? '\r\n' : '\n';
 const indented = mod.split('\n').map(l => (l ? '  ' + l : l)).join(eol);
-const out = src.replace(tail, eol + '  },' + eol + indented + eol + ' ]' + eol + '}' + eol);
+
+/* Замена только функцией: в строке замены $$ значит один доллар, и хелпер
+   $$ из тестов по вёрстке молча превратился бы в $ — то есть в querySelector
+   вместо querySelectorAll. Функция отдаёт текст как есть. */
+const out = src.replace(tail, () => eol + '  },' + eol + indented + eol + ' ]' + eol + '}' + eol);
 
 const check = JSON.parse(out);
 if (check.modules.length !== courseObj.modules.length + 1) {

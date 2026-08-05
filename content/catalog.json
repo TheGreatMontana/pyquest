@@ -729,14 +729,14 @@
    "color": "#a78bfa",
    "level": "beginner",
    "status": "full",
-   "estimatedHours": 10,
+   "estimatedHours": 16,
    "requires": [],
    "grants": [
     "csharp-basics-skill",
     "static-typing"
    ],
    "legacyIds": [],
-   "moduleCount": 1,
+   "moduleCount": 2,
    "compiled": true,
    "runner": "csharp"
   },
@@ -837,7 +837,7 @@
    "color": "#06b6d4",
    "level": "beginner",
    "status": "full",
-   "estimatedHours": 12,
+   "estimatedHours": 18,
    "requires": [
     "css-layout"
    ],
@@ -845,7 +845,7 @@
     "css-frameworks"
    ],
    "legacyIds": [],
-   "moduleCount": 1,
+   "moduleCount": 2,
    "runner": "tailwind"
   },
   {
