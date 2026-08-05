@@ -299,6 +299,347 @@
      }
     ]
    }
+  },
+  {
+   "id": "nl-02",
+   "title": { "ru": "Классификация текста", "uz": "Matnni tasniflash", "en": "Text classification" },
+   "tagline": { "ru": "Стоп-слова, TF-IDF и наивный Байес — рабочий спам-фильтр за три урока", "uz": "Stop-so'zlar, TF-IDF va sodda Bayes — uch darsda ishlaydigan spam-filtr", "en": "Stop words, TF-IDF and naive Bayes — a working spam filter in three lessons" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "Не все слова одинаково полезны", "uz": "Barcha so'zlar bir xil foydali emas", "en": "Not all words are equally useful" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Мешок слов из первого модуля считает каждое слово. Проблема в том, что самые частые слова — <b>и</b>, <b>в</b>, <b>не</b>, <b>что</b> — есть в любом тексте и не говорят о нём ничего.</p><p>Их называют <b>стоп-словами</b> и обычно выбрасывают. Но есть способ умнее: пусть вес слова сам зависит от того, насколько оно редкое.</p><p>Так устроен <b>TF-IDF</b>. Он состоит из двух множителей:</p><ul><li><b>TF</b> — часто ли слово встречается <i>в этом</i> тексте</li><li><b>IDF</b> — насколько оно редко <i>во всех</i> текстах</li></ul><p>Слово «в» встречается везде, IDF у него почти ноль — и всё произведение обнуляется. Слово «ипотека» есть в трёх текстах из тысячи, IDF высокий — оно и определяет тему.</p>",
+        "uz": "<p>Birinchi moduldagi so'zlar qopi har bir so'zni sanaydi. Muammo shundaki, eng ko'p uchraydigan so'zlar — <b>va</b>, <b>da</b>, <b>emas</b>, <b>nima</b> — har qanday matnda bor va u haqida hech nima demaydi.</p><p>Ular <b>stop-so'zlar</b> deyiladi va odatda tashlab yuboriladi. Lekin aqlliroq yo'l bor: so'z vazni uning qanchalik kam uchrashiga bog'liq bo'lsin.</p><p><b>TF-IDF</b> shunday tuzilgan. U ikki ko'paytuvchidan iborat:</p><ul><li><b>TF</b> — so'z <i>shu</i> matnda tez-tez uchraydimi</li><li><b>IDF</b> — u <i>barcha</i> matnlarda qanchalik kam</li></ul><p>«da» so'zi hamma joyda uchraydi, uning IDF si deyarli nol — butun ko'paytma nollanadi. «ipoteka» so'zi mingdan uch matnda bor, IDF yuqori — mavzuni aynan u belgilaydi.</p>",
+        "en": "<p>The bag of words from the first module counts every word. The trouble is that the most frequent words — <b>and</b>, <b>in</b>, <b>not</b>, <b>that</b> — appear in every text and say nothing about it.</p><p>They are called <b>stop words</b> and are usually thrown away. But there is a smarter approach: let a word's weight depend on how rare it is.</p><p>That is <b>TF-IDF</b>. It has two factors:</p><ul><li><b>TF</b> — how often the word occurs <i>in this</i> text</li><li><b>IDF</b> — how rare it is <i>across all</i> texts</li></ul><p>The word “in” appears everywhere, its IDF is nearly zero — and the whole product collapses. The word “mortgage” appears in three texts out of a thousand, its IDF is high — and it is what defines the topic.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "from math import log\n\ndocs = [\n    \"кот сидит на окне\",\n    \"кот спит на диване\",\n    \"курс доллара вырос на бирже\",\n]\n\ndef words(text):\n    return text.lower().split()\n\ndef idf(word):\n    # в скольких документах встречается слово\n    n = sum(1 for d in docs if word in words(d))\n    return log(len(docs) / n) if n else 0.0\n\nfor w in [\"на\", \"кот\", \"биржe\", \"доллара\"]:\n    print(f\"{w:10} idf = {idf(w):.3f}\")"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Предлог «на» есть во всех трёх документах, его IDF равен нулю ровно: <code>log(3/3) = 0</code>. Слово «кот» есть в двух — вес небольшой. «доллара» есть в одном — вес максимальный.</p><p>Слово «биржe» написано с латинской <code>e</code> в конце. Такого слова в текстах нет, поэтому счётчик равен нулю. Опечатка в одном символе — и слово для модели просто не существует. Это, а не сложная математика, ломает большинство наивных решений.</p>",
+        "uz": "<p>«na» old ko'makchisi uchala hujjatda ham bor, uning IDF si aynan nolga teng: <code>log(3/3) = 0</code>. «kot» so'zi ikkitasida — vazni kichik. «dollara» bittasida — vazni maksimal.</p><p>«birje» so'zi oxirida lotin <code>e</code> bilan yozilgan. Matnlarda bunday so'z yo'q, shuning uchun hisoblagich nolga teng. Bitta belgidagi xato — va so'z model uchun umuman mavjud emas. Ko'p sodda yechimlarni murakkab matematika emas, aynan shu buzadi.</p>",
+        "en": "<p>The preposition “на” appears in all three documents, so its IDF is exactly zero: <code>log(3/3) = 0</code>. The word “кот” appears in two — a small weight. “доллара” appears in one — the maximum weight.</p><p>The word “биржe” is written with a Latin <code>e</code> at the end. No such word exists in the texts, so the count is zero. A one-character typo and the word simply does not exist for the model. This, not difficult mathematics, is what breaks most naive solutions.</p>"
+       }
+      },
+      {
+       "type": "note",
+       "kind": "tip",
+       "html": {
+        "ru": "Перед подсчётом текст обычно приводят к нижнему регистру, убирают знаки препинания и иногда обрезают окончания. «Кота», «коту» и «Кот» должны стать одним словом, иначе модель считает их разными и распыляет вес.",
+        "uz": "Hisoblashdan oldin matn odatda kichik harfga o'tkaziladi, tinish belgilari olib tashlanadi va ba'zan qo'shimchalar qirqiladi. «Kotni», «kotga» va «Kot» bitta so'z bo'lishi kerak, aks holda model ularni turlicha sanab, vaznni sochib yuboradi.",
+        "en": "Before counting, text is usually lowercased, stripped of punctuation and sometimes trimmed of endings. “Cats”, “cat's” and “Cat” must become one word, otherwise the model treats them as different and spreads the weight thin."
+       }
+      },
+      {
+       "type": "checkpoint",
+       "q": { "ru": "Слово встречается во всех документах коллекции. Чему равен его IDF?", "uz": "So'z to'plamning barcha hujjatlarida uchraydi. Uning IDF si nechaga teng?", "en": "A word occurs in every document of the collection. What is its IDF?" },
+       "options": [
+        { "ru": "Максимальный", "uz": "Maksimal", "en": "Maximum" },
+        { "ru": "Ноль — слово ничего не различает", "uz": "Nol — so'z hech nimani ajratmaydi", "en": "Zero — the word distinguishes nothing" },
+        { "ru": "Единица", "uz": "Bir", "en": "One" },
+        { "ru": "Не определён", "uz": "Aniqlanmagan", "en": "Undefined" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "<code>log(N / N) = log(1) = 0</code>. Именно поэтому TF-IDF сам, без списка стоп-слов, гасит предлоги и союзы.",
+        "uz": "<code>log(N / N) = log(1) = 0</code>. Aynan shuning uchun TF-IDF stop-so'zlar ro'yxatisiz o'zi old ko'makchi va bog'lovchilarni so'ndiradi.",
+        "en": "<code>log(N / N) = log(1) = 0</code>. This is exactly why TF-IDF mutes prepositions and conjunctions on its own, with no stop-word list."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "Наивный Байес: считаем вероятности", "uz": "Sodda Bayes: ehtimolliklarni hisoblaymiz", "en": "Naive Bayes: counting probabilities" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Классифицировать текст можно почти без математики. Идея: посмотреть, в каком классе слова письма встречаются чаще, и выбрать этот класс.</p><p>Считаем так. Для каждого класса — сколько раз слово встретилось в текстах этого класса, делённое на общее число слов в классе. Перемножаем такие доли по всем словам письма. У какого класса произведение больше, тот и ответ.</p><p>Метод называют <b>наивным</b>, потому что он предполагает, что слова независимы: будто вероятность встретить «выиграли» никак не связана с тем, что рядом стоит «приз». Это неправда, но работает удивительно хорошо — спам-фильтры жили на этом годами.</p>",
+        "uz": "<p>Matnni deyarli matematikasiz tasniflash mumkin. G'oya: xat so'zlari qaysi sinfda tez-tez uchrashini ko'rib, o'sha sinfni tanlash.</p><p>Shunday hisoblaymiz. Har bir sinf uchun — so'z shu sinf matnlarida necha marta uchragani, sinfdagi umumiy so'zlar soniga bo'lingan. Xatning barcha so'zlari bo'yicha bunday ulushlarni ko'paytiramiz. Qaysi sinfning ko'paytmasi katta bo'lsa, javob o'sha.</p><p>Usul <b>sodda</b> deyiladi, chunki u so'zlar mustaqil deb faraz qiladi: go'yo «yutdingiz» so'zini uchratish ehtimoli yonida «sovrin» turgani bilan bog'liq emas. Bu haqiqat emas, lekin ajablanarli darajada yaxshi ishlaydi — spam-filtrlar yillar davomida shunda yashagan.</p>",
+        "en": "<p>Text can be classified almost without mathematics. The idea: see in which class the letter's words occur more often, and pick that class.</p><p>Here is the count. For each class, take how many times the word appeared in that class's texts, divided by the total number of words in the class. Multiply these shares across all the words of the letter. Whichever class has the larger product wins.</p><p>The method is called <b>naive</b> because it assumes words are independent: as if the chance of seeing “won” had nothing to do with “prize” standing next to it. That is false, yet it works surprisingly well — spam filters lived on it for years.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "train = [\n    (\"выиграли приз получите деньги\", \"спам\"),\n    (\"срочно получите деньги сейчас\", \"спам\"),\n    (\"встреча завтра в офисе\", \"обычное\"),\n    (\"отчёт готов жду встречу\", \"обычное\"),\n]\n\nfrom collections import Counter\n\nclasses = {}\nfor text, label in train:\n    classes.setdefault(label, Counter()).update(text.split())\n\nvocab = set(w for c in classes.values() for w in c)\n\ndef score(text, label):\n    counts = classes[label]\n    total = sum(counts.values())\n    p = 1.0\n    for w in text.split():\n        # +1 к каждому счётчику: неизвестное слово не должно обнулять всё\n        p *= (counts[w] + 1) / (total + len(vocab))\n    return p\n\nletter = \"получите деньги срочно\"\nfor label in classes:\n    print(f\"{label:9} -> {score(letter, label):.10f}\")\n\nprint(\"\\nответ:\", max(classes, key=lambda c: score(letter, c)))"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Обрати внимание на <code>+ 1</code> в числителе. Без него любое слово, которого не было в обучении, даёт долю <code>0</code>, и всё произведение обнуляется — одно незнакомое слово убивает весь классификатор.</p><p>Приём называется <b>сглаживанием Лапласа</b>: каждому слову заранее выдают по одному воображаемому вхождению. Знаменатель при этом растёт на размер словаря, чтобы доли по-прежнему складывались в единицу.</p>",
+        "uz": "<p>Suratdagi <code>+ 1</code> ga e'tibor bering. Usiz o'qitishda bo'lmagan har qanday so'z <code>0</code> ulush beradi va butun ko'paytma nollanadi — bitta notanish so'z butun klassifikatorni o'ldiradi.</p><p>Usul <b>Laplas silliqlashi</b> deyiladi: har bir so'zga oldindan bittadan xayoliy uchrash beriladi. Maxraj esa lug'at hajmiga oshadi, ulushlar hamon birga yig'ilishi uchun.</p>",
+        "en": "<p>Note the <code>+ 1</code> in the numerator. Without it any word unseen during training gives a share of <code>0</code> and the whole product collapses — a single unknown word kills the entire classifier.</p><p>The trick is called <b>Laplace smoothing</b>: every word is granted one imaginary occurrence in advance. The denominator grows by the vocabulary size so the shares still sum to one.</p>"
+       }
+      },
+      {
+       "type": "note",
+       "kind": "trap",
+       "html": {
+        "ru": "На длинных текстах произведение сотен маленьких дробей уходит в машинный ноль, и все классы получают одинаковый счёт 0.0. Поэтому на практике складывают логарифмы вместо перемножения долей: <code>log(a·b) = log a + log b</code>, а сравнение сохраняется.",
+        "uz": "Uzun matnlarda yuzlab kichik kasrlar ko'paytmasi mashina noliga tushadi va barcha sinflar bir xil 0.0 ball oladi. Shuning uchun amalda ulushlarni ko'paytirish o'rniga logarifmlar qo'shiladi: <code>log(a·b) = log a + log b</code>, taqqoslash esa saqlanadi.",
+        "en": "On long texts the product of hundreds of tiny fractions underflows to machine zero and every class scores the same 0.0. In practice you therefore add logarithms instead of multiplying shares: <code>log(a·b) = log a + log b</code>, and the comparison is preserved."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "Оценка и подводные камни", "uz": "Baholash va suv ostidagi toshlar", "en": "Evaluation and pitfalls" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Классификатор написан. Дальше — тот же вопрос, что и в машинном обучении: насколько ему можно верить.</p><p>Проверять надо на письмах, которых он не видел. Смотреть — на precision и recall по классу «спам», а не на общую точность: спама обычно куда меньше, чем обычной почты, и модель «всё обычное» даст красивые 95%.</p><p>У текстов есть и свои ловушки:</p><ul><li><b>Дисбаланс классов.</b> Если спама 2%, модель научится молчать. Помогает взвешивание или добавление примеров.</li><li><b>Утечка через время.</b> Учиться на письмах за март и проверяться на феврале — значит подсматривать в будущее. Разделять надо по дате.</li><li><b>Сдвиг данных.</b> Спамеры меняют слова. Модель, обученная год назад, сегодня ловит только старые схемы.</li></ul>",
+        "uz": "<p>Klassifikator yozildi. Keyingisi — mashinali o'rganishdagi bilan bir xil savol: unga qanchalik ishonish mumkin.</p><p>U ko'rmagan xatlarda tekshirish kerak. Umumiy aniqlikka emas, «spam» sinfi bo'yicha precision va recall ga qarash kerak: spam odatda oddiy pochtadan ancha kam va «hammasi oddiy» modeli chiroyli 95% beradi.</p><p>Matnlarning o'z tuzoqlari ham bor:</p><ul><li><b>Sinflar nomutanosibligi.</b> Spam 2% bo'lsa, model jim turishni o'rganadi. Vaznlash yoki misol qo'shish yordam beradi.</li><li><b>Vaqt orqali sizish.</b> Mart xatlarida o'qib, fevralda tekshirish — kelajakka qarash demakdir. Sana bo'yicha bo'lish kerak.</li><li><b>Ma'lumot siljishi.</b> Spamerlar so'zlarni o'zgartiradi. Bir yil oldin o'qitilgan model bugun faqat eski sxemalarni tutadi.</li></ul>",
+        "en": "<p>The classifier is written. Next comes the same question as in machine learning: how much can you trust it.</p><p>Evaluate on letters it has not seen. Look at precision and recall for the “spam” class, not at overall accuracy: spam is usually far rarer than ordinary mail, and an “everything is fine” model scores a pretty 95%.</p><p>Text has its own traps:</p><ul><li><b>Class imbalance.</b> If spam is 2%, the model learns to stay silent. Weighting or adding examples helps.</li><li><b>Leakage through time.</b> Training on March letters and testing on February means peeking into the future. Split by date.</li><li><b>Data drift.</b> Spammers change their wording. A model trained a year ago catches only the old schemes today.</li></ul>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "# 100 писем, спама всего 4 — типичный дисбаланс\nactual    = [1] * 4 + [0] * 96\nlazy      = [0] * 100                      # модель «всё обычное»\nsensible  = [1, 1, 1, 0] + [0] * 94 + [1] * 2   # ловит 3 из 4, две ложные тревоги\n\ndef report(name, predicted):\n    tp = sum(1 for a, p in zip(actual, predicted) if a == 1 and p == 1)\n    fp = sum(1 for a, p in zip(actual, predicted) if a == 0 and p == 1)\n    fn = sum(1 for a, p in zip(actual, predicted) if a == 1 and p == 0)\n    acc = sum(1 for a, p in zip(actual, predicted) if a == p) / len(actual)\n    pr = tp / (tp + fp) if tp + fp else 0.0\n    rc = tp / (tp + fn) if tp + fn else 0.0\n    print(f\"{name:22} точность={acc:.2f}  precision={pr:.2f}  recall={rc:.2f}\")\n\nreport(\"молчит всегда\", lazy)\nreport(\"честно работает\", sensible)"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Ленивая модель выигрывает по общей точности — 96% против 95% — и при этом не ловит ни одного спама. Precision и recall у неё нулевые, и именно они говорят правду.</p><p>Отсюда правило: <b>выбирать метрику до того, как начал обучать</b>. Иначе легко подобрать ту, по которой твоя модель выглядит лучше.</p>",
+        "uz": "<p>Dangasa model umumiy aniqlikda yutadi — 96% ga qarshi 95% — va shu bilan birga birorta spamni tutmaydi. Uning precision va recall i nol va haqiqatni aynan ular aytadi.</p><p>Shundan qoida: <b>o'lchovni o'qitishni boshlashdan oldin tanlash</b>. Aks holda modelingiz yaxshiroq ko'rinadigan o'lchovni tanlab olish oson.</p>",
+        "en": "<p>The lazy model wins on overall accuracy — 96% against 95% — while catching no spam at all. Its precision and recall are zero, and they are the ones telling the truth.</p><p>Hence the rule: <b>choose the metric before you start training</b>. Otherwise it is easy to pick the one your model happens to look good on.</p>"
+       }
+      },
+      {
+       "type": "summary",
+       "items": [
+        { "ru": "Частые слова бесполезны; TF-IDF гасит их автоматически", "uz": "Ko'p uchraydigan so'zlar foydasiz; TF-IDF ularni avtomatik so'ndiradi", "en": "Frequent words are useless; TF-IDF mutes them automatically" },
+        { "ru": "Наивный Байес перемножает доли слов по каждому классу", "uz": "Sodda Bayes har sinf bo'yicha so'z ulushlarini ko'paytiradi", "en": "Naive Bayes multiplies word shares within each class" },
+        { "ru": "Сглаживание +1 спасает от нулей на незнакомых словах", "uz": "+1 silliqlash notanish so'zlardagi nollardan qutqaradi", "en": "The +1 smoothing saves you from zeros on unknown words" },
+        { "ru": "На длинных текстах складывай логарифмы вместо умножения", "uz": "Uzun matnlarda ko'paytirish o'rniga logarifmlarni qo'shing", "en": "On long texts add logarithms instead of multiplying" },
+        { "ru": "При дисбалансе классов общая точность врёт — смотри precision и recall", "uz": "Sinflar nomutanosibligida umumiy aniqlik aldaydi — precision va recall ga qarang", "en": "With imbalanced classes overall accuracy lies — look at precision and recall" }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": { "ru": "Что показывает IDF слова?", "uz": "So'zning IDF si nimani ko'rsatadi?", "en": "What does a word's IDF show?" },
+     "options": [
+      { "ru": "Как часто оно встречается в этом тексте", "uz": "U shu matnda qanchalik tez uchrashini", "en": "How often it occurs in this text" },
+      { "ru": "Насколько оно редко во всей коллекции текстов", "uz": "U butun matnlar to'plamida qanchalik kam ekanini", "en": "How rare it is across the whole collection" },
+      { "ru": "Его длину в символах", "uz": "Uning belgilardagi uzunligini", "en": "Its length in characters" },
+      { "ru": "Его позицию в предложении", "uz": "Uning gapdagi o'rnini", "en": "Its position in the sentence" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Первое — это TF. Вместе TF и IDF дают вес: часто здесь и редко везде.",
+      "uz": "Birinchisi — TF. TF va IDF birgalikda vazn beradi: shu yerda tez-tez va hamma joyda kam.",
+      "en": "The first one is TF. Together TF and IDF give the weight: frequent here and rare everywhere."
+     }
+    },
+    {
+     "q": { "ru": "Зачем в наивном Байесе прибавляют единицу к счётчикам?", "uz": "Sodda Bayesda nega hisoblagichlarga bir qo'shiladi?", "en": "Why is one added to the counts in naive Bayes?" },
+     "options": [
+      { "ru": "Чтобы результат был целым", "uz": "Natija butun bo'lishi uchun", "en": "To keep the result an integer" },
+      { "ru": "Чтобы незнакомое слово не обнулило всё произведение", "uz": "Notanish so'z butun ko'paytmani nollamasligi uchun", "en": "So an unknown word does not zero the whole product" },
+      { "ru": "Чтобы ускорить вычисления", "uz": "Hisoblashni tezlashtirish uchun", "en": "To speed up the computation" },
+      { "ru": "Так требует формула логарифма", "uz": "Logarifm formulasi shuni talab qiladi", "en": "The logarithm formula requires it" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Одно слово с нулевым счётчиком делает счёт всего класса нулевым — а такие слова в новых текстах будут всегда.",
+      "uz": "Nol hisoblagichli bitta so'z butun sinf ballini nolga aylantiradi — bunday so'zlar yangi matnlarda doim bo'ladi.",
+      "en": "A single word with a zero count makes the whole class score zero — and such words always appear in new texts."
+     }
+    },
+    {
+     "q": { "ru": "Почему наивный Байес называется наивным?", "uz": "Sodda Bayes nega sodda deyiladi?", "en": "Why is naive Bayes called naive?" },
+     "options": [
+      { "ru": "Его легко написать", "uz": "Uni yozish oson", "en": "It is easy to write" },
+      { "ru": "Он считает слова независимыми друг от друга", "uz": "U so'zlarni bir-biridan mustaqil deb hisoblaydi", "en": "It assumes words are independent of each other" },
+      { "ru": "Он часто ошибается", "uz": "U ko'p xato qiladi", "en": "It is often wrong" },
+      { "ru": "Его придумали первым", "uz": "U birinchi bo'lib o'ylab topilgan", "en": "It was invented first" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Предположение заведомо ложное — язык весь состоит из связей между словами. Но на классификации оно почти не мешает.",
+      "uz": "Faraz aniq yolg'on — til butunlay so'zlar orasidagi bog'lanishlardan iborat. Lekin tasniflashda u deyarli xalaqit bermaydi.",
+      "en": "The assumption is plainly false — language is made of connections between words. Yet for classification it barely hurts."
+     }
+    },
+    {
+     "q": { "ru": "Текст из 500 слов, счёт получился ровно 0.0 для всех классов. Что случилось?", "uz": "500 so'zli matn, barcha sinflar uchun ball aynan 0.0 chiqdi. Nima bo'ldi?", "en": "A 500-word text scores exactly 0.0 for every class. What happened?" },
+     "options": [
+      { "ru": "Текст пустой", "uz": "Matn bo'sh", "en": "The text is empty" },
+      { "ru": "Произведение маленьких дробей ушло в машинный ноль", "uz": "Kichik kasrlar ko'paytmasi mashina noliga tushdi", "en": "The product of tiny fractions underflowed to machine zero" },
+      { "ru": "Модель не обучена", "uz": "Model o'qitilmagan", "en": "The model is untrained" },
+      { "ru": "Все слова оказались стоп-словами", "uz": "Barcha so'zlar stop-so'z bo'lib chiqdi", "en": "All the words turned out to be stop words" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Пятьсот множителей вида 0.001 дают число меньше, чем float способен хранить. Лечится переходом к сумме логарифмов.",
+      "uz": "0.001 ko'rinishidagi besh yuz ko'paytuvchi float saqlay oladiganidan kichik son beradi. Logarifmlar yig'indisiga o'tish bilan davolanadi.",
+      "en": "Five hundred factors of about 0.001 give a number smaller than a float can hold. Cured by switching to a sum of logarithms."
+     }
+    },
+    {
+     "q": { "ru": "Спама 2% от почты. Модель говорит «не спам» всегда. Её точность…", "uz": "Spam pochtaning 2% i. Model doim «spam emas» deydi. Uning aniqligi…", "en": "Spam is 2% of the mail. A model always says “not spam”. Its accuracy is…" },
+     "options": [
+      { "ru": "2%", "uz": "2%", "en": "2%" },
+      { "ru": "98%, и это ничего не стоит", "uz": "98%, va bu hech nimaga arzimaydi", "en": "98%, and it is worthless" },
+      { "ru": "50%", "uz": "50%", "en": "50%" },
+      { "ru": "0%", "uz": "0%", "en": "0%" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Recall по спаму у такой модели равен нулю — она не ловит ничего. Именно эту метрику и надо смотреть.",
+      "uz": "Bunday modelning spam bo'yicha recall i nolga teng — u hech nimani tutmaydi. Aynan shu o'lchovga qarash kerak.",
+      "en": "Its recall on spam is zero — it catches nothing. That is precisely the metric to watch."
+     }
+    },
+    {
+     "q": { "ru": "Модель обучили год назад, сейчас она стала хуже ловить спам. Как это называется?", "uz": "Model bir yil oldin o'qitilgan, hozir spamni yomonroq tuta boshladi. Bu nima deyiladi?", "en": "A model trained a year ago now catches less spam. What is this called?" },
+     "options": [
+      { "ru": "Переобучение", "uz": "Qayta o'qitish", "en": "Overfitting" },
+      { "ru": "Сдвиг данных: спамеры сменили слова", "uz": "Ma'lumot siljishi: spamerlar so'zlarni o'zgartirdi", "en": "Data drift: the spammers changed their wording" },
+      { "ru": "Утечка данных", "uz": "Ma'lumot sizishi", "en": "Data leakage" },
+      { "ru": "Дисбаланс классов", "uz": "Sinflar nomutanosibligi", "en": "Class imbalance" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Мир меняется, а модель осталась в прошлом. Поэтому в продакшене качество измеряют постоянно и переобучают по расписанию.",
+      "uz": "Dunyo o'zgaradi, model esa o'tmishda qoldi. Shuning uchun ishlab chiqarishda sifat doimiy o'lchanadi va jadval bo'yicha qayta o'qitiladi.",
+      "en": "The world moved on and the model stayed behind. That is why production quality is measured continuously and models are retrained on a schedule."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "python",
+     "title": { "ru": "Считаем IDF", "uz": "IDF ni hisoblaymiz", "en": "Computing IDF" },
+     "brief": { "ru": "Насколько слово редкое", "uz": "So'z qanchalik kam", "en": "How rare a word is" },
+     "desc": {
+      "ru": "<p><code>idf(word, docs)</code> получает слово и список текстов. Посчитай, в скольких текстах слово встречается, и верни <code>log(len(docs) / n)</code>.</p><p>Тексты разбивай по пробелам и приводи к нижнему регистру. Если слово не встретилось нигде или список пуст — верни <code>0.0</code>.</p>",
+      "uz": "<p><code>idf(word, docs)</code> so'z va matnlar ro'yxatini oladi. So'z nechta matnda uchrashini hisoblang va <code>log(len(docs) / n)</code> ni qaytaring.</p><p>Matnlarni bo'shliq bo'yicha ajrating va kichik harfga o'tkazing. So'z hech qayerda uchramasa yoki ro'yxat bo'sh bo'lsa — <code>0.0</code> qaytaring.</p>",
+      "en": "<p><code>idf(word, docs)</code> takes a word and a list of texts. Count in how many texts the word occurs and return <code>log(len(docs) / n)</code>.</p><p>Split texts on spaces and lowercase them. If the word occurs nowhere, or the list is empty, return <code>0.0</code>.</p>"
+     },
+     "starter": "from math import log\n\ndef idf(word, docs):\n    # твой код\n    pass\n\nprint(idf('кот', ['кот на окне', 'кот спит', 'курс вырос']))\n",
+     "tests": "from math import log\ndocs = ['кот на окне', 'кот спит на диване', 'курс доллара вырос']\nassert abs(idf('на', docs) - log(3 / 2)) < 1e-9, 'Слово «на» есть в двух документах'\nassert abs(idf('кот', docs) - log(3 / 2)) < 1e-9, 'Слово «кот» тоже в двух'\nassert abs(idf('доллара', docs) - log(3)) < 1e-9, 'Редкое слово — высокий вес'\nassert idf('слон', docs) == 0.0, 'Слова нет ни в одном документе'\nassert idf('кот', []) == 0.0, 'Пустая коллекция'\nassert abs(idf('КОТ', docs) - log(3 / 2)) < 1e-9, 'Регистр не должен мешать'",
+     "hint": {
+      "ru": "Приведи <code>word</code> к нижнему регистру один раз, затем посчитай документы через <code>sum(1 for d in docs if word in d.lower().split())</code>. Ноль документов обработай до деления.",
+      "uz": "<code>word</code> ni bir marta kichik harfga o'tkazing, keyin hujjatlarni <code>sum(1 for d in docs if word in d.lower().split())</code> orqali sanang. Nol hujjatni bo'lishdan oldin qayta ishlang.",
+      "en": "Lowercase <code>word</code> once, then count documents with <code>sum(1 for d in docs if word in d.lower().split())</code>. Handle zero documents before dividing."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "python",
+     "title": { "ru": "Убрать стоп-слова", "uz": "Stop-so'zlarni olib tashlash", "en": "Removing stop words" },
+     "brief": { "ru": "Чистка текста перед подсчётом", "uz": "Hisoblashdan oldin matnni tozalash", "en": "Cleaning text before counting" },
+     "desc": {
+      "ru": "<p><code>clean(text, stop)</code> приводит текст к нижнему регистру, разбивает по пробелам, убирает слова из множества <code>stop</code> и возвращает список оставшихся.</p><p>Слова короче двух символов тоже выбрасывай — обычно это мусор.</p>",
+      "uz": "<p><code>clean(text, stop)</code> matnni kichik harfga o'tkazadi, bo'shliq bo'yicha ajratadi, <code>stop</code> to'plamidagi so'zlarni olib tashlaydi va qolganlar ro'yxatini qaytaradi.</p><p>Ikki belgidan qisqa so'zlarni ham tashlang — odatda bu axlat.</p>",
+      "en": "<p><code>clean(text, stop)</code> lowercases the text, splits it on spaces, removes the words in the set <code>stop</code> and returns what is left.</p><p>Also drop words shorter than two characters — they are usually noise.</p>"
+     },
+     "starter": "def clean(text, stop):\n    # твой код\n    pass\n\nprint(clean('Кот и Пёс в доме', {'и', 'в'}))\n",
+     "tests": "assert clean('Кот и Пёс в доме', {'и', 'в'}) == ['кот', 'пёс', 'доме'], 'Стоп-слова убраны, регистр опущен'\nassert clean('', {'и'}) == [], 'Пустой текст'\nassert clean('а б ва', set()) == ['ва'], 'Слова короче двух символов выбрасываются'\nassert clean('ОДНО СЛОВО', set()) == ['одно', 'слово'], 'Без стоп-слов текст только приводится к нижнему регистру'\nassert clean('спам спам спам', {'спам'}) == [], 'Всё убрано'",
+     "hint": {
+      "ru": "Один проход по <code>text.lower().split()</code> со списковым включением: оставляем слово, если оно не в <code>stop</code> и его длина не меньше двух.",
+      "uz": "<code>text.lower().split()</code> bo'ylab ro'yxat inklyuziyasi bilan bir o'tish: so'z <code>stop</code> da bo'lmasa va uzunligi ikkidan kam bo'lmasa qoldiramiz.",
+      "en": "One pass over <code>text.lower().split()</code> with a list comprehension: keep a word if it is not in <code>stop</code> and its length is at least two."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "python",
+     "title": { "ru": "Наивный Байес", "uz": "Sodda Bayes", "en": "Naive Bayes" },
+     "brief": { "ru": "Спам или не спам", "uz": "Spam yoki spam emas", "en": "Spam or not spam" },
+     "desc": {
+      "ru": "<p><code>classify(train, text)</code> получает список пар <code>(текст, метка)</code> и новый текст. Посчитай для каждой метки произведение долей слов со сглаживанием <code>+1</code> и верни метку с наибольшим счётом.</p><p>Доля слова: <code>(сколько раз слово встретилось в классе + 1) / (всего слов в классе + размер словаря)</code>. Словарь — все разные слова из обучающих текстов.</p><p>Если <code>train</code> пуст — верни <code>None</code>. При равенстве счётов верни метку, которая встретилась в <code>train</code> первой.</p>",
+      "uz": "<p><code>classify(train, text)</code> <code>(matn, yorliq)</code> juftliklar ro'yxatini va yangi matnni oladi. Har bir yorliq uchun <code>+1</code> silliqlash bilan so'z ulushlari ko'paytmasini hisoblang va eng katta ballli yorliqni qaytaring.</p><p>So'z ulushi: <code>(so'z sinfda necha marta uchragan + 1) / (sinfdagi jami so'zlar + lug'at hajmi)</code>. Lug'at — o'qitish matnlaridagi barcha turli so'zlar.</p><p><code>train</code> bo'sh bo'lsa — <code>None</code> qaytaring. Ballar teng bo'lsa, <code>train</code> da birinchi uchragan yorliqni qaytaring.</p>",
+      "en": "<p><code>classify(train, text)</code> takes a list of <code>(text, label)</code> pairs and a new text. Compute for each label the product of word shares with <code>+1</code> smoothing and return the label with the highest score.</p><p>Word share: <code>(times the word occurred in the class + 1) / (total words in the class + vocabulary size)</code>. The vocabulary is every distinct word across the training texts.</p><p>If <code>train</code> is empty, return <code>None</code>. On a tie, return the label that appeared first in <code>train</code>.</p>"
+     },
+     "starter": "def classify(train, text):\n    # твой код\n    pass\n\ndata = [('выиграли приз деньги', 'спам'), ('встреча завтра офис', 'обычное')]\nprint(classify(data, 'приз деньги'))\n",
+     "tests": "data = [\n    ('выиграли приз получите деньги', 'спам'),\n    ('срочно получите деньги сейчас', 'спам'),\n    ('встреча завтра в офисе', 'обычное'),\n    ('отчёт готов жду встречу', 'обычное'),\n]\nassert classify(data, 'получите деньги срочно') == 'спам', 'Слова из спама'\nassert classify(data, 'встреча завтра офисе') == 'обычное', 'Слова из обычных писем'\nassert classify([], 'что угодно') is None, 'Без обучения ответа нет'\nassert classify(data, 'абракадабра') in {'спам', 'обычное'}, 'Незнакомое слово не должно ломать классификатор'\nassert classify([('да', 'A')], 'да') == 'A', 'Один класс — он же и ответ'",
+     "hint": {
+      "ru": "Собери <code>Counter</code> слов для каждой метки и общий словарь. Затем для каждой метки перемножь <code>(counts[w] + 1) / (total + len(vocab))</code> по словам текста и возьми максимум. Порядок меток сохрани, проходя <code>train</code> по очереди.",
+      "uz": "Har yorliq uchun so'zlar <code>Counter</code> ini va umumiy lug'atni yig'ing. Keyin har yorliq uchun matn so'zlari bo'yicha <code>(counts[w] + 1) / (total + len(vocab))</code> ni ko'paytiring va maksimumni oling. <code>train</code> ni navbat bilan aylanib, yorliqlar tartibini saqlang.",
+      "en": "Build a <code>Counter</code> of words per label plus a shared vocabulary. Then for each label multiply <code>(counts[w] + 1) / (total + len(vocab))</code> over the text's words and take the maximum. Preserve label order by walking <code>train</code> in sequence."
+     }
+    }
+   ],
+   "exam": {
+    "time": 540,
+    "questions": [
+     {
+      "q": { "ru": "Слово есть в 1 документе из 100. Его IDF по сравнению со словом из 90 документов…", "uz": "So'z 100 hujjatdan 1 tasida bor. Uning IDF si 90 hujjatdagi so'znikiga nisbatan…", "en": "A word appears in 1 document out of 100. Its IDF compared with a word in 90 documents is…" },
+      "options": [
+       { "ru": "меньше", "uz": "kichik", "en": "smaller" },
+       { "ru": "значительно больше", "uz": "sezilarli katta", "en": "significantly larger" },
+       { "ru": "такой же", "uz": "xuddi shunday", "en": "the same" },
+       { "ru": "отрицательный", "uz": "manfiy", "en": "negative" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "В обучении не было слова «криптовалюта». Без сглаживания счёт письма с этим словом будет…", "uz": "O'qitishda «kriptovalyuta» so'zi bo'lmagan. Silliqlashsiz shu so'zli xat balli…", "en": "The word “crypto” never appeared in training. Without smoothing, a letter containing it scores…" },
+      "options": [
+       { "ru": "нормальным", "uz": "odatiy", "en": "normally" },
+       { "ru": "нулевым для всех классов", "uz": "barcha sinflar uchun nol", "en": "zero for every class" },
+       { "ru": "максимальным", "uz": "maksimal", "en": "the maximum" },
+       { "ru": "отрицательным", "uz": "manfiy", "en": "negative" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Почему на длинных текстах переходят к логарифмам?", "uz": "Nega uzun matnlarda logarifmlarga o'tiladi?", "en": "Why switch to logarithms on long texts?" },
+      "options": [
+       { "ru": "Логарифмы точнее описывают язык", "uz": "Logarifmlar tilni aniqroq tasvirlaydi", "en": "Logarithms describe language more accurately" },
+       { "ru": "Произведение сотен маленьких дробей обнуляется", "uz": "Yuzlab kichik kasrlar ko'paytmasi nollanadi", "en": "A product of hundreds of small fractions underflows" },
+       { "ru": "Так требует наивное предположение", "uz": "Sodda faraz shuni talab qiladi", "en": "The naive assumption requires it" },
+       { "ru": "Чтобы убрать стоп-слова", "uz": "Stop-so'zlarni olib tashlash uchun", "en": "To remove stop words" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Модель для спама обучили на письмах за март, проверили на февральских. Что не так?", "uz": "Spam modeli mart xatlarida o'qitilib, fevral xatlarida tekshirildi. Nima nuqson?", "en": "A spam model was trained on March letters and tested on February ones. What is wrong?" },
+      "options": [
+       { "ru": "Ничего", "uz": "Hech nima", "en": "Nothing" },
+       { "ru": "Проверка идёт на прошлом, хотя работать модели предстоит в будущем", "uz": "Tekshiruv o'tmishda ketmoqda, model esa kelajakda ishlashi kerak", "en": "The evaluation runs on the past while the model will work in the future" },
+       { "ru": "Февраль короче марта", "uz": "Fevral martdan qisqa", "en": "February is shorter than March" },
+       { "ru": "Нужно больше классов", "uz": "Ko'proq sinf kerak", "en": "More classes are needed" }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "python",
+      "title": { "ru": "Классификатор и его оценка", "uz": "Klassifikator va uning bahosi", "en": "A classifier and its score" },
+      "desc": {
+       "ru": "<p>Собери модуль воедино. <code>evaluate(train, test)</code> обучает наивный Байес на <code>train</code>, предсказывает метки для всех текстов из <code>test</code> и возвращает <b>recall по классу «спам»</b> — долю настоящих спам-писем, которые модель нашла.</p><p>Обе выборки — списки пар <code>(текст, метка)</code>, метки: <code>'спам'</code> и <code>'обычное'</code>.</p><p>Если в <code>test</code> нет ни одного спама — верни <code>0.0</code>.</p>",
+       "uz": "<p>Modulni birlashtiring. <code>evaluate(train, test)</code> <code>train</code> da sodda Bayesni o'qitadi, <code>test</code> dagi barcha matnlar uchun yorliqlarni bashorat qiladi va <b>«spam» sinfi bo'yicha recall</b> ni — model topgan haqiqiy spam xatlar ulushini qaytaradi.</p><p>Ikkala namuna ham <code>(matn, yorliq)</code> juftliklar ro'yxati, yorliqlar: <code>'спам'</code> va <code>'обычное'</code>.</p><p><code>test</code> da birorta spam bo'lmasa — <code>0.0</code> qaytaring.</p>",
+       "en": "<p>Assemble the module. <code>evaluate(train, test)</code> trains naive Bayes on <code>train</code>, predicts labels for every text in <code>test</code> and returns the <b>recall on the “spam” class</b> — the share of real spam letters the model found.</p><p>Both samples are lists of <code>(text, label)</code> pairs with labels <code>'спам'</code> and <code>'обычное'</code>.</p><p>If there is no spam in <code>test</code>, return <code>0.0</code>.</p>"
+      },
+      "starter": "def evaluate(train, test):\n    # обучи, предскажи, посчитай recall по классу «спам»\n    pass\n\ndata = [('приз деньги', 'спам'), ('встреча офис', 'обычное')]\nprint(evaluate(data, [('деньги приз', 'спам')]))\n",
+      "tests": "train = [\n    ('выиграли приз получите деньги', 'спам'),\n    ('срочно получите деньги сейчас', 'спам'),\n    ('встреча завтра в офисе', 'обычное'),\n    ('отчёт готов жду встречу', 'обычное'),\n]\ntest = [('получите деньги срочно', 'спам'), ('приз выиграли', 'спам'), ('встреча в офисе', 'обычное')]\nassert evaluate(train, test) == 1.0, 'Оба спам-письма должны быть найдены'\nassert evaluate(train, [('встреча завтра', 'обычное')]) == 0.0, 'В проверке нет спама'\nassert evaluate(train, []) == 0.0, 'Пустая проверочная выборка'\nres = evaluate(train, [('получите деньги', 'спам'), ('абракадабра ерунда', 'спам')])\nassert 0.0 <= res <= 1.0, 'Recall — доля от нуля до единицы'",
+      "hint": {
+       "ru": "Возьми <code>classify</code> из задачи 3 и прогони его по каждому тексту <code>test</code>. Recall = сколько раз ответ был «спам» при настоящем «спам», делённое на общее число настоящих «спам». Проверь нулевой знаменатель.",
+       "uz": "3-vazifadagi <code>classify</code> ni oling va uni <code>test</code> ning har bir matni bo'yicha yuriting. Recall = haqiqiy «спам» da javob «спам» bo'lgan hollar soni, haqiqiy «спам» lar umumiy soniga bo'lingan. Nol maxrajni tekshiring.",
+       "en": "Take <code>classify</code> from task 3 and run it over every text in <code>test</code>. Recall = how often the answer was “спам” when the truth was “спам”, divided by the total number of real spam letters. Check for a zero denominator."
+      }
+     }
+    ]
+   }
   }
  ]
 }

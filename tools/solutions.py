@@ -124,6 +124,57 @@ print(split([1, 2, 3, 4, 5], 0.6))""",
     return float(sum(abs(k * x - y) for x, y in test) / len(test))
 
 print(evaluate([(1, 2), (2, 4), (3, 6), (4, 8)], 0.5))""",
+'ml-intro/ml-02/t1': """from math import sqrt
+
+def knn(train, point, k):
+    if not train:
+        return None
+    ranked = sorted(train, key=lambda row: sqrt(sum((a - b) ** 2 for a, b in zip(row[0], point))))
+    labels = [label for _, label in ranked[:k]]
+    return max(set(labels), key=labels.count)
+
+print(knn([([0], 'A'), ([1], 'A'), ([10], 'B')], [9], 1))""",
+'ml-intro/ml-02/t2': """def scores(actual, predicted):
+    tp = sum(1 for a, p in zip(actual, predicted) if a == 1 and p == 1)
+    fp = sum(1 for a, p in zip(actual, predicted) if a == 0 and p == 1)
+    fn = sum(1 for a, p in zip(actual, predicted) if a == 1 and p == 0)
+    precision = tp / (tp + fp) if tp + fp else 0.0
+    recall = tp / (tp + fn) if tp + fn else 0.0
+    return precision, recall
+
+print(scores([1, 0, 1, 1], [1, 1, 0, 1]))""",
+'ml-intro/ml-02/t3': """def normalize(rows):
+    if not rows:
+        return []
+    cols = list(zip(*rows))
+    lo = [min(c) for c in cols]
+    hi = [max(c) for c in cols]
+    out = []
+    for row in rows:
+        out.append([(v - l) / (h - l) if h > l else 0.0 for v, l, h in zip(row, lo, hi)])
+    return out
+
+print(normalize([[10, 100], [20, 300], [30, 200]]))""",
+'ml-intro/ml-02/exam0': """from math import sqrt
+
+def run_knn(train, test, k):
+    if not test:
+        return (0.0, 0.0)
+    predicted = []
+    for point, _ in test:
+        ranked = sorted(train, key=lambda row: sqrt(sum((a - b) ** 2 for a, b in zip(row[0], point))))
+        labels = [label for _, label in ranked[:k]]
+        predicted.append(max(set(labels), key=labels.count))
+    actual = [label for _, label in test]
+    tp = sum(1 for a, p in zip(actual, predicted) if a == 1 and p == 1)
+    fp = sum(1 for a, p in zip(actual, predicted) if a == 0 and p == 1)
+    fn = sum(1 for a, p in zip(actual, predicted) if a == 1 and p == 0)
+    precision = tp / (tp + fp) if tp + fp else 0.0
+    recall = tp / (tp + fn) if tp + fn else 0.0
+    return precision, recall
+
+train = [([0], 0), ([1], 0), ([10], 1), ([11], 1)]
+print(run_knn(train, [([2], 0), ([9], 1)], 1))""",
 
 # ===== dl-intro =====
 'dl-intro/dl-01/t1': """def neuron(inputs, weights, bias):
@@ -155,6 +206,46 @@ print(step(0.0, [(1, 3), (2, 6)], 0.1))""",
     return w
 
 print(train([(1, 3), (2, 6), (3, 9)], 0.05, 50))""",
+'dl-intro/dl-02/t1': """def slope(f, x, h=1e-6):
+    return (f(x + h) - f(x)) / h
+
+print(slope(lambda v: v * v, 3))""",
+'dl-intro/dl-02/t2': """def descend(f, start, rate, steps):
+    h = 1e-6
+    x = start
+    for _ in range(steps):
+        x = x - rate * (f(x + h) - f(x)) / h
+    return x
+
+print(descend(lambda x: (x - 3) ** 2, 10.0, 0.1, 50))""",
+'dl-intro/dl-02/t3': """def diagnose(losses):
+    if len(losses) < 2:
+        return 'стоит'
+    if losses[-1] < losses[0]:
+        return 'сходится'
+    if losses[-1] > losses[0]:
+        return 'расходится'
+    return 'стоит'
+
+print(diagnose([10, 5, 2, 1]))""",
+'dl-intro/dl-02/exam0': """def train(xs, ys, rate, epochs):
+    if not xs:
+        return (0.0, 0.0)
+    h = 1e-6
+    w, b = 0.0, 0.0
+
+    def mse(w, b):
+        return sum((w * x + b - y) ** 2 for x, y in zip(xs, ys)) / len(xs)
+
+    for _ in range(epochs):
+        base = mse(w, b)
+        gw = (mse(w + h, b) - base) / h
+        gb = (mse(w, b + h) - base) / h
+        w -= rate * gw
+        b -= rate * gb
+    return (w, b)
+
+print(train([1, 2, 3, 4, 5], [3, 5, 7, 9, 11], 0.02, 300))""",
 
 # ===== nlp-intro =====
 'nlp-intro/nl-01/t1': """def tokenize(text):
@@ -211,6 +302,75 @@ def most_similar(query, docs):
     return best
 
 print(most_similar('python код', ['борщ рецепт', 'python простой код']))""",
+'nlp-intro/nl-02/t1': """from math import log
+
+def idf(word, docs):
+    if not docs:
+        return 0.0
+    w = word.lower()
+    n = sum(1 for d in docs if w in d.lower().split())
+    if not n:
+        return 0.0
+    return log(len(docs) / n)
+
+print(idf('кот', ['кот на окне', 'кот спит', 'курс вырос']))""",
+'nlp-intro/nl-02/t2': """def clean(text, stop):
+    return [w for w in text.lower().split() if w not in stop and len(w) >= 2]
+
+print(clean('Кот и Пёс в доме', {'и', 'в'}))""",
+'nlp-intro/nl-02/t3': """def classify(train, text):
+    if not train:
+        return None
+    counts = {}
+    vocab = set()
+    for doc, label in train:
+        words = doc.lower().split()
+        bag = counts.setdefault(label, {})
+        for w in words:
+            bag[w] = bag.get(w, 0) + 1
+            vocab.add(w)
+
+    def score(label):
+        bag = counts[label]
+        total = sum(bag.values())
+        p = 1.0
+        for w in text.lower().split():
+            p *= (bag.get(w, 0) + 1) / (total + len(vocab))
+        return p
+
+    return max(counts, key=score)
+
+data = [('выиграли приз деньги', 'спам'), ('встреча завтра офис', 'обычное')]
+print(classify(data, 'приз деньги'))""",
+'nlp-intro/nl-02/exam0': """def evaluate(train, test):
+    if not train or not test:
+        return 0.0
+    counts = {}
+    vocab = set()
+    for doc, label in train:
+        bag = counts.setdefault(label, {})
+        for w in doc.lower().split():
+            bag[w] = bag.get(w, 0) + 1
+            vocab.add(w)
+
+    def classify(text):
+        def score(label):
+            bag = counts[label]
+            total = sum(bag.values())
+            p = 1.0
+            for w in text.lower().split():
+                p *= (bag.get(w, 0) + 1) / (total + len(vocab))
+            return p
+        return max(counts, key=score)
+
+    real = sum(1 for _, label in test if label == 'спам')
+    if not real:
+        return 0.0
+    found = sum(1 for doc, label in test if label == 'спам' and classify(doc) == 'спам')
+    return found / real
+
+data = [('приз деньги', 'спам'), ('встреча офис', 'обычное')]
+print(evaluate(data, [('деньги приз', 'спам')]))""",
 
 # ===== cv-intro =====
 'cv-intro/cv-01/t1': """def invert(image):

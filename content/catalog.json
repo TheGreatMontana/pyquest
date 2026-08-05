@@ -864,7 +864,7 @@
    "color": "#a78bfa",
    "level": "intermediate",
    "status": "full",
-   "estimatedHours": 10,
+   "estimatedHours": 16,
    "requires": [
     "python-collections"
    ],
@@ -872,7 +872,7 @@
     "ml-basics"
    ],
    "legacyIds": [],
-   "moduleCount": 1,
+   "moduleCount": 2,
    "runner": "python"
   },
   {
@@ -891,7 +891,7 @@
    "color": "#c084fc",
    "level": "intermediate",
    "status": "full",
-   "estimatedHours": 10,
+   "estimatedHours": 16,
    "requires": [
     "ml-basics"
    ],
@@ -899,7 +899,7 @@
     "dl-basics"
    ],
    "legacyIds": [],
-   "moduleCount": 1,
+   "moduleCount": 2,
    "runner": "python"
   },
   {
@@ -918,7 +918,7 @@
    "color": "#38bdf8",
    "level": "intermediate",
    "status": "full",
-   "estimatedHours": 9,
+   "estimatedHours": 15,
    "requires": [
     "python-collections"
    ],
@@ -926,7 +926,7 @@
     "nlp-basics"
    ],
    "legacyIds": [],
-   "moduleCount": 1,
+   "moduleCount": 2,
    "runner": "python"
   },
   {

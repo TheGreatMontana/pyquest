@@ -303,6 +303,347 @@
      }
     ]
    }
+  },
+  {
+   "id": "dl-02",
+   "title": { "ru": "Градиентный спуск: как сеть находит веса", "uz": "Gradient tushish: tarmoq vaznlarni qanday topadi", "en": "Gradient descent: how a network finds its weights" },
+   "tagline": { "ru": "Производная численно, шаг обучения, эпохи и почему сеть иногда расходится", "uz": "Sonli hosila, o'qitish qadami, epoxalar va nega tarmoq ba'zan uzoqlashadi", "en": "Numeric derivatives, the learning rate, epochs and why a network sometimes diverges" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "Производная без формул", "uz": "Formulasiz hosila", "en": "Derivatives without formulas" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Обучение — это спуск с горы в тумане. Ты стоишь в точке, видишь только землю под ногами и хочешь вниз. Единственное, что доступно, — <b>наклон</b> прямо здесь.</p><p>Наклон и есть производная. Считать её через формулы не обязательно: достаточно сдвинуться на крошечный шаг вправо и посмотреть, насколько изменилось значение.</p><p><code>(f(x + h) − f(x)) / h</code> при очень маленьком <code>h</code> — это и есть численная производная. Настоящие библиотеки считают точнее и быстрее, но смысл ровно такой.</p><p>Если наклон положительный, функция растёт вправо — значит вниз надо влево. Отсюда правило шага: <code>x = x − скорость · наклон</code>. Знак минус разворачивает нас в сторону спуска.</p>",
+        "uz": "<p>O'qitish — bu tumanda tog'dan tushish. Siz bir nuqtada turibsiz, faqat oyoq ostidagi yerni ko'rasiz va pastga tushmoqchisiz. Yagona mavjud narsa — aynan shu yerdagi <b>qiyalik</b>.</p><p>Qiyalik — bu hosila. Uni formulalar orqali hisoblash shart emas: kichkina qadam o'ngga siljib, qiymat qanchalik o'zgarganiga qarash yetarli.</p><p>Juda kichik <code>h</code> da <code>(f(x + h) − f(x)) / h</code> — bu sonli hosila. Haqiqiy kutubxonalar aniqroq va tezroq hisoblaydi, lekin mohiyati aynan shunday.</p><p>Qiyalik musbat bo'lsa, funksiya o'ngga o'sadi — demak pastga chapga borish kerak. Shundan qadam qoidasi: <code>x = x − tezlik · qiyalik</code>. Minus ishorasi bizni tushish tomoniga buradi.</p>",
+        "en": "<p>Training is walking down a mountain in fog. You stand at a point, see only the ground under your feet, and want to go down. The only thing available is the <b>slope</b> right here.</p><p>That slope is the derivative. You do not need formulas to get it: nudge one tiny step to the right and see how much the value changed.</p><p><code>(f(x + h) − f(x)) / h</code> for a very small <code>h</code> is the numeric derivative. Real libraries compute it more precisely and faster, but the meaning is exactly this.</p><p>If the slope is positive the function rises to the right — so downhill is to the left. Hence the step rule: <code>x = x − rate · slope</code>. The minus turns us towards the descent.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "def loss(x):\n    # яма с минимумом в x = 3\n    return (x - 3) ** 2\n\ndef slope(f, x, h=1e-6):\n    return (f(x + h) - f(x)) / h\n\nx = 10.0\nrate = 0.1\n\nfor step in range(1, 21):\n    g = slope(loss, x)\n    x = x - rate * g\n    if step % 4 == 0:\n        print(f\"шаг {step:2}: x = {x:.4f}, потери = {loss(x):.6f}\")\n\nprint(f\"итог: x ≈ {x:.3f} (минимум в 3)\")"
+      },
+      {
+       "type": "note",
+       "kind": "tip",
+       "html": {
+        "ru": "Заметь: про то, что минимум в тройке, программа не знала. Она пришла туда, зная только наклон под ногами. Ровно так же обучается сеть с миллиардом весов — просто наклон считается сразу по всем.",
+        "uz": "E'tibor bering: minimum uchda ekanini dastur bilmagan. U faqat oyoq ostidagi qiyalikni bilib, o'sha yerga keldi. Milliard vaznli tarmoq ham xuddi shunday o'qiydi — shunchaki qiyalik hammasi bo'yicha birdan hisoblanadi.",
+        "en": "Note: the program never knew the minimum was at three. It got there knowing only the slope underfoot. A network with a billion weights trains exactly the same way — the slope is simply computed for all of them at once."
+       }
+      },
+      {
+       "type": "checkpoint",
+       "q": { "ru": "Наклон в текущей точке равен −4, скорость обучения 0.1. Куда сдвинется x?", "uz": "Joriy nuqtadagi qiyalik −4, o'qitish tezligi 0.1. x qayerga siljiydi?", "en": "The slope at the current point is −4 and the learning rate is 0.1. Where does x move?" },
+       "options": [
+        { "ru": "Уменьшится на 0.4", "uz": "0.4 ga kamayadi", "en": "It decreases by 0.4" },
+        { "ru": "Увеличится на 0.4", "uz": "0.4 ga ortadi", "en": "It increases by 0.4" },
+        { "ru": "Не изменится", "uz": "O'zgarmaydi", "en": "It stays the same" },
+        { "ru": "Увеличится на 4", "uz": "4 ga ortadi", "en": "It increases by 4" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "<code>x − 0.1 · (−4) = x + 0.4</code>. Отрицательный наклон означает, что функция убывает вправо, туда и шагаем.",
+        "uz": "<code>x − 0.1 · (−4) = x + 0.4</code>. Manfiy qiyalik funksiya o'ngga kamayishini bildiradi, o'sha yoqqa qadam tashlaymiz.",
+        "en": "<code>x − 0.1 · (−4) = x + 0.4</code>. A negative slope means the function decreases to the right, so that is where we step."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "Скорость обучения и эпохи", "uz": "O'qitish tezligi va epoxalar", "en": "Learning rate and epochs" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Размер шага — <b>скорость обучения</b> (learning rate). Это первое, что настраивают, и первое, что ломает обучение.</p><ul><li><b>Слишком маленькая</b> — сеть ползёт. Тысяча эпох, а потери почти те же.</li><li><b>Слишком большая</b> — сеть перепрыгивает минимум, попадает на противоположный склон выше, чем была, и с каждым шагом улетает дальше. Потери растут до бесконечности. Это называется <b>расхождением</b>.</li></ul><p>Один полный проход по всем обучающим данным называется <b>эпохой</b>. Обучение — это много эпох подряд, и после каждой потери должны падать. Если они скачут вверх — почти всегда виновата скорость обучения.</p>",
+        "uz": "<p>Qadam o'lchami — <b>o'qitish tezligi</b> (learning rate). Bu birinchi bo'lib sozlanadigan va birinchi bo'lib o'qitishni buzadigan narsa.</p><ul><li><b>Juda kichik</b> — tarmoq o'rmalaydi. Ming epoxa o'tadi, yo'qotish esa deyarli o'sha-o'sha.</li><li><b>Juda katta</b> — tarmoq minimumdan sakrab o'tadi, qarama-qarshi yonbag'irga oldingidan balandroq tushadi va har qadamda uzoqroq uchadi. Yo'qotish cheksizgacha o'sadi. Bu <b>uzoqlashish</b> deyiladi.</li></ul><p>Barcha o'qitish ma'lumotlari bo'yicha bir to'liq o'tish <b>epoxa</b> deyiladi. O'qitish — ketma-ket ko'p epoxa, va har biridan keyin yo'qotish tushishi kerak. Agar u yuqoriga sakrasa — deyarli doim o'qitish tezligi aybdor.</p>",
+        "en": "<p>The step size is the <b>learning rate</b>. It is the first thing you tune and the first thing that breaks training.</p><ul><li><b>Too small</b> — the network crawls. A thousand epochs later the loss is nearly unchanged.</li><li><b>Too large</b> — the network jumps over the minimum, lands on the opposite slope higher than it started, and flies further away with every step. The loss grows without bound. This is called <b>divergence</b>.</li></ul><p>One full pass over all the training data is an <b>epoch</b>. Training is many epochs in a row, and after each one the loss should fall. If it jumps upwards, the learning rate is almost always to blame.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "def loss(x):\n    return (x - 3) ** 2\n\ndef slope(f, x, h=1e-6):\n    return (f(x + h) - f(x)) / h\n\ndef descend(rate, steps=8):\n    x = 10.0\n    path = []\n    for _ in range(steps):\n        x = x - rate * slope(loss, x)\n        path.append(round(loss(x), 2))\n    return path\n\nprint(\"rate = 0.01 (мелкий шаг):\", descend(0.01))\nprint(\"rate = 0.10 (в самый раз):\", descend(0.10))\nprint(\"rate = 1.05 (слишком много):\", descend(1.05))"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Третья строка — та самая расходимость. Потери не просто не падают, они растут по экспоненте, и через десяток шагов в весах окажется <code>inf</code>, а затем <code>nan</code>. Дальше сеть уже не лечится: <code>nan</code> заражает все вычисления, и обучение приходится начинать заново.</p><p>Практическое правило: если после первых эпох потери ушли вверх — уменьшай скорость обучения в десять раз и пробуй снова. Это чинит больше проблем, чем любая замена архитектуры.</p>",
+        "uz": "<p>Uchinchi qator — o'sha uzoqlashish. Yo'qotish nafaqat tushmaydi, balki eksponensial o'sadi va o'nlab qadamdan keyin vaznlarda <code>inf</code>, so'ng <code>nan</code> paydo bo'ladi. Undan keyin tarmoq davolanmaydi: <code>nan</code> barcha hisoblarni zararlaydi va o'qitishni qaytadan boshlashga to'g'ri keladi.</p><p>Amaliy qoida: birinchi epoxalardan keyin yo'qotish yuqoriga ketgan bo'lsa — o'qitish tezligini o'n barobar kamaytiring va qayta urinib ko'ring. Bu har qanday arxitektura almashtirishdan ko'ra ko'proq muammoni tuzatadi.</p>",
+        "en": "<p>The third line is that divergence. The loss does not merely fail to fall, it grows exponentially, and within a dozen steps the weights hold <code>inf</code> and then <code>nan</code>. After that the network is beyond repair: <code>nan</code> infects every computation and training must restart.</p><p>Rule of thumb: if the loss goes up after the first epochs, divide the learning rate by ten and try again. This fixes more problems than any change of architecture.</p>"
+       }
+      },
+      {
+       "type": "predict",
+       "code": "x = 1.0\nrate = 2.0\n\n# минимум функции (x - 0) ** 2 находится в нуле\nfor _ in range(3):\n    gradient = 2 * x\n    x = x - rate * gradient\n    print(round(x, 3))",
+       "options": [
+        { "ru": "Значения падают к нулю", "uz": "Qiymatlar nolga tushadi", "en": "The values fall towards zero" },
+        { "ru": "Значения прыгают, меняя знак, и растут по модулю", "uz": "Qiymatlar ishorasini o'zgartirib sakraydi va moduli bo'yicha o'sadi", "en": "The values bounce, flipping sign, and grow in magnitude" },
+        { "ru": "Значения не меняются", "uz": "Qiymatlar o'zgarmaydi", "en": "The values do not change" },
+        { "ru": "Ошибка деления", "uz": "Bo'lish xatosi", "en": "A division error" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "<code>x − 2 · 2x = −3x</code>. Каждый шаг умножает x на −3: 1, −3, 9, −27. Классическое расхождение из-за слишком большой скорости обучения.",
+        "uz": "<code>x − 2 · 2x = −3x</code>. Har qadam x ni −3 ga ko'paytiradi: 1, −3, 9, −27. Juda katta o'qitish tezligi tufayli klassik uzoqlashish.",
+        "en": "<code>x − 2 · 2x = −3x</code>. Every step multiplies x by −3: 1, −3, 9, −27. Classic divergence caused by too large a learning rate."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "Обучаем настоящую модель", "uz": "Haqiqiy modelni o'qitamiz", "en": "Training a real model" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Соберём всё. Модель <code>y = w · x + b</code> с двумя весами. Потери — средний квадрат ошибки. Наклон считаем по каждому весу отдельно: сдвигаем только его, остальные держим на месте.</p><p>Так и работает <b>обратное распространение</b> в настоящих сетях. Разница лишь в том, что там наклоны по всем весам получают одним проходом назад по слоям, а не отдельным пересчётом для каждого. Идея же ровно эта: узнать, как изменятся потери, если чуть подвинуть данный вес.</p>",
+        "uz": "<p>Hammasini yig'amiz. Ikki vaznli <code>y = w · x + b</code> modeli. Yo'qotish — o'rtacha kvadratik xato. Qiyalikni har bir vazn bo'yicha alohida hisoblaymiz: faqat o'shani siljitamiz, qolganini joyida ushlaymiz.</p><p>Haqiqiy tarmoqlarda <b>teskari tarqalish</b> ham shunday ishlaydi. Farqi shundaki, u yerda barcha vaznlar bo'yicha qiyaliklar qatlamlar bo'ylab bitta orqaga o'tishda olinadi, har biri uchun alohida qayta hisoblash bilan emas. G'oya esa aynan shu: shu vazn biroz siljisa, yo'qotish qanday o'zgarishini bilish.</p>",
+        "en": "<p>Let us assemble everything. The model <code>y = w · x + b</code> has two weights. The loss is the mean squared error. We compute the slope for each weight separately: nudge only that one and hold the rest still.</p><p>This is how <b>backpropagation</b> works in real networks too. The only difference is that there the slopes for all weights arrive in a single backward pass through the layers rather than a separate recomputation for each. The idea is exactly this: find out how the loss changes if this particular weight moves a little.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "xs = [1, 2, 3, 4, 5]\nys = [3, 5, 7, 9, 11]        # настоящая зависимость: y = 2x + 1\n\nw, b = 0.0, 0.0\nrate = 0.02\nh = 1e-6\n\ndef mse(w, b):\n    return sum((w * x + b - y) ** 2 for x, y in zip(xs, ys)) / len(xs)\n\nfor epoch in range(1, 301):\n    # наклон по каждому весу: двигаем только его\n    gw = (mse(w + h, b) - mse(w, b)) / h\n    gb = (mse(w, b + h) - mse(w, b)) / h\n    w -= rate * gw\n    b -= rate * gb\n    if epoch % 100 == 0:\n        print(f\"эпоха {epoch:3}: w={w:.3f} b={b:.3f} потери={mse(w, b):.5f}\")\n\nprint(f\"\\nвыучено: y = {w:.2f}·x + {b:.2f}\")\nprint(\"предсказание для x=10:\", round(w * 10 + b, 2))"
+      },
+      {
+       "type": "note",
+       "kind": "trap",
+       "html": {
+        "ru": "Веса почти никогда не начинают с нуля в настоящих сетях. Если все нейроны слоя стартуют одинаковыми, они получают одинаковый наклон и остаются одинаковыми навсегда — слой из ста нейронов работает как один. Поэтому веса инициализируют случайными числами.",
+        "uz": "Haqiqiy tarmoqlarda vaznlar deyarli hech qachon noldan boshlanmaydi. Qatlamning barcha neyronlari bir xil boshlansa, ular bir xil qiyalik oladi va abadiy bir xil qoladi — yuz neyronli qatlam bitta bo'lib ishlaydi. Shuning uchun vaznlar tasodifiy sonlar bilan boshlanadi.",
+        "en": "In real networks weights almost never start at zero. If every neuron in a layer starts identical, they all receive the same slope and stay identical forever — a hundred-neuron layer behaves as one. That is why weights are initialised randomly."
+       }
+      },
+      {
+       "type": "summary",
+       "items": [
+        { "ru": "Наклон можно получить численно: сдвинуть на h и посмотреть разницу", "uz": "Qiyalikni sonli olish mumkin: h ga siljitib, farqqa qarash", "en": "A slope can be found numerically: nudge by h and look at the difference" },
+        { "ru": "Шаг обучения: вес минус скорость, умноженная на наклон", "uz": "O'qitish qadami: vazn minus tezlik karra qiyalik", "en": "The training step: weight minus rate times slope" },
+        { "ru": "Эпоха — один полный проход по обучающим данным", "uz": "Epoxa — o'qitish ma'lumoti bo'yicha bir to'liq o'tish", "en": "An epoch is one full pass over the training data" },
+        { "ru": "Слишком большая скорость обучения даёт расхождение и nan", "uz": "Juda katta o'qitish tezligi uzoqlashish va nan beradi", "en": "Too large a learning rate causes divergence and nan" },
+        { "ru": "Одинаковые начальные веса делают слой бесполезным", "uz": "Bir xil boshlang'ich vaznlar qatlamni foydasiz qiladi", "en": "Identical initial weights make a layer useless" }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": { "ru": "Что делает шаг градиентного спуска?", "uz": "Gradient tushish qadami nima qiladi?", "en": "What does a gradient descent step do?" },
+     "options": [
+      { "ru": "Прибавляет к весу наклон", "uz": "Vaznga qiyalikni qo'shadi", "en": "Adds the slope to the weight" },
+      { "ru": "Вычитает из веса наклон, умноженный на скорость обучения", "uz": "Vazndan qiyalik karra o'qitish tezligini ayiradi", "en": "Subtracts the slope times the learning rate from the weight" },
+      { "ru": "Умножает вес на наклон", "uz": "Vaznni qiyalikka ko'paytiradi", "en": "Multiplies the weight by the slope" },
+      { "ru": "Обнуляет вес", "uz": "Vaznni nollaydi", "en": "Zeroes the weight" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Минус разворачивает движение в сторону убывания потерь, а скорость обучения задаёт длину шага.",
+      "uz": "Minus harakatni yo'qotish kamayishi tomoniga buradi, o'qitish tezligi esa qadam uzunligini beradi.",
+      "en": "The minus turns the motion towards decreasing loss, and the learning rate sets the step length."
+     }
+    },
+    {
+     "q": { "ru": "Потери с каждой эпохой растут всё быстрее. Что менять в первую очередь?", "uz": "Yo'qotish har epoxada tezroq o'smoqda. Birinchi navbatda nimani o'zgartirish kerak?", "en": "The loss grows faster with every epoch. What do you change first?" },
+     "options": [
+      { "ru": "Добавить слоёв", "uz": "Qatlam qo'shish", "en": "Add more layers" },
+      { "ru": "Уменьшить скорость обучения", "uz": "O'qitish tezligini kamaytirish", "en": "Reduce the learning rate" },
+      { "ru": "Увеличить количество эпох", "uz": "Epoxalar sonini oshirish", "en": "Increase the number of epochs" },
+      { "ru": "Собрать больше данных", "uz": "Ko'proq ma'lumot yig'ish", "en": "Collect more data" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Растущие потери — почти всегда расхождение из-за слишком длинного шага. Больше эпох тут только ускорит катастрофу.",
+      "uz": "O'suvchi yo'qotish — deyarli doim juda uzun qadam tufayli uzoqlashish. Ko'proq epoxa bu yerda faqat halokatni tezlashtiradi.",
+      "en": "Rising loss is nearly always divergence from too long a step. More epochs would only speed up the disaster."
+     }
+    },
+    {
+     "q": { "ru": "Что такое эпоха?", "uz": "Epoxa nima?", "en": "What is an epoch?" },
+     "options": [
+      { "ru": "Один шаг по одному примеру", "uz": "Bitta misol bo'yicha bir qadam", "en": "One step on one example" },
+      { "ru": "Один полный проход по всем обучающим данным", "uz": "Barcha o'qitish ma'lumoti bo'yicha bir to'liq o'tish", "en": "One full pass over all the training data" },
+      { "ru": "Время работы модели в продакшене", "uz": "Modelning ishlab chiqarishdagi ishlash vaqti", "en": "The model's runtime in production" },
+      { "ru": "Количество слоёв", "uz": "Qatlamlar soni", "en": "The number of layers" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Сотни эпох — норма. Внутри каждой данные обычно разбивают на пачки и делают шаг после каждой.",
+      "uz": "Yuzlab epoxa — odatiy hol. Har birining ichida ma'lumot odatda to'plamlarga bo'linadi va har biridan keyin qadam tashlanadi.",
+      "en": "Hundreds of epochs are normal. Inside each one the data is usually split into batches with a step after every batch."
+     }
+    },
+    {
+     "q": { "ru": "Почему нельзя инициализировать все веса слоя нулями?", "uz": "Nega qatlamning barcha vaznlarini nol bilan boshlash mumkin emas?", "en": "Why can't all weights in a layer be initialised to zero?" },
+     "options": [
+      { "ru": "Ноль запрещён в математике", "uz": "Nol matematikada taqiqlangan", "en": "Zero is forbidden in mathematics" },
+      { "ru": "Все нейроны получат одинаковый наклон и останутся одинаковыми", "uz": "Barcha neyronlar bir xil qiyalik oladi va bir xil qoladi", "en": "Every neuron gets the same slope and stays identical" },
+      { "ru": "Обучение пойдёт слишком быстро", "uz": "O'qitish juda tez ketadi", "en": "Training would go too fast" },
+      { "ru": "Память переполнится", "uz": "Xotira to'lib ketadi", "en": "Memory would overflow" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Симметрия не ломается сама: сто одинаковых нейронов навсегда останутся одним. Случайная инициализация её и ломает.",
+      "uz": "Simmetriya o'zi buzilmaydi: yuzta bir xil neyron abadiy bitta bo'lib qoladi. Tasodifiy boshlash uni buzadi.",
+      "en": "The symmetry does not break by itself: a hundred identical neurons stay one forever. Random initialisation is what breaks it."
+     }
+    },
+    {
+     "q": { "ru": "Скорость обучения очень маленькая. Что будет?", "uz": "O'qitish tezligi juda kichik. Nima bo'ladi?", "en": "The learning rate is very small. What happens?" },
+     "options": [
+      { "ru": "Обучение разойдётся", "uz": "O'qitish uzoqlashadi", "en": "Training diverges" },
+      { "ru": "Потери будут падать, но очень медленно", "uz": "Yo'qotish tushadi, lekin juda sekin", "en": "The loss falls, but very slowly" },
+      { "ru": "Модель переобучится мгновенно", "uz": "Model bir zumda qayta o'qib ketadi", "en": "The model overfits instantly" },
+      { "ru": "Веса станут nan", "uz": "Vaznlar nan bo'ladi", "en": "The weights become nan" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Направление верное, длина шага крошечная. Это не ошибка, а трата времени — и риск остановиться, не дойдя.",
+      "uz": "Yo'nalish to'g'ri, qadam uzunligi juda kichik. Bu xato emas, vaqt sarfi — va yetib bormay to'xtash xavfi.",
+      "en": "The direction is right, the step is tiny. Not an error but a waste of time — and a risk of stopping before arriving."
+     }
+    },
+    {
+     "q": { "ru": "Как численно найти наклон функции в точке?", "uz": "Funksiya qiyaligini nuqtada sonli qanday topish mumkin?", "en": "How do you find a function's slope at a point numerically?" },
+     "options": [
+      { "ru": "Взять значение функции в этой точке", "uz": "Shu nuqtadagi funksiya qiymatini olish", "en": "Take the function's value at that point" },
+      { "ru": "Сдвинуться на маленькое h и поделить разницу значений на h", "uz": "Kichik h ga siljib, qiymatlar farqini h ga bo'lish", "en": "Nudge by a small h and divide the change in value by h" },
+      { "ru": "Возвести значение в квадрат", "uz": "Qiymatni kvadratga ko'tarish", "en": "Square the value" },
+      { "ru": "Никак, нужны формулы производных", "uz": "Hech qanday, hosila formulalari kerak", "en": "You cannot; you need derivative formulas" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Формулы дают точность и скорость, но принципиально они не нужны — этот способ работает для любой функции, которую можно вычислить.",
+      "uz": "Formulalar aniqlik va tezlik beradi, lekin printsipial jihatdan ular shart emas — bu usul hisoblash mumkin bo'lgan har qanday funksiya uchun ishlaydi.",
+      "en": "Formulas give precision and speed, but in principle they are not required — this works for any function you can evaluate."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "python",
+     "title": { "ru": "Численная производная", "uz": "Sonli hosila", "en": "Numeric derivative" },
+     "brief": { "ru": "Наклон без формул", "uz": "Formulasiz qiyalik", "en": "A slope without formulas" },
+     "desc": {
+      "ru": "<p>Напиши <code>slope(f, x, h=1e-6)</code> — численный наклон функции <code>f</code> в точке <code>x</code>: <code>(f(x + h) − f(x)) / h</code>.</p>",
+      "uz": "<p><code>slope(f, x, h=1e-6)</code> yozing — <code>f</code> funksiyaning <code>x</code> nuqtadagi sonli qiyaligi: <code>(f(x + h) − f(x)) / h</code>.</p>",
+      "en": "<p>Write <code>slope(f, x, h=1e-6)</code> — the numeric slope of <code>f</code> at <code>x</code>: <code>(f(x + h) − f(x)) / h</code>.</p>"
+     },
+     "starter": "def slope(f, x, h=1e-6):\n    # твой код\n    pass\n\nprint(slope(lambda v: v * v, 3))\n",
+     "tests": "assert abs(slope(lambda v: v * v, 3) - 6) < 1e-3, 'Производная x² в точке 3 равна 6'\nassert abs(slope(lambda v: 5 * v, 100) - 5) < 1e-3, 'У прямой наклон постоянный'\nassert abs(slope(lambda v: 7, 2)) < 1e-6, 'У константы наклон нулевой'\nassert abs(slope(lambda v: (v - 3) ** 2, 3)) < 1e-3, 'В минимуме наклон близок к нулю'\nassert abs(slope(lambda v: v * v, 2, h=1e-4) - 4) < 1e-2, 'Шаг h передаётся именованным аргументом'",
+     "hint": {
+      "ru": "Одна строка: вернуть <code>(f(x + h) - f(x)) / h</code>. Значение <code>h</code> уже задано по умолчанию.",
+      "uz": "Bir qator: <code>(f(x + h) - f(x)) / h</code> ni qaytarish. <code>h</code> qiymati sukut bo'yicha berilgan.",
+      "en": "One line: return <code>(f(x + h) - f(x)) / h</code>. The default <code>h</code> is already given."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "python",
+     "title": { "ru": "Спуск к минимуму", "uz": "Minimumga tushish", "en": "Descending to the minimum" },
+     "brief": { "ru": "Шаги градиентного спуска", "uz": "Gradient tushish qadamlari", "en": "Gradient descent steps" },
+     "desc": {
+      "ru": "<p><code>descend(f, start, rate, steps)</code> начинает в точке <code>start</code> и делает <code>steps</code> шагов градиентного спуска по функции <code>f</code>. Верни точку, в которой оказался.</p><p>Наклон считай численно с <code>h = 1e-6</code>. При <code>steps = 0</code> верни <code>start</code>.</p>",
+      "uz": "<p><code>descend(f, start, rate, steps)</code> <code>start</code> nuqtadan boshlaydi va <code>f</code> funksiya bo'yicha <code>steps</code> ta gradient tushish qadamini bajaradi. Yakuniy nuqtani qaytaring.</p><p>Qiyalikni <code>h = 1e-6</code> bilan sonli hisoblang. <code>steps = 0</code> bo'lsa <code>start</code> ni qaytaring.</p>",
+      "en": "<p><code>descend(f, start, rate, steps)</code> begins at <code>start</code> and performs <code>steps</code> gradient descent steps on <code>f</code>. Return the point it ends up at.</p><p>Compute the slope numerically with <code>h = 1e-6</code>. With <code>steps = 0</code> return <code>start</code>.</p>"
+     },
+     "starter": "def descend(f, start, rate, steps):\n    # твой код\n    pass\n\nprint(descend(lambda x: (x - 3) ** 2, 10.0, 0.1, 50))\n",
+     "tests": "res = descend(lambda x: (x - 3) ** 2, 10.0, 0.1, 100)\nassert abs(res - 3) < 0.01, 'За сто шагов должны прийти к минимуму в 3'\nassert descend(lambda x: x * x, 5.0, 0.1, 0) == 5.0, 'Ноль шагов — точка не меняется'\nres2 = descend(lambda x: (x + 7) ** 2, 0.0, 0.1, 200)\nassert abs(res2 + 7) < 0.01, 'Минимум слева — идём влево'\nslow = descend(lambda x: (x - 3) ** 2, 10.0, 0.001, 5)\nassert slow > 9.8, 'С крошечной скоростью за пять шагов почти не сдвинемся'\nbad = descend(lambda x: x * x, 1.0, 2.0, 5)\nassert abs(bad) > 1, 'Слишком большая скорость уводит от минимума'",
+     "hint": {
+      "ru": "Цикл на <code>steps</code> повторов, внутри — <code>x = x - rate * (f(x + h) - f(x)) / h</code>. Переменную <code>x</code> начни со <code>start</code>.",
+      "uz": "<code>steps</code> takrorlanadigan sikl, ichida — <code>x = x - rate * (f(x + h) - f(x)) / h</code>. <code>x</code> o'zgaruvchini <code>start</code> dan boshlang.",
+      "en": "A loop of <code>steps</code> iterations with <code>x = x - rate * (f(x + h) - f(x)) / h</code> inside. Start <code>x</code> at <code>start</code>."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "python",
+     "title": { "ru": "Расходится или сходится", "uz": "Uzoqlashadimi yoki yaqinlashadimi", "en": "Diverging or converging" },
+     "brief": { "ru": "Диагностика обучения", "uz": "O'qitish diagnostikasi", "en": "Diagnosing training" },
+     "desc": {
+      "ru": "<p>Тебе дают список потерь по эпохам. <code>diagnose(losses)</code> возвращает строку:</p><ul><li><code>'сходится'</code> — последнее значение меньше первого</li><li><code>'расходится'</code> — последнее больше первого</li><li><code>'стоит'</code> — они равны, а также если список короче двух элементов</li></ul>",
+      "uz": "<p>Sizga epoxalar bo'yicha yo'qotishlar ro'yxati beriladi. <code>diagnose(losses)</code> satr qaytaradi:</p><ul><li><code>'сходится'</code> — oxirgi qiymat birinchisidan kichik</li><li><code>'расходится'</code> — oxirgisi birinchisidan katta</li><li><code>'стоит'</code> — ular teng, shuningdek ro'yxat ikki elementdan qisqa bo'lsa</li></ul>",
+      "en": "<p>You are given a list of losses per epoch. <code>diagnose(losses)</code> returns a string:</p><ul><li><code>'сходится'</code> — the last value is smaller than the first</li><li><code>'расходится'</code> — the last is larger than the first</li><li><code>'стоит'</code> — they are equal, and also when the list is shorter than two items</li></ul>"
+     },
+     "starter": "def diagnose(losses):\n    # твой код\n    pass\n\nprint(diagnose([10, 5, 2, 1]))\n",
+     "tests": "assert diagnose([10, 5, 2, 1]) == 'сходится', 'Потери падают'\nassert diagnose([1, 9, 81, 729]) == 'расходится', 'Потери растут'\nassert diagnose([4, 7, 4]) == 'стоит', 'Начало и конец совпали'\nassert diagnose([]) == 'стоит', 'Пустой список'\nassert diagnose([5]) == 'стоит', 'Одного значения мало для вывода'\nassert diagnose([100, 0.001]) == 'сходится', 'Резкое падение — тоже сходимость'",
+     "hint": {
+      "ru": "Сначала отсеки списки короче двух элементов. Дальше сравни <code>losses[-1]</code> с <code>losses[0]</code>.",
+      "uz": "Avval ikki elementdan qisqa ro'yxatlarni ajrating. Keyin <code>losses[-1]</code> ni <code>losses[0]</code> bilan solishtiring.",
+      "en": "First filter out lists shorter than two items. Then compare <code>losses[-1]</code> with <code>losses[0]</code>."
+     }
+    }
+   ],
+   "exam": {
+    "time": 540,
+    "questions": [
+     {
+      "q": { "ru": "Наклон равен 0. Что произойдёт на следующем шаге?", "uz": "Qiyalik 0 ga teng. Keyingi qadamda nima bo'ladi?", "en": "The slope is 0. What happens on the next step?" },
+      "options": [
+       { "ru": "Вес улетит в бесконечность", "uz": "Vazn cheksizlikka uchadi", "en": "The weight flies to infinity" },
+       { "ru": "Вес не изменится — мы в точке, где спускаться некуда", "uz": "Vazn o'zgarmaydi — biz tushadigan joy yo'q nuqtadamiz", "en": "The weight stays put — we are where there is nowhere to descend" },
+       { "ru": "Обучение начнётся заново", "uz": "O'qitish qaytadan boshlanadi", "en": "Training restarts" },
+       { "ru": "Скорость обучения удвоится", "uz": "O'qitish tezligi ikki barobar ortadi", "en": "The learning rate doubles" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Потери за пять эпох: 8.0, 3.1, 1.4, 0.9, 0.7. Что это?", "uz": "Besh epoxadagi yo'qotish: 8.0, 3.1, 1.4, 0.9, 0.7. Bu nima?", "en": "Losses over five epochs: 8.0, 3.1, 1.4, 0.9, 0.7. What is this?" },
+      "options": [
+       { "ru": "Расхождение", "uz": "Uzoqlashish", "en": "Divergence" },
+       { "ru": "Нормальная сходимость", "uz": "Odatiy yaqinlashish", "en": "Normal convergence" },
+       { "ru": "Переобучение", "uz": "Qayta o'qitish", "en": "Overfitting" },
+       { "ru": "Ошибка в данных", "uz": "Ma'lumotdagi xato", "en": "A data error" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "В весах появился nan. Самая частая причина?", "uz": "Vaznlarda nan paydo bo'ldi. Eng ko'p uchraydigan sabab?", "en": "nan appeared in the weights. The most common cause?" },
+      "options": [
+       { "ru": "Мало данных", "uz": "Ma'lumot kam", "en": "Too little data" },
+       { "ru": "Слишком большая скорость обучения: веса ушли в бесконечность", "uz": "Juda katta o'qitish tezligi: vaznlar cheksizlikka ketdi", "en": "Too large a learning rate: the weights blew up to infinity" },
+       { "ru": "Слишком много эпох", "uz": "Juda ko'p epoxa", "en": "Too many epochs" },
+       { "ru": "Признаки нормализованы", "uz": "Belgilar normallashtirilgan", "en": "The features are normalised" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Что такое обратное распространение по сути?", "uz": "Teskari tarqalish mohiyatan nima?", "en": "What is backpropagation in essence?" },
+      "options": [
+       { "ru": "Перезапуск сети с нуля", "uz": "Tarmoqni noldan qayta ishga tushirish", "en": "Restarting the network from scratch" },
+       { "ru": "Способ получить наклон потерь по каждому весу за один проход назад", "uz": "Bitta orqaga o'tishda har bir vazn bo'yicha yo'qotish qiyaligini olish usuli", "en": "A way to get the loss slope for every weight in a single backward pass" },
+       { "ru": "Удаление лишних слоёв", "uz": "Ortiqcha qatlamlarni o'chirish", "en": "Removing extra layers" },
+       { "ru": "Проверка на тестовых данных", "uz": "Test ma'lumotida tekshirish", "en": "Evaluation on test data" }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "python",
+      "title": { "ru": "Обучить прямую", "uz": "To'g'ri chiziqni o'qitish", "en": "Train a straight line" },
+      "desc": {
+       "ru": "<p>Обучи модель <code>y = w · x + b</code> градиентным спуском.</p><p><code>train(xs, ys, rate, epochs)</code> начинает с <code>w = 0.0</code> и <code>b = 0.0</code>, на каждой эпохе считает средний квадрат ошибки, находит численные наклоны по <code>w</code> и по <code>b</code> (с <code>h = 1e-6</code>) и делает шаг по обоим. Верни кортеж <code>(w, b)</code>.</p><p>Если данных нет — верни <code>(0.0, 0.0)</code>.</p>",
+       "uz": "<p><code>y = w · x + b</code> modelini gradient tushish bilan o'qiting.</p><p><code>train(xs, ys, rate, epochs)</code> <code>w = 0.0</code> va <code>b = 0.0</code> dan boshlaydi, har epoxada o'rtacha kvadratik xatoni hisoblaydi, <code>w</code> va <code>b</code> bo'yicha sonli qiyaliklarni topadi (<code>h = 1e-6</code> bilan) va ikkalasi bo'yicha qadam tashlaydi. <code>(w, b)</code> kortejini qaytaring.</p><p>Ma'lumot bo'lmasa — <code>(0.0, 0.0)</code> qaytaring.</p>",
+       "en": "<p>Train the model <code>y = w · x + b</code> with gradient descent.</p><p><code>train(xs, ys, rate, epochs)</code> starts at <code>w = 0.0</code> and <code>b = 0.0</code>, computes the mean squared error each epoch, finds the numeric slopes for <code>w</code> and <code>b</code> (with <code>h = 1e-6</code>) and steps on both. Return the tuple <code>(w, b)</code>.</p><p>With no data, return <code>(0.0, 0.0)</code>.</p>"
+      },
+      "starter": "def train(xs, ys, rate, epochs):\n    # w и b начинаются с нуля, дальше — шаги спуска\n    pass\n\nprint(train([1, 2, 3, 4, 5], [3, 5, 7, 9, 11], 0.02, 300))\n",
+      "tests": "w, b = train([1, 2, 3, 4, 5], [3, 5, 7, 9, 11], 0.02, 400)\nassert abs(w - 2) < 0.2, 'Настоящий коэффициент равен 2'\nassert abs(b - 1) < 0.5, 'Свободный член близок к 1'\nassert train([], [], 0.1, 10) == (0.0, 0.0), 'Без данных возвращаем нули'\nw2, b2 = train([1, 2, 3], [2, 4, 6], 0.05, 400)\nassert abs(w2 - 2) < 0.2 and abs(b2) < 0.3, 'Прямая через начало координат'\nw0, b0 = train([1, 2], [1, 2], 0.1, 0)\nassert w0 == 0.0 and b0 == 0.0, 'Ноль эпох — веса остались начальными'",
+      "hint": {
+       "ru": "Заведи функцию потерь <code>mse(w, b)</code> внутри. Наклон по <code>w</code> — <code>(mse(w + h, b) - mse(w, b)) / h</code>, по <code>b</code> — то же со сдвигом второго аргумента. Оба веса обновляй после того, как посчитал оба наклона.",
+       "uz": "Ichida <code>mse(w, b)</code> yo'qotish funksiyasini yarating. <code>w</code> bo'yicha qiyalik — <code>(mse(w + h, b) - mse(w, b)) / h</code>, <code>b</code> bo'yicha — ikkinchi argumentni siljitib xuddi shunday. Ikkala vaznni ikkala qiyalikni hisoblagandan keyin yangilang.",
+       "en": "Define a loss function <code>mse(w, b)</code> inside. The slope for <code>w</code> is <code>(mse(w + h, b) - mse(w, b)) / h</code>; for <code>b</code> the same with the second argument nudged. Update both weights only after computing both slopes."
+      }
+     }
+    ]
+   }
   }
  ]
 }

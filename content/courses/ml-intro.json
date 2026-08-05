@@ -314,6 +314,347 @@
      }
     ]
    }
+  },
+  {
+   "id": "ml-02",
+   "title": { "ru": "Классификация и честная оценка", "uz": "Tasniflash va halol baholash", "en": "Classification and honest evaluation" },
+   "tagline": { "ru": "Первый настоящий классификатор, матрица ошибок и подготовка признаков", "uz": "Birinchi haqiqiy klassifikator, xatolar matritsasi va belgilarni tayyorlash", "en": "Your first real classifier, the confusion matrix and feature preparation" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "k ближайших соседей", "uz": "k ta eng yaqin qo'shni", "en": "k nearest neighbours" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Самый понятный классификатор не учится вообще. Он просто запоминает обучающую выборку, а на новом объекте ищет <b>k самых похожих</b> из запомненных и отдаёт ответ большинства.</p><p>Похожесть — это расстояние. Для двух объектов с числовыми признаками берут обычное евклидово расстояние: корень из суммы квадратов разностей по каждому признаку.</p><p>Метод называется <b>k-NN</b>, k-nearest neighbours. Его стоит знать по двум причинам: он работает без всякой математики и он показывает, что бывает, когда признаки в разных масштабах.</p>",
+        "uz": "<p>Eng tushunarli klassifikator umuman o'qimaydi. U shunchaki o'qitish namunasini yodlab oladi, yangi obyektda esa yodlanganlardan <b>eng o'xshash k tasini</b> topib, ko'pchilikning javobini beradi.</p><p>O'xshashlik — bu masofa. Sonli belgilarga ega ikki obyekt uchun oddiy Evklid masofasi olinadi: har bir belgi bo'yicha farqlar kvadratlari yig'indisidan kvadrat ildiz.</p><p>Usul <b>k-NN</b>, k-nearest neighbours deyiladi. Uni ikki sabab bilan bilish kerak: u hech qanday matematikasiz ishlaydi va belgilar turli miqyosda bo'lganda nima bo'lishini ko'rsatadi.</p>",
+        "en": "<p>The most understandable classifier does not learn at all. It simply memorises the training set, and for a new object finds the <b>k most similar</b> memorised ones and returns the majority answer.</p><p>Similarity is distance. For two objects with numeric features you take the ordinary Euclidean distance: the square root of the sum of squared differences across features.</p><p>The method is called <b>k-NN</b>, k-nearest neighbours. It is worth knowing for two reasons: it works without any mathematics, and it shows what happens when features live on different scales.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "from math import sqrt\n\n# каждый объект: [рост, вес] -> класс\ntrain = [\n    ([150, 50], \"ребёнок\"),\n    ([155, 52], \"ребёнок\"),\n    ([160, 55], \"ребёнок\"),\n    ([180, 80], \"взрослый\"),\n    ([175, 78], \"взрослый\"),\n    ([185, 90], \"взрослый\"),\n]\n\ndef distance(a, b):\n    return sqrt(sum((x - y) ** 2 for x, y in zip(a, b)))\n\ndef predict(point, k=3):\n    ranked = sorted(train, key=lambda row: distance(row[0], point))\n    nearest = [label for _, label in ranked[:k]]\n    return max(set(nearest), key=nearest.count)\n\nprint(predict([158, 53]))   # рядом с детьми\nprint(predict([182, 85]))   # рядом со взрослыми"
+      },
+      {
+       "type": "predict",
+       "code": "from math import sqrt\n\ntrain = [([0], \"A\"), ([1], \"A\"), ([10], \"B\")]\n\ndef predict(point, k):\n    ranked = sorted(train, key=lambda r: abs(r[0][0] - point[0]))\n    near = [lbl for _, lbl in ranked[:k]]\n    return max(set(near), key=near.count)\n\nprint(predict([9], 1))\nprint(predict([9], 3))",
+       "options": [
+        { "ru": "Сначала B, потом B", "uz": "Avval B, keyin B", "en": "First B, then B" },
+        { "ru": "Сначала B, потом A", "uz": "Avval B, keyin A", "en": "First B, then A" },
+        { "ru": "Сначала A, потом A", "uz": "Avval A, keyin A", "en": "First A, then A" },
+        { "ru": "Ошибка", "uz": "Xato", "en": "An error" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "При k=1 ближайший сосед — 10, класс B. При k=3 берутся все три объекта, и большинство оказывается A. Значение k меняет ответ, поэтому его подбирают на проверочной выборке.",
+        "uz": "k=1 da eng yaqin qo'shni 10, sinf B. k=3 da uchala obyekt olinadi va ko'pchilik A bo'lib chiqadi. k qiymati javobni o'zgartiradi, shuning uchun u tekshiruv namunasida tanlanadi.",
+        "en": "With k=1 the nearest neighbour is 10, class B. With k=3 all three objects are taken and the majority turns out to be A. The value of k changes the answer, which is why it is tuned on a validation set."
+       }
+      },
+      {
+       "type": "note",
+       "kind": "tip",
+       "html": {
+        "ru": "k берут нечётным, чтобы в двух классах не было ничьей. Маленькое k чувствительно к шуму, большое — сглаживает границу между классами до бесполезности.",
+        "uz": "k toq olinadi, ikki sinfda durang bo'lmasligi uchun. Kichik k shovqinga sezgir, katta k esa sinflar orasidagi chegarani foydasiz darajada silliqlaydi.",
+        "en": "k is taken odd so two classes cannot tie. A small k is sensitive to noise; a large one smooths the boundary between classes into uselessness."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "Точность врёт: матрица ошибок", "uz": "Aniqlik aldaydi: xatolar matritsasi", "en": "Accuracy lies: the confusion matrix" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Болезнь встречается у одного человека из тысячи. Модель, которая всем говорит «здоров», даёт <b>99,9% точности</b> и при этом абсолютно бесполезна.</p><p>Поэтому ответы раскладывают на четыре кучки:</p><ul><li><b>TP</b> — сказали «да» и угадали</li><li><b>FP</b> — сказали «да», а на деле нет (ложная тревога)</li><li><b>FN</b> — сказали «нет», а на деле да (пропуск)</li><li><b>TN</b> — сказали «нет» и угадали</li></ul><p>Из них считают две честные метрики. <b>Точность</b> (precision) = TP / (TP + FP): насколько можно верить, когда модель говорит «да». <b>Полнота</b> (recall) = TP / (TP + FN): какую долю настоящих «да» модель нашла.</p>",
+        "uz": "<p>Kasallik ming kishidan bittasida uchraydi. Hammaga «sog'lom» deydigan model <b>99,9% aniqlik</b> beradi va shu bilan birga mutlaqo foydasiz.</p><p>Shuning uchun javoblar to'rt guruhga ajratiladi:</p><ul><li><b>TP</b> — «ha» dedik va topdik</li><li><b>FP</b> — «ha» dedik, aslida yo'q (yolg'on signal)</li><li><b>FN</b> — «yo'q» dedik, aslida ha (o'tkazib yuborish)</li><li><b>TN</b> — «yo'q» dedik va topdik</li></ul><p>Ulardan ikki halol o'lchov hisoblanadi. <b>Aniqlik</b> (precision) = TP / (TP + FP): model «ha» deganda unga qanchalik ishonish mumkin. <b>To'liqlik</b> (recall) = TP / (TP + FN): model haqiqiy «ha» larning qanchasini topdi.</p>",
+        "en": "<p>A disease occurs in one person in a thousand. A model that tells everyone “healthy” achieves <b>99.9% accuracy</b> and is completely useless.</p><p>So answers are sorted into four buckets:</p><ul><li><b>TP</b> — said “yes” and was right</li><li><b>FP</b> — said “yes” but it was not (false alarm)</li><li><b>FN</b> — said “no” but it was (a miss)</li><li><b>TN</b> — said “no” and was right</li></ul><p>Two honest metrics come from them. <b>Precision</b> = TP / (TP + FP): how much you can trust the model when it says “yes”. <b>Recall</b> = TP / (TP + FN): what share of the real “yes” cases the model found.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "actual    = [1, 0, 1, 1, 0, 0, 1, 0, 0, 0]\npredicted = [1, 0, 0, 1, 1, 0, 1, 0, 0, 0]\n\ntp = sum(1 for a, p in zip(actual, predicted) if a == 1 and p == 1)\nfp = sum(1 for a, p in zip(actual, predicted) if a == 0 and p == 1)\nfn = sum(1 for a, p in zip(actual, predicted) if a == 1 and p == 0)\ntn = sum(1 for a, p in zip(actual, predicted) if a == 0 and p == 0)\n\nprint(f\"TP={tp}  FP={fp}  FN={fn}  TN={tn}\")\nprint(f\"точность (accuracy): {(tp + tn) / len(actual):.2f}\")\nprint(f\"precision: {tp / (tp + fp):.2f}\")\nprint(f\"recall:    {tp / (tp + fn):.2f}\")"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Precision и recall тянут в разные стороны. Скажешь «да» всем — recall станет единицей, а precision рухнет. Скажешь «да» только в одном самом очевидном случае — precision будет идеальной, а recall почти нулевой.</p><p>Что важнее — решает задача, а не математика. В медицинском скрининге страшнее пропуск: лучше лишний раз перепроверить здорового. В спам-фильтре страшнее ложная тревога: потерянное письмо от работодателя хуже, чем реклама во входящих.</p><p>Когда нужна одна цифра, берут <b>F1</b> — гармоническое среднее двух: <code>2 · p · r / (p + r)</code>. Оно наказывает за перекос: если одна метрика близка к нулю, F1 тоже близка к нулю.</p>",
+        "uz": "<p>Precision va recall qarama-qarshi tomonga tortadi. Hammaga «ha» desangiz — recall birga aylanadi, precision qulaydi. Faqat eng aniq bitta holatda «ha» desangiz — precision ideal, recall esa deyarli nol bo'ladi.</p><p>Qaysi biri muhimroq — buni matematika emas, vazifa hal qiladi. Tibbiy skriningda o'tkazib yuborish qo'rqinchliroq: sog'lom odamni yana bir bor tekshirgan yaxshi. Spam-filtrda yolg'on signal qo'rqinchliroq: ish beruvchidan yo'qolgan xat kelgan qutidagi reklamadan yomonroq.</p><p>Bitta raqam kerak bo'lsa, <b>F1</b> olinadi — ikkalasining garmonik o'rtachasi: <code>2 · p · r / (p + r)</code>. U og'ish uchun jazolaydi: bir o'lchov nolga yaqin bo'lsa, F1 ham nolga yaqin.</p>",
+        "en": "<p>Precision and recall pull in opposite directions. Say “yes” to everyone and recall becomes one while precision collapses. Say “yes” only in the single most obvious case and precision is perfect while recall is near zero.</p><p>Which matters more is decided by the problem, not by mathematics. In medical screening a miss is worse: better to double-check a healthy person. In a spam filter a false alarm is worse: a lost letter from an employer beats an advert in the inbox.</p><p>When you need one number, take <b>F1</b> — the harmonic mean of the two: <code>2 · p · r / (p + r)</code>. It punishes imbalance: if one metric is near zero, F1 is near zero too.</p>"
+       }
+      },
+      {
+       "type": "checkpoint",
+       "q": { "ru": "Модель для поиска мошеннических платежей помечает только один платёж из тысячи, зато всегда верно. Что с ней не так?", "uz": "Firibgarlik to'lovlarini qidiruvchi model mingdan faqat bittasini belgilaydi, lekin doim to'g'ri. Unda nima nuqson?", "en": "A fraud-detection model flags only one payment in a thousand but is always right. What is wrong with it?" },
+       "options": [
+        { "ru": "Низкая precision", "uz": "Past precision", "en": "Low precision" },
+        { "ru": "Низкий recall — большинство мошенников проходит мимо", "uz": "Past recall — firibgarlarning ko'pi o'tib ketadi", "en": "Low recall — most fraudsters slip through" },
+        { "ru": "Ничего, это идеальная модель", "uz": "Hech nima, bu ideal model", "en": "Nothing, it is a perfect model" },
+        { "ru": "Слишком много ложных тревог", "uz": "Juda ko'p yolg'on signal", "en": "Too many false alarms" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Precision у неё единица — каждая тревога верна. Но она молчит почти всегда, поэтому находит ничтожную долю настоящего мошенничества. Одна метрика без второй ничего не говорит.",
+        "uz": "Uning precision i bir — har bir signal to'g'ri. Ammo u deyarli doim jim, shuning uchun haqiqiy firibgarlikning arzimas qismini topadi. Bir o'lchov ikkinchisisiz hech nima demaydi.",
+        "en": "Its precision is one — every alarm is correct. But it stays silent almost always, so it catches a negligible share of the real fraud. One metric without the other says nothing."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "Масштаб признаков решает всё", "uz": "Belgilar miqyosi hamma narsani hal qiladi", "en": "Feature scale decides everything" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Вернёмся к k-NN. Пусть признаки — возраст (20–60) и доход (20 000–200 000). Разница в возрасте на 40 лет даёт вклад в расстояние 40. Разница в доходе на 40 000 даёт вклад 40 000.</p><p>Значит, возраст в расчёте расстояния просто не существует: доход перекрывает его в тысячу раз. Модель формально работает, а фактически смотрит на одну колонку.</p><p>Лечится <b>нормализацией</b>. Простейший вариант — min-max: каждый признак сжимается в отрезок от 0 до 1 по формуле <code>(x − min) / (max − min)</code>. Тогда все признаки говорят одинаково громко.</p>",
+        "uz": "<p>k-NN ga qaytamiz. Belgilar yosh (20–60) va daromad (20 000–200 000) bo'lsin. Yoshdagi 40 yillik farq masofaga 40 hissa qo'shadi. Daromaddagi 40 000 lik farq 40 000 hissa qo'shadi.</p><p>Demak, masofa hisobida yosh umuman mavjud emas: daromad uni ming marta bosib ketadi. Model rasman ishlaydi, aslida esa bitta ustunga qaraydi.</p><p><b>Normallashtirish</b> bilan davolanadi. Eng oddiy variant — min-max: har bir belgi <code>(x − min) / (max − min)</code> formulasi bo'yicha 0 dan 1 gacha kesmaga siqiladi. Shunda barcha belgilar bir xil baland ovozda gapiradi.</p>",
+        "en": "<p>Back to k-NN. Suppose the features are age (20–60) and income (20,000–200,000). A 40-year difference in age contributes 40 to the distance. A 40,000 difference in income contributes 40,000.</p><p>So in the distance computation age simply does not exist: income overwhelms it a thousandfold. The model formally works while actually looking at one column.</p><p>The cure is <b>normalisation</b>. The simplest form is min-max: each feature is squeezed into the range 0 to 1 with <code>(x − min) / (max − min)</code>. Then every feature speaks equally loudly.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "from math import sqrt\n\nrows = [\n    ([25, 30000], \"эконом\"),\n    ([28, 35000], \"эконом\"),\n    ([50, 190000], \"премиум\"),\n    ([55, 180000], \"премиум\"),\n]\nnew = [26, 185000]     # молодой, но с большим доходом\n\ndef nearest(data, point):\n    return min(data, key=lambda r: sqrt(sum((a - b) ** 2 for a, b in zip(r[0], point))))[1]\n\nprint(\"без нормализации:\", nearest(rows, new))\n\n# нормализуем каждую колонку отдельно\ncols = list(zip(*[r[0] for r in rows]))\nlo = [min(c) for c in cols]\nhi = [max(c) for c in cols]\n\ndef norm(vec):\n    return [(v - l) / (h - l) if h > l else 0.0 for v, l, h in zip(vec, lo, hi)]\n\nscaled = [(norm(r[0]), r[1]) for r in rows]\nprint(\"с нормализацией:\", nearest(scaled, norm(new)))"
+      },
+      {
+       "type": "note",
+       "kind": "trap",
+       "html": {
+        "ru": "Границы min и max берутся <b>только по обучающей выборке</b>. Если посчитать их по всем данным сразу, информация из проверочной части просочится в обучение — и оценка снова станет нечестной. Это называется утечкой данных, и она портит больше проектов, чем любая ошибка в модели.",
+        "uz": "min va max chegaralari <b>faqat o'qitish namunasi bo'yicha</b> olinadi. Ularni butun ma'lumot bo'yicha hisoblasangiz, tekshiruv qismidan axborot o'qitishga sizib o'tadi — va baho yana halol bo'lmay qoladi. Bu ma'lumot sizishi deyiladi va u modeldagi har qanday xatodan ko'ra ko'proq loyihani buzadi.",
+        "en": "The min and max bounds are taken <b>from the training set only</b>. Compute them over all the data and information from the held-out part leaks into training — and the evaluation becomes dishonest again. This is called data leakage, and it ruins more projects than any modelling mistake."
+       }
+      },
+      {
+       "type": "summary",
+       "items": [
+        { "ru": "k-NN относит объект к классу большинства среди k ближайших", "uz": "k-NN obyektni k ta eng yaqin ichidagi ko'pchilik sinfiga qo'shadi", "en": "k-NN assigns an object to the majority class among its k nearest neighbours" },
+        { "ru": "Точность обманывает на редких событиях; смотри precision и recall", "uz": "Aniqlik kam uchraydigan hodisalarda aldaydi; precision va recall ga qarang", "en": "Accuracy lies on rare events; look at precision and recall" },
+        { "ru": "Что важнее — пропуск или ложная тревога — решает задача", "uz": "O'tkazib yuborishmi yoki yolg'on signalmi — buni vazifa hal qiladi", "en": "Whether a miss or a false alarm is worse is decided by the problem" },
+        { "ru": "Признаки в разных масштабах нужно нормализовать", "uz": "Turli miqyosdagi belgilarni normallashtirish kerak", "en": "Features on different scales must be normalised" },
+        { "ru": "Границы нормализации считаются по обучающей части, иначе утечка", "uz": "Normallashtirish chegaralari o'qitish qismi bo'yicha hisoblanadi, aks holda sizish", "en": "Normalisation bounds come from the training part, otherwise you leak" }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": { "ru": "Что делает k-NN на этапе обучения?", "uz": "k-NN o'qitish bosqichida nima qiladi?", "en": "What does k-NN do during training?" },
+     "options": [
+      { "ru": "Подбирает коэффициенты градиентным спуском", "uz": "Gradient tushish bilan koeffitsiyentlarni tanlaydi", "en": "Fits coefficients by gradient descent" },
+      { "ru": "Практически ничего — просто запоминает выборку", "uz": "Deyarli hech nima — shunchaki namunani yodlaydi", "en": "Almost nothing — it just memorises the sample" },
+      { "ru": "Строит дерево решений", "uz": "Qaror daraxtini quradi", "en": "Builds a decision tree" },
+      { "ru": "Считает средние по классам", "uz": "Sinflar bo'yicha o'rtachani hisoblaydi", "en": "Computes class averages" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Вся работа откладывается на момент предсказания — поэтому k-NN быстро «учится» и медленно отвечает.",
+      "uz": "Barcha ish bashorat paytiga qoldiriladi — shuning uchun k-NN tez «o'qiydi» va sekin javob beradi.",
+      "en": "All the work is postponed to prediction time — which is why k-NN “trains” fast and answers slowly."
+     }
+    },
+    {
+     "q": { "ru": "Модель сказала «да» 10 раз, из них верно 4. Чему равна precision?", "uz": "Model 10 marta «ha» dedi, shundan 4 tasi to'g'ri. Precision nechaga teng?", "en": "A model said “yes” 10 times, 4 of them correct. What is the precision?" },
+     "options": [
+      { "ru": "0.4", "uz": "0.4", "en": "0.4" },
+      { "ru": "0.6", "uz": "0.6", "en": "0.6" },
+      { "ru": "1.0", "uz": "1.0", "en": "1.0" },
+      { "ru": "Нельзя посчитать без recall", "uz": "Recall siz hisoblab bo'lmaydi", "en": "It cannot be computed without recall" }
+     ],
+     "a": 0,
+     "explain": {
+      "ru": "Precision = TP / (TP + FP) = 4 / 10. Сколько настоящих «да» было всего, для precision не нужно — это уже про recall.",
+      "uz": "Precision = TP / (TP + FP) = 4 / 10. Haqiqiy «ha» lar umuman qancha bo'lgani precision uchun kerak emas — bu recall haqida.",
+      "en": "Precision = TP / (TP + FP) = 4 / 10. How many real “yes” cases existed is irrelevant here — that is recall's business."
+     }
+    },
+    {
+     "q": { "ru": "Из 100 больных модель нашла 30. Чему равен recall?", "uz": "100 bemordan model 30 tasini topdi. Recall nechaga teng?", "en": "Out of 100 sick patients the model found 30. What is the recall?" },
+     "options": [
+      { "ru": "0.3", "uz": "0.3", "en": "0.3" },
+      { "ru": "0.7", "uz": "0.7", "en": "0.7" },
+      { "ru": "3.0", "uz": "3.0", "en": "3.0" },
+      { "ru": "Зависит от числа здоровых", "uz": "Sog'lomlar soniga bog'liq", "en": "It depends on the number of healthy people" }
+     ],
+     "a": 0,
+     "explain": {
+      "ru": "Recall = TP / (TP + FN) = 30 / 100. Здоровые в эту формулу не входят вообще.",
+      "uz": "Recall = TP / (TP + FN) = 30 / 100. Sog'lomlar bu formulaga umuman kirmaydi.",
+      "en": "Recall = TP / (TP + FN) = 30 / 100. Healthy people do not appear in this formula at all."
+     }
+    },
+    {
+     "q": { "ru": "В спам-фильтре что обычно опаснее?", "uz": "Spam-filtrda odatda nima xavfliroq?", "en": "In a spam filter, which is usually more dangerous?" },
+     "options": [
+      { "ru": "Пропустить спам во входящие", "uz": "Spamni kelgan qutiga o'tkazib yuborish", "en": "Letting spam into the inbox" },
+      { "ru": "Отправить нужное письмо в спам", "uz": "Kerakli xatni spamga jo'natish", "en": "Sending a wanted letter to spam" },
+      { "ru": "Одинаково", "uz": "Bir xil", "en": "They are equal" },
+      { "ru": "Ни то, ни другое не важно", "uz": "Ikkalasi ham muhim emas", "en": "Neither matters" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Потерянное письмо человек может не заметить никогда, а рекламу он просто удалит. Поэтому спам-фильтры настраивают на высокую precision.",
+      "uz": "Yo'qolgan xatni odam umuman sezmasligi mumkin, reklamani esa shunchaki o'chiradi. Shuning uchun spam-filtrlar yuqori precision ga sozlanadi.",
+      "en": "A lost letter may never be noticed, while an advert is simply deleted. That is why spam filters are tuned for high precision."
+     }
+    },
+    {
+     "q": { "ru": "Признаки — возраст (20–60) и зарплата (30 000–300 000). Что произойдёт в k-NN без нормализации?", "uz": "Belgilar — yosh (20–60) va maosh (30 000–300 000). Normallashtirmasdan k-NN da nima bo'ladi?", "en": "Features are age (20–60) and salary (30,000–300,000). What happens in k-NN without normalisation?" },
+     "options": [
+      { "ru": "Оба признака учитываются поровну", "uz": "Ikkala belgi teng hisobga olinadi", "en": "Both features count equally" },
+      { "ru": "Расстояние определяется почти только зарплатой", "uz": "Masofa deyarli faqat maosh bilan aniqlanadi", "en": "The distance is determined almost entirely by salary" },
+      { "ru": "Модель откажется работать", "uz": "Model ishlashdan bosh tortadi", "en": "The model refuses to run" },
+      { "ru": "Возраст станет важнее", "uz": "Yosh muhimroq bo'ladi", "en": "Age becomes more important" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Разности по зарплате на несколько порядков больше, поэтому в сумме квадратов вклад возраста теряется.",
+      "uz": "Maosh bo'yicha farqlar bir necha tartibga katta, shuning uchun kvadratlar yig'indisida yosh hissasi yo'qoladi.",
+      "en": "Salary differences are orders of magnitude larger, so age's contribution vanishes inside the sum of squares."
+     }
+    },
+    {
+     "q": { "ru": "Почему min и max для нормализации берут только по обучающей части?", "uz": "Nega normallashtirish uchun min va max faqat o'qitish qismidan olinadi?", "en": "Why are min and max for normalisation taken from the training part only?" },
+     "options": [
+      { "ru": "Так быстрее считать", "uz": "Shunday tez hisoblanadi", "en": "It is faster to compute" },
+      { "ru": "Иначе информация о проверочных данных просочится в обучение", "uz": "Aks holda tekshiruv ma'lumoti haqidagi axborot o'qitishga sizib o'tadi", "en": "Otherwise information about the test data leaks into training" },
+      { "ru": "Это требование библиотек", "uz": "Bu kutubxonalar talabi", "en": "The libraries require it" },
+      { "ru": "Чтобы значения были целыми", "uz": "Qiymatlar butun bo'lishi uchun", "en": "To keep the values integers" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Утечка данных даёт красивую оценку на бумаге и провал на реальных пользователях.",
+      "uz": "Ma'lumot sizishi qog'ozda chiroyli baho va haqiqiy foydalanuvchilarda muvaffaqiyatsizlik beradi.",
+      "en": "Data leakage gives a beautiful number on paper and a failure with real users."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "python",
+     "title": { "ru": "Ближайший сосед", "uz": "Eng yaqin qo'shni", "en": "Nearest neighbour" },
+     "brief": { "ru": "Классификация по расстоянию", "uz": "Masofa bo'yicha tasniflash", "en": "Classification by distance" },
+     "desc": {
+      "ru": "<p>Напиши <code>knn(train, point, k)</code>. <code>train</code> — список пар <code>(признаки, метка)</code>, <code>point</code> — список признаков. Найди <code>k</code> ближайших по евклидову расстоянию и верни метку, встречающуюся чаще всего.</p><p>Если <code>train</code> пуст — верни <code>None</code>.</p>",
+      "uz": "<p><code>knn(train, point, k)</code> yozing. <code>train</code> — <code>(belgilar, yorliq)</code> juftliklar ro'yxati, <code>point</code> — belgilar ro'yxati. Evklid masofasi bo'yicha eng yaqin <code>k</code> tasini toping va eng ko'p uchragan yorliqni qaytaring.</p><p><code>train</code> bo'sh bo'lsa — <code>None</code> qaytaring.</p>",
+      "en": "<p>Write <code>knn(train, point, k)</code>. <code>train</code> is a list of <code>(features, label)</code> pairs, <code>point</code> is a list of features. Find the <code>k</code> nearest by Euclidean distance and return the most frequent label.</p><p>If <code>train</code> is empty, return <code>None</code>.</p>"
+     },
+     "starter": "from math import sqrt\n\ndef knn(train, point, k):\n    # твой код\n    pass\n\nprint(knn([([0], 'A'), ([1], 'A'), ([10], 'B')], [9], 1))\n",
+     "tests": "data = [([0], 'A'), ([1], 'A'), ([10], 'B'), ([11], 'B')]\nassert knn(data, [9], 1) == 'B', 'Ближайший к 9 — это 10, класс B'\nassert knn(data, [0.5], 1) == 'A', 'Рядом с нулём — класс A'\nassert knn(data, [5], 3) == 'A', 'Среди трёх ближайших большинство — A'\nassert knn([], [1], 3) is None, 'Пустая выборка — None'\nflat = [([0, 0], 'X'), ([3, 4], 'Y')]\nassert knn(flat, [0, 1], 1) == 'X', 'Расстояние считается по всем признакам'\nassert knn(flat, [3, 3], 1) == 'Y', 'Ближе к (3, 4), чем к (0, 0)'",
+     "hint": {
+      "ru": "Отсортируй <code>train</code> по <code>sqrt(sum((a - b) ** 2 ...))</code>, возьми срез <code>[:k]</code>, собери метки в список и верни <code>max(set(labels), key=labels.count)</code>.",
+      "uz": "<code>train</code> ni <code>sqrt(sum((a - b) ** 2 ...))</code> bo'yicha saralang, <code>[:k]</code> kesimini oling, yorliqlarni ro'yxatga yig'ing va <code>max(set(labels), key=labels.count)</code> qaytaring.",
+      "en": "Sort <code>train</code> by <code>sqrt(sum((a - b) ** 2 ...))</code>, slice <code>[:k]</code>, collect the labels and return <code>max(set(labels), key=labels.count)</code>."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "python",
+     "title": { "ru": "Precision и recall", "uz": "Precision va recall", "en": "Precision and recall" },
+     "brief": { "ru": "Честная оценка классификатора", "uz": "Klassifikatorni halol baholash", "en": "An honest classifier score" },
+     "desc": {
+      "ru": "<p><code>scores(actual, predicted)</code> получает два списка из нулей и единиц и возвращает кортеж <code>(precision, recall)</code>.</p><p>Если модель ни разу не сказала «да», precision считай равной <code>0.0</code>. Если настоящих «да» вообще не было, recall тоже <code>0.0</code>.</p>",
+      "uz": "<p><code>scores(actual, predicted)</code> nol va birlardan iborat ikki ro'yxat oladi va <code>(precision, recall)</code> kortejini qaytaradi.</p><p>Model biror marta ham «ha» demagan bo'lsa, precision ni <code>0.0</code> deb hisoblang. Haqiqiy «ha» lar umuman bo'lmagan bo'lsa, recall ham <code>0.0</code>.</p>",
+      "en": "<p><code>scores(actual, predicted)</code> receives two lists of zeros and ones and returns the tuple <code>(precision, recall)</code>.</p><p>If the model never said “yes”, treat precision as <code>0.0</code>. If there were no real “yes” cases at all, recall is <code>0.0</code> too.</p>"
+     },
+     "starter": "def scores(actual, predicted):\n    # твой код\n    pass\n\nprint(scores([1, 0, 1, 1], [1, 1, 0, 1]))\n",
+     "tests": "p, r = scores([1, 0, 1, 1], [1, 1, 0, 1])\nassert abs(p - 2/3) < 1e-9, 'Из трёх ответов «да» верны два'\nassert abs(r - 2/3) < 1e-9, 'Из трёх настоящих «да» найдены два'\nassert scores([0, 0], [0, 0]) == (0.0, 0.0), 'Ни одного «да» с обеих сторон'\np2, r2 = scores([1, 1], [1, 1])\nassert p2 == 1.0 and r2 == 1.0, 'Идеальное предсказание'\np3, r3 = scores([1, 1, 1], [1, 0, 0])\nassert p3 == 1.0 and abs(r3 - 1/3) < 1e-9, 'Осторожная модель: precision высокая, recall низкий'",
+     "hint": {
+      "ru": "Посчитай tp, fp и fn через <code>zip</code>. Precision = tp / (tp + fp), recall = tp / (tp + fn) — оба знаменателя проверь на ноль до деления.",
+      "uz": "tp, fp va fn ni <code>zip</code> orqali hisoblang. Precision = tp / (tp + fp), recall = tp / (tp + fn) — bo'lishdan oldin ikkala maxrajni nolga tekshiring.",
+      "en": "Count tp, fp and fn with <code>zip</code>. Precision = tp / (tp + fp), recall = tp / (tp + fn) — check both denominators for zero before dividing."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "python",
+     "title": { "ru": "Нормализация колонок", "uz": "Ustunlarni normallashtirish", "en": "Normalising columns" },
+     "brief": { "ru": "Признаки в один масштаб", "uz": "Belgilarni bir miqyosga", "en": "Features onto one scale" },
+     "desc": {
+      "ru": "<p><code>normalize(rows)</code> получает список одинаковых по длине списков чисел и сжимает <b>каждую колонку</b> в отрезок от 0 до 1 по формуле <code>(x − min) / (max − min)</code>.</p><p>Если в колонке все значения одинаковы, деление невозможно — ставь <code>0.0</code>. Пустой вход даёт пустой список.</p>",
+      "uz": "<p><code>normalize(rows)</code> uzunligi bir xil sonlar ro'yxatlari ro'yxatini oladi va <b>har bir ustunni</b> <code>(x − min) / (max − min)</code> formulasi bo'yicha 0 dan 1 gacha kesmaga siqadi.</p><p>Ustundagi barcha qiymatlar bir xil bo'lsa, bo'lish mumkin emas — <code>0.0</code> qo'ying. Bo'sh kirish bo'sh ro'yxat beradi.</p>",
+      "en": "<p><code>normalize(rows)</code> takes a list of equal-length lists of numbers and squeezes <b>each column</b> into the range 0 to 1 with <code>(x − min) / (max − min)</code>.</p><p>If every value in a column is the same, division is impossible — use <code>0.0</code>. Empty input gives an empty list.</p>"
+     },
+     "starter": "def normalize(rows):\n    # твой код\n    pass\n\nprint(normalize([[10, 100], [20, 300], [30, 200]]))\n",
+     "tests": "out = normalize([[10, 100], [20, 300], [30, 200]])\nassert out[0] == [0.0, 0.0], 'Минимумы обеих колонок становятся нулями'\nassert out[1] == [0.5, 1.0], 'Середина первой колонки и максимум второй'\nassert out[2] == [1.0, 0.5], 'Максимум первой колонки и середина второй'\nassert normalize([]) == [], 'Пустой вход — пустой выход'\nassert normalize([[5, 5], [5, 9]]) == [[0.0, 0.0], [0.0, 1.0]], 'Постоянная колонка даёт нули'\nassert normalize([[7]]) == [[0.0]], 'Одна строка — колонка постоянна'",
+     "hint": {
+      "ru": "Разверни таблицу через <code>zip(*rows)</code>, чтобы получить колонки, посчитай для каждой min и max, затем собери строки обратно. Проверку <code>hi == lo</code> делай до деления.",
+      "uz": "Ustunlarni olish uchun jadvalni <code>zip(*rows)</code> orqali aylantiring, har biri uchun min va max hisoblang, keyin qatorlarni qaytarib yig'ing. <code>hi == lo</code> tekshiruvini bo'lishdan oldin qiling.",
+      "en": "Transpose with <code>zip(*rows)</code> to get columns, compute min and max for each, then rebuild the rows. Do the <code>hi == lo</code> check before dividing."
+     }
+    }
+   ],
+   "exam": {
+    "time": 540,
+    "questions": [
+     {
+      "q": { "ru": "Что означает высокая precision при низком recall?", "uz": "Yuqori precision va past recall nimani anglatadi?", "en": "What does high precision with low recall mean?" },
+      "options": [
+       { "ru": "Модель ошибается всегда", "uz": "Model doim xato qiladi", "en": "The model is always wrong" },
+       { "ru": "Когда модель говорит «да», ей можно верить, но говорит она редко", "uz": "Model «ha» deganda unga ishonish mumkin, lekin u kam gapiradi", "en": "When the model says “yes” you can trust it, but it rarely says so" },
+       { "ru": "Модель находит всё, но много ошибается", "uz": "Model hammasini topadi, lekin ko'p xato qiladi", "en": "The model finds everything but makes many mistakes" },
+       { "ru": "Данные размечены неверно", "uz": "Ma'lumot noto'g'ri belgilangan", "en": "The data is mislabelled" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Болезнь есть у 1% людей. Модель всем говорит «здоров». Её точность (accuracy)…", "uz": "Kasallik odamlarning 1% ida bor. Model hammaga «sog'lom» deydi. Uning aniqligi…", "en": "A disease affects 1% of people. A model tells everyone “healthy”. Its accuracy is…" },
+      "options": [
+       { "ru": "около 1% — модель бесполезна", "uz": "taxminan 1% — model foydasiz", "en": "about 1% — the model is useless" },
+       { "ru": "около 99%, и это ничего не говорит о её пользе", "uz": "taxminan 99%, va bu uning foydasi haqida hech nima demaydi", "en": "about 99%, and that says nothing about its usefulness" },
+       { "ru": "равна нулю", "uz": "nolga teng", "en": "zero" },
+       { "ru": "не определена", "uz": "aniqlanmagan", "en": "undefined" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Какое k в k-NN обычно выбирают?", "uz": "k-NN da odatda qanday k tanlanadi?", "en": "Which k is usually chosen in k-NN?" },
+      "options": [
+       { "ru": "Всегда 1 — так точнее", "uz": "Doim 1 — shunday aniqroq", "en": "Always 1 — it is more accurate" },
+       { "ru": "Нечётное, подобранное на проверочной выборке", "uz": "Toq, tekshiruv namunasida tanlangan", "en": "An odd number, tuned on a validation set" },
+       { "ru": "Равное числу объектов", "uz": "Obyektlar soniga teng", "en": "Equal to the number of objects" },
+       { "ru": "Любое, разницы нет", "uz": "Har qanday, farqi yo'q", "en": "Any value, it makes no difference" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Нормализацию посчитали по всей таблице сразу, включая проверочную часть. Что это?", "uz": "Normallashtirish butun jadval bo'yicha, tekshiruv qismi bilan birga hisoblandi. Bu nima?", "en": "Normalisation was computed over the whole table at once, test part included. What is this?" },
+      "options": [
+       { "ru": "Правильный подход", "uz": "To'g'ri yondashuv", "en": "The correct approach" },
+       { "ru": "Утечка данных: оценка перестала быть честной", "uz": "Ma'lumot sizishi: baho halol bo'lmay qoldi", "en": "Data leakage: the evaluation is no longer honest" },
+       { "ru": "Переобучение", "uz": "Qayta o'qitish", "en": "Overfitting" },
+       { "ru": "Ошибка в коде", "uz": "Koddagi xato", "en": "A bug in the code" }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "python",
+      "title": { "ru": "Классификатор с оценкой", "uz": "Baholi klassifikator", "en": "A classifier with a score" },
+      "desc": {
+       "ru": "<p>Собери модуль целиком. <code>run_knn(train, test, k)</code> получает две выборки пар <code>(признаки, метка)</code>, где метки — <code>0</code> и <code>1</code>.</p><p>Для каждого объекта из <code>test</code> предскажи метку методом k ближайших соседей по <code>train</code> и верни кортеж <code>(precision, recall)</code> на этой проверочной выборке.</p><p>Пустая проверочная выборка даёт <code>(0.0, 0.0)</code>.</p>",
+       "uz": "<p>Modulni to'liq yig'ing. <code>run_knn(train, test, k)</code> <code>(belgilar, yorliq)</code> juftliklaridan iborat ikki namuna oladi, yorliqlar — <code>0</code> va <code>1</code>.</p><p><code>test</code> dagi har bir obyekt uchun <code>train</code> bo'yicha k ta eng yaqin qo'shni usuli bilan yorliqni bashorat qiling va shu tekshiruv namunasida <code>(precision, recall)</code> kortejini qaytaring.</p><p>Bo'sh tekshiruv namunasi <code>(0.0, 0.0)</code> beradi.</p>",
+       "en": "<p>Put the whole module together. <code>run_knn(train, test, k)</code> receives two samples of <code>(features, label)</code> pairs where labels are <code>0</code> and <code>1</code>.</p><p>For every object in <code>test</code>, predict the label with k nearest neighbours over <code>train</code> and return the tuple <code>(precision, recall)</code> on that held-out sample.</p><p>An empty test sample gives <code>(0.0, 0.0)</code>.</p>"
+      },
+      "starter": "from math import sqrt\n\ndef run_knn(train, test, k):\n    # предскажи каждый объект из test, потом посчитай precision и recall\n    pass\n\ntrain = [([0], 0), ([1], 0), ([10], 1), ([11], 1)]\ntest  = [([2], 0), ([9], 1)]\nprint(run_knn(train, test, 1))\n",
+      "tests": "train = [([0], 0), ([1], 0), ([10], 1), ([11], 1)]\np, r = run_knn(train, [([2], 0), ([9], 1)], 1)\nassert p == 1.0 and r == 1.0, 'Оба объекта предсказаны верно'\nassert run_knn(train, [], 1) == (0.0, 0.0), 'Пустая проверочная выборка'\np2, r2 = run_knn(train, [([0], 0), ([1], 0)], 1)\nassert p2 == 0.0 and r2 == 0.0, 'Ни одного «да» — обе метрики нулевые'\np3, r3 = run_knn(train, [([10], 1), ([0], 1)], 1)\nassert p3 == 1.0 and abs(r3 - 0.5) < 1e-9, 'Одно из двух настоящих «да» найдено'\nflat = [([0, 0], 0), ([10, 10], 1)]\np4, r4 = run_knn(flat, [([9, 9], 1)], 1)\nassert p4 == 1.0 and r4 == 1.0, 'Работает и на нескольких признаках'",
+      "hint": {
+       "ru": "Две части, каждую ты уже писал: предсказание через сортировку по расстоянию и подсчёт tp, fp, fn по спискам настоящих и предсказанных меток. Проверь пустой <code>test</code> до всех вычислений.",
+       "uz": "Ikki qism, ikkalasini ham yozgansiz: masofa bo'yicha saralash orqali bashorat va haqiqiy hamda bashorat qilingan yorliqlar ro'yxati bo'yicha tp, fp, fn hisobi. Barcha hisoblardan oldin bo'sh <code>test</code> ni tekshiring.",
+       "en": "Two parts, both of which you have already written: prediction by sorting on distance, and counting tp, fp, fn over the actual and predicted label lists. Check for an empty <code>test</code> before any computation."
+      }
+     }
+    ]
+   }
   }
  ]
 }
