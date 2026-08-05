@@ -72,7 +72,27 @@ def init_db():
         ''')
 
 
+def migrate_db():
+    """Добавляет is_admin, если его ещё нет. Существующие строки не трогаются.
+
+    Проверка «есть ли колонка» и ALTER — это два разных запроса, а воркеров
+    gunicorn несколько и стартуют они одновременно: второй успевал добавить
+    колонку между проверкой и добавлением у первого, и тот падал. Поэтому
+    ошибку о дубликате просто принимаем — значит, сосед уже всё сделал.
+    """
+    with sqlite3.connect(DB_PATH) as d:
+        cols = [r[1] for r in d.execute('PRAGMA table_info(users)')]
+        if 'is_admin' in cols:
+            return
+        try:
+            d.execute('ALTER TABLE users ADD COLUMN is_admin INTEGER NOT NULL DEFAULT 0')
+        except sqlite3.OperationalError as e:
+            if 'duplicate column' not in str(e).lower():
+                raise
+
+
 init_db()
+migrate_db()
 
 
 def _token_hash(token):
@@ -94,6 +114,20 @@ def current_user():
     row = db().execute('SELECT user_id FROM sessions WHERE token_hash = ?',
                        (_token_hash(header[7:]),)).fetchone()
     return row['user_id'] if row else None
+
+
+def is_admin(user_id):
+    row = db().execute('SELECT is_admin FROM users WHERE id = ?', (user_id,)).fetchone()
+    return bool(row and row['is_admin'])
+
+
+def require_admin():
+    """Возвращает id администратора либо None. Флаг живёт в базе, а не в токене:
+    отозвать права можно немедленно, не дожидаясь, пока истечёт сессия."""
+    uid = current_user()
+    if uid is None or not is_admin(uid):
+        return None
+    return uid
 
 
 def too_many_fails(username):
@@ -123,7 +157,7 @@ def register():
         db().commit()
     except sqlite3.IntegrityError:
         return jsonify(error='Этот логин уже занят'), 409
-    return jsonify(token=issue_token(cur.lastrowid), username=username)
+    return jsonify(token=issue_token(cur.lastrowid), username=username, is_admin=False)
 
 
 @app.post('/api/login')
@@ -133,12 +167,13 @@ def login():
     password = str(body.get('password', ''))
     if too_many_fails(username):
         return jsonify(error='Слишком много попыток. Подожди 10 минут'), 429
-    row = db().execute('SELECT id, username, pass_hash FROM users WHERE username = ?',
+    row = db().execute('SELECT id, username, pass_hash, is_admin FROM users WHERE username = ?',
                        (username,)).fetchone()
     if not row or not check_password_hash(row['pass_hash'], password):
         _fails.setdefault(username, []).append(time.time())
         return jsonify(error='Неверный логин или пароль'), 401
-    return jsonify(token=issue_token(row['id']), username=row['username'])
+    return jsonify(token=issue_token(row['id']), username=row['username'],
+                   is_admin=bool(row['is_admin']))
 
 
 @app.post('/api/logout')
@@ -285,6 +320,111 @@ def put_state():
                  (uid, raw, int(time.time())))
     db().commit()
     return jsonify(ok=True, warning=message) if message else jsonify(ok=True)
+
+
+# ---------------------------------------------------------------- админ
+# Права проверяются здесь и только здесь. Клиент показывает или прячет раздел,
+# но решает всегда сервер: подделанный флаг в браузере ничего не даст.
+
+def _user_row(uid):
+    return db().execute('SELECT id, username, created, is_admin FROM users WHERE id = ?',
+                        (uid,)).fetchone()
+
+
+@app.get('/api/admin/users')
+def admin_users():
+    if require_admin() is None:
+        return jsonify(error='Нужны права администратора'), 403
+
+    rows = db().execute('''
+        SELECT u.id, u.username, u.created, u.is_admin,
+               s.updated AS last_seen, s.data AS state
+        FROM users u
+        LEFT JOIN states s ON s.user_id = u.id
+        ORDER BY u.id
+    ''').fetchall()
+
+    users = []
+    for r in rows:
+        xp, modules, streak = 0, 0, 0
+        if r['state']:
+            try:
+                st = json.loads(r['state'])
+                xp = int(st.get('xp') or 0)
+                streak = int(st.get('streak') or 0)
+                modules = len(st.get('modules') or st.get('mods') or {})
+            except (ValueError, TypeError):
+                pass          # битое состояние не должно ронять весь список
+        users.append({
+            'id': r['id'],
+            'username': r['username'],
+            'created': r['created'],
+            'is_admin': bool(r['is_admin']),
+            'last_seen': r['last_seen'],
+            'xp': xp,
+            'modules': modules,
+            'streak': streak,
+        })
+    # Хеши паролей наружу не отдаём ни при каких правах
+    return jsonify(users=users, total=len(users))
+
+
+@app.post('/api/admin/user/<int:target>/role')
+def admin_set_role(target):
+    me = require_admin()
+    if me is None:
+        return jsonify(error='Нужны права администратора'), 403
+    if target == me:
+        # Иначе последний администратор может случайно закрыть себе вход в раздел
+        return jsonify(error='Свои права снимать нельзя'), 400
+    if not _user_row(target):
+        return jsonify(error='Пользователь не найден'), 404
+
+    make_admin = bool((request.get_json(silent=True) or {}).get('is_admin'))
+    db().execute('UPDATE users SET is_admin = ? WHERE id = ?', (1 if make_admin else 0, target))
+    db().commit()
+    return jsonify(ok=True, is_admin=make_admin)
+
+
+@app.post('/api/admin/user/<int:target>/reset')
+def admin_reset_progress(target):
+    if require_admin() is None:
+        return jsonify(error='Нужны права администратора'), 403
+    if not _user_row(target):
+        return jsonify(error='Пользователь не найден'), 404
+
+    # Сам аккаунт остаётся: обнуляется только прогресс
+    db().execute('DELETE FROM states WHERE user_id = ?', (target,))
+    db().commit()
+    return jsonify(ok=True)
+
+
+@app.delete('/api/admin/user/<int:target>')
+def admin_delete_user(target):
+    me = require_admin()
+    if me is None:
+        return jsonify(error='Нужны права администратора'), 403
+    if target == me:
+        return jsonify(error='Свой аккаунт удалить нельзя'), 400
+    row = _user_row(target)
+    if not row:
+        return jsonify(error='Пользователь не найден'), 404
+
+    db().execute('DELETE FROM states WHERE user_id = ?', (target,))
+    db().execute('DELETE FROM sessions WHERE user_id = ?', (target,))
+    db().execute('DELETE FROM users WHERE id = ?', (target,))
+    db().commit()
+    return jsonify(ok=True, username=row['username'])
+
+
+@app.get('/api/me')
+def me():
+    """Кто я и есть ли у меня права. Нужен интерфейсу после перезагрузки."""
+    uid = current_user()
+    if uid is None:
+        return jsonify(error='Не авторизован'), 401
+    row = _user_row(uid)
+    return jsonify(username=row['username'], is_admin=bool(row['is_admin']))
 
 
 if __name__ == '__main__':

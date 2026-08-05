@@ -70,6 +70,7 @@ await new Promise(r => setTimeout(r, 3000));
 
 const PAGES = [
   ['01-dashboard', '#/'],
+  ['14-admin', '#/admin'],
   ['02-catalog', '#/catalog'],
   ['03-domain-frontend', '#/domain/frontend'],
   ['12-domain-devops', '#/domain/devops'],

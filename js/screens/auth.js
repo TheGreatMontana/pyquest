@@ -50,7 +50,7 @@ export function renderAuth(root, mode) {
     btn.textContent = t('auth.working');
     try {
       const res = await S.api(isReg ? '/register' : '/login', 'POST', { username, password });
-      await completeAuth(res.username, res.token);
+      await completeAuth(res.username, res.token, res.is_admin);
     } catch (err) {
       errEl.textContent = err.message;
       errEl.hidden = false;
@@ -66,8 +66,10 @@ export function renderAuth(root, mode) {
  * Вход состоялся: выбираем более полное состояние (локальное или серверное),
  * мигрируем схему и сразу отправляем результат на сервер.
  */
-export async function completeAuth(username, token) {
-  S.setAuth({ token, username });
+export async function completeAuth(username, token, isAdmin) {
+  /* Флаг прав нужен интерфейсу, чтобы показать раздел. Доступ к данным он не
+     даёт: сервер проверяет права заново на каждом запросе. */
+  S.setAuth({ token, username, is_admin: !!isAdmin });
 
   const prevUser = S.lastUser();
   let localRaw = S.loadLocal();

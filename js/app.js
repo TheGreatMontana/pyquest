@@ -15,6 +15,7 @@ import { renderCourse, renderModule, initBookmarks } from './screens/course.js';
 import { renderExam, stopExam } from './screens/exam.js';
 import { renderRoadmap, renderPractice, renderAssessment, renderCertificate } from './screens/misc.js';
 import { renderProjects, renderProject } from './screens/projects.js';
+import { renderAdmin } from './screens/admin.js';
 
 const app = document.getElementById('app');
 
@@ -34,6 +35,10 @@ function updateTopbar() {
   if (auth) userChip.querySelector('b').textContent = auth.username;
 
   document.querySelector('.topnav').hidden = !auth;
+  /* Ссылку видно только администратору. Это удобство, а не защита:
+     доступ к данным всё равно решает сервер на каждом запросе. */
+  const adminLink = document.getElementById('nav-admin');
+  if (adminLink) adminLink.hidden = !(auth && auth.is_admin);
   document.getElementById('stat-streak').hidden = !auth;
   document.getElementById('stat-xp').hidden = !auth;
   document.getElementById('stat-rank').hidden = !auth;
@@ -56,6 +61,8 @@ function applyStaticLabels() {
   document.querySelector('[data-i18n="nav.practice"]').textContent = t('nav.practice');
   document.querySelector('[data-i18n="nav.projects"]').textContent = t('nav.projects');
   document.querySelector('[data-i18n="nav.roadmap"]').textContent = t('nav.roadmap');
+  const na = document.querySelector('[data-i18n="nav.admin"]');
+  if (na) na.textContent = t('nav.admin');
   document.querySelector('.footer p').innerHTML = esc(t('footer.text')) +
     ' · <a href="https://github.com/TheGreatMontana/pyquest" target="_blank" rel="noopener">GitHub</a>';
   document.getElementById('stat-streak').title = t('topbar.streak');
@@ -79,6 +86,7 @@ async function route() {
   try {
     if (p[0] === 'catalog') return renderCatalog(app);
     if (p[0] === 'domain' && p[1]) return renderDomain(app, p[1]);
+    if (p[0] === 'admin') return await renderAdmin(app);
     if (p[0] === 'roadmap') return renderRoadmap(app);
     if (p[0] === 'practice') return await renderPractice(app);
     if (p[0] === 'projects') return await renderProjects(app);
