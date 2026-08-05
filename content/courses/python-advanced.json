@@ -558,7 +558,7 @@
       {
        "type": "run",
        "lang": "python",
-       "code": "with open('hello.txt', 'w') as f:\n    f.write('Первая строка\\n')\n    f.write('Вторая строка\\n')\nprint('Файл записан!')"
+       "code": "with open('hello.txt', 'w', encoding='utf-8') as f:\n    f.write('Первая строка\\n')\n    f.write('Вторая строка\\n')\nprint('Файл записан!')"
       },
       {
        "type": "text",
@@ -583,7 +583,7 @@
       {
        "type": "run",
        "lang": "python",
-       "code": "with open('data.txt', 'w') as f:\n    f.write('яблоко\\nбанан\\nвишня\\n')\n\n# 1) весь файл одной строкой\nwith open('data.txt', 'r') as f:\n    text = f.read()\nprint(text)\n\n# 2) списком строк\nwith open('data.txt', 'r') as f:\n    lines = f.readlines()\nprint(lines)"
+       "code": "with open('data.txt', 'w', encoding='utf-8') as f:\n    f.write('яблоко\\nбанан\\nвишня\\n')\n\n# 1) весь файл одной строкой\nwith open('data.txt', 'r', encoding='utf-8') as f:\n    text = f.read()\nprint(text)\n\n# 2) списком строк\nwith open('data.txt', 'r', encoding='utf-8') as f:\n    lines = f.readlines()\nprint(lines)"
       },
       {
        "type": "text",
@@ -594,7 +594,7 @@
       {
        "type": "run",
        "lang": "python",
-       "code": "with open('data.txt', 'w') as f:\n    f.write('яблоко\\nбанан\\nвишня\\n')\n\nwith open('data.txt', 'r') as f:\n    for line in f:\n        print('Фрукт:', line.strip())"
+       "code": "with open('data.txt', 'w', encoding='utf-8') as f:\n    f.write('яблоко\\nбанан\\nвишня\\n')\n\nwith open('data.txt', 'r', encoding='utf-8') as f:\n    for line in f:\n        print('Фрукт:', line.strip())"
       },
       {
        "type": "text",
@@ -619,7 +619,7 @@
       {
        "type": "run",
        "lang": "python",
-       "code": "with open('log.txt', 'w') as f:\n    f.write('игра началась\\n')\nwith open('log.txt', 'a') as f:\n    f.write('уровень пройден\\n')\nwith open('log.txt') as f:\n    print(f.read())"
+       "code": "with open('log.txt', 'w', encoding='utf-8') as f:\n    f.write('игра началась\\n')\nwith open('log.txt', 'a', encoding='utf-8') as f:\n    f.write('уровень пройден\\n')\nwith open('log.txt', encoding='utf-8') as f:\n    print(f.read())"
       },
       {
        "type": "text",
@@ -630,7 +630,7 @@
       {
        "type": "run",
        "lang": "python",
-       "code": "try:\n    with open('net_takogo.txt') as f:\n        print(f.read())\nexcept FileNotFoundError:\n    print('Файла нет - но программа жива!')"
+       "code": "try:\n    with open('net_takogo.txt', encoding='utf-8') as f:\n        print(f.read())\nexcept FileNotFoundError:\n    print('Файла нет - но программа жива!')"
       }
      ]
     },
@@ -649,7 +649,7 @@
       {
        "type": "run",
        "lang": "python",
-       "code": "with open('scores.txt', 'w') as f:\n    f.write('aziz 300\\ntimur 150\\nsara 420\\n')\n\ntotal = 0\nwith open('scores.txt') as f:\n    for line in f:\n        name, score = line.split()   # разбить по пробелу\n        total += int(score)          # строку - в число!\n        print(f'{name}: {score}')\nprint(f'Сумма: {total}')"
+       "code": "with open('scores.txt', 'w', encoding='utf-8') as f:\n    f.write('aziz 300\\ntimur 150\\nsara 420\\n')\n\ntotal = 0\nwith open('scores.txt', encoding='utf-8') as f:\n    for line in f:\n        name, score = line.split()   # разбить по пробелу\n        total += int(score)          # строку - в число!\n        print(f'{name}: {score}')\nprint(f'Сумма: {total}')"
       },
       {
        "type": "text",
@@ -835,12 +835,12 @@
      "desc": {
       "ru": "<p>Запиши в файл <code>diary.txt</code> две строки:</p><pre class=\"code\">День 13: изучаю файлы\nЗавтра финальный босс</pre><p>Потом прочитай файл и выведи его содержимое.</p>"
      },
-     "starter": "# запиши через with open('diary.txt', 'w')\n# прочитай и выведи\n",
+     "starter": "# запиши через with open('diary.txt', 'w', encoding='utf-8')\n# прочитай и выведи\n",
      "hint": {
       "ru": "f.write('День 13: изучаю файлы\\n') и f.write('Завтра финальный босс\\n'), потом открой в режиме 'r' и print(f.read())."
      },
      "kind": "python",
-     "tests": "with open('diary.txt') as _f:\n    _content = _f.read()\nassert 'День 13: изучаю файлы' in _content, 'В файле нет строки: День 13: изучаю файлы'\nassert 'Завтра финальный босс' in _content, 'В файле нет строки: Завтра финальный босс'\nassert 'День 13' in _stdout, 'Прочитай файл и выведи через print'"
+     "tests": "with open('diary.txt', encoding='utf-8') as _f:\n    _content = _f.read()\nassert 'День 13: изучаю файлы' in _content, 'В файле нет строки: День 13: изучаю файлы'\nassert 'Завтра финальный босс' in _content, 'В файле нет строки: Завтра финальный босс'\nassert 'День 13' in _stdout, 'Прочитай файл и выведи через print'"
     },
     {
      "id": "t2",
@@ -858,7 +858,7 @@
       "ru": "Запись: for item in items: f.write(item + \"\\n\"). Чтение: for i, line in enumerate(f, 1): print(f\"{i}. {line.strip()}\")"
      },
      "kind": "python",
-     "tests": "with open('shop.txt') as _f:\n    _lines = [l.strip() for l in _f if l.strip()]\nassert _lines == ['хлеб', 'молоко', 'плов'], 'В файле должно быть 3 строки: хлеб, молоко, плов. Сейчас: ' + str(_lines)\nassert '1. хлеб' in _stdout, 'Вывод: 1. хлеб'\nassert '2. молоко' in _stdout, 'Вывод: 2. молоко'\nassert '3. плов' in _stdout, 'Вывод: 3. плов'"
+     "tests": "with open('shop.txt', encoding='utf-8') as _f:\n    _lines = [l.strip() for l in _f if l.strip()]\nassert _lines == ['хлеб', 'молоко', 'плов'], 'В файле должно быть 3 строки: хлеб, молоко, плов. Сейчас: ' + str(_lines)\nassert '1. хлеб' in _stdout, 'Вывод: 1. хлеб'\nassert '2. молоко' in _stdout, 'Вывод: 2. молоко'\nassert '3. плов' in _stdout, 'Вывод: 3. плов'"
     },
     {
      "id": "t3",
@@ -871,7 +871,7 @@
      "desc": {
       "ru": "<p>В файле <code>results.txt</code> лежат результаты (он уже создан стартовым кодом). Прочитай его и выведи: <code>Общий счёт: 870</code></p>"
      },
-     "starter": "with open('results.txt', 'w') as f:\n    f.write('level1 250\\nlevel2 300\\nlevel3 320\\n')\n\n# прочитай файл, сложи числа, выведи 'Общий счёт: 870'\n",
+     "starter": "with open('results.txt', 'w', encoding='utf-8') as f:\n    f.write('level1 250\\nlevel2 300\\nlevel3 320\\n')\n\n# прочитай файл, сложи числа, выведи 'Общий счёт: 870'\n",
      "hint": {
       "ru": "total = 0, потом for line in f: name, score = line.split(), total += int(score). В конце print(f\"Общий счёт: {total}\")"
      },
@@ -888,13 +888,13 @@
       },
       "options": [
        {
-        "ru": "open('f.txt', 'r')"
+        "ru": "open('f.txt', 'r', encoding='utf-8')"
        },
        {
-        "ru": "open('f.txt', 'w')"
+        "ru": "open('f.txt', 'w', encoding='utf-8')"
        },
        {
-        "ru": "open('f.txt', 'a')"
+        "ru": "open('f.txt', 'a', encoding='utf-8')"
        },
        {
         "ru": "open('f.txt', 'add')"
@@ -921,7 +921,7 @@
        }
       ],
       "a": 2,
-      "code": "with open('t.txt', 'w') as f:\n    f.write('A')\nwith open('t.txt', 'w') as f:\n    f.write('B')\nwith open('t.txt') as f:\n    print(f.read())"
+      "code": "with open('t.txt', 'w', encoding='utf-8') as f:\n    f.write('A')\nwith open('t.txt', 'w', encoding='utf-8') as f:\n    f.write('B')\nwith open('t.txt', encoding='utf-8') as f:\n    print(f.read())"
      },
      {
       "q": {
@@ -1013,7 +1013,7 @@
       "desc": {
        "ru": "<p>Стартовый код создаёт лог. Прочитай его, посчитай сколько строк содержат слово <code>ERROR</code> и выведи: <code>Ошибок: 2</code></p>"
       },
-      "starter": "with open('server.log', 'w') as f:\n    f.write('INFO старт\\nERROR сбой сети\\nINFO работаем\\nERROR диск полон\\nINFO стоп\\n')\n\n# посчитай строки с ERROR\n",
+      "starter": "with open('server.log', 'w', encoding='utf-8') as f:\n    f.write('INFO старт\\nERROR сбой сети\\nINFO работаем\\nERROR диск полон\\nINFO стоп\\n')\n\n# посчитай строки с ERROR\n",
       "kind": "python",
       "tests": "assert 'Ошибок: 2' in _stdout, 'Ожидался вывод: Ошибок: 2. Считай: if \\'ERROR\\' in line'"
      }
