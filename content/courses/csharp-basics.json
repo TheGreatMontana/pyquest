@@ -4,162 +4,673 @@
  "modules": [
   {
    "id": "cs-01",
-   "title": { "ru": "C#: язык платформы .NET", "uz": "C#: .NET platformasi tili", "en": "C#: the language of the .NET platform" },
-   "tagline": { "ru": "Типы, классы, свойства и LINQ", "uz": "Turlar, sinflar, xususiyatlar va LINQ", "en": "Types, classes, properties and LINQ" },
+   "title": {
+    "ru": "C#: язык платформы .NET",
+    "uz": "C#: .NET platformasi tili",
+    "en": "C#: the language of the .NET platform"
+   },
+   "tagline": {
+    "ru": "Типы, классы, свойства и LINQ",
+    "uz": "Turlar, sinflar, xususiyatlar va LINQ",
+    "en": "Types, classes, properties and LINQ"
+   },
    "lessons": [
     {
      "id": "l1",
-     "title": { "ru": "Где живёт C#", "uz": "C# qayerda yashaydi", "en": "Where C# lives" },
+     "title": {
+      "ru": "Где живёт C#",
+      "uz": "C# qayerda yashaydi",
+      "en": "Where C# lives"
+     },
      "blocks": [
-      { "type": "text", "html": {
+      {
+       "type": "text",
+       "html": {
         "ru": "<p><b>C#</b> — язык Microsoft для платформы .NET. На нём пишут корпоративные веб-сервисы (ASP.NET), игры в Unity и десктопные приложения Windows.</p><p>Он строго типизирован как C++, но с автоматической сборкой мусора как в Python — golden middle между контролем и удобством.</p><p>Особенно важен для тебя как для человека, изучающего SQL Server: экосистема Microsoft — это C# и T-SQL вместе.</p>",
         "uz": "<p><b>C#</b> — Microsoft'ning .NET platformasi uchun tili. Unda korporativ veb-xizmatlar (ASP.NET), Unity o'yinlari va Windows desktop ilovalari yoziladi.</p><p>U C++ kabi qat'iy turlangan, lekin Python kabi avtomatik axlat yig'ish bilan.</p><p>SQL Server o'rganayotgan odam uchun ayniqsa muhim: Microsoft ekotizimi — bu C# va T-SQL birgalikda.</p>",
-        "en": "<p><b>C#</b> is Microsoft's language for the .NET platform. It powers enterprise web services (ASP.NET), Unity games and Windows desktop apps.</p><p>It is strictly typed like C++, but with automatic garbage collection like Python — a golden middle between control and convenience.</p><p>Especially relevant if you are learning SQL Server: the Microsoft ecosystem means C# and T-SQL together.</p>" } },
-      { "type": "code", "lang": "csharp", "code": "using System;\n\nclass Program\n{\n    static void Main()\n    {\n        string name = \"Азиз\";\n        int level = 7;\n\n        Console.WriteLine($\"Привет, {name}! Уровень: {level}\");\n    }\n}" },
-      { "type": "note", "kind": "tip", "html": {
+        "en": "<p><b>C#</b> is Microsoft's language for the .NET platform. It powers enterprise web services (ASP.NET), Unity games and Windows desktop apps.</p><p>It is strictly typed like C++, but with automatic garbage collection like Python — a golden middle between control and convenience.</p><p>Especially relevant if you are learning SQL Server: the Microsoft ecosystem means C# and T-SQL together.</p>"
+       }
+      },
+      {
+       "type": "code",
+       "lang": "csharp",
+       "code": "using System;\n\nclass Program\n{\n    static void Main()\n    {\n        string name = \"Азиз\";\n        int level = 7;\n\n        Console.WriteLine($\"Привет, {name}! Уровень: {level}\");\n    }\n}"
+      },
+      {
+       "type": "note",
+       "kind": "tip",
+       "html": {
         "ru": "Строка с <code>$</code> перед кавычками — это интерполяция, прямой аналог f-строк Python. Запуск: <code>dotnet run</code> (нужен .NET SDK, бесплатный и кроссплатформенный).",
         "uz": "Qo'shtirnoq oldidagi <code>$</code> — bu interpolyatsiya, Python f-satrlarining to'g'ridan-to'g'ri analogi. Ishga tushirish: <code>dotnet run</code>.",
-        "en": "A string with <code>$</code> before the quotes is interpolation, the direct analogue of Python f-strings. Run with <code>dotnet run</code> (needs the free, cross-platform .NET SDK)." } }
+        "en": "A string with <code>$</code> before the quotes is interpolation, the direct analogue of Python f-strings. Run with <code>dotnet run</code> (needs the free, cross-platform .NET SDK)."
+       }
+      }
      ]
     },
     {
      "id": "l2",
-     "title": { "ru": "Классы и свойства", "uz": "Sinflar va xususiyatlar", "en": "Classes and properties" },
+     "title": {
+      "ru": "Классы и свойства",
+      "uz": "Sinflar va xususiyatlar",
+      "en": "Classes and properties"
+     },
      "blocks": [
-      { "type": "text", "html": {
+      {
+       "type": "text",
+       "html": {
         "ru": "<p>Главная особенность C# по сравнению с Java и C++ — <b>свойства</b>. Вместо пары геттер/сеттер пишется короткая конструкция, которая выглядит как поле, но работает как метод.</p>",
         "uz": "<p>C# ning Java va C++ ga nisbatan asosiy xususiyati — <b>xususiyatlar (properties)</b>. Getter/setter juftligi o'rniga maydonga o'xshab ko'rinadigan, lekin metod kabi ishlaydigan qisqa konstruksiya yoziladi.</p>",
-        "en": "<p>C#'s standout feature versus Java and C++ is <b>properties</b>. Instead of a getter/setter pair you write a short construct that looks like a field but behaves like a method.</p>" } },
-      { "type": "code", "lang": "csharp", "code": "using System;\n\nclass Player\n{\n    public string Name { get; }              // только чтение\n    public int Hp { get; private set; }       // читать всем, менять - только внутри\n\n    public Player(string name, int hp)\n    {\n        Name = name;\n        Hp = hp;\n    }\n\n    public void TakeDamage(int dmg)\n    {\n        Hp = Math.Max(0, Hp - dmg);           // не уходим в минус\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var hero = new Player(\"Азиз\", 100);   // var = тип выводится сам\n        hero.TakeDamage(30);\n        Console.WriteLine($\"{hero.Name}: {hero.Hp} HP\");\n    }\n}" },
-      { "type": "predict", "lang": "csharp",
-        "code": "var hero = new Player(\"Азиз\", 100);\nhero.Hp = 999;\nConsole.WriteLine(hero.Hp);",
-        "options": [
-          { "ru": "999", "uz": "999", "en": "999" },
-          { "ru": "100", "uz": "100", "en": "100" },
-          { "ru": "Ошибка компиляции: сеттер приватный", "uz": "Kompilyatsiya xatosi: setter private", "en": "A compilation error: the setter is private" },
-          { "ru": "0", "uz": "0", "en": "0" }
-        ], "a": 2,
-        "explain": { "ru": "<code>private set</code> означает: читать Hp может кто угодно, а изменять — только код внутри класса. Компилятор не даст обойти правило, и ошибка обнаружится ещё до запуска. В этом сила строгой типизации.", "uz": "<code>private set</code> degani: Hp ni har kim o'qiy oladi, o'zgartirishni esa faqat sinf ichidagi kod. Kompilyator qoidani chetlab o'tishga yo'l qo'ymaydi.", "en": "<code>private set</code> means anyone may read Hp, but only code inside the class may change it. The compiler enforces this before the program even runs — the strength of static typing." } }
+        "en": "<p>C#'s standout feature versus Java and C++ is <b>properties</b>. Instead of a getter/setter pair you write a short construct that looks like a field but behaves like a method.</p>"
+       }
+      },
+      {
+       "type": "code",
+       "lang": "csharp",
+       "code": "using System;\n\nclass Player\n{\n    public string Name { get; }              // только чтение\n    public int Hp { get; private set; }       // читать всем, менять - только внутри\n\n    public Player(string name, int hp)\n    {\n        Name = name;\n        Hp = hp;\n    }\n\n    public void TakeDamage(int dmg)\n    {\n        Hp = Math.Max(0, Hp - dmg);           // не уходим в минус\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var hero = new Player(\"Азиз\", 100);   // var = тип выводится сам\n        hero.TakeDamage(30);\n        Console.WriteLine($\"{hero.Name}: {hero.Hp} HP\");\n    }\n}"
+      },
+      {
+       "type": "predict",
+       "lang": "csharp",
+       "code": "var hero = new Player(\"Азиз\", 100);\nhero.Hp = 999;\nConsole.WriteLine(hero.Hp);",
+       "options": [
+        {
+         "ru": "999",
+         "uz": "999",
+         "en": "999"
+        },
+        {
+         "ru": "100",
+         "uz": "100",
+         "en": "100"
+        },
+        {
+         "ru": "Ошибка компиляции: сеттер приватный",
+         "uz": "Kompilyatsiya xatosi: setter private",
+         "en": "A compilation error: the setter is private"
+        },
+        {
+         "ru": "0",
+         "uz": "0",
+         "en": "0"
+        }
+       ],
+       "a": 2,
+       "explain": {
+        "ru": "<code>private set</code> означает: читать Hp может кто угодно, а изменять — только код внутри класса. Компилятор не даст обойти правило, и ошибка обнаружится ещё до запуска. В этом сила строгой типизации.",
+        "uz": "<code>private set</code> degani: Hp ni har kim o'qiy oladi, o'zgartirishni esa faqat sinf ichidagi kod. Kompilyator qoidani chetlab o'tishga yo'l qo'ymaydi.",
+        "en": "<code>private set</code> means anyone may read Hp, but only code inside the class may change it. The compiler enforces this before the program even runs — the strength of static typing."
+       }
+      }
      ]
     },
     {
      "id": "l3",
-     "title": { "ru": "LINQ: SQL внутри языка", "uz": "LINQ: til ichidagi SQL", "en": "LINQ: SQL inside the language" },
+     "title": {
+      "ru": "LINQ: SQL внутри языка",
+      "uz": "LINQ: til ichidagi SQL",
+      "en": "LINQ: SQL inside the language"
+     },
      "blocks": [
-      { "type": "text", "html": {
+      {
+       "type": "text",
+       "html": {
         "ru": "<p><b>LINQ</b> — визитная карточка C#. Это язык запросов к коллекциям, встроенный прямо в код. Если ты знаешь SQL, то узнаешь всё сразу: <code>Where</code> — это WHERE, <code>Select</code> — SELECT, <code>OrderBy</code> — ORDER BY, <code>GroupBy</code> — GROUP BY.</p>",
         "uz": "<p><b>LINQ</b> — C# ning tashrif qog'ozi. Bu kodga o'rnatilgan to'plamlarga so'rov tili. SQL bilsangiz, hammasini darhol tanib olasiz: <code>Where</code> — WHERE, <code>Select</code> — SELECT, <code>OrderBy</code> — ORDER BY.</p>",
-        "en": "<p><b>LINQ</b> is C#'s calling card: a query language for collections built into the code. If you know SQL you will recognise everything at once: <code>Where</code> is WHERE, <code>Select</code> is SELECT, <code>OrderBy</code> is ORDER BY, <code>GroupBy</code> is GROUP BY.</p>" } },
-      { "type": "code", "lang": "csharp", "code": "using System;\nusing System.Linq;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static void Main()\n    {\n        var players = new List<Player>\n        {\n            new Player(\"Азиз\", 80),\n            new Player(\"Тимур\", 95),\n            new Player(\"Сара\", 60)\n        };\n\n        // Тот же смысл, что SELECT Name FROM players WHERE Hp > 70 ORDER BY Hp DESC\n        var strong = players\n            .Where(p => p.Hp > 70)\n            .OrderByDescending(p => p.Hp)\n            .Select(p => p.Name);\n\n        foreach (var name in strong)\n            Console.WriteLine(name);      // Тимур, Азиз\n\n        Console.WriteLine($\"Средний HP: {players.Average(p => p.Hp)}\");\n    }\n}" },
-      { "type": "match",
-        "pairs": [
-          { "left": { "ru": "Where()", "uz": "Where()", "en": "Where()" }, "right": { "ru": "WHERE в SQL — фильтр", "uz": "SQL'dagi WHERE — filtr", "en": "WHERE in SQL — a filter" } },
-          { "left": { "ru": "Select()", "uz": "Select()", "en": "Select()" }, "right": { "ru": "SELECT — выбор полей", "uz": "SELECT — maydonlarni tanlash", "en": "SELECT — choosing fields" } },
-          { "left": { "ru": "OrderBy()", "uz": "OrderBy()", "en": "OrderBy()" }, "right": { "ru": "ORDER BY — сортировка", "uz": "ORDER BY — saralash", "en": "ORDER BY — sorting" } },
-          { "left": { "ru": "GroupBy()", "uz": "GroupBy()", "en": "GroupBy()" }, "right": { "ru": "GROUP BY — группировка", "uz": "GROUP BY — guruhlash", "en": "GROUP BY — grouping" } }
-        ] },
-      { "type": "summary", "items": [
-        { "ru": "C# строго типизирован, но память освобождается сама", "uz": "C# qat'iy turlangan, lekin xotira o'zi bo'shaydi", "en": "C# is statically typed, yet memory frees itself" },
-        { "ru": "Свойства { get; set; } заменяют пары геттер-сеттер", "uz": "{ get; set; } xususiyatlari getter-setter juftliklarini almashtiradi", "en": "Properties { get; set; } replace getter/setter pairs" },
-        { "ru": "$-строки — это f-строки Python", "uz": "$-satrlar — bu Python f-satrlari", "en": "$-strings are Python's f-strings" },
-        { "ru": "LINQ приносит логику SQL прямо в код", "uz": "LINQ SQL mantiqini to'g'ridan-to'g'ri kodga olib keladi", "en": "LINQ brings SQL logic straight into the code" }
-      ] }
+        "en": "<p><b>LINQ</b> is C#'s calling card: a query language for collections built into the code. If you know SQL you will recognise everything at once: <code>Where</code> is WHERE, <code>Select</code> is SELECT, <code>OrderBy</code> is ORDER BY, <code>GroupBy</code> is GROUP BY.</p>"
+       }
+      },
+      {
+       "type": "code",
+       "lang": "csharp",
+       "code": "using System;\nusing System.Linq;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static void Main()\n    {\n        var players = new List<Player>\n        {\n            new Player(\"Азиз\", 80),\n            new Player(\"Тимур\", 95),\n            new Player(\"Сара\", 60)\n        };\n\n        // Тот же смысл, что SELECT Name FROM players WHERE Hp > 70 ORDER BY Hp DESC\n        var strong = players\n            .Where(p => p.Hp > 70)\n            .OrderByDescending(p => p.Hp)\n            .Select(p => p.Name);\n\n        foreach (var name in strong)\n            Console.WriteLine(name);      // Тимур, Азиз\n\n        Console.WriteLine($\"Средний HP: {players.Average(p => p.Hp)}\");\n    }\n}"
+      },
+      {
+       "type": "match",
+       "pairs": [
+        {
+         "left": {
+          "ru": "Where()",
+          "uz": "Where()",
+          "en": "Where()"
+         },
+         "right": {
+          "ru": "WHERE в SQL — фильтр",
+          "uz": "SQL'dagi WHERE — filtr",
+          "en": "WHERE in SQL — a filter"
+         }
+        },
+        {
+         "left": {
+          "ru": "Select()",
+          "uz": "Select()",
+          "en": "Select()"
+         },
+         "right": {
+          "ru": "SELECT — выбор полей",
+          "uz": "SELECT — maydonlarni tanlash",
+          "en": "SELECT — choosing fields"
+         }
+        },
+        {
+         "left": {
+          "ru": "OrderBy()",
+          "uz": "OrderBy()",
+          "en": "OrderBy()"
+         },
+         "right": {
+          "ru": "ORDER BY — сортировка",
+          "uz": "ORDER BY — saralash",
+          "en": "ORDER BY — sorting"
+         }
+        },
+        {
+         "left": {
+          "ru": "GroupBy()",
+          "uz": "GroupBy()",
+          "en": "GroupBy()"
+         },
+         "right": {
+          "ru": "GROUP BY — группировка",
+          "uz": "GROUP BY — guruhlash",
+          "en": "GROUP BY — grouping"
+         }
+        }
+       ]
+      },
+      {
+       "type": "summary",
+       "items": [
+        {
+         "ru": "C# строго типизирован, но память освобождается сама",
+         "uz": "C# qat'iy turlangan, lekin xotira o'zi bo'shaydi",
+         "en": "C# is statically typed, yet memory frees itself"
+        },
+        {
+         "ru": "Свойства { get; set; } заменяют пары геттер-сеттер",
+         "uz": "{ get; set; } xususiyatlari getter-setter juftliklarini almashtiradi",
+         "en": "Properties { get; set; } replace getter/setter pairs"
+        },
+        {
+         "ru": "$-строки — это f-строки Python",
+         "uz": "$-satrlar — bu Python f-satrlari",
+         "en": "$-strings are Python's f-strings"
+        },
+        {
+         "ru": "LINQ приносит логику SQL прямо в код",
+         "uz": "LINQ SQL mantiqini to'g'ridan-to'g'ri kodga olib keladi",
+         "en": "LINQ brings SQL logic straight into the code"
+        }
+       ]
+      }
      ]
     }
    ],
    "quiz": [
-    { "q": { "ru": "Что такое свойство (property) в C#?", "uz": "C# da xususiyat (property) nima?", "en": "What is a property in C#?" },
-      "options": [
-        { "ru": "Обычное поле класса", "uz": "Sinfning oddiy maydoni", "en": "An ordinary class field" },
-        { "ru": "Конструкция, которая выглядит как поле, но работает как методы get/set", "uz": "Maydonga o'xshaydigan, lekin get/set metodlari kabi ishlaydigan konstruksiya", "en": "A construct that looks like a field but works like get/set methods" },
-        { "ru": "Настройка проекта", "uz": "Loyiha sozlamasi", "en": "A project setting" },
-        { "ru": "Тип данных", "uz": "Ma'lumot turi", "en": "A data type" }
-      ], "a": 1,
-      "explain": { "ru": "<code>public int Hp { get; private set; }</code> — снаружи это выглядит как поле, но доступ контролируется.", "uz": "<code>public int Hp { get; private set; }</code> — tashqaridan maydonga o'xshaydi, lekin kirish nazorat qilinadi.", "en": "<code>public int Hp { get; private set; }</code> — from outside it looks like a field, but access is controlled." } },
-    { "q": { "ru": "Что делает <code>var</code> в C#?", "uz": "C# da <code>var</code> nima qiladi?", "en": "What does <code>var</code> do in C#?" },
-      "options": [
-        { "ru": "Создаёт переменную без типа, как в JavaScript", "uz": "JavaScript'dagi kabi tursiz o'zgaruvchi yaratadi", "en": "Creates an untyped variable like in JavaScript" },
-        { "ru": "Тип выводится компилятором, но остаётся строгим", "uz": "Tur kompilyator tomonidan aniqlanadi, lekin qat'iy qoladi", "en": "The type is inferred by the compiler but stays static" },
-        { "ru": "Делает переменную глобальной", "uz": "O'zgaruvchini global qiladi", "en": "Makes the variable global" },
-        { "ru": "Это устаревший синтаксис", "uz": "Bu eskirgan sintaksis", "en": "It is legacy syntax" }
-      ], "a": 1,
-      "explain": { "ru": "Важное отличие от JS: тип определяется на этапе компиляции и потом не меняется. <code>var x = 5;</code> — это int навсегда.", "uz": "JS dan muhim farqi: tur kompilyatsiya bosqichida aniqlanadi va keyin o'zgarmaydi.", "en": "A key difference from JS: the type is fixed at compile time and never changes. <code>var x = 5;</code> is an int forever." } },
-    { "q": { "ru": "<code>players.Where(p => p.Hp > 70)</code> — аналог чего в SQL?", "uz": "<code>players.Where(p => p.Hp > 70)</code> SQL'da nimaning analogi?", "en": "<code>players.Where(p => p.Hp > 70)</code> is the analogue of what in SQL?" },
-      "options": [
-        { "ru": "SELECT", "uz": "SELECT", "en": "SELECT" },
-        { "ru": "WHERE", "uz": "WHERE", "en": "WHERE" },
-        { "ru": "JOIN", "uz": "JOIN", "en": "JOIN" },
-        { "ru": "INSERT", "uz": "INSERT", "en": "INSERT" }
-      ], "a": 1,
-      "explain": { "ru": "LINQ намеренно повторяет логику SQL — знание одного помогает освоить другое.", "uz": "LINQ ataylab SQL mantiqini takrorlaydi — birini bilish ikkinchisini o'zlashtirishga yordam beradi.", "en": "LINQ deliberately mirrors SQL — knowing one helps you pick up the other." } },
-    { "q": { "ru": "Нужно ли освобождать память вручную в C#?", "uz": "C# da xotirani qo'lda bo'shatish kerakmi?", "en": "Do you free memory manually in C#?" },
-      "options": [
-        { "ru": "Да, через delete", "uz": "Ha, delete orqali", "en": "Yes, with delete" },
-        { "ru": "Нет, работает сборщик мусора", "uz": "Yo'q, axlat yig'uvchi ishlaydi", "en": "No, a garbage collector handles it" },
-        { "ru": "Да, через free()", "uz": "Ha, free() orqali", "en": "Yes, with free()" },
-        { "ru": "Только для массивов", "uz": "Faqat massivlar uchun", "en": "Only for arrays" }
-      ], "a": 1,
-      "explain": { "ru": "Как в Python. Именно поэтому C# проще C++ — но и контроля над памятью меньше.", "uz": "Python'dagi kabi. Aynan shuning uchun C# C++ dan oddiyroq — lekin xotira nazorati kamroq.", "en": "Just like Python. That is why C# is simpler than C++ — with less control over memory in exchange." } },
-    { "q": { "ru": "Аналог f-строки Python в C# — это…", "uz": "C# da Python f-satrining analogi — bu…", "en": "The C# analogue of a Python f-string is…" },
-      "options": [
-        { "ru": "$\"текст {переменная}\"", "uz": "$\"matn {o'zgaruvchi}\"", "en": "$\"text {variable}\"" },
-        { "ru": "f\"текст {переменная}\"", "uz": "f\"matn {o'zgaruvchi}\"", "en": "f\"text {variable}\"" },
-        { "ru": "printf", "uz": "printf", "en": "printf" },
-        { "ru": "Такого нет", "uz": "Bunday narsa yo'q", "en": "There is none" }
-      ], "a": 0,
-      "explain": { "ru": "Символ <code>$</code> перед строкой включает интерполяцию — вставку значений в фигурных скобках.", "uz": "Satr oldidagi <code>$</code> belgisi interpolyatsiyani yoqadi.", "en": "The <code>$</code> before the string enables interpolation — inserting values in braces." } },
-    { "q": { "ru": "Где чаще всего применяют C#?", "uz": "C# ko'pincha qayerda qo'llaniladi?", "en": "Where is C# most often used?" },
-      "options": [
-        { "ru": "Веб-сервисы ASP.NET, игры в Unity, приложения Windows", "uz": "ASP.NET veb-xizmatlari, Unity o'yinlari, Windows ilovalari", "en": "ASP.NET web services, Unity games, Windows apps" },
-        { "ru": "Только для мобильных приложений", "uz": "Faqat mobil ilovalar uchun", "en": "Mobile apps only" },
-        { "ru": "Только для драйверов", "uz": "Faqat drayverlar uchun", "en": "Drivers only" },
-        { "ru": "Только для скриптов", "uz": "Faqat skriptlar uchun", "en": "Scripts only" }
-      ], "a": 0,
-      "explain": { "ru": "Плюс это язык экосистемы Microsoft — там же, где SQL Server, который ты изучаешь по программе ментора.", "uz": "Bundan tashqari bu Microsoft ekotizimi tili — siz o'rganayotgan SQL Server ham o'sha yerda.", "en": "It is also the Microsoft ecosystem language — the same world as the SQL Server you are learning." } }
+    {
+     "q": {
+      "ru": "Что такое свойство (property) в C#?",
+      "uz": "C# da xususiyat (property) nima?",
+      "en": "What is a property in C#?"
+     },
+     "options": [
+      {
+       "ru": "Обычное поле класса",
+       "uz": "Sinfning oddiy maydoni",
+       "en": "An ordinary class field"
+      },
+      {
+       "ru": "Конструкция, которая выглядит как поле, но работает как методы get/set",
+       "uz": "Maydonga o'xshaydigan, lekin get/set metodlari kabi ishlaydigan konstruksiya",
+       "en": "A construct that looks like a field but works like get/set methods"
+      },
+      {
+       "ru": "Настройка проекта",
+       "uz": "Loyiha sozlamasi",
+       "en": "A project setting"
+      },
+      {
+       "ru": "Тип данных",
+       "uz": "Ma'lumot turi",
+       "en": "A data type"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "<code>public int Hp { get; private set; }</code> — снаружи это выглядит как поле, но доступ контролируется.",
+      "uz": "<code>public int Hp { get; private set; }</code> — tashqaridan maydonga o'xshaydi, lekin kirish nazorat qilinadi.",
+      "en": "<code>public int Hp { get; private set; }</code> — from outside it looks like a field, but access is controlled."
+     }
+    },
+    {
+     "q": {
+      "ru": "Что делает <code>var</code> в C#?",
+      "uz": "C# da <code>var</code> nima qiladi?",
+      "en": "What does <code>var</code> do in C#?"
+     },
+     "options": [
+      {
+       "ru": "Создаёт переменную без типа, как в JavaScript",
+       "uz": "JavaScript'dagi kabi tursiz o'zgaruvchi yaratadi",
+       "en": "Creates an untyped variable like in JavaScript"
+      },
+      {
+       "ru": "Тип выводится компилятором, но остаётся строгим",
+       "uz": "Tur kompilyator tomonidan aniqlanadi, lekin qat'iy qoladi",
+       "en": "The type is inferred by the compiler but stays static"
+      },
+      {
+       "ru": "Делает переменную глобальной",
+       "uz": "O'zgaruvchini global qiladi",
+       "en": "Makes the variable global"
+      },
+      {
+       "ru": "Это устаревший синтаксис",
+       "uz": "Bu eskirgan sintaksis",
+       "en": "It is legacy syntax"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Важное отличие от JS: тип определяется на этапе компиляции и потом не меняется. <code>var x = 5;</code> — это int навсегда.",
+      "uz": "JS dan muhim farqi: tur kompilyatsiya bosqichida aniqlanadi va keyin o'zgarmaydi.",
+      "en": "A key difference from JS: the type is fixed at compile time and never changes. <code>var x = 5;</code> is an int forever."
+     }
+    },
+    {
+     "q": {
+      "ru": "<code>players.Where(p => p.Hp > 70)</code> — аналог чего в SQL?",
+      "uz": "<code>players.Where(p => p.Hp > 70)</code> SQL'da nimaning analogi?",
+      "en": "<code>players.Where(p => p.Hp > 70)</code> is the analogue of what in SQL?"
+     },
+     "options": [
+      {
+       "ru": "SELECT",
+       "uz": "SELECT",
+       "en": "SELECT"
+      },
+      {
+       "ru": "WHERE",
+       "uz": "WHERE",
+       "en": "WHERE"
+      },
+      {
+       "ru": "JOIN",
+       "uz": "JOIN",
+       "en": "JOIN"
+      },
+      {
+       "ru": "INSERT",
+       "uz": "INSERT",
+       "en": "INSERT"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "LINQ намеренно повторяет логику SQL — знание одного помогает освоить другое.",
+      "uz": "LINQ ataylab SQL mantiqini takrorlaydi — birini bilish ikkinchisini o'zlashtirishga yordam beradi.",
+      "en": "LINQ deliberately mirrors SQL — knowing one helps you pick up the other."
+     }
+    },
+    {
+     "q": {
+      "ru": "Нужно ли освобождать память вручную в C#?",
+      "uz": "C# da xotirani qo'lda bo'shatish kerakmi?",
+      "en": "Do you free memory manually in C#?"
+     },
+     "options": [
+      {
+       "ru": "Да, через delete",
+       "uz": "Ha, delete orqali",
+       "en": "Yes, with delete"
+      },
+      {
+       "ru": "Нет, работает сборщик мусора",
+       "uz": "Yo'q, axlat yig'uvchi ishlaydi",
+       "en": "No, a garbage collector handles it"
+      },
+      {
+       "ru": "Да, через free()",
+       "uz": "Ha, free() orqali",
+       "en": "Yes, with free()"
+      },
+      {
+       "ru": "Только для массивов",
+       "uz": "Faqat massivlar uchun",
+       "en": "Only for arrays"
+      }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Как в Python. Именно поэтому C# проще C++ — но и контроля над памятью меньше.",
+      "uz": "Python'dagi kabi. Aynan shuning uchun C# C++ dan oddiyroq — lekin xotira nazorati kamroq.",
+      "en": "Just like Python. That is why C# is simpler than C++ — with less control over memory in exchange."
+     }
+    },
+    {
+     "q": {
+      "ru": "Аналог f-строки Python в C# — это…",
+      "uz": "C# da Python f-satrining analogi — bu…",
+      "en": "The C# analogue of a Python f-string is…"
+     },
+     "options": [
+      {
+       "ru": "$\"текст {переменная}\"",
+       "uz": "$\"matn {o'zgaruvchi}\"",
+       "en": "$\"text {variable}\""
+      },
+      {
+       "ru": "f\"текст {переменная}\"",
+       "uz": "f\"matn {o'zgaruvchi}\"",
+       "en": "f\"text {variable}\""
+      },
+      {
+       "ru": "printf",
+       "uz": "printf",
+       "en": "printf"
+      },
+      {
+       "ru": "Такого нет",
+       "uz": "Bunday narsa yo'q",
+       "en": "There is none"
+      }
+     ],
+     "a": 0,
+     "explain": {
+      "ru": "Символ <code>$</code> перед строкой включает интерполяцию — вставку значений в фигурных скобках.",
+      "uz": "Satr oldidagi <code>$</code> belgisi interpolyatsiyani yoqadi.",
+      "en": "The <code>$</code> before the string enables interpolation — inserting values in braces."
+     }
+    },
+    {
+     "q": {
+      "ru": "Где чаще всего применяют C#?",
+      "uz": "C# ko'pincha qayerda qo'llaniladi?",
+      "en": "Where is C# most often used?"
+     },
+     "options": [
+      {
+       "ru": "Веб-сервисы ASP.NET, игры в Unity, приложения Windows",
+       "uz": "ASP.NET veb-xizmatlari, Unity o'yinlari, Windows ilovalari",
+       "en": "ASP.NET web services, Unity games, Windows apps"
+      },
+      {
+       "ru": "Только для мобильных приложений",
+       "uz": "Faqat mobil ilovalar uchun",
+       "en": "Mobile apps only"
+      },
+      {
+       "ru": "Только для драйверов",
+       "uz": "Faqat drayverlar uchun",
+       "en": "Drivers only"
+      },
+      {
+       "ru": "Только для скриптов",
+       "uz": "Faqat skriptlar uchun",
+       "en": "Scripts only"
+      }
+     ],
+     "a": 0,
+     "explain": {
+      "ru": "Плюс это язык экосистемы Microsoft — там же, где SQL Server, который ты изучаешь по программе ментора.",
+      "uz": "Bundan tashqari bu Microsoft ekotizimi tili — siz o'rganayotgan SQL Server ham o'sha yerda.",
+      "en": "It is also the Microsoft ecosystem language — the same world as the SQL Server you are learning."
+     }
+    }
    ],
    "tasks": [
-    { "id": "t1", "kind": "csharp",
-      "title": { "ru": "Класс с свойствами", "uz": "Xususiyatli sinf", "en": "A class with properties" },
-      "brief": { "ru": "get, private set, конструктор", "uz": "get, private set, konstruktor", "en": "get, private set, constructor" },
-      "desc": { "ru": "<p>Напиши класс <code>Account</code>: свойство <code>Balance</code> (читать всем, менять только внутри), конструктор с начальной суммой, методы <code>Deposit(int)</code> и <code>Withdraw(int)</code> (не уходить в минус).</p>", "uz": "<p><code>Account</code> sinfini yozing: <code>Balance</code> xususiyati (hamma o'qiydi, faqat ichida o'zgaradi), boshlang'ich summa bilan konstruktor, <code>Deposit(int)</code> va <code>Withdraw(int)</code> metodlari.</p>", "en": "<p>Write an <code>Account</code> class: a <code>Balance</code> property (readable by all, writable only inside), a constructor with the starting sum, and <code>Deposit(int)</code> / <code>Withdraw(int)</code> methods that never go negative.</p>" },
-      "starter": "using System;\n\nclass Account\n{\n    // твой код\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var acc = new Account(100);\n        acc.Deposit(50);\n        acc.Withdraw(200);\n        Console.WriteLine(acc.Balance);   // 150\n    }\n}\n",
-      "solution": "using System;\n\nclass Account\n{\n    public int Balance { get; private set; }   // читать всем, менять - только классу\n\n    public Account(int start)\n    {\n        Balance = start;\n    }\n\n    public void Deposit(int amount)\n    {\n        if (amount > 0) Balance += amount;\n    }\n\n    public void Withdraw(int amount)\n    {\n        if (amount > 0 && amount <= Balance) Balance -= amount;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var acc = new Account(100);\n        acc.Deposit(50);\n        acc.Withdraw(200);          // больше баланса - операция игнорируется\n        Console.WriteLine(acc.Balance);   // 150\n    }\n}",
-      "hint": { "ru": "public int Balance { get; private set; } — и проверка amount <= Balance в Withdraw.", "uz": "public int Balance { get; private set; } — va Withdraw da amount <= Balance tekshiruvi.", "en": "public int Balance { get; private set; } — plus an amount <= Balance check in Withdraw." } },
-    { "id": "t2", "kind": "csharp",
-      "title": { "ru": "LINQ-запрос", "uz": "LINQ so'rovi", "en": "A LINQ query" },
-      "brief": { "ru": "Where + OrderBy + Select", "uz": "Where + OrderBy + Select", "en": "Where + OrderBy + Select" },
-      "desc": { "ru": "<p>Дан список чисел. Напиши LINQ-запрос, который оставляет числа больше 10, сортирует по убыванию и выводит их.</p><p>Это тот же <code>SELECT … WHERE … ORDER BY …</code>, только внутри C#.</p>", "uz": "<p>Sonlar ro'yxati berilgan. 10 dan katta sonlarni qoldiradigan, kamayish bo'yicha saralaydigan va chiqaradigan LINQ so'rovini yozing.</p>", "en": "<p>Given a list of numbers, write a LINQ query keeping numbers above 10, sorting descending and printing them.</p><p>It is the same <code>SELECT … WHERE … ORDER BY …</code>, just inside C#.</p>" },
-      "starter": "using System;\nusing System.Linq;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static void Main()\n    {\n        var nums = new List<int> { 4, 25, 8, 42, 15 };\n        // твой LINQ-запрос\n    }\n}\n",
-      "solution": "using System;\nusing System.Linq;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static void Main()\n    {\n        var nums = new List<int> { 4, 25, 8, 42, 15 };\n\n        var result = nums\n            .Where(n => n > 10)              // WHERE n > 10\n            .OrderByDescending(n => n);      // ORDER BY n DESC\n\n        foreach (var n in result)\n            Console.WriteLine(n);            // 42, 25, 15\n    }\n}",
-      "hint": { "ru": "nums.Where(n => n > 10).OrderByDescending(n => n), потом foreach для вывода.", "uz": "nums.Where(n => n > 10).OrderByDescending(n => n), keyin chiqarish uchun foreach.", "en": "nums.Where(n => n > 10).OrderByDescending(n => n), then foreach to print." } },
-    { "id": "t3", "kind": "csharp",
-      "title": { "ru": "Словарь и группировка", "uz": "Lug'at va guruhlash", "en": "Dictionary and grouping" },
-      "brief": { "ru": "Dictionary + GroupBy", "uz": "Dictionary + GroupBy", "en": "Dictionary + GroupBy" },
-      "desc": { "ru": "<p>Дан массив слов. Посчитай, сколько раз встречается каждое слово, и выведи результат. Используй <code>GroupBy</code> или <code>Dictionary</code>.</p>", "uz": "<p>So'zlar massivi berilgan. Har bir so'z necha marta uchraganini hisoblang va natijani chiqaring. <code>GroupBy</code> yoki <code>Dictionary</code> ishlating.</p>", "en": "<p>Given an array of words, count how many times each word occurs and print the result. Use <code>GroupBy</code> or a <code>Dictionary</code>.</p>" },
-      "starter": "using System;\nusing System.Linq;\n\nclass Program\n{\n    static void Main()\n    {\n        string[] words = { \"csharp\", \"sql\", \"csharp\" };\n        // твой код\n    }\n}\n",
-      "solution": "using System;\nusing System.Linq;\n\nclass Program\n{\n    static void Main()\n    {\n        string[] words = { \"csharp\", \"sql\", \"csharp\" };\n\n        var counts = words\n            .GroupBy(w => w)                                  // GROUP BY word\n            .Select(g => new { Word = g.Key, Count = g.Count() })\n            .OrderByDescending(x => x.Count);\n\n        foreach (var item in counts)\n            Console.WriteLine($\"{item.Word}: {item.Count}\");   // csharp: 2, sql: 1\n    }\n}",
-      "hint": { "ru": "words.GroupBy(w => w).Select(g => new { Word = g.Key, Count = g.Count() }) — почти дословный GROUP BY из SQL.", "uz": "words.GroupBy(w => w).Select(g => new { Word = g.Key, Count = g.Count() }) — SQL'dagi GROUP BY ning deyarli so'zma-so'z varianti.", "en": "words.GroupBy(w => w).Select(g => new { Word = g.Key, Count = g.Count() }) — almost literally SQL's GROUP BY." } }
+    {
+     "id": "t1",
+     "kind": "csharp",
+     "title": {
+      "ru": "Класс с свойствами",
+      "uz": "Xususiyatli sinf",
+      "en": "A class with properties"
+     },
+     "brief": {
+      "ru": "get, private set, конструктор",
+      "uz": "get, private set, konstruktor",
+      "en": "get, private set, constructor"
+     },
+     "desc": {
+      "ru": "<p>Напиши класс <code>Account</code>: свойство <code>Balance</code> (читать всем, менять только внутри), конструктор с начальной суммой, методы <code>Deposit(int)</code> и <code>Withdraw(int)</code> (не уходить в минус).</p>",
+      "uz": "<p><code>Account</code> sinfini yozing: <code>Balance</code> xususiyati (hamma o'qiydi, faqat ichida o'zgaradi), boshlang'ich summa bilan konstruktor, <code>Deposit(int)</code> va <code>Withdraw(int)</code> metodlari.</p>",
+      "en": "<p>Write an <code>Account</code> class: a <code>Balance</code> property (readable by all, writable only inside), a constructor with the starting sum, and <code>Deposit(int)</code> / <code>Withdraw(int)</code> methods that never go negative.</p>"
+     },
+     "starter": "using System;\n\nclass Account\n{\n    // твой код\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var acc = new Account(100);\n        acc.Deposit(50);\n        acc.Withdraw(200);\n        Console.WriteLine(acc.Balance);   // 150\n    }\n}\n",
+     "solution": "using System;\n\nclass Account\n{\n    public int Balance { get; private set; }   // читать всем, менять - только классу\n\n    public Account(int start)\n    {\n        Balance = start;\n    }\n\n    public void Deposit(int amount)\n    {\n        if (amount > 0) Balance += amount;\n    }\n\n    public void Withdraw(int amount)\n    {\n        if (amount > 0 && amount <= Balance) Balance -= amount;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var acc = new Account(100);\n        acc.Deposit(50);\n        acc.Withdraw(200);          // больше баланса - операция игнорируется\n        Console.WriteLine(acc.Balance);   // 150\n    }\n}",
+     "hint": {
+      "ru": "public int Balance { get; private set; } — и проверка amount <= Balance в Withdraw.",
+      "uz": "public int Balance { get; private set; } — va Withdraw da amount <= Balance tekshiruvi.",
+      "en": "public int Balance { get; private set; } — plus an amount <= Balance check in Withdraw."
+     },
+     "expected": "150"
+    },
+    {
+     "id": "t2",
+     "kind": "csharp",
+     "title": {
+      "ru": "LINQ-запрос",
+      "uz": "LINQ so'rovi",
+      "en": "A LINQ query"
+     },
+     "brief": {
+      "ru": "Where + OrderBy + Select",
+      "uz": "Where + OrderBy + Select",
+      "en": "Where + OrderBy + Select"
+     },
+     "desc": {
+      "ru": "<p>Дан список чисел. Напиши LINQ-запрос, который оставляет числа больше 10, сортирует по убыванию и выводит их.</p><p>Это тот же <code>SELECT … WHERE … ORDER BY …</code>, только внутри C#.</p>",
+      "uz": "<p>Sonlar ro'yxati berilgan. 10 dan katta sonlarni qoldiradigan, kamayish bo'yicha saralaydigan va chiqaradigan LINQ so'rovini yozing.</p>",
+      "en": "<p>Given a list of numbers, write a LINQ query keeping numbers above 10, sorting descending and printing them.</p><p>It is the same <code>SELECT … WHERE … ORDER BY …</code>, just inside C#.</p>"
+     },
+     "starter": "using System;\nusing System.Linq;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static void Main()\n    {\n        var nums = new List<int> { 4, 25, 8, 42, 15 };\n        // твой LINQ-запрос\n    }\n}\n",
+     "solution": "using System;\nusing System.Linq;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static void Main()\n    {\n        var nums = new List<int> { 4, 25, 8, 42, 15 };\n\n        var result = nums\n            .Where(n => n > 10)              // WHERE n > 10\n            .OrderByDescending(n => n);      // ORDER BY n DESC\n\n        foreach (var n in result)\n            Console.WriteLine(n);            // 42, 25, 15\n    }\n}",
+     "hint": {
+      "ru": "nums.Where(n => n > 10).OrderByDescending(n => n), потом foreach для вывода.",
+      "uz": "nums.Where(n => n > 10).OrderByDescending(n => n), keyin chiqarish uchun foreach.",
+      "en": "nums.Where(n => n > 10).OrderByDescending(n => n), then foreach to print."
+     },
+     "expected": "42\n25\n15"
+    },
+    {
+     "id": "t3",
+     "kind": "csharp",
+     "title": {
+      "ru": "Словарь и группировка",
+      "uz": "Lug'at va guruhlash",
+      "en": "Dictionary and grouping"
+     },
+     "brief": {
+      "ru": "Dictionary + GroupBy",
+      "uz": "Dictionary + GroupBy",
+      "en": "Dictionary + GroupBy"
+     },
+     "desc": {
+      "ru": "<p>Дан массив слов. Посчитай, сколько раз встречается каждое слово, и выведи результат. Используй <code>GroupBy</code> или <code>Dictionary</code>.</p>",
+      "uz": "<p>So'zlar massivi berilgan. Har bir so'z necha marta uchraganini hisoblang va natijani chiqaring. <code>GroupBy</code> yoki <code>Dictionary</code> ishlating.</p>",
+      "en": "<p>Given an array of words, count how many times each word occurs and print the result. Use <code>GroupBy</code> or a <code>Dictionary</code>.</p>"
+     },
+     "starter": "using System;\nusing System.Linq;\n\nclass Program\n{\n    static void Main()\n    {\n        string[] words = { \"csharp\", \"sql\", \"csharp\" };\n        // твой код\n    }\n}\n",
+     "solution": "using System;\nusing System.Linq;\n\nclass Program\n{\n    static void Main()\n    {\n        string[] words = { \"csharp\", \"sql\", \"csharp\" };\n\n        var counts = words\n            .GroupBy(w => w)                                  // GROUP BY word\n            .Select(g => new { Word = g.Key, Count = g.Count() })\n            .OrderByDescending(x => x.Count);\n\n        foreach (var item in counts)\n            Console.WriteLine($\"{item.Word}: {item.Count}\");   // csharp: 2, sql: 1\n    }\n}",
+     "hint": {
+      "ru": "words.GroupBy(w => w).Select(g => new { Word = g.Key, Count = g.Count() }) — почти дословный GROUP BY из SQL.",
+      "uz": "words.GroupBy(w => w).Select(g => new { Word = g.Key, Count = g.Count() }) — SQL'dagi GROUP BY ning deyarli so'zma-so'z varianti.",
+      "en": "words.GroupBy(w => w).Select(g => new { Word = g.Key, Count = g.Count() }) — almost literally SQL's GROUP BY."
+     },
+     "expected": "csharp: 2\nsql: 1"
+    }
    ],
    "exam": {
     "time": 420,
     "questions": [
-     { "q": { "ru": "<code>public int Hp { get; private set; }</code> — кто может изменить Hp?", "uz": "<code>public int Hp { get; private set; }</code> — Hp ni kim o'zgartira oladi?", "en": "<code>public int Hp { get; private set; }</code> — who can change Hp?" },
-       "options": [{ "ru": "Любой код", "uz": "Har qanday kod", "en": "Any code" }, { "ru": "Только код внутри класса", "uz": "Faqat sinf ichidagi kod", "en": "Only code inside the class" }, { "ru": "Никто", "uz": "Hech kim", "en": "Nobody" }, { "ru": "Только наследники", "uz": "Faqat vorislar", "en": "Only subclasses" }], "a": 1 },
-     { "q": { "ru": "Что вернёт <code>nums.Where(n => n > 100)</code>, если таких чисел нет?", "uz": "Bunday sonlar bo'lmasa <code>nums.Where(n => n > 100)</code> nima qaytaradi?", "en": "What does <code>nums.Where(n => n > 100)</code> return when no such numbers exist?" },
-       "options": [{ "ru": "null", "uz": "null", "en": "null" }, { "ru": "Пустую последовательность", "uz": "Bo'sh ketma-ketlik", "en": "An empty sequence" }, { "ru": "Ошибку", "uz": "Xato", "en": "An error" }, { "ru": "Ноль", "uz": "Nol", "en": "Zero" }], "a": 1 },
-     { "q": { "ru": "Чем C# отличается от C++ в управлении памятью?", "uz": "Xotirani boshqarishda C# C++ dan nimasi bilan farq qiladi?", "en": "How does C# differ from C++ in memory management?" },
-       "options": [{ "ru": "Ничем", "uz": "Hech nimasi bilan", "en": "In no way" }, { "ru": "В C# работает сборщик мусора, вручную освобождать не нужно", "uz": "C# da axlat yig'uvchi ishlaydi, qo'lda bo'shatish shart emas", "en": "C# has a garbage collector, no manual freeing needed" }, { "ru": "C# требует free()", "uz": "C# free() talab qiladi", "en": "C# requires free()" }, { "ru": "C# не использует память", "uz": "C# xotira ishlatmaydi", "en": "C# uses no memory" }], "a": 1 },
-     { "q": { "ru": "Метод <code>Main</code> в C# — это…", "uz": "C# dagi <code>Main</code> metodi — bu…", "en": "The <code>Main</code> method in C# is…" },
-       "options": [{ "ru": "Точка входа в программу", "uz": "Dasturga kirish nuqtasi", "en": "The program's entry point" }, { "ru": "Обычный метод", "uz": "Oddiy metod", "en": "An ordinary method" }, { "ru": "Конструктор", "uz": "Konstruktor", "en": "A constructor" }, { "ru": "Свойство", "uz": "Xususiyat", "en": "A property" }], "a": 0 },
-     { "q": { "ru": "Строгая типизация C# помогает тем, что…", "uz": "C# ning qat'iy turlanishi shu bilan yordam beradi…", "en": "C#'s static typing helps because…" },
-       "options": [{ "ru": "Ошибки типов находятся при компиляции, а не у пользователя", "uz": "Tur xatolari foydalanuvchida emas, kompilyatsiyada topiladi", "en": "Type errors surface at compile time, not at the user" }, { "ru": "Код становится короче", "uz": "Kod qisqaradi", "en": "The code gets shorter" }, { "ru": "Не нужны тесты", "uz": "Testlar kerak emas", "en": "Tests become unnecessary" }, { "ru": "Программа занимает меньше памяти", "uz": "Dastur kamroq xotira egallaydi", "en": "The program uses less memory" }], "a": 0 }
+     {
+      "q": {
+       "ru": "<code>public int Hp { get; private set; }</code> — кто может изменить Hp?",
+       "uz": "<code>public int Hp { get; private set; }</code> — Hp ni kim o'zgartira oladi?",
+       "en": "<code>public int Hp { get; private set; }</code> — who can change Hp?"
+      },
+      "options": [
+       {
+        "ru": "Любой код",
+        "uz": "Har qanday kod",
+        "en": "Any code"
+       },
+       {
+        "ru": "Только код внутри класса",
+        "uz": "Faqat sinf ichidagi kod",
+        "en": "Only code inside the class"
+       },
+       {
+        "ru": "Никто",
+        "uz": "Hech kim",
+        "en": "Nobody"
+       },
+       {
+        "ru": "Только наследники",
+        "uz": "Faqat vorislar",
+        "en": "Only subclasses"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "Что вернёт <code>nums.Where(n => n > 100)</code>, если таких чисел нет?",
+       "uz": "Bunday sonlar bo'lmasa <code>nums.Where(n => n > 100)</code> nima qaytaradi?",
+       "en": "What does <code>nums.Where(n => n > 100)</code> return when no such numbers exist?"
+      },
+      "options": [
+       {
+        "ru": "null",
+        "uz": "null",
+        "en": "null"
+       },
+       {
+        "ru": "Пустую последовательность",
+        "uz": "Bo'sh ketma-ketlik",
+        "en": "An empty sequence"
+       },
+       {
+        "ru": "Ошибку",
+        "uz": "Xato",
+        "en": "An error"
+       },
+       {
+        "ru": "Ноль",
+        "uz": "Nol",
+        "en": "Zero"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "Чем C# отличается от C++ в управлении памятью?",
+       "uz": "Xotirani boshqarishda C# C++ dan nimasi bilan farq qiladi?",
+       "en": "How does C# differ from C++ in memory management?"
+      },
+      "options": [
+       {
+        "ru": "Ничем",
+        "uz": "Hech nimasi bilan",
+        "en": "In no way"
+       },
+       {
+        "ru": "В C# работает сборщик мусора, вручную освобождать не нужно",
+        "uz": "C# da axlat yig'uvchi ishlaydi, qo'lda bo'shatish shart emas",
+        "en": "C# has a garbage collector, no manual freeing needed"
+       },
+       {
+        "ru": "C# требует free()",
+        "uz": "C# free() talab qiladi",
+        "en": "C# requires free()"
+       },
+       {
+        "ru": "C# не использует память",
+        "uz": "C# xotira ishlatmaydi",
+        "en": "C# uses no memory"
+       }
+      ],
+      "a": 1
+     },
+     {
+      "q": {
+       "ru": "Метод <code>Main</code> в C# — это…",
+       "uz": "C# dagi <code>Main</code> metodi — bu…",
+       "en": "The <code>Main</code> method in C# is…"
+      },
+      "options": [
+       {
+        "ru": "Точка входа в программу",
+        "uz": "Dasturga kirish nuqtasi",
+        "en": "The program's entry point"
+       },
+       {
+        "ru": "Обычный метод",
+        "uz": "Oddiy metod",
+        "en": "An ordinary method"
+       },
+       {
+        "ru": "Конструктор",
+        "uz": "Konstruktor",
+        "en": "A constructor"
+       },
+       {
+        "ru": "Свойство",
+        "uz": "Xususiyat",
+        "en": "A property"
+       }
+      ],
+      "a": 0
+     },
+     {
+      "q": {
+       "ru": "Строгая типизация C# помогает тем, что…",
+       "uz": "C# ning qat'iy turlanishi shu bilan yordam beradi…",
+       "en": "C#'s static typing helps because…"
+      },
+      "options": [
+       {
+        "ru": "Ошибки типов находятся при компиляции, а не у пользователя",
+        "uz": "Tur xatolari foydalanuvchida emas, kompilyatsiyada topiladi",
+        "en": "Type errors surface at compile time, not at the user"
+       },
+       {
+        "ru": "Код становится короче",
+        "uz": "Kod qisqaradi",
+        "en": "The code gets shorter"
+       },
+       {
+        "ru": "Не нужны тесты",
+        "uz": "Testlar kerak emas",
+        "en": "Tests become unnecessary"
+       },
+       {
+        "ru": "Программа занимает меньше памяти",
+        "uz": "Dastur kamroq xotira egallaydi",
+        "en": "The program uses less memory"
+       }
+      ],
+      "a": 0
+     }
     ],
     "tasks": [
-     { "kind": "csharp",
-       "title": { "ru": "Средний балл через LINQ", "uz": "LINQ orqali o'rtacha ball", "en": "Average score via LINQ" },
-       "desc": { "ru": "<p>Дан массив оценок. Выведи количество оценок, средний балл и максимальную — одним проходом через LINQ (<code>Count</code>, <code>Average</code>, <code>Max</code>).</p>", "uz": "<p>Baholar massivi berilgan. Baholar sonini, o'rtacha ballni va maksimalni LINQ orqali chiqaring (<code>Count</code>, <code>Average</code>, <code>Max</code>).</p>", "en": "<p>Given an array of scores, print the count, the average and the maximum using LINQ (<code>Count</code>, <code>Average</code>, <code>Max</code>).</p>" },
-       "starter": "using System;\nusing System.Linq;\n\nclass Program\n{\n    static void Main()\n    {\n        int[] scores = { 80, 95, 60, 75 };\n        // твой код\n    }\n}\n",
-       "solution": "using System;\nusing System.Linq;\n\nclass Program\n{\n    static void Main()\n    {\n        int[] scores = { 80, 95, 60, 75 };\n\n        Console.WriteLine($\"Оценок: {scores.Count()}\");\n        Console.WriteLine($\"Средний: {scores.Average()}\");\n        Console.WriteLine($\"Максимум: {scores.Max()}\");\n    }\n}" }
+     {
+      "kind": "csharp",
+      "title": {
+       "ru": "Средний балл через LINQ",
+       "uz": "LINQ orqali o'rtacha ball",
+       "en": "Average score via LINQ"
+      },
+      "desc": {
+       "ru": "<p>Дан массив оценок. Выведи количество оценок, средний балл и максимальную — одним проходом через LINQ (<code>Count</code>, <code>Average</code>, <code>Max</code>).</p>",
+       "uz": "<p>Baholar massivi berilgan. Baholar sonini, o'rtacha ballni va maksimalni LINQ orqali chiqaring (<code>Count</code>, <code>Average</code>, <code>Max</code>).</p>",
+       "en": "<p>Given an array of scores, print the count, the average and the maximum using LINQ (<code>Count</code>, <code>Average</code>, <code>Max</code>).</p>"
+      },
+      "starter": "using System;\nusing System.Linq;\n\nclass Program\n{\n    static void Main()\n    {\n        int[] scores = { 80, 95, 60, 75 };\n        // твой код\n    }\n}\n",
+      "solution": "using System;\nusing System.Linq;\n\nclass Program\n{\n    static void Main()\n    {\n        int[] scores = { 80, 95, 60, 75 };\n\n        Console.WriteLine($\"Оценок: {scores.Count()}\");\n        Console.WriteLine($\"Средний: {scores.Average()}\");\n        Console.WriteLine($\"Максимум: {scores.Max()}\");\n    }\n}",
+      "expected": "Оценок: 4\nСредний: 77.5\nМаксимум: 95"
+     }
     ]
    }
   }

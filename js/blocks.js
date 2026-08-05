@@ -29,10 +29,11 @@ export function renderBlock(b, i) {
     case 'jsrun':
     case 'crun':
     case 'cpprun':
+    case 'csharprun':
     case 'javarun':
     case 'sqlrun': {
-      const KIND = { sqlrun: 'sql', jsrun: 'js', crun: 'c', cpprun: 'cpp', javarun: 'java', run: 'py' };
-      const LANG = { sql: 'sql', js: 'javascript', c: 'c', cpp: 'cpp', java: 'java', py: 'python' };
+      const KIND = { sqlrun: 'sql', jsrun: 'js', crun: 'c', cpprun: 'cpp', javarun: 'java', csharprun: 'cs', run: 'py' };
+      const LANG = { sql: 'sql', js: 'javascript', c: 'c', cpp: 'cpp', java: 'java', cs: 'csharp', py: 'python' };
       const kind = KIND[b.type];
       const lang = b.lang || LANG[kind];
       return codeBlock(b.code, lang) +

@@ -15,6 +15,7 @@ const runners = {
   c: async (code, onStatus) => window.CRunner.run(code, 'c', '', onStatus),
   cpp: async (code, onStatus) => window.CRunner.run(code, 'cpp', '', onStatus),
   java: async (code, onStatus) => window.JavaRunner.run(code, 'java', '', onStatus),
+  cs: async (code, onStatus) => window.CsRunner.run(code, 'csharp', '', onStatus),
   sql: async (code, onStatus) => {
     const res = await window.SqlRunner.run(code, onStatus);
     return res.error ? { error: res.error } : { html: window.SqlRunner.tableHtml(res.result) };
@@ -22,7 +23,7 @@ const runners = {
 };
 
 /** Язык задачи → ключ раннера. Чего здесь нет — то запускать пока нечем. */
-const RUNNABLE = { python: 'py', javascript: 'js', sql: 'sql', c: 'c', cpp: 'cpp', java: 'java',
+const RUNNABLE = { python: 'py', javascript: 'js', sql: 'sql', c: 'c', cpp: 'cpp', java: 'java', csharp: 'cs',
                    html: 'web', css: 'web', tailwind: 'web' };
 /** Языки вёрстки: результат не текст в консоли, а страница — её надо показывать. */
 const WEB_KINDS = ['html', 'css', 'tailwind'];
@@ -419,7 +420,7 @@ function renderTask(root, courseId, course, m, taskId, remember) {
             else out.innerHTML = '<span class="err">✗ ' + esc(res.err) + '</span>';
           });
         }
-      } else if (runnerKey === 'c' || runnerKey === 'cpp' || runnerKey === 'java') {
+      } else if (runnerKey === 'c' || runnerKey === 'cpp' || runnerKey === 'java' || runnerKey === 'cs') {
         /* Компилируемые языки собираются настоящим компилятором прямо в браузере.
            Проверка — по выводу программы: он и есть результат работы. */
         const res = await runners[runnerKey](ed.value, s => {

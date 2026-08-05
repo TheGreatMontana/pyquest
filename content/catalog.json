@@ -721,9 +721,9 @@
     "en": "C#: fundamentals and LINQ"
    },
    "description": {
-    "ru": "Язык экосистемы Microsoft: свойства, строгая типизация, сборщик мусора и LINQ — SQL прямо внутри кода.",
-    "uz": "Microsoft ekotizimi tili: xususiyatlar, qat'iy turlash, axlat yig'uvchi va LINQ — kod ichidagi SQL.",
-    "en": "The Microsoft ecosystem language: properties, static typing, garbage collection and LINQ — SQL inside your code."
+    "ru": "Язык экосистемы Microsoft: свойства, статическая типизация, сборка мусора и LINQ — SQL прямо внутри кода. Код компилируется настоящим Roslyn в браузере.",
+    "uz": "Microsoft ekotizimi tili: xossalar, statik turlash, axlat yig‘ish va LINQ — kod ichidagi SQL. Kod brauzerda haqiqiy Roslyn bilan kompilyatsiya qilinadi.",
+    "en": "The Microsoft ecosystem language: properties, static typing, garbage collection and LINQ — SQL inside your code. Compiled by real Roslyn in the browser."
    },
    "glyph": "layers",
    "color": "#a78bfa",
@@ -737,7 +737,8 @@
    ],
    "legacyIds": [],
    "moduleCount": 1,
-   "compiled": true
+   "compiled": true,
+   "runner": "csharp"
   },
   {
    "id": "java-basics",

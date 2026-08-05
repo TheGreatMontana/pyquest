@@ -1,6 +1,6 @@
 # PyQuest — интерактивная платформа обучения IT
 
-Учись программированию по-настоящему. **Python, JavaScript, SQL, C, C++ и Java выполняются прямо в браузере** — настоящими компиляторами и рантаймами, без отправки кода на сервер. Задачи проверяются автоматически, экзамены с таймером открывают следующие модули. C# пока идёт со сверкой по эталонному решению, и платформа честно об этом пишет. Три языка интерфейса: **Русский · O'zbekcha · English**.
+Учись программированию по-настоящему. **Python, JavaScript, SQL, C, C++, Java и C# выполняются прямо в браузере** — настоящими компиляторами и рантаймами, без отправки кода на сервер. Задачи проверяются автоматически, экзамены с таймером открывают следующие модули. Три языка интерфейса: **Русский · O'zbekcha · English**.
 
 **Живая версия:** https://course.azizbek-azimov.uz
 
@@ -25,7 +25,7 @@
 
 ### Возможности
 
-- **Шесть языков выполняются в браузере**: Python ([Pyodide](https://pyodide.org)), JavaScript (Web Worker), C и C++ (настоящий clang в WebAssembly), Java (ecj + [CheerpJ](https://cheerpj.com)), SQL ([sql.js](https://sql.js.org))
+- **Семь языков выполняются в браузере**: Python ([Pyodide](https://pyodide.org)), JavaScript (Web Worker), C и C++ (настоящий clang в WebAssembly), Java (ecj + [CheerpJ](https://cheerpj.com)), C# (Roslyn на Blazor WebAssembly), SQL ([sql.js](https://sql.js.org))
 - **Живой предпросмотр вёрстки** — HTML, CSS и Tailwind рендерятся в sandbox-iframe, задачи проверяются по вычисленным стилям
 - **14 типов блоков урока**: теория, запускаемые примеры, «предскажи вывод», «найди баг», «сопоставь пары», «расставь по порядку», проверка знаний, итоги
 - **Граф пререквизитов**: курсы связаны через навыки, платформа подсказывает, чего не хватает и где это получить
@@ -58,6 +58,7 @@ js/
 ├── jsrunner.js         JavaScript (Web Worker, таймаут 5 с)
 ├── crunner.js          C и C++ (clang + wasm-ld в WebAssembly)
 ├── jrunner.js          Java (ecj под CheerpJ)
+├── csrunner.js         C# (Roslyn на Blazor, скрытый iframe)
 ├── webrunner.js        HTML / CSS / Tailwind (sandbox-iframe)
 └── sqlrunner.js        SQL (sql.js)
 content/
@@ -87,6 +88,8 @@ node tools/check-sql.js        # SQL выполняется на реально�
 node tools/check-js.mjs        # JS-фрагменты и задачи проходят свои автотесты
 node tools/check-clang.mjs     # C и C++ собираются настоящим clang (нужен tools/fetch-wasm.mjs)
 node tools/check-java.mjs      # Java собирается ecj и исполняется JVM в headless Chrome
+node tools/check-csharp.mjs    # C# компилируется Roslyn в headless Chrome
+python tools/check-admin.py    # админский раздел: посторонних не пускает
 node tools/browser-check.mjs   # раннеры проверяются в настоящем браузере на живом сайте
 python tools/check-tasks.py    # каждая задача решаема эталонным решением
 node tools/check-ui.mjs        # миграция прогресса, граф, XP, языки
