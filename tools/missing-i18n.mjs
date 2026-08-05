@@ -46,6 +46,8 @@ for (const m of course.modules) {
   delete rest.id;
   walk(rest, m.id);
 }
+/* Финальный экзамен лежит рядом с модулями и переводится теми же оверлеями */
+if (course.finalExam) walk(course.finalExam, 'finalExam');
 
 console.log('# ' + courseId + ' → ' + lang + ': не переведено ' + missing.length + ' полей');
 if (process.argv.includes('--json')) {

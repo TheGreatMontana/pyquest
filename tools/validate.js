@@ -240,13 +240,13 @@ function checkBlocks(blocks, where, oKey) {
           else if (!COMPILED_KINDS.includes(lang)) err(w + ': неизвестный язык predict: ' + lang);
         }
         if (typeof b.a !== 'number' || !b.options || b.a >= b.options.length) err(w + ': неверный ответ predict');
-        (b.options || []).forEach((o, oi) => checkMl(o, w + '.option' + oi, true));
+        (b.options || []).forEach((o, oi) => checkMl(o, w + '.option' + oi, true, ok && ok + '.options.' + oi));
         break;
       case 'checkpoint':
         stats.interactive++;
-        checkMl(b.q, w + '.q', true);
+        checkMl(b.q, w + '.q', true, ok && ok + '.q');
         if (typeof b.a !== 'number' || !b.options || b.a >= b.options.length) err(w + ': неверный ответ checkpoint');
-        (b.options || []).forEach((o, oi) => checkMl(o, w + '.option' + oi, true));
+        (b.options || []).forEach((o, oi) => checkMl(o, w + '.option' + oi, true, ok && ok + '.options.' + oi));
         break;
       case 'findbug':
         stats.interactive++;
@@ -256,16 +256,19 @@ function checkBlocks(blocks, where, oKey) {
       case 'match':
         stats.interactive++;
         if (!Array.isArray(b.pairs) || b.pairs.length < 2) err(w + ': match требует минимум 2 пары');
-        (b.pairs || []).forEach((p, pi) => { checkMl(p.left, w + '.pair' + pi + '.left', true); checkMl(p.right, w + '.pair' + pi + '.right', true); });
+        (b.pairs || []).forEach((p, pi) => {
+          checkMl(p.left, w + '.pair' + pi + '.left', true, ok && ok + '.pairs.' + pi + '.left');
+          checkMl(p.right, w + '.pair' + pi + '.right', true, ok && ok + '.pairs.' + pi + '.right');
+        });
         break;
       case 'order':
         stats.interactive++;
         if (!Array.isArray(b.steps) || b.steps.length < 2) err(w + ': order требует минимум 2 шага');
-        (b.steps || []).forEach((s, si) => checkMl(s, w + '.step' + si, true));
+        (b.steps || []).forEach((s, si) => checkMl(s, w + '.step' + si, true, ok && ok + '.steps.' + si));
         break;
       case 'summary':
         if (!Array.isArray(b.items) || !b.items.length) err(w + ': summary без пунктов');
-        (b.items || []).forEach((s, si) => checkMl(s, w + '.item' + si, true));
+        (b.items || []).forEach((s, si) => checkMl(s, w + '.item' + si, true, ok && ok + '.items.' + si));
         break;
     }
   });

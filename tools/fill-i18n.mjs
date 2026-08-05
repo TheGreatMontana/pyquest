@@ -59,6 +59,8 @@ for (const m of course.modules) {
   delete rest.id;
   walk(rest, m.id);
 }
+/* Финальный экзамен лежит рядом с модулями и переводится теми же оверлеями */
+if (course.finalExam) walk(course.finalExam, 'finalExam');
 
 let added = 0;
 const skipped = [];
