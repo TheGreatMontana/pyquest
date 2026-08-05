@@ -291,6 +291,340 @@
      }
     ]
    }
+  },
+  {
+   "id": "is-02",
+   "title": { "ru": "Обнаружение и человеческий фактор", "uz": "Aniqlash va inson omili", "en": "Detection and the human factor" },
+   "tagline": { "ru": "Журналы, аутентификация и социальная инженерия — где на самом деле ломают компании", "uz": "Jurnallar, autentifikatsiya va ijtimoiy muhandislik — kompaniyalar aslida qayerda buziladi", "en": "Logs, authentication and social engineering — where companies actually get broken into" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "Журналы: без них ты слепой", "uz": "Jurnallar: ularsiz siz ko'rsiz", "en": "Logs: without them you are blind" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Средний срок, за который компания замечает у себя чужого, измеряется <b>неделями</b>. Не потому, что атака сложная, а потому, что смотреть было не во что.</p><p>Журнал безопасности отвечает на четыре вопроса по каждому важному событию: <b>кто</b>, <b>что</b>, <b>когда</b> и <b>откуда</b>. Записывают вход и выход, смену пароля и прав, доступ к чувствительным данным, действия администраторов.</p><p>Два правила, без которых журнал бесполезен:</p><ul><li><b>Не писать секреты.</b> Пароль, токен или номер карты в журнале — это утечка, которая ждёт своего часа. Их маскируют.</li><li><b>Хранить отдельно.</b> Журнал на том же сервере, который взломали, злоумышленник первым делом и подчистит.</li></ul>",
+        "uz": "<p>Kompaniya o'zida begonani sezadigan o'rtacha muddat <b>haftalar</b> bilan o'lchanadi. Hujum murakkabligidan emas, qaraydigan narsa yo'qligidan.</p><p>Xavfsizlik jurnali har muhim hodisa bo'yicha to'rt savolga javob beradi: <b>kim</b>, <b>nima</b>, <b>qachon</b> va <b>qayerdan</b>. Kirish va chiqish, parol va huquq almashuvi, nozik ma'lumotga kirish, administrator harakatlari yoziladi.</p><p>Jurnal foydasiz bo'lib qolmasligi uchun ikki qoida:</p><ul><li><b>Sirlarni yozmaslik.</b> Jurnaldagi parol, token yoki karta raqami — o'z vaqtini kutayotgan sizish. Ular niqoblanadi.</li><li><b>Alohida saqlash.</b> Buzilgan serverdagi jurnalni buzg'unchi birinchi navbatda tozalaydi.</li></ul>",
+        "en": "<p>The average time it takes a company to notice an intruder is measured in <b>weeks</b>. Not because the attack is sophisticated, but because there was nothing to look at.</p><p>A security log answers four questions about each important event: <b>who</b>, <b>what</b>, <b>when</b> and <b>from where</b>. You record sign-ins and sign-outs, password and permission changes, access to sensitive data, and administrator actions.</p><p>Two rules without which a log is useless:</p><ul><li><b>Never write secrets.</b> A password, token or card number in a log is a leak waiting to happen. They are masked.</li><li><b>Store it elsewhere.</b> A log on the very server that was breached is the first thing an attacker cleans up.</li></ul>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "def mask(value, keep=4):\n    \"\"\"Оставляем хвост, остальное прячем — чтобы событие можно было опознать.\"\"\"\n    text = str(value)\n    if len(text) <= keep:\n        return \"*\" * len(text)\n    return \"*\" * (len(text) - keep) + text[-keep:]\n\nevent = {\n    \"кто\": \"azizbek\",\n    \"что\": \"вход\",\n    \"откуда\": \"203.0.113.42\",\n    \"токен\": \"a1b2c3d4e5f6g7h8\",\n    \"карта\": \"4276380012345678\",\n}\n\nSECRETS = {\"токен\", \"карта\", \"пароль\"}\n\nsafe = {k: (mask(v) if k in SECRETS else v) for k, v in event.items()}\nfor k, v in safe.items():\n    print(f\"{k:8} {v}\")"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Последние четыре символа оставлены намеренно: по ним можно понять, та же это карта или другая, но восстановить номер нельзя. Так работает любая нормальная маскировка.</p><p>Когда журналы есть, поверх них ставят правила обнаружения. Простейшие ловят большинство реальных атак:</p><ul><li>много неудачных входов подряд с одного адреса — подбор пароля;</li><li>вход из страны, откуда этот сотрудник никогда не заходил;</li><li>выгрузка объёма данных, в десятки раз большего обычного;</li><li>действие администратора в четыре часа ночи.</li></ul>",
+        "uz": "<p>Oxirgi to'rt belgi ataylab qoldirilgan: ular bo'yicha bu o'sha kartami yoki boshqasi ekanini tushunish mumkin, lekin raqamni tiklab bo'lmaydi. Har qanday normal niqoblash shunday ishlaydi.</p><p>Jurnallar bo'lgach, ular ustiga aniqlash qoidalari qo'yiladi. Eng oddiylari haqiqiy hujumlarning ko'pini tutadi:</p><ul><li>bitta manzildan ketma-ket ko'p muvaffaqiyatsiz kirish — parol tanlash;</li><li>bu xodim hech qachon kirmagan mamlakatdan kirish;</li><li>odatdagidan o'nlab barobar katta hajmdagi ma'lumot yuklab olish;</li><li>tunning to'rtida administrator harakati.</li></ul>",
+        "en": "<p>The last four characters are kept on purpose: they let you tell whether it is the same card or a different one, while the number cannot be recovered. That is how any decent masking works.</p><p>Once logs exist, detection rules are built on top. The simplest ones catch most real attacks:</p><ul><li>many failed sign-ins in a row from one address — password guessing;</li><li>a sign-in from a country this employee has never used;</li><li>a data export tens of times larger than usual;</li><li>an administrator action at four in the morning.</li></ul>"
+       }
+      },
+      {
+       "type": "checkpoint",
+       "q": { "ru": "Почему журналы безопасности хранят на отдельном сервере?", "uz": "Nega xavfsizlik jurnallari alohida serverda saqlanadi?", "en": "Why are security logs stored on a separate server?" },
+       "options": [
+        { "ru": "Чтобы сэкономить место", "uz": "Joy tejash uchun", "en": "To save space" },
+        { "ru": "Взломав сервер, злоумышленник первым делом чистит его журналы", "uz": "Serverni buzgan buzg'unchi birinchi navbatda uning jurnallarini tozalaydi", "en": "Having breached a server, an attacker first cleans its logs" },
+        { "ru": "Так быстрее читать", "uz": "Shunday o'qish tezroq", "en": "It is faster to read" },
+        { "ru": "Этого требует закон", "uz": "Qonun shuni talab qiladi", "en": "The law requires it" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Заметание следов — стандартный шаг любой атаки. Журнал, до которого злоумышленник не дотянулся, часто единственный источник правды о случившемся.",
+        "uz": "Izlarni yashirish — har qanday hujumning standart qadami. Buzg'unchi yeta olmagan jurnal ko'pincha bo'lib o'tgan voqea haqidagi yagona haqiqat manbai.",
+        "en": "Covering tracks is a standard step in any attack. A log the attacker could not reach is often the only source of truth about what happened."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "Аутентификация: пароль — не защита", "uz": "Autentifikatsiya: parol — himoya emas", "en": "Authentication: a password is not protection" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Пароль подводит тремя способами сразу: его подбирают, его переиспользуют на десяти сайтах и его выманивают. Поэтому современная защита строится не на пароле, а на <b>двух факторах</b>.</p><p>Фактор — это категория доказательства:</p><ul><li><b>Что ты знаешь</b> — пароль, ПИН.</li><li><b>Что у тебя есть</b> — телефон с приложением, аппаратный ключ.</li><li><b>Кто ты есть</b> — отпечаток, лицо.</li></ul><p>Два фактора — это два <b>разных</b> пункта из списка. Пароль плюс контрольный вопрос — это по-прежнему один фактор, потому что и то и другое — знание, и то и другое выманивается одним разговором.</p><p>Надёжность факторов тоже разная. SMS перехватывается подменой сим-карты, коды из приложения устойчивее, аппаратный ключ вдобавок проверяет адрес сайта — и потому фишинг против него не работает.</p>",
+        "uz": "<p>Parol bir vaqtning o'zida uch yo'l bilan qoqiltiradi: uni tanlab topishadi, uni o'nta saytda qayta ishlatishadi va uni aldab olishadi. Shuning uchun zamonaviy himoya parolga emas, <b>ikki omilga</b> quriladi.</p><p>Omil — bu isbot toifasi:</p><ul><li><b>Siz biladigan narsa</b> — parol, PIN.</li><li><b>Sizda bor narsa</b> — ilovali telefon, apparat kalit.</li><li><b>Siz kimligingiz</b> — barmoq izi, yuz.</li></ul><p>Ikki omil — ro'yxatdagi <b>turli</b> ikki band. Parol qo'shimcha nazorat savoli — bu hamon bitta omil, chunki ikkalasi ham bilim va ikkalasi ham bitta suhbat bilan aldab olinadi.</p><p>Omillar ishonchliligi ham har xil. SMS sim-karta almashtirish bilan tutib olinadi, ilovadagi kodlar chidamliroq, apparat kalit esa qo'shimcha ravishda sayt manzilini tekshiradi — shuning uchun unga qarshi fishing ishlamaydi.</p>",
+        "en": "<p>A password fails in three ways at once: it gets guessed, it gets reused across ten sites, and it gets talked out of you. So modern protection is built not on a password but on <b>two factors</b>.</p><p>A factor is a category of proof:</p><ul><li><b>Something you know</b> — a password, a PIN.</li><li><b>Something you have</b> — a phone with an app, a hardware key.</li><li><b>Something you are</b> — a fingerprint, a face.</li></ul><p>Two factors means two <b>different</b> items from that list. A password plus a security question is still one factor, because both are knowledge and both can be extracted in a single conversation.</p><p>Factors differ in strength too. SMS is intercepted through SIM swapping, app codes are sturdier, and a hardware key additionally verifies the site's address — which is why phishing does not work against it.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "ALPHABETS = {\n    \"только цифры\": 10,\n    \"строчные буквы\": 26,\n    \"буквы и цифры\": 62,\n    \"с символами\": 95,\n}\nGUESSES_PER_SECOND = 10_000_000_000     # современная видеокарта\n\ndef years(alphabet, length):\n    combinations = alphabet ** length\n    seconds = combinations / GUESSES_PER_SECOND\n    return seconds / 60 / 60 / 24 / 365\n\nfor name, size in ALPHABETS.items():\n    for length in (8, 12, 16):\n        y = years(size, length)\n        if y < 1 / 365:\n            verdict = \"меньше суток\"\n        elif y < 1:\n            verdict = f\"{y * 365:.0f} дней\"\n        else:\n            verdict = f\"{y:,.0f} лет\"\n        print(f\"{name:15} длина {length:2} -> {verdict}\")"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Смотри на закономерность: добавление символов помогает, но <b>длина помогает несравнимо сильнее</b>. Восьмизначный пароль со всеми символами слабее шестнадцатизначного из одних строчных букв.</p><p>Именно поэтому требование «заглавная, цифра и спецсимвол» устарело: оно рождает <code>Password1!</code> — пароль, который подбирается мгновенно, потому что стоит первым в любом словаре. Современная рекомендация — длинная фраза и проверка по спискам утёкших паролей.</p><p>И главное: всё это про <b>подбор</b>. Если пароль выманили фишингом, его длина не значит ничего. От этого спасает только второй фактор.</p>",
+        "uz": "<p>Qonuniyatga qarang: belgi qo'shish yordam beradi, lekin <b>uzunlik beqiyos kuchliroq yordam beradi</b>. Barcha belgili sakkiz xonali parol faqat kichik harflardan iborat o'n olti xonalidan zaifroq.</p><p>Aynan shuning uchun «bosh harf, raqam va maxsus belgi» talabi eskirdi: u <code>Password1!</code> ni tug'diradi — har qanday lug'atda birinchi turgani uchun bir zumda topiladigan parol. Zamonaviy tavsiya — uzun ibora va sizib chiqqan parollar ro'yxati bo'yicha tekshiruv.</p><p>Va eng muhimi: bularning hammasi <b>tanlash</b> haqida. Parol fishing bilan aldab olingan bo'lsa, uning uzunligi hech nima anglatmaydi. Bundan faqat ikkinchi omil qutqaradi.</p>",
+        "en": "<p>Look at the pattern: adding symbols helps, but <b>length helps incomparably more</b>. An eight-character password with every symbol is weaker than a sixteen-character one of plain lowercase letters.</p><p>This is exactly why the “uppercase, digit and special character” requirement is obsolete: it produces <code>Password1!</code> — a password cracked instantly because it sits first in every dictionary. The modern recommendation is a long phrase plus a check against leaked-password lists.</p><p>And most importantly: all of this concerns <b>guessing</b>. If the password was phished, its length means nothing. Only a second factor saves you there.</p>"
+       }
+      },
+      {
+       "type": "note",
+       "kind": "trap",
+       "html": {
+        "ru": "Ограничение «максимум 16 символов» или запрет пробелов в пароле — почти верный признак, что пароль хранится в открытом виде или почти в открытом. У правильно захешированного пароля длина исходника не имеет значения: хеш всегда одного размера.",
+        "uz": "Paroldagi «maksimum 16 belgi» cheklovi yoki bo'shliq taqig'i — parol ochiq yoki deyarli ochiq holda saqlanayotganining deyarli aniq belgisi. To'g'ri xeshlangan parolda manba uzunligi ahamiyatsiz: xesh doim bir o'lchamda.",
+        "en": "A “maximum 16 characters” limit or a ban on spaces in a password is a near-certain sign that the password is stored in plain text or close to it. For a properly hashed password the input length is irrelevant: the hash is always the same size."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "Ломают не системы, а людей", "uz": "Tizimlarni emas, odamlarni buzishadi", "en": "It is people who get broken, not systems" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Большинство успешных атак начинается не с уязвимости в коде, а с письма. Это дешевле, быстрее и не требует квалификации.</p><p>Схема всегда одна и та же — четыре рычага:</p><ul><li><b>Срочность.</b> «Аккаунт будет заблокирован через два часа». Спешащий человек не проверяет адрес.</li><li><b>Авторитет.</b> Письмо от «директора» или «службы безопасности».</li><li><b>Страх или выгода.</b> Штраф, увольнение, премия, выигрыш.</li><li><b>Правдоподобие.</b> Настоящий логотип, знакомые имена, адрес, отличающийся одной буквой.</li></ul><p>Заметь: ни один из рычагов не технический. Поэтому антивирус их не ловит — а вот привычка проверять адрес отправителя ловит.</p>",
+        "uz": "<p>Muvaffaqiyatli hujumlarning ko'pi koddagi zaiflikdan emas, xatdan boshlanadi. Bu arzonroq, tezroq va malaka talab qilmaydi.</p><p>Sxema doim bir xil — to'rt richag:</p><ul><li><b>Shoshilinchlik.</b> «Hisob ikki soatdan keyin bloklanadi». Shoshayotgan odam manzilni tekshirmaydi.</li><li><b>Obro'.</b> «Direktor» yoki «xavfsizlik xizmati» dan xat.</li><li><b>Qo'rquv yoki foyda.</b> Jarima, ishdan bo'shatish, mukofot, yutuq.</li><li><b>Ishonchlilik.</b> Haqiqiy logotip, tanish ismlar, bitta harfi bilan farq qiladigan manzil.</li></ul><p>E'tibor bering: richaglarning birortasi ham texnik emas. Shuning uchun antivirus ularni tutmaydi — jo'natuvchi manzilini tekshirish odati esa tutadi.</p>",
+        "en": "<p>Most successful attacks begin not with a flaw in the code but with an email. It is cheaper, faster and requires no skill.</p><p>The pattern is always the same — four levers:</p><ul><li><b>Urgency.</b> “Your account will be locked in two hours.” A hurrying person does not check the address.</li><li><b>Authority.</b> A message from “the director” or “the security team”.</li><li><b>Fear or gain.</b> A fine, a dismissal, a bonus, a prize.</li><li><b>Plausibility.</b> A real logo, familiar names, an address that differs by one letter.</li></ul><p>Note that none of the levers is technical. Which is why antivirus does not catch them — but the habit of checking the sender's address does.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "TRUSTED = \"azizbek-azimov.uz\"\n\nsenders = [\n    \"support@azizbek-azimov.uz\",\n    \"support@azizbek-azimov.uz.attacker.com\",\n    \"support@azizbek-azimоv.uz\",          # здесь одна буква кириллическая\n    \"support@azizbek-azimov.uz.ru\",\n    \"noreply@mail.azizbek-azimov.uz\",\n]\n\ndef domain_of(address):\n    return address.rsplit(\"@\", 1)[-1].lower()\n\ndef trusted(address, base):\n    d = domain_of(address)\n    # только сам домен или его настоящий поддомен\n    return d == base or d.endswith(\".\" + base)\n\nfor s in senders:\n    mark = \"свой \" if trusted(s, TRUSTED) else \"ЧУЖОЙ\"\n    print(f\"{mark}  {s}\")"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Второй адрес — классика: настоящий домен превращён в начало чужого. Проверка «содержит наш домен» пропустила бы его.</p><p>Третий страшнее: там русская <code>о</code> вместо латинской. Глазом это не отличить, а машина видит разные строки. Именно поэтому решение о доверии принимает <b>код по точному сравнению</b>, а не человек по внешнему виду.</p><p>Что делать сотруднику, если письмо кажется подозрительным: не переходить по ссылке из письма, а открыть сайт самому; не отвечать отправителю, а написать коллеге по известному контакту; сообщить в безопасность даже если ошибся. Компания, где за ложную тревогу ругают, узнаёт об атаках последней.</p>",
+        "uz": "<p>Ikkinchi manzil — klassika: haqiqiy domen begonaning boshiga aylantirilgan. «Bizning domenni saqlaydi» tekshiruvi uni o'tkazib yuborardi.</p><p>Uchinchisi qo'rqinchliroq: u yerda lotincha o'rniga ruscha <code>о</code>. Buni ko'z bilan ajratib bo'lmaydi, mashina esa turli satrlarni ko'radi. Aynan shuning uchun ishonch haqidagi qarorni tashqi ko'rinish bo'yicha odam emas, <b>aniq solishtirish bo'yicha kod</b> qabul qiladi.</p><p>Xat shubhali tuyulsa, xodim nima qilishi kerak: xatdagi havoladan o'tmaslik, saytni o'zi ochish; jo'natuvchiga javob bermaslik, hamkasbga ma'lum kontakt orqali yozish; xato qilgan bo'lsa ham xavfsizlikka xabar berish. Yolg'on signal uchun urishadigan kompaniya hujumlar haqida oxirgi bo'lib biladi.</p>",
+        "en": "<p>The second address is a classic: the real domain has been turned into the prefix of a foreign one. A “contains our domain” check would have let it through.</p><p>The third is worse: it uses a Cyrillic <code>о</code> instead of a Latin one. The eye cannot tell them apart; the machine sees different strings. This is exactly why the trust decision belongs to <b>code doing an exact comparison</b>, not to a human judging by looks.</p><p>What an employee should do with a suspicious message: do not follow the link in it, open the site yourself; do not reply to the sender, message a colleague through a known contact; report it to security even if you turn out to be wrong. A company that scolds people for false alarms is the last to hear about attacks.</p>"
+       }
+      },
+      {
+       "type": "summary",
+       "items": [
+        { "ru": "Журнал отвечает: кто, что, когда и откуда", "uz": "Jurnal javob beradi: kim, nima, qachon va qayerdan", "en": "A log answers: who, what, when and from where" },
+        { "ru": "Секреты в журнал не пишут — маскируют", "uz": "Sirlar jurnalga yozilmaydi — niqoblanadi", "en": "Secrets never go into logs — they are masked" },
+        { "ru": "Журналы хранят там, куда взломщик не дотянется", "uz": "Jurnallar buzg'unchi yeta olmaydigan joyda saqlanadi", "en": "Logs are kept where an intruder cannot reach them" },
+        { "ru": "Два фактора — это два разных вида доказательства, а не два пароля", "uz": "Ikki omil — ikki turli isbot turi, ikki parol emas", "en": "Two factors means two different kinds of proof, not two passwords" },
+        { "ru": "Длина пароля важнее набора символов", "uz": "Parol uzunligi belgilar to'plamidan muhimroq", "en": "Password length matters more than the character set" },
+        { "ru": "Фишинг работает на срочности, авторитете, страхе и правдоподобии", "uz": "Fishing shoshilinchlik, obro', qo'rquv va ishonchlilikka tayanadi", "en": "Phishing runs on urgency, authority, fear and plausibility" },
+        { "ru": "Домен проверяют точным сравнением, а не «содержит»", "uz": "Domen «saqlaydi» bilan emas, aniq solishtirish bilan tekshiriladi", "en": "Check a domain by exact comparison, never by “contains”" }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": { "ru": "Что нельзя записывать в журнал безопасности?", "uz": "Xavfsizlik jurnaliga nimani yozib bo'lmaydi?", "en": "What must never go into a security log?" },
+     "options": [
+      { "ru": "IP-адрес пользователя", "uz": "Foydalanuvchi IP-manzilini", "en": "The user's IP address" },
+      { "ru": "Пароли и токены в открытом виде", "uz": "Ochiq holdagi parol va tokenlarni", "en": "Passwords and tokens in plain text" },
+      { "ru": "Время события", "uz": "Hodisa vaqtini", "en": "The time of the event" },
+      { "ru": "Имя пользователя", "uz": "Foydalanuvchi nomini", "en": "The user name" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Журналы читает много людей и хранятся они долго. Секрет, попавший туда, утечёт рано или поздно.",
+      "uz": "Jurnallarni ko'p odam o'qiydi va ular uzoq saqlanadi. U yerga tushgan sir ertami-kechmi sizib chiqadi.",
+      "en": "Logs are read by many people and kept for a long time. A secret that lands there leaks sooner or later."
+     }
+    },
+    {
+     "q": { "ru": "Пароль плюс контрольный вопрос — это сколько факторов?", "uz": "Parol qo'shimcha nazorat savoli — bu nechta omil?", "en": "A password plus a security question — how many factors?" },
+     "options": [
+      { "ru": "Два", "uz": "Ikkita", "en": "Two" },
+      { "ru": "Один: оба относятся к «что ты знаешь»", "uz": "Bitta: ikkalasi ham «siz biladigan narsa» ga tegishli", "en": "One: both belong to “something you know”" },
+      { "ru": "Три", "uz": "Uchta", "en": "Three" },
+      { "ru": "Ни одного", "uz": "Birorta ham emas", "en": "None" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Оба выманиваются в одном телефонном разговоре. Второй фактор должен быть другой природы — устройство или биометрия.",
+      "uz": "Ikkalasi ham bitta telefon suhbatida aldab olinadi. Ikkinchi omil boshqa tabiatda bo'lishi kerak — qurilma yoki biometriya.",
+      "en": "Both can be extracted in a single phone call. A second factor must be of a different nature — a device or biometrics."
+     }
+    },
+    {
+     "q": { "ru": "Что надёжнее против подбора?", "uz": "Tanlashga qarshi qaysi biri ishonchliroq?", "en": "Which resists guessing better?" },
+     "options": [
+      { "ru": "Восемь символов со всеми спецсимволами", "uz": "Barcha maxsus belgili sakkiz belgi", "en": "Eight characters with every special symbol" },
+      { "ru": "Шестнадцать строчных букв", "uz": "O'n olti kichik harf", "en": "Sixteen lowercase letters" },
+      { "ru": "Одинаково", "uz": "Bir xil", "en": "The same" },
+      { "ru": "Зависит от сайта", "uz": "Saytga bog'liq", "en": "It depends on the site" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Число вариантов растёт как алфавит в степени длины. Длина стоит в показателе степени, и она всегда побеждает.",
+      "uz": "Variantlar soni alifbo darajada uzunlik kabi o'sadi. Uzunlik daraja ko'rsatkichida turadi va u doim yutadi.",
+      "en": "The number of combinations grows as alphabet to the power of length. Length sits in the exponent, and it always wins."
+     }
+    },
+    {
+     "q": { "ru": "Сайт не разрешает пароль длиннее 16 символов. О чём это говорит?", "uz": "Sayt 16 belgidan uzun parolga ruxsat bermaydi. Bu nima haqida gapiradi?", "en": "A site does not allow passwords longer than 16 characters. What does that suggest?" },
+     "options": [
+      { "ru": "Так безопаснее", "uz": "Shunday xavfsizroq", "en": "It is safer that way" },
+      { "ru": "Скорее всего, пароль хранится не хешем", "uz": "Ehtimol, parol xesh bilan saqlanmaydi", "en": "The password is most likely not stored as a hash" },
+      { "ru": "Экономия базы данных", "uz": "Ma'lumotlar bazasini tejash", "en": "Database savings" },
+      { "ru": "Ничего не говорит", "uz": "Hech nima demaydi", "en": "It suggests nothing" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Хеш от пароля любой длины занимает одинаковое место. Ограничение сверху выдаёт хранение в колонке фиксированной длины.",
+      "uz": "Har qanday uzunlikdagi paroldan olingan xesh bir xil joy egallaydi. Yuqoridan cheklov qat'iy uzunlikdagi ustunda saqlanishini oshkor qiladi.",
+      "en": "A hash of a password of any length takes the same space. An upper limit betrays storage in a fixed-length column."
+     }
+    },
+    {
+     "q": { "ru": "Письмо: «Ваш аккаунт заблокируют через час, подтвердите пароль». Какой это рычаг?", "uz": "Xat: «Hisobingiz bir soatdan keyin bloklanadi, parolni tasdiqlang». Bu qanday richag?", "en": "An email: “Your account will be locked in an hour, confirm your password.” Which lever is this?" },
+     "options": [
+      { "ru": "Авторитет", "uz": "Obro'", "en": "Authority" },
+      { "ru": "Срочность: думать некогда, надо действовать", "uz": "Shoshilinchlik: o'ylashga vaqt yo'q, harakat qilish kerak", "en": "Urgency: no time to think, you must act" },
+      { "ru": "Выгода", "uz": "Foyda", "en": "Gain" },
+      { "ru": "Это не фишинг", "uz": "Bu fishing emas", "en": "This is not phishing" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Срочность существует ровно для того, чтобы человек не успел проверить адрес отправителя. Настоящие сервисы никогда не просят пароль письмом.",
+      "uz": "Shoshilinchlik aynan odam jo'natuvchi manzilini tekshirishga ulgurmasligi uchun mavjud. Haqiqiy xizmatlar hech qachon xat orqali parol so'ramaydi.",
+      "en": "Urgency exists precisely so the person has no time to check the sender. Real services never ask for a password by email."
+     }
+    },
+    {
+     "q": { "ru": "Адрес отправителя <code>support@ourbank.com.attacker.net</code>. Он свой?", "uz": "Jo'natuvchi manzili <code>support@ourbank.com.attacker.net</code>. U o'zimizniki?", "en": "The sender is <code>support@ourbank.com.attacker.net</code>. Is it ours?" },
+     "options": [
+      { "ru": "Да, там есть ourbank.com", "uz": "Ha, u yerda ourbank.com bor", "en": "Yes, it contains ourbank.com" },
+      { "ru": "Нет: настоящий домен здесь attacker.net", "uz": "Yo'q: bu yerdagi haqiqiy domen attacker.net", "en": "No: the real domain here is attacker.net" },
+      { "ru": "Нельзя определить", "uz": "Aniqlab bo'lmaydi", "en": "It cannot be determined" },
+      { "ru": "Да, если письмо с логотипом", "uz": "Ha, xat logotipli bo'lsa", "en": "Yes, if the email has a logo" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Домен читается справа налево. Всё, что левее последних двух частей, злоумышленник пишет какое угодно.",
+      "uz": "Domen o'ngdan chapga o'qiladi. Oxirgi ikki qismdan chapdagi hamma narsani buzg'unchi xohlaganicha yozadi.",
+      "en": "A domain reads right to left. Everything left of the last two parts can be anything the attacker wants."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "python",
+     "title": { "ru": "Маскировка секретов", "uz": "Sirlarni niqoblash", "en": "Masking secrets" },
+     "brief": { "ru": "Журнал без утечки", "uz": "Sizishsiz jurnal", "en": "A log without a leak" },
+     "desc": {
+      "ru": "<p><code>safe_event(event, secrets)</code> получает словарь события и множество имён полей, которые считаются секретными.</p><p>Верни новый словарь, где секретные значения заменены маской: все символы кроме последних четырёх — звёздочки. Если значение не длиннее четырёх символов, замени его звёздочками целиком.</p><p>Остальные поля оставь как есть. Исходный словарь не меняй.</p>",
+      "uz": "<p><code>safe_event(event, secrets)</code> hodisa lug'atini va sir hisoblanadigan maydon nomlari to'plamini oladi.</p><p>Sirli qiymatlar niqob bilan almashtirilgan yangi lug'atni qaytaring: oxirgi to'rttadan boshqa barcha belgilar — yulduzchalar. Qiymat to'rt belgidan uzun bo'lmasa, uni butunlay yulduzcha bilan almashtiring.</p><p>Qolgan maydonlarni o'z holicha qoldiring. Asl lug'atni o'zgartirmang.</p>",
+      "en": "<p><code>safe_event(event, secrets)</code> takes an event dict and a set of field names considered secret.</p><p>Return a new dict where secret values are replaced by a mask: every character except the last four becomes an asterisk. If a value is four characters or shorter, replace it entirely with asterisks.</p><p>Leave the other fields untouched. Do not modify the original dict.</p>"
+     },
+     "starter": "def safe_event(event, secrets):\n    # твой код\n    pass\n\nprint(safe_event({'кто': 'aziz', 'токен': 'abcdefgh'}, {'токен'}))\n",
+     "tests": "src = {'кто': 'aziz', 'токен': 'abcdefgh', 'карта': '4276380012345678'}\nout = safe_event(src, {'токен', 'карта'})\nassert out['кто'] == 'aziz', 'Несекретные поля не трогаем'\nassert out['токен'] == '****efgh', 'Видны только последние четыре символа'\nassert out['карта'] == '************5678', 'Номер карты замаскирован'\nassert src['токен'] == 'abcdefgh', 'Исходный словарь должен остаться прежним'\nassert safe_event({'пин': '12'}, {'пин'})['пин'] == '**', 'Короткое значение прячем целиком'\nassert safe_event({'a': 1}, set()) == {'a': 1}, 'Без секретов словарь не меняется'",
+     "hint": {
+      "ru": "Собери новый словарь через включение по <code>event.items()</code>. Для секретных значений: <code>str(v)</code>, потом сравни длину с четырьмя и склей звёздочки с хвостом <code>text[-4:]</code>.",
+      "uz": "<code>event.items()</code> bo'yicha inklyuziya bilan yangi lug'at yig'ing. Sirli qiymatlar uchun: <code>str(v)</code>, keyin uzunlikni to'rt bilan solishtiring va yulduzchalarni <code>text[-4:]</code> dumi bilan yopishtiring.",
+      "en": "Build a new dict with a comprehension over <code>event.items()</code>. For secret values: <code>str(v)</code>, then compare the length with four and join the asterisks to the tail <code>text[-4:]</code>."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "python",
+     "title": { "ru": "Ловим подбор пароля", "uz": "Parol tanlashni tutamiz", "en": "Catching a password guess" },
+     "brief": { "ru": "Правило обнаружения по журналу", "uz": "Jurnal bo'yicha aniqlash qoidasi", "en": "A detection rule over the log" },
+     "desc": {
+      "ru": "<p><code>bruteforce(log, limit)</code> получает список событий вида <code>(адрес, успех)</code>, где <code>успех</code> — <code>True</code> или <code>False</code>.</p><p>Верни отсортированный список адресов, у которых <b>подряд</b> случилось <code>limit</code> или больше неудач. Успешный вход обнуляет счётчик для этого адреса.</p>",
+      "uz": "<p><code>bruteforce(log, limit)</code> <code>(manzil, muvaffaqiyat)</code> ko'rinishidagi hodisalar ro'yxatini oladi, bu yerda <code>muvaffaqiyat</code> — <code>True</code> yoki <code>False</code>.</p><p><b>Ketma-ket</b> <code>limit</code> yoki undan ko'p muvaffaqiyatsizlik bo'lgan manzillarning saralangan ro'yxatini qaytaring. Muvaffaqiyatli kirish shu manzil uchun hisoblagichni nollaydi.</p>",
+      "en": "<p><code>bruteforce(log, limit)</code> receives a list of events shaped <code>(address, success)</code>, where <code>success</code> is <code>True</code> or <code>False</code>.</p><p>Return a sorted list of addresses that had <code>limit</code> or more failures <b>in a row</b>. A successful sign-in resets that address's counter.</p>"
+     },
+     "starter": "def bruteforce(log, limit):\n    # твой код\n    pass\n\nprint(bruteforce([('1.1.1.1', False), ('1.1.1.1', False), ('1.1.1.1', False)], 3))\n",
+     "tests": "log = [('1.1.1.1', False), ('2.2.2.2', True), ('1.1.1.1', False), ('1.1.1.1', False)]\nassert bruteforce(log, 3) == ['1.1.1.1'], 'Три неудачи подряд с одного адреса'\nassert bruteforce(log, 4) == [], 'Порог выше — никого'\nreset = [('1.1.1.1', False), ('1.1.1.1', False), ('1.1.1.1', True), ('1.1.1.1', False)]\nassert bruteforce(reset, 3) == [], 'Успешный вход обнулил счётчик'\nassert bruteforce([], 3) == [], 'Пустой журнал'\nmany = [('b', False)] * 3 + [('a', False)] * 5\nassert bruteforce(many, 3) == ['a', 'b'], 'Список отсортирован'\nassert bruteforce([('x', True)] * 10, 1) == [], 'Одни успехи — тревоги нет'",
+     "hint": {
+      "ru": "Веди словарь «адрес → текущая серия неудач» и множество попавшихся. На <code>False</code> увеличивай счётчик и сравнивай с порогом, на <code>True</code> обнуляй. В конце верни <code>sorted(...)</code>.",
+      "uz": "«Manzil → joriy muvaffaqiyatsizliklar seriyasi» lug'atini va tutilganlar to'plamini yuriting. <code>False</code> da hisoblagichni oshiring va chegara bilan solishtiring, <code>True</code> da nollang. Oxirida <code>sorted(...)</code> qaytaring.",
+      "en": "Keep a dict “address → current failure streak” and a set of the caught. On <code>False</code> increment and compare with the threshold, on <code>True</code> reset. Return <code>sorted(...)</code> at the end."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "python",
+     "title": { "ru": "Проверка домена отправителя", "uz": "Jo'natuvchi domenini tekshirish", "en": "Checking the sender's domain" },
+     "brief": { "ru": "Не «содержит», а точно", "uz": "«Saqlaydi» emas, aniq", "en": "Not “contains” but exactly" },
+     "desc": {
+      "ru": "<p><code>is_ours(address, base)</code> возвращает <code>True</code>, только если домен адреса — это <b>ровно</b> <code>base</code> или его настоящий поддомен (то есть заканчивается на точку плюс <code>base</code>).</p><p>Домен — часть после последней <code>@</code>, сравнивать в нижнем регистре. Адрес без <code>@</code> доверенным не считается.</p>",
+      "uz": "<p><code>is_ours(address, base)</code> faqat manzil domeni <b>aynan</b> <code>base</code> yoki uning haqiqiy subdomeni bo'lsa (ya'ni nuqta va <code>base</code> bilan tugasa) <code>True</code> qaytaradi.</p><p>Domen — oxirgi <code>@</code> dan keyingi qism, kichik harfda solishtiriladi. <code>@</code> siz manzil ishonchli hisoblanmaydi.</p>",
+      "en": "<p><code>is_ours(address, base)</code> returns <code>True</code> only if the address's domain is <b>exactly</b> <code>base</code> or a genuine subdomain of it (that is, it ends with a dot plus <code>base</code>).</p><p>The domain is the part after the last <code>@</code>, compared in lowercase. An address without <code>@</code> is never trusted.</p>"
+     },
+     "starter": "def is_ours(address, base):\n    # твой код\n    pass\n\nprint(is_ours('support@example.com', 'example.com'))\n",
+     "tests": "assert is_ours('support@example.com', 'example.com') is True, 'Ровно наш домен'\nassert is_ours('a@mail.example.com', 'example.com') is True, 'Настоящий поддомен'\nassert is_ours('a@example.com.attacker.net', 'example.com') is False, 'Наш домен стал началом чужого'\nassert is_ours('a@notexample.com', 'example.com') is False, 'Приклеили слева — не поддомен'\nassert is_ours('a@EXAMPLE.COM', 'example.com') is True, 'Регистр не важен'\nassert is_ours('без-собаки', 'example.com') is False, 'Это не адрес'\nassert is_ours('a@b@example.com', 'example.com') is True, 'Домен — после последней собаки'",
+     "hint": {
+      "ru": "Сначала проверь наличие <code>@</code>. Домен — <code>address.rsplit('@', 1)[-1].lower()</code>. Условие: <code>d == base or d.endswith('.' + base)</code>.",
+      "uz": "Avval <code>@</code> borligini tekshiring. Domen — <code>address.rsplit('@', 1)[-1].lower()</code>. Shart: <code>d == base or d.endswith('.' + base)</code>.",
+      "en": "First check for an <code>@</code>. The domain is <code>address.rsplit('@', 1)[-1].lower()</code>. The condition: <code>d == base or d.endswith('.' + base)</code>."
+     }
+    }
+   ],
+   "exam": {
+    "time": 540,
+    "questions": [
+     {
+      "q": { "ru": "В журнале видно 200 неудачных входов за минуту с одного IP. Что это?", "uz": "Jurnalda bir daqiqada bitta IP dan 200 muvaffaqiyatsiz kirish ko'rinadi. Bu nima?", "en": "The log shows 200 failed sign-ins in a minute from one IP. What is it?" },
+      "options": [
+       { "ru": "Пользователь забыл пароль", "uz": "Foydalanuvchi parolni unutgan", "en": "A user forgot their password" },
+       { "ru": "Подбор пароля — нужна блокировка и оповещение", "uz": "Parol tanlash — bloklash va ogohlantirish kerak", "en": "Password guessing — block and alert" },
+       { "ru": "Сбой сети", "uz": "Tarmoq nosozligi", "en": "A network glitch" },
+       { "ru": "Нормальная работа", "uz": "Odatiy ish", "en": "Normal operation" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Какая пара действительно даёт два фактора?", "uz": "Qaysi juftlik haqiqatan ikki omil beradi?", "en": "Which pair really gives two factors?" },
+      "options": [
+       { "ru": "Пароль и девичья фамилия матери", "uz": "Parol va onaning qizlik familiyasi", "en": "A password and mother's maiden name" },
+       { "ru": "Пароль и код из приложения на телефоне", "uz": "Parol va telefondagi ilova kodi", "en": "A password and a code from a phone app" },
+       { "ru": "Пароль и ПИН", "uz": "Parol va PIN", "en": "A password and a PIN" },
+       { "ru": "Два разных пароля", "uz": "Ikki turli parol", "en": "Two different passwords" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Сотрудник получил письмо «от директора» с просьбой срочно оплатить счёт. Правильное действие?", "uz": "Xodim «direktordan» shoshilinch hisobni to'lash so'rovi bilan xat oldi. To'g'ri harakat?", "en": "An employee gets an email “from the director” urgently asking to pay an invoice. The right action?" },
+      "options": [
+       { "ru": "Оплатить, раз просит директор", "uz": "To'lash, direktor so'rayapti-ku", "en": "Pay it, the director asked" },
+       { "ru": "Связаться с директором по известному контакту, а не отвечать на письмо", "uz": "Direktor bilan ma'lum kontakt orqali bog'lanish, xatga javob bermaslik", "en": "Contact the director through a known channel rather than replying" },
+       { "ru": "Переслать письмо коллегам", "uz": "Xatni hamkasblarga yuborish", "en": "Forward the email to colleagues" },
+       { "ru": "Удалить и никому не говорить", "uz": "O'chirish va hech kimga aytmaslik", "en": "Delete it and tell nobody" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Почему проверка «адрес содержит наш домен» плоха?", "uz": "Nega «manzil bizning domenni saqlaydi» tekshiruvi yomon?", "en": "Why is a “the address contains our domain” check bad?" },
+      "options": [
+       { "ru": "Она медленная", "uz": "U sekin", "en": "It is slow" },
+       { "ru": "Наш домен можно вставить внутрь чужого", "uz": "Bizning domenni begonaning ichiga qo'yish mumkin", "en": "Our domain can be embedded inside a foreign one" },
+       { "ru": "Она не различает регистр", "uz": "U registrni ajratmaydi", "en": "It ignores case" },
+       { "ru": "Она ничем не плоха", "uz": "U hech nimasi bilan yomon emas", "en": "It is not bad at all" }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "python",
+      "title": { "ru": "Разбор журнала входов", "uz": "Kirishlar jurnalini tahlil qilish", "en": "Analysing the sign-in log" },
+      "desc": {
+       "ru": "<p>Собери разбор инцидента. <code>report(log, limit)</code> получает список событий-словарей с ключами <code>'кто'</code>, <code>'адрес'</code>, <code>'успех'</code> и <code>'токен'</code>.</p><p>Верни словарь с тремя ключами:</p><ul><li><code>'подозрительные'</code> — отсортированный список адресов с <code>limit</code> и более неудачами подряд;</li><li><code>'всего'</code> — сколько всего событий;</li><li><code>'последнее'</code> — последнее событие журнала с <b>замаскированным</b> токеном (последние четыре символа видны), или <code>None</code> для пустого журнала.</li></ul><p>Исходные события менять нельзя.</p>",
+       "uz": "<p>Insident tahlilini yig'ing. <code>report(log, limit)</code> <code>'кто'</code>, <code>'адрес'</code>, <code>'успех'</code> va <code>'токен'</code> kalitli hodisa-lug'atlar ro'yxatini oladi.</p><p>Uch kalitli lug'at qaytaring:</p><ul><li><code>'подозрительные'</code> — ketma-ket <code>limit</code> va undan ko'p muvaffaqiyatsizlikli manzillarning saralangan ro'yxati;</li><li><code>'всего'</code> — jami nechta hodisa;</li><li><code>'последнее'</code> — jurnalning oxirgi hodisasi <b>niqoblangan</b> token bilan (oxirgi to'rt belgi ko'rinadi), yoki bo'sh jurnal uchun <code>None</code>.</li></ul><p>Asl hodisalarni o'zgartirib bo'lmaydi.</p>",
+       "en": "<p>Assemble an incident report. <code>report(log, limit)</code> receives a list of event dicts with keys <code>'кто'</code>, <code>'адрес'</code>, <code>'успех'</code> and <code>'токен'</code>.</p><p>Return a dict with three keys:</p><ul><li><code>'подозрительные'</code> — a sorted list of addresses with <code>limit</code> or more consecutive failures;</li><li><code>'всего'</code> — the total number of events;</li><li><code>'последнее'</code> — the last event of the log with its token <b>masked</b> (the final four characters visible), or <code>None</code> for an empty log.</li></ul><p>The original events must not be modified.</p>"
+      },
+      "starter": "def report(log, limit):\n    # неудачи подряд, счётчик событий и последнее событие без секрета\n    pass\n\nlog = [{'кто': 'a', 'адрес': '1.1.1.1', 'успех': False, 'токен': 'abcdefgh'}]\nprint(report(log, 1))\n",
+      "tests": "log = [\n    {'кто': 'a', 'адрес': '1.1.1.1', 'успех': False, 'токен': 'aaaabbbb'},\n    {'кто': 'a', 'адрес': '1.1.1.1', 'успех': False, 'токен': 'ccccdddd'},\n    {'кто': 'b', 'адрес': '2.2.2.2', 'успех': True,  'токен': 'eeeeffff'},\n    {'кто': 'a', 'адрес': '1.1.1.1', 'успех': False, 'токен': 'gggghhhh'},\n]\nres = report(log, 3)\nassert res['подозрительные'] == ['1.1.1.1'], 'Три неудачи подряд с одного адреса'\nassert res['всего'] == 4, 'Событий было четыре'\nassert res['последнее']['токен'] == '****hhhh', 'Токен в отчёте замаскирован'\nassert res['последнее']['кто'] == 'a', 'Остальные поля на месте'\nassert log[3]['токен'] == 'gggghhhh', 'Исходный журнал не изменился'\nempty = report([], 3)\nassert empty['последнее'] is None and empty['всего'] == 0, 'Пустой журнал'\nassert report(log, 10)['подозрительные'] == [], 'Порог не достигнут'",
+      "hint": {
+       "ru": "Три части, каждую ты уже писал: серии неудач как в задаче 2, <code>len(log)</code> и маскировка как в задаче 1. Для последнего события сделай <b>копию</b> словаря, иначе испортишь исходный журнал.",
+       "uz": "Uch qism, har birini yozgansiz: 2-vazifadagidek muvaffaqiyatsizliklar seriyasi, <code>len(log)</code> va 1-vazifadagidek niqoblash. Oxirgi hodisa uchun lug'atning <b>nusxasini</b> oling, aks holda asl jurnalni buzasiz.",
+       "en": "Three parts you have already written: failure streaks as in task 2, <code>len(log)</code>, and masking as in task 1. For the last event make a <b>copy</b> of the dict, otherwise you corrupt the original log."
+      }
+     }
+    ]
+   }
   }
  ]
 }

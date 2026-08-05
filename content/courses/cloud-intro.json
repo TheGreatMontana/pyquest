@@ -535,6 +535,339 @@
      }
     ]
    }
+  },
+  {
+   "id": "cl-02",
+   "title": { "ru": "Счёт, отказы и автомасштаб", "uz": "Hisob, nosozliklar va avtomiqyos", "en": "The bill, failures and autoscaling" },
+   "tagline": { "ru": "Почему облако внезапно дорого, где оно падает и как заставить его расти само", "uz": "Nega bulut to'satdan qimmat, u qayerda yiqiladi va uni o'zi o'sishga qanday majburlash mumkin", "en": "Why the cloud is suddenly expensive, where it fails and how to make it grow by itself" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "Из чего складывается счёт", "uz": "Hisob nimalardan tashkil topadi", "en": "What the bill is made of" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Главная неожиданность облака в том, что платят не только за серверы. Счёт складывается минимум из четырёх частей, и самая коварная — последняя.</p><ul><li><b>Вычисления</b> — часы работы машин. Считается легко и предсказуемо.</li><li><b>Хранение</b> — гигабайты в месяц. Дёшево, но растёт само и никогда не уменьшается, если за этим не следить.</li><li><b>Запросы</b> — плата за количество операций к хранилищу. Миллион мелких файлов дороже одного крупного не только по времени.</li><li><b>Трафик наружу</b> — байты, ушедшие из облака в интернет. Внутрь бесплатно, наружу — нет. На этом сгорают бюджеты.</li></ul><p>Первое, что делают с внезапно выросшим счётом, — раскладывают его по этим четырём строкам. Почти всегда виновата одна.</p>",
+        "uz": "<p>Bulutning asosiy kutilmagan tomoni shundaki, faqat serverlar uchun to'lanmaydi. Hisob kamida to'rt qismdan iborat va eng ayyori — oxirgisi.</p><ul><li><b>Hisoblash</b> — mashinalar ish soatlari. Oson va bashoratli hisoblanadi.</li><li><b>Saqlash</b> — oyiga gigabaytlar. Arzon, lekin o'zi o'sadi va kuzatilmasa hech qachon kamaymaydi.</li><li><b>So'rovlar</b> — omborga amallar soni uchun to'lov. Million mayda fayl bitta yirikdan nafaqat vaqt bo'yicha qimmat.</li><li><b>Tashqariga trafik</b> — bulutdan internetga ketgan baytlar. Ichkariga bepul, tashqariga — yo'q. Byudjetlar shunda yonadi.</li></ul><p>To'satdan o'sgan hisob bilan birinchi qilinadigan ish — uni shu to'rt qatorga ajratish. Deyarli doim bittasi aybdor.</p>",
+        "en": "<p>The main surprise of the cloud is that you do not pay only for servers. The bill has at least four parts, and the sneakiest is the last one.</p><ul><li><b>Compute</b> — machine hours. Easy and predictable to calculate.</li><li><b>Storage</b> — gigabytes per month. Cheap, but it grows by itself and never shrinks unless someone watches it.</li><li><b>Requests</b> — a charge per operation against storage. A million small files costs more than one large one, and not only in time.</li><li><b>Egress traffic</b> — bytes leaving the cloud for the internet. Inbound is free, outbound is not. This is where budgets burn.</li></ul><p>The first thing done with a suddenly grown bill is to break it into these four lines. Almost always one of them is the culprit.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "PRICE = {\n    \"час машины\": 0.05,        # доллар за час\n    \"ГБ хранения\": 0.02,       # доллар за ГБ в месяц\n    \"млн запросов\": 0.40,\n    \"ГБ наружу\": 0.09,\n}\n\ndef bill(hours, gb_stored, requests, gb_out):\n    lines = {\n        \"вычисления\": hours * PRICE[\"час машины\"],\n        \"хранение\": gb_stored * PRICE[\"ГБ хранения\"],\n        \"запросы\": requests / 1_000_000 * PRICE[\"млн запросов\"],\n        \"трафик наружу\": gb_out * PRICE[\"ГБ наружу\"],\n    }\n    for name, cost in lines.items():\n        print(f\"{name:15} ${cost:9.2f}\")\n    print(f\"{'ИТОГО':15} ${sum(lines.values()):9.2f}\")\n\nprint(\"обычный месяц:\")\nbill(hours=730 * 2, gb_stored=500, requests=5_000_000, gb_out=200)\nprint()\nprint(\"тот же месяц, но кто-то раздаёт видео из облака:\")\nbill(hours=730 * 2, gb_stored=500, requests=5_000_000, gb_out=20_000)"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Серверы те же, данных столько же — а счёт вырос в восемнадцать раз. Виноват один параметр, о котором обычно не думают на этапе проектирования.</p><p>Лечится это не экономией на машинах, а <b>CDN</b>: сеть доставки кэширует файлы ближе к пользователю, и из облака они уходят один раз, а не миллион.</p>",
+        "uz": "<p>Serverlar o'sha, ma'lumot ham shuncha — hisob esa o'n sakkiz barobar o'sdi. Loyihalash bosqichida odatda o'ylanmaydigan bitta parametr aybdor.</p><p>Bu mashinalarda tejash bilan emas, <b>CDN</b> bilan davolanadi: yetkazib berish tarmog'i fayllarni foydalanuvchiga yaqinroq keshlaydi va ular bulutdan million marta emas, bir marta chiqadi.</p>",
+        "en": "<p>The same servers, the same amount of data — and the bill grew eighteenfold. One parameter is to blame, and it is rarely considered at design time.</p><p>The cure is not cheaper machines but a <b>CDN</b>: a delivery network caches files closer to the user, so they leave the cloud once instead of a million times.</p>"
+       }
+      },
+      {
+       "type": "checkpoint",
+       "q": { "ru": "Что из этого обычно бесплатно у облачных провайдеров?", "uz": "Bulut provayderlarida bulardan qaysi biri odatda bepul?", "en": "Which of these is usually free with cloud providers?" },
+       "options": [
+        { "ru": "Трафик наружу, в интернет", "uz": "Tashqariga, internetga trafik", "en": "Outbound traffic to the internet" },
+        { "ru": "Трафик внутрь, из интернета в облако", "uz": "Ichkariga, internetdan bulutga trafik", "en": "Inbound traffic from the internet into the cloud" },
+        { "ru": "Хранение данных", "uz": "Ma'lumot saqlash", "en": "Data storage" },
+        { "ru": "Часы работы машин", "uz": "Mashinalar ish soatlari", "en": "Machine hours" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Загрузить данные в облако почти всегда бесплатно, а вот забрать обратно — платно. Это одна из причин, почему уйти от провайдера дороже, чем прийти.",
+        "uz": "Ma'lumotni bulutga yuklash deyarli doim bepul, qaytarib olish esa — pullik. Bu provayderdan ketish kelishdan qimmatroq bo'lishining sabablaridan biri.",
+        "en": "Uploading into the cloud is almost always free; taking it back out is not. That is one reason leaving a provider costs more than joining."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "Автомасштаб: пусть растёт само", "uz": "Avtomiqyos: o'zi o'ssin", "en": "Autoscaling: let it grow by itself" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Нагрузка на сервис неровная: утром пусто, вечером пик, в чёрную пятницу — десять пиков. Держать машины на максимум круглосуточно значит платить за воздух двадцать часов в сутки.</p><p><b>Автомасштаб</b> добавляет машины, когда нагрузка растёт, и убирает, когда падает. Правило обычно простое: держать среднюю загрузку процессора около целевой.</p><p>Нужное число машин считается почти в лоб: <code>текущая нагрузка / целевая загрузка на машину</code>, округлить вверх. К этому добавляют три ограничителя:</p><ul><li><b>Минимум</b> — сколько машин остаётся всегда, даже ночью.</li><li><b>Максимум</b> — потолок, чтобы ошибка в коде не выписала счёт на тысячи.</li><li><b>Пауза</b> (cooldown) — сколько ждать между решениями, иначе система начнёт дёргаться.</li></ul>",
+        "uz": "<p>Xizmatga yuk notekis: ertalab bo'sh, kechqurun cho'qqi, qora juma da — o'nta cho'qqi. Mashinalarni sutka bo'yi maksimumda ushlash sutkasiga yigirma soat havoga to'lash demakdir.</p><p><b>Avtomiqyos</b> yuk o'sganda mashina qo'shadi, tushganda olib tashlaydi. Qoida odatda oddiy: protsessorning o'rtacha bandligini maqsadli darajada ushlash.</p><p>Kerakli mashinalar soni deyarli to'g'ridan-to'g'ri hisoblanadi: <code>joriy yuk / mashinaga maqsadli bandlik</code>, yuqoriga yaxlitlanadi. Bunga uch cheklovchi qo'shiladi:</p><ul><li><b>Minimum</b> — kechasi ham doim qoladigan mashinalar soni.</li><li><b>Maksimum</b> — shift, koddagi xato minglab hisob yozmasligi uchun.</li><li><b>Pauza</b> (cooldown) — qarorlar orasida qancha kutish, aks holda tizim silkina boshlaydi.</li></ul>",
+        "en": "<p>Load is uneven: empty in the morning, a peak in the evening, ten peaks on Black Friday. Keeping machines at maximum around the clock means paying for air twenty hours a day.</p><p><b>Autoscaling</b> adds machines when load grows and removes them when it falls. The rule is usually simple: keep average CPU utilisation near a target.</p><p>The required machine count is almost a direct calculation: <code>current load / target load per machine</code>, rounded up. Three limiters are added on top:</p><ul><li><b>Minimum</b> — how many machines always stay, even at night.</li><li><b>Maximum</b> — a ceiling, so a bug in the code cannot write a bill for thousands.</li><li><b>Cooldown</b> — how long to wait between decisions, or the system starts thrashing.</li></ul>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "from math import ceil\n\nMIN, MAX = 2, 20\nPER_MACHINE = 100     # запросов в секунду на одну машину\n\ndef machines_for(rps):\n    need = ceil(rps / PER_MACHINE) if rps > 0 else 0\n    return max(MIN, min(need, MAX))\n\nday = [(\"03:00\", 30), (\"09:00\", 450), (\"13:00\", 900),\n       (\"20:00\", 1800), (\"23:00\", 5000)]\n\nfor hour, rps in day:\n    n = machines_for(rps)\n    cost = n * 0.05\n    flag = \"  <- упёрлись в потолок\" if n == MAX else \"\"\n    print(f\"{hour}  нагрузка {rps:5} rps -> машин {n:2}  ${cost:.2f}/час{flag}\")"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>В три ночи хватило бы одной машины, но минимум держит две — это страховка на случай отказа. В одиннадцать вечера потребовалось бы пятьдесят, но потолок остановил на двадцати: часть запросов не обслужится, зато счёт останется предсказуемым.</p><p>Упереться в потолок — это <b>решение, а не авария</b>. Альтернатива — молча выписать счёт в двадцать раз больше, и такие истории заканчиваются хуже.</p>",
+        "uz": "<p>Tunning uchida bitta mashina yetardi, lekin minimum ikkitani ushlaydi — bu nosozlikka qarshi sug'urta. Kechqurun o'n birda ellikta kerak bo'lardi, lekin shift yigirmatada to'xtatdi: so'rovlarning bir qismi xizmat ko'rmaydi, buning evaziga hisob bashoratli qoladi.</p><p>Shiftga tiralish — <b>bu qaror, avariya emas</b>. Muqobili — jimgina yigirma barobar katta hisob yozish, va bunday hikoyalar yomonroq tugaydi.</p>",
+        "en": "<p>At three in the morning one machine would do, but the minimum keeps two — insurance against a failure. At eleven at night fifty would be needed, but the ceiling stopped at twenty: some requests go unserved, and the bill stays predictable.</p><p>Hitting the ceiling is <b>a decision, not an outage</b>. The alternative is silently writing a bill twenty times larger, and those stories end worse.</p>"
+       }
+      },
+      {
+       "type": "note",
+       "kind": "trap",
+       "html": {
+        "ru": "Автомасштаб помогает только тому, что <b>масштабируется горизонтально</b>: сервису без состояния, у которого любая машина обслужит любой запрос. Если приложение хранит сессию в памяти конкретного сервера, добавление второй машины ничего не ускорит — оно сломает вход пользователей.",
+        "uz": "Avtomiqyos faqat <b>gorizontal miqyoslanadigan</b> narsaga yordam beradi: har qanday mashinasi har qanday so'rovga xizmat qiladigan holatsiz xizmatga. Ilova sessiyani aniq server xotirasida saqlasa, ikkinchi mashina qo'shish hech nimani tezlashtirmaydi — u foydalanuvchilar kirishini buzadi.",
+        "en": "Autoscaling only helps things that <b>scale horizontally</b>: a stateless service where any machine can serve any request. If the application keeps sessions in one server's memory, adding a second machine speeds up nothing — it breaks users' logins."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "Зоны, регионы и честная надёжность", "uz": "Zonalar, mintaqalar va halol ishonchlilik", "en": "Zones, regions and honest reliability" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Облако не волшебное: это чужие компьютеры в чужих зданиях. Здание может обесточиться, поэтому провайдеры делят мир на уровни:</p><ul><li><b>Зона доступности</b> — отдельный дата-центр со своим питанием и охлаждением. Соседние зоны связаны быстрым каналом.</li><li><b>Регион</b> — несколько зон в одной географии, например «Франкфурт».</li><li><b>Несколько регионов</b> — защита от масштабной аварии и способ быть ближе к пользователям на другом континенте.</li></ul><p>Правило простое: сервис в одной зоне падает вместе с зоной. Чтобы пережить отказ, нужны копии <b>минимум в двух зонах</b> и балансировщик, который перестанет слать трафик в мёртвую.</p>",
+        "uz": "<p>Bulut sehrli emas: bu begona binolardagi begona kompyuterlar. Bino elektrsiz qolishi mumkin, shuning uchun provayderlar dunyoni darajalarga bo'ladi:</p><ul><li><b>Ochiqlik zonasi</b> — o'z quvvat va sovutishiga ega alohida ma'lumot markazi. Qo'shni zonalar tez kanal bilan bog'langan.</li><li><b>Mintaqa</b> — bir geografiyadagi bir necha zona, masalan «Frankfurt».</li><li><b>Bir necha mintaqa</b> — keng ko'lamli avariyadan himoya va boshqa qit'adagi foydalanuvchilarga yaqinroq bo'lish usuli.</li></ul><p>Qoida oddiy: bir zonadagi xizmat zona bilan birga yiqiladi. Nosozlikdan omon qolish uchun <b>kamida ikki zonada</b> nusxalar va o'lik zonaga trafik yubormay qo'yadigan balanslovchi kerak.</p>",
+        "en": "<p>The cloud is not magic: it is other people's computers in other people's buildings. A building can lose power, so providers divide the world into levels:</p><ul><li><b>Availability zone</b> — a separate data centre with its own power and cooling. Neighbouring zones are linked by a fast channel.</li><li><b>Region</b> — several zones in one geography, for example “Frankfurt”.</li><li><b>Multiple regions</b> — protection against a large-scale failure and a way to sit closer to users on another continent.</li></ul><p>The rule is simple: a service in one zone goes down with that zone. To survive a failure you need copies in <b>at least two zones</b> and a load balancer that stops sending traffic to the dead one.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "NEEDED = 5      # столько машин нужно, чтобы держать нагрузку\n\ndef survives(layout, needed):\n    total = sum(layout.values())\n    worst = max(layout.values()) if layout else 0\n    return total - worst >= needed, total, worst\n\nfor name, layout in [\n    (\"всё в одной зоне\", {\"зона-a\": 8}),\n    (\"две зоны поровну\", {\"зона-a\": 4, \"зона-b\": 4}),\n    (\"три зоны\", {\"зона-a\": 3, \"зона-b\": 3, \"зона-c\": 3}),\n]:\n    ok, total, worst = survives(layout, NEEDED)\n    print(f\"{name:18} машин {total:2}, худшая потеря {worst:2} -> \"\n          f\"{'переживёт отказ зоны' if ok else 'НЕ переживёт'}\")"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Восемь машин в одной зоне надёжнее не делают ничего: зона упала — упало всё. Восемь в двух зонах переживут потерю четырёх, но останутся ровно с четырьмя при нужных пяти — то есть выживут, но не справятся.</p><p>Отсюда практическое правило: <b>считать не общее число машин, а сколько останется после потери самой большой зоны</b>. Три зоны по три дают шесть выживших — это уже настоящая отказоустойчивость.</p><p>И последнее, о чём забывают чаще всего: отказоустойчивость нужно <b>проверять</b>. Зона, которую ни разу не выключали учебно, почти всегда преподносит сюрприз в день настоящей аварии.</p>",
+        "uz": "<p>Bir zonadagi sakkiz mashina ishonchlilikka hech nima qo'shmaydi: zona yiqildi — hammasi yiqildi. Ikki zonadagi sakkiztasi to'rttasini yo'qotishdan omon qoladi, lekin kerakli beshtada aynan to'rtta qoladi — ya'ni omon qoladi, lekin uddalay olmaydi.</p><p>Shundan amaliy qoida: <b>mashinalarning umumiy sonini emas, eng katta zonani yo'qotgandan keyin qanchasi qolishini hisoblash</b>. Uchtadan uch zona oltita omon qolganni beradi — bu allaqachon haqiqiy nosozlikka chidamlilik.</p><p>Va eng ko'p unutiladigan oxirgi narsa: nosozlikka chidamlilikni <b>tekshirish</b> kerak. Hech qachon o'quv tariqasida o'chirilmagan zona haqiqiy avariya kunida deyarli doim syurpriz qiladi.</p>",
+        "en": "<p>Eight machines in one zone add nothing to reliability: the zone falls, everything falls. Eight across two zones survive losing four, but are left with exactly four when five are needed — they survive without coping.</p><p>Hence the practical rule: <b>count not the total number of machines but how many remain after losing the largest zone</b>. Three zones of three leave six survivors — that is real fault tolerance.</p><p>And the thing forgotten most often: fault tolerance must be <b>tested</b>. A zone that has never been switched off as a drill almost always brings a surprise on the day of the real outage.</p>"
+       }
+      },
+      {
+       "type": "summary",
+       "items": [
+        { "ru": "Счёт складывается из вычислений, хранения, запросов и трафика наружу", "uz": "Hisob hisoblash, saqlash, so'rovlar va tashqariga trafikdan yig'iladi", "en": "The bill is compute, storage, requests and egress traffic" },
+        { "ru": "Трафик наружу платный, внутрь — обычно нет", "uz": "Tashqariga trafik pullik, ichkariga — odatda yo'q", "en": "Egress costs money, ingress usually does not" },
+        { "ru": "Автомасштаб держит загрузку у цели, но нужен потолок против счёта", "uz": "Avtomiqyos bandlikni maqsadda ushlaydi, lekin hisobga qarshi shift kerak", "en": "Autoscaling keeps utilisation near target, but needs a ceiling against the bill" },
+        { "ru": "Масштабируется горизонтально только сервис без состояния", "uz": "Gorizontal faqat holatsiz xizmat miqyoslanadi", "en": "Only a stateless service scales horizontally" },
+        { "ru": "Одна зона — одна точка отказа; нужны минимум две", "uz": "Bir zona — bir nosozlik nuqtasi; kamida ikkitasi kerak", "en": "One zone is one point of failure; you need at least two" },
+        { "ru": "Считай, что останется после потери самой большой зоны", "uz": "Eng katta zonani yo'qotgandan keyin nima qolishini hisoblang", "en": "Count what remains after losing the largest zone" }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": { "ru": "Счёт за облако вырос вдвое, серверов столько же. Что проверять первым?", "uz": "Bulut hisobi ikki barobar oshdi, serverlar o'sha. Birinchi nimani tekshirish kerak?", "en": "The cloud bill doubled with the same servers. What do you check first?" },
+     "options": [
+      { "ru": "Скорость дисков", "uz": "Disklar tezligini", "en": "Disk speed" },
+      { "ru": "Разбить счёт по статьям: трафик, хранение, запросы, вычисления", "uz": "Hisobni moddalarga ajratish: trafik, saqlash, so'rovlar, hisoblash", "en": "Break the bill down: traffic, storage, requests, compute" },
+      { "ru": "Версию операционной системы", "uz": "Operatsion tizim versiyasini", "en": "The operating system version" },
+      { "ru": "Ничего, так бывает", "uz": "Hech nimani, shunday bo'ladi", "en": "Nothing, it happens" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Без разбивки поиск превращается в гадание. Провайдеры дают такую детализацию встроенным отчётом.",
+      "uz": "Ajratmasdan qidiruv folbinlikka aylanadi. Provayderlar bunday tafsilotni o'rnatilgan hisobotda beradi.",
+      "en": "Without the breakdown the search becomes guesswork. Providers give this detail in a built-in report."
+     }
+    },
+    {
+     "q": { "ru": "Нагрузка 450 запросов в секунду, одна машина держит 100, минимум 2, максимум 20. Сколько машин?", "uz": "Yuk sekundiga 450 so'rov, bitta mashina 100 ni ko'taradi, minimum 2, maksimum 20. Nechta mashina?", "en": "Load is 450 requests per second, one machine handles 100, min 2, max 20. How many machines?" },
+     "options": [
+      { "ru": "4", "uz": "4", "en": "4" },
+      { "ru": "5 — округляем вверх", "uz": "5 — yuqoriga yaxlitlaymiz", "en": "5 — rounded up" },
+      { "ru": "2", "uz": "2", "en": "2" },
+      { "ru": "20", "uz": "20", "en": "20" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Четыре машины дают только 400 rps — полсотни запросов останутся без ответа. Округление вверх здесь обязательно.",
+      "uz": "To'rt mashina atigi 400 rps beradi — ellikka yaqin so'rov javobsiz qoladi. Bu yerda yuqoriga yaxlitlash majburiy.",
+      "en": "Four machines give only 400 rps — fifty requests would go unanswered. Rounding up is mandatory here."
+     }
+    },
+    {
+     "q": { "ru": "Зачем автомасштабу верхний потолок?", "uz": "Avtomiqyosga nega yuqori shift kerak?", "en": "Why does autoscaling need an upper ceiling?" },
+     "options": [
+      { "ru": "Так требует провайдер", "uz": "Provayder shuni talab qiladi", "en": "The provider requires it" },
+      { "ru": "Чтобы ошибка или атака не выписали неограниченный счёт", "uz": "Xato yoki hujum cheksiz hisob yozmasligi uchun", "en": "So a bug or an attack cannot write an unlimited bill" },
+      { "ru": "Чтобы машины не перегрелись", "uz": "Mashinalar qizib ketmasligi uchun", "en": "So the machines do not overheat" },
+      { "ru": "Потолок не нужен", "uz": "Shift kerak emas", "en": "A ceiling is not needed" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Цикл в коде или ботнет способны попросить тысячу машин. Потолок превращает катастрофу в деградацию.",
+      "uz": "Koddagi sikl yoki botnet mingta mashina so'rashi mumkin. Shift halokatni degradatsiyaga aylantiradi.",
+      "en": "A loop in the code or a botnet can ask for a thousand machines. The ceiling turns a catastrophe into degradation."
+     }
+    },
+    {
+     "q": { "ru": "Приложение хранит сессии пользователей в памяти сервера. Что будет при автомасштабе?", "uz": "Ilova foydalanuvchi sessiyalarini server xotirasida saqlaydi. Avtomiqyosda nima bo'ladi?", "en": "An application keeps user sessions in server memory. What happens with autoscaling?" },
+     "options": [
+      { "ru": "Всё заработает быстрее", "uz": "Hammasi tezroq ishlaydi", "en": "Everything gets faster" },
+      { "ru": "Пользователей будет выбрасывать: их сессия осталась на другой машине", "uz": "Foydalanuvchilar chiqarib yuboriladi: ularning sessiyasi boshqa mashinada qoldi", "en": "Users get logged out: their session lives on another machine" },
+      { "ru": "Ничего не изменится", "uz": "Hech nima o'zgarmaydi", "en": "Nothing changes" },
+      { "ru": "Счёт уменьшится", "uz": "Hisob kamayadi", "en": "The bill drops" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Поэтому состояние выносят наружу — в общую базу или кэш. Без этого горизонтальное масштабирование невозможно.",
+      "uz": "Shuning uchun holat tashqariga — umumiy baza yoki keshga chiqariladi. Busiz gorizontal miqyoslash mumkin emas.",
+      "en": "This is why state is moved out — into a shared database or cache. Without that, horizontal scaling is impossible."
+     }
+    },
+    {
+     "q": { "ru": "Восемь машин в одной зоне доступности. Насколько это отказоустойчиво?", "uz": "Bir ochiqlik zonasida sakkiz mashina. Bu qanchalik nosozlikka chidamli?", "en": "Eight machines in one availability zone. How fault-tolerant is that?" },
+     "options": [
+      { "ru": "Очень — машин же восемь", "uz": "Juda — mashina sakkizta-ku", "en": "Very — there are eight machines" },
+      { "ru": "Никак: падение зоны уносит все восемь", "uz": "Hech qanday: zona yiqilishi sakkizalasini olib ketadi", "en": "Not at all: a zone failure takes all eight" },
+      { "ru": "Зависит от размера машин", "uz": "Mashinalar hajmiga bog'liq", "en": "It depends on machine size" },
+      { "ru": "Достаточно для любых требований", "uz": "Har qanday talab uchun yetarli", "en": "Enough for any requirement" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Количество машин защищает от отказа машины. От отказа зоны защищает только вторая зона.",
+      "uz": "Mashinalar soni mashina nosozligidan himoya qiladi. Zona nosozligidan faqat ikkinchi zona himoya qiladi.",
+      "en": "The machine count protects against a machine failure. Only a second zone protects against a zone failure."
+     }
+    },
+    {
+     "q": { "ru": "Как честно оценить, переживёт ли сервис отказ зоны?", "uz": "Xizmat zona nosozligidan omon qoladimi — buni halol qanday baholash mumkin?", "en": "How do you honestly judge whether a service survives a zone failure?" },
+     "options": [
+      { "ru": "Посчитать общее число машин", "uz": "Mashinalarning umumiy sonini sanash", "en": "Count the total number of machines" },
+      { "ru": "Посчитать, сколько останется после потери самой крупной зоны", "uz": "Eng yirik zonani yo'qotgandan keyin qanchasi qolishini sanash", "en": "Count what remains after losing the largest zone" },
+      { "ru": "Спросить у провайдера", "uz": "Provayderdan so'rash", "en": "Ask the provider" },
+      { "ru": "Посмотреть на счёт", "uz": "Hisobga qarash", "en": "Look at the bill" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "И потом обязательно проверить учениями. Непроверенная отказоустойчивость — это надежда, а не свойство системы.",
+      "uz": "Va keyin albatta mashq bilan tekshirish. Tekshirilmagan nosozlikka chidamlilik — bu tizim xususiyati emas, umid.",
+      "en": "And then verify it with a drill. Untested fault tolerance is a hope, not a property of the system."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "python",
+     "title": { "ru": "Разбор счёта", "uz": "Hisobni ajratish", "en": "Breaking down the bill" },
+     "brief": { "ru": "Куда ушли деньги", "uz": "Pul qayerga ketdi", "en": "Where the money went" },
+     "desc": {
+      "ru": "<p><code>biggest_line(usage, prices)</code> получает два словаря с одинаковыми ключами: сколько потрачено ресурса и цена за единицу.</p><p>Верни имя статьи с наибольшей стоимостью. Если словарь пуст — верни <code>None</code>. Ключи, которых нет в ценах, пропускай.</p>",
+      "uz": "<p><code>biggest_line(usage, prices)</code> bir xil kalitli ikki lug'at oladi: resurs qancha sarflangani va birlik narxi.</p><p>Eng katta qiymatli modda nomini qaytaring. Lug'at bo'sh bo'lsa — <code>None</code> qaytaring. Narxlarda yo'q kalitlarni o'tkazib yuboring.</p>",
+      "en": "<p><code>biggest_line(usage, prices)</code> takes two dicts with the same keys: how much of a resource was consumed and the unit price.</p><p>Return the name of the most expensive line. If the dict is empty, return <code>None</code>. Skip keys missing from the prices.</p>"
+     },
+     "starter": "def biggest_line(usage, prices):\n    # твой код\n    pass\n\nprint(biggest_line({'трафик': 20000, 'хранение': 500}, {'трафик': 0.09, 'хранение': 0.02}))\n",
+     "tests": "prices = {'машины': 0.05, 'хранение': 0.02, 'трафик': 0.09}\nassert biggest_line({'машины': 1460, 'хранение': 500, 'трафик': 200}, prices) == 'машины', '73 доллара против 10 и 18'\nassert biggest_line({'машины': 1460, 'хранение': 500, 'трафик': 20000}, prices) == 'трафик', '1800 долларов на трафике'\nassert biggest_line({}, prices) is None, 'Пустое потребление'\nassert biggest_line({'неизвестно': 100}, prices) is None, 'Ключа нет в ценах — считать нечего'\nassert biggest_line({'хранение': 1}, prices) == 'хранение', 'Единственная статья'",
+     "hint": {
+      "ru": "Собери словарь стоимостей только по общим ключам, а потом <code>max(costs, key=costs.get)</code>. Пустой результат обработай до этого.",
+      "uz": "Faqat umumiy kalitlar bo'yicha qiymatlar lug'atini yig'ing, keyin <code>max(costs, key=costs.get)</code>. Bo'sh natijani bundan oldin qayta ishlang.",
+      "en": "Build a dict of costs over the shared keys only, then <code>max(costs, key=costs.get)</code>. Handle an empty result before that."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "python",
+     "title": { "ru": "Сколько машин поднять", "uz": "Nechta mashina ko'tarish", "en": "How many machines to run" },
+     "brief": { "ru": "Правило автомасштаба", "uz": "Avtomiqyos qoidasi", "en": "The autoscaling rule" },
+     "desc": {
+      "ru": "<p><code>scale(rps, per_machine, low, high)</code> считает нужное число машин: нагрузку делим на ёмкость одной машины и <b>округляем вверх</b>.</p><p>Результат зажимаем между <code>low</code> и <code>high</code>. Нулевая или отрицательная нагрузка даёт минимум <code>low</code>.</p>",
+      "uz": "<p><code>scale(rps, per_machine, low, high)</code> kerakli mashinalar sonini hisoblaydi: yukni bitta mashina sig'imiga bo'lamiz va <b>yuqoriga yaxlitlaymiz</b>.</p><p>Natijani <code>low</code> va <code>high</code> orasiga siqamiz. Nol yoki manfiy yuk minimum <code>low</code> beradi.</p>",
+      "en": "<p><code>scale(rps, per_machine, low, high)</code> computes the machine count: divide the load by one machine's capacity and <b>round up</b>.</p><p>Clamp the result between <code>low</code> and <code>high</code>. Zero or negative load gives the minimum <code>low</code>.</p>"
+     },
+     "starter": "from math import ceil\n\ndef scale(rps, per_machine, low, high):\n    # твой код\n    pass\n\nprint(scale(450, 100, 2, 20))\n",
+     "tests": "assert scale(450, 100, 2, 20) == 5, 'Округляем вверх: четырёх машин не хватит'\nassert scale(400, 100, 2, 20) == 4, 'Ровно четыре машины'\nassert scale(5000, 100, 2, 20) == 20, 'Упёрлись в потолок'\nassert scale(30, 100, 2, 20) == 2, 'Ночью держим минимум'\nassert scale(0, 100, 2, 20) == 2, 'Нет нагрузки — всё равно минимум'\nassert scale(-5, 100, 2, 20) == 2, 'Отрицательная нагрузка не ломает расчёт'",
+     "hint": {
+      "ru": "<code>ceil(rps / per_machine)</code>, потом <code>max(low, min(need, high))</code>. Неположительную нагрузку отсеки до деления.",
+      "uz": "<code>ceil(rps / per_machine)</code>, keyin <code>max(low, min(need, high))</code>. Musbat bo'lmagan yukni bo'lishdan oldin ajrating.",
+      "en": "<code>ceil(rps / per_machine)</code>, then <code>max(low, min(need, high))</code>. Filter out non-positive load before dividing."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "python",
+     "title": { "ru": "Переживёт ли отказ зоны", "uz": "Zona nosozligidan omon qoladimi", "en": "Will it survive a zone failure" },
+     "brief": { "ru": "Честная проверка размещения", "uz": "Joylashtirishni halol tekshirish", "en": "An honest check of the layout" },
+     "desc": {
+      "ru": "<p><code>survives(layout, needed)</code> получает словарь «зона → число машин» и минимально необходимое количество машин.</p><p>Верни <code>True</code>, если после потери <b>самой крупной</b> зоны машин остаётся не меньше <code>needed</code>. Пустое размещение даёт <code>False</code>, если требуется хоть одна машина.</p>",
+      "uz": "<p><code>survives(layout, needed)</code> «zona → mashinalar soni» lug'atini va minimal zarur mashinalar sonini oladi.</p><p><b>Eng yirik</b> zonani yo'qotgandan keyin mashinalar <code>needed</code> dan kam qolmasa <code>True</code> qaytaring. Bo'sh joylashtirish, agar hech bo'lmasa bitta mashina kerak bo'lsa, <code>False</code> beradi.</p>",
+      "en": "<p><code>survives(layout, needed)</code> receives a dict “zone → machine count” and the minimum machines required.</p><p>Return <code>True</code> if after losing the <b>largest</b> zone at least <code>needed</code> machines remain. An empty layout gives <code>False</code> when at least one machine is required.</p>"
+     },
+     "starter": "def survives(layout, needed):\n    # твой код\n    pass\n\nprint(survives({'a': 4, 'b': 4}, 5))\n",
+     "tests": "assert survives({'a': 8}, 5) is False, 'Одна зона — теряем всё'\nassert survives({'a': 4, 'b': 4}, 5) is False, 'Останется четыре при нужных пяти'\nassert survives({'a': 4, 'b': 4}, 4) is True, 'Четырёх как раз хватает'\nassert survives({'a': 3, 'b': 3, 'c': 3}, 5) is True, 'Шесть выживших из девяти'\nassert survives({}, 1) is False, 'Ничего не развёрнуто'\nassert survives({}, 0) is True, 'Ноль машин требовать можно'\nassert survives({'a': 10, 'b': 1}, 1) is True, 'Перекос: выживет одна машина, но её хватает'",
+     "hint": {
+      "ru": "Сумма всех значений минус <code>max</code> — это и есть выжившие. Для пустого словаря <code>max</code> упадёт, поэтому обработай его отдельно.",
+      "uz": "Barcha qiymatlar yig'indisi minus <code>max</code> — bu omon qolganlar. Bo'sh lug'atda <code>max</code> xato beradi, shuning uchun uni alohida qayta ishlang.",
+      "en": "The sum of all values minus the <code>max</code> is the survivors. For an empty dict <code>max</code> raises, so handle it separately."
+     }
+    }
+   ],
+   "exam": {
+    "time": 540,
+    "questions": [
+     {
+      "q": { "ru": "Сервис раздаёт видео пользователям по всему миру прямо из облака. Какая статья счёта вырастет?", "uz": "Xizmat butun dunyo foydalanuvchilariga videoni to'g'ridan-to'g'ri bulutdan tarqatadi. Hisobning qaysi moddasi o'sadi?", "en": "A service streams video worldwide straight from the cloud. Which bill line grows?" },
+      "options": [
+       { "ru": "Хранение", "uz": "Saqlash", "en": "Storage" },
+       { "ru": "Трафик наружу", "uz": "Tashqariga trafik", "en": "Egress traffic" },
+       { "ru": "Вычисления", "uz": "Hisoblash", "en": "Compute" },
+       { "ru": "Ни одна", "uz": "Hech qaysi", "en": "None" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Нагрузка 1250 rps, машина держит 300, минимум 2, максимум 10. Сколько машин поднимет автомасштаб?", "uz": "Yuk 1250 rps, mashina 300 ni ko'taradi, minimum 2, maksimum 10. Avtomiqyos nechta mashina ko'taradi?", "en": "Load is 1250 rps, a machine handles 300, min 2, max 10. How many machines does autoscaling run?" },
+      "options": [
+       { "ru": "4", "uz": "4", "en": "4" },
+       { "ru": "5", "uz": "5", "en": "5" },
+       { "ru": "10", "uz": "10", "en": "10" },
+       { "ru": "2", "uz": "2", "en": "2" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Что означает «сервис без состояния»?", "uz": "«Holatsiz xizmat» nima degani?", "en": "What does “stateless service” mean?" },
+      "options": [
+       { "ru": "Он не хранит никаких данных вообще", "uz": "U umuman hech qanday ma'lumot saqlamaydi", "en": "It stores no data at all" },
+       { "ru": "Любая его машина может обслужить любой запрос — состояние вынесено наружу", "uz": "Uning har qanday mashinasi har qanday so'rovga xizmat qiladi — holat tashqariga chiqarilgan", "en": "Any of its machines can serve any request — the state lives outside" },
+       { "ru": "Он работает без базы данных", "uz": "U ma'lumotlar bazasisiz ishlaydi", "en": "It runs without a database" },
+       { "ru": "Он не логируется", "uz": "U loglanmaydi", "en": "It does not log" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Размещение: зона-a — 6 машин, зона-b — 2. Нужно 5. Переживёт отказ зоны?", "uz": "Joylashtirish: zona-a — 6 mashina, zona-b — 2. 5 ta kerak. Zona nosozligidan omon qoladimi?", "en": "Layout: zone-a has 6 machines, zone-b has 2. Five are needed. Does it survive a zone failure?" },
+      "options": [
+       { "ru": "Да, машин восемь", "uz": "Ha, mashina sakkizta", "en": "Yes, there are eight machines" },
+       { "ru": "Нет: потеря зоны-a оставит две машины из нужных пяти", "uz": "Yo'q: zona-a ni yo'qotish kerakli beshtadan ikkitasini qoldiradi", "en": "No: losing zone-a leaves two machines out of the five needed" },
+       { "ru": "Да, если добавить балансировщик", "uz": "Ha, balanslovchi qo'shilsa", "en": "Yes, if you add a load balancer" },
+       { "ru": "Нельзя определить", "uz": "Aniqlab bo'lmaydi", "en": "It cannot be determined" }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "python",
+      "title": { "ru": "План на сутки", "uz": "Sutkalik reja", "en": "A plan for the day" },
+      "desc": {
+       "ru": "<p>Соедини автомасштаб со счётом. <code>day_cost(loads, per_machine, low, high, price)</code> получает список нагрузок по часам.</p><p>Для каждого часа посчитай число машин правилом автомасштаба (с округлением вверх и зажимом между <code>low</code> и <code>high</code>), умножь на цену машино-часа и сложи всё за сутки.</p><p>Верни стоимость числом с плавающей точкой. Пустой список нагрузок даёт <code>0.0</code>.</p>",
+       "uz": "<p>Avtomiqyosni hisob bilan bog'lang. <code>day_cost(loads, per_machine, low, high, price)</code> soatlar bo'yicha yuklar ro'yxatini oladi.</p><p>Har soat uchun mashinalar sonini avtomiqyos qoidasi bilan hisoblang (yuqoriga yaxlitlash va <code>low</code> hamda <code>high</code> orasiga siqish bilan), mashina-soat narxiga ko'paytiring va sutka bo'yicha hammasini qo'shing.</p><p>Qiymatni suzuvchi nuqtali son sifatida qaytaring. Bo'sh yuklar ro'yxati <code>0.0</code> beradi.</p>",
+       "en": "<p>Join autoscaling with the bill. <code>day_cost(loads, per_machine, low, high, price)</code> receives a list of hourly loads.</p><p>For each hour compute the machine count with the autoscaling rule (rounding up and clamping between <code>low</code> and <code>high</code>), multiply by the price per machine-hour and sum over the day.</p><p>Return the cost as a float. An empty load list gives <code>0.0</code>.</p>"
+      },
+      "starter": "from math import ceil\n\ndef day_cost(loads, per_machine, low, high, price):\n    # для каждого часа: сколько машин, столько и платим\n    pass\n\nprint(day_cost([30, 450, 900, 1800], 100, 2, 20, 0.05))\n",
+      "tests": "assert abs(day_cost([30, 450, 900, 1800], 100, 2, 20, 0.05) - 1.7) < 1e-9, '2 + 5 + 9 + 18 = 34 машино-часа по 5 центов'\nassert day_cost([], 100, 2, 20, 0.05) == 0.0, 'Нет часов — нет счёта'\nassert abs(day_cost([0] * 24, 100, 2, 20, 0.05) - 2.4) < 1e-9, 'Сутки на минимуме: 24 часа по две машины'\nassert abs(day_cost([100000], 100, 2, 20, 0.05) - 1.0) < 1e-9, 'Потолок ограничивает даже безумную нагрузку'\nassert isinstance(day_cost([100], 100, 2, 20, 0.05), float), 'Результат — число с плавающей точкой'",
+      "hint": {
+       "ru": "Функцию <code>scale</code> из задачи 2 можно переиспользовать целиком: пройди по <code>loads</code>, сложи машины, умножь сумму на <code>price</code> в конце.",
+       "uz": "2-vazifadagi <code>scale</code> funksiyani to'liq qayta ishlatish mumkin: <code>loads</code> bo'ylab yuring, mashinalarni qo'shing, oxirida yig'indini <code>price</code> ga ko'paytiring.",
+       "en": "The <code>scale</code> function from task 2 can be reused wholesale: walk <code>loads</code>, sum the machines, multiply the total by <code>price</code> at the end."
+      }
+     }
+    ]
+   }
   }
  ]
 }

@@ -1026,7 +1026,7 @@
    "color": "#60a5fa",
    "level": "intermediate",
    "status": "full",
-   "estimatedHours": 8,
+   "estimatedHours": 14,
    "requires": [
     "python-collections"
    ],
@@ -1034,7 +1034,7 @@
     "cloud-basics"
    ],
    "legacyIds": [],
-   "moduleCount": 1,
+   "moduleCount": 2,
    "runner": "python"
   },
   {
@@ -1053,7 +1053,7 @@
    "color": "#f87171",
    "level": "intermediate",
    "status": "full",
-   "estimatedHours": 8,
+   "estimatedHours": 14,
    "requires": [
     "security-basics"
    ],
@@ -1061,7 +1061,7 @@
     "infosec-basics"
    ],
    "legacyIds": [],
-   "moduleCount": 1,
+   "moduleCount": 2,
    "runner": "python"
   }
  ],

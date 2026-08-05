@@ -605,6 +605,36 @@ print(survives([2, 2, 2], 3))""",
     return round(total * price_per_hour, 2)
 
 print(bill([10, 500, 10], 120, 0.1, 2, 10))""",
+'cloud-intro/cl-02/t1': """def biggest_line(usage, prices):
+    costs = {k: v * prices[k] for k, v in usage.items() if k in prices}
+    if not costs:
+        return None
+    return max(costs, key=costs.get)
+
+print(biggest_line({'трафик': 20000, 'хранение': 500}, {'трафик': 0.09, 'хранение': 0.02}))""",
+'cloud-intro/cl-02/t2': """from math import ceil
+
+def scale(rps, per_machine, low, high):
+    need = ceil(rps / per_machine) if rps > 0 else 0
+    return max(low, min(need, high))
+
+print(scale(450, 100, 2, 20))""",
+'cloud-intro/cl-02/t3': """def survives(layout, needed):
+    if not layout:
+        return needed <= 0
+    return sum(layout.values()) - max(layout.values()) >= needed
+
+print(survives({'a': 4, 'b': 4}, 5))""",
+'cloud-intro/cl-02/exam0': """from math import ceil
+
+def day_cost(loads, per_machine, low, high, price):
+    total = 0
+    for rps in loads:
+        need = ceil(rps / per_machine) if rps > 0 else 0
+        total += max(low, min(need, high))
+    return float(total * price)
+
+print(day_cost([30, 450, 900, 1800], 100, 2, 20, 0.05))""",
 
 # ===== infosec-intro =====
 'infosec-intro/is-01/t1': """def top_risk(risks):
@@ -637,4 +667,62 @@ USERS = {'Азиз': 'админ'}
 ROLES = {'админ': {'read', 'write', 'delete'}}
 NEED = {'админ': {'read', 'write'}}
 print(audit(USERS, ROLES, NEED))""",
+'infosec-intro/is-02/t1': """def mask(value):
+    text = str(value)
+    if len(text) <= 4:
+        return '*' * len(text)
+    return '*' * (len(text) - 4) + text[-4:]
+
+def safe_event(event, secrets):
+    return {k: (mask(v) if k in secrets else v) for k, v in event.items()}
+
+print(safe_event({'кто': 'aziz', 'токен': 'abcdefgh'}, {'токен'}))""",
+'infosec-intro/is-02/t2': """def bruteforce(log, limit):
+    streak = {}
+    caught = set()
+    for address, success in log:
+        if success:
+            streak[address] = 0
+        else:
+            streak[address] = streak.get(address, 0) + 1
+            if streak[address] >= limit:
+                caught.add(address)
+    return sorted(caught)
+
+print(bruteforce([('1.1.1.1', False), ('1.1.1.1', False), ('1.1.1.1', False)], 3))""",
+'infosec-intro/is-02/t3': """def is_ours(address, base):
+    if '@' not in address:
+        return False
+    domain = address.rsplit('@', 1)[-1].lower()
+    base = base.lower()
+    return domain == base or domain.endswith('.' + base)
+
+print(is_ours('support@example.com', 'example.com'))""",
+'infosec-intro/is-02/exam0': """def report(log, limit):
+    def mask(value):
+        text = str(value)
+        if len(text) <= 4:
+            return '*' * len(text)
+        return '*' * (len(text) - 4) + text[-4:]
+
+    streak = {}
+    caught = set()
+    for event in log:
+        address = event['адрес']
+        if event['успех']:
+            streak[address] = 0
+        else:
+            streak[address] = streak.get(address, 0) + 1
+            if streak[address] >= limit:
+                caught.add(address)
+
+    last = None
+    if log:
+        last = dict(log[-1])
+        last['токен'] = mask(last['токен'])
+
+    return {'подозрительные': sorted(caught), 'всего': len(log), 'последнее': last}
+
+log = [{'кто': 'a', 'адрес': '1.1.1.1', 'успех': False, 'токен': 'abcdefgh'}]
+print(report(log, 1))""",
 }
