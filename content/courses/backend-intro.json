@@ -178,6 +178,352 @@
        "tests": "assert handle('GET', '/api/users') == 200, \"GET /api/users -> 200\"\nassert handle('POST', '/api/users') == 201, \"POST /api/users -> 201\"\nassert handle('GET', '/nope') == 404, \"неизвестный путь -> 404\"\nassert handle('DELETE', '/api/users') == 404, \"неподдерживаемый метод -> 404\"" }
     ]
    }
+  },
+  {
+   "id": "be-02",
+   "title": { "ru": "Сервис, который не падает", "uz": "Yiqilmaydigan xizmat", "en": "A service that does not fall over" },
+   "tagline": { "ru": "Валидация, аутентификация, пагинация и идемпотентность — что отличает игрушку от рабочего API", "uz": "Validatsiya, autentifikatsiya, sahifalash va idempotentlik — o'yinchoqni ishchi API dan nima ajratadi", "en": "Validation, authentication, pagination and idempotency — what separates a toy from a working API" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "Никогда не верь клиенту", "uz": "Mijozga hech qachon ishonmang", "en": "Never trust the client" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Первое правило бэкенда: <b>всё, что пришло снаружи, — враждебно, пока не доказано обратное</b>. Проверки в браузере не считаются: запрос можно отправить напрямую, минуя твою форму.</p><p>Валидация отвечает на четыре вопроса по каждому полю:</p><ul><li><b>Есть ли оно?</b> Обязательные поля должны присутствовать.</li><li><b>Того ли типа?</b> Цена — число, а не строка «много».</li><li><b>В допустимых ли границах?</b> Возраст от 0 до 130, количество больше нуля.</li><li><b>Не лишнее ли оно?</b> Поле <code>is_admin</code>, пришедшее от клиента, надо выбросить, а не сохранить.</li></ul><p>Последний пункт — самый недооценённый. Слепое сохранение всего присланного в базу подарило миру не одну статью об угоне админских прав.</p>",
+        "uz": "<p>Bekendning birinchi qoidasi: <b>tashqaridan kelgan hamma narsa aksi isbotlanmaguncha dushman</b>. Brauzerdagi tekshiruvlar hisobga olinmaydi: so'rovni sizning shaklingizni chetlab, to'g'ridan-to'g'ri yuborish mumkin.</p><p>Validatsiya har maydon bo'yicha to'rt savolga javob beradi:</p><ul><li><b>U bormi?</b> Majburiy maydonlar mavjud bo'lishi kerak.</li><li><b>Turi to'g'rimi?</b> Narx — son, «ko'p» degan satr emas.</li><li><b>Ruxsat etilgan chegaradami?</b> Yosh 0 dan 130 gacha, miqdor noldan katta.</li><li><b>Ortiqcha emasmi?</b> Mijozdan kelgan <code>is_admin</code> maydonini saqlash emas, tashlash kerak.</li></ul><p>Oxirgi band — eng past baholangani. Yuborilgan hamma narsani ko'r-ko'rona bazaga saqlash dunyoga admin huquqlarini o'g'irlash haqida bir nechta maqola sovg'a qilgan.</p>",
+        "en": "<p>The first rule of the backend: <b>everything that arrives from outside is hostile until proven otherwise</b>. Checks in the browser do not count: a request can be sent directly, bypassing your form.</p><p>Validation answers four questions per field:</p><ul><li><b>Is it there?</b> Required fields must be present.</li><li><b>Is it the right type?</b> A price is a number, not the string “a lot”.</li><li><b>Is it in range?</b> Age from 0 to 130, quantity above zero.</li><li><b>Is it extra?</b> An <code>is_admin</code> field coming from the client must be dropped, not saved.</li></ul><p>The last point is the most underrated. Blindly saving everything submitted into the database has given the world more than one article about hijacked admin rights.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "SCHEMA = {\n    \"название\": {\"type\": str, \"required\": True},\n    \"цена\":     {\"type\": (int, float), \"required\": True, \"min\": 0},\n    \"количество\": {\"type\": int, \"required\": False, \"min\": 1},\n}\n\ndef validate(payload):\n    errors = []\n    for field, rule in SCHEMA.items():\n        if field not in payload:\n            if rule[\"required\"]:\n                errors.append(f\"{field}: обязательное поле\")\n            continue\n        value = payload[field]\n        if not isinstance(value, rule[\"type\"]) or isinstance(value, bool):\n            errors.append(f\"{field}: неверный тип\")\n        elif \"min\" in rule and value < rule[\"min\"]:\n            errors.append(f\"{field}: меньше {rule['min']}\")\n    extra = set(payload) - set(SCHEMA)\n    for field in sorted(extra):\n        errors.append(f\"{field}: лишнее поле, игнорируем\")\n    return errors\n\nfor payload in [\n    {\"название\": \"кофе\", \"цена\": 25000, \"количество\": 2},\n    {\"цена\": -5},\n    {\"название\": \"чай\", \"цена\": \"дорого\", \"is_admin\": True},\n]:\n    print(payload)\n    problems = validate(payload)\n    print(\"  \", problems or \"всё в порядке\")"
+      },
+      {
+       "type": "note",
+       "kind": "trap",
+       "html": {
+        "ru": "Обрати внимание на <code>isinstance(value, bool)</code>. В Python <code>bool</code> — подкласс <code>int</code>, поэтому <code>isinstance(True, int)</code> даёт <code>True</code>, и цена <code>True</code> прошла бы проверку типа. Такие мелочи и составляют разницу между валидацией на бумаге и настоящей.",
+        "uz": "<code>isinstance(value, bool)</code> ga e'tibor bering. Python da <code>bool</code> — <code>int</code> ning quyi sinfi, shuning uchun <code>isinstance(True, int)</code> <code>True</code> beradi va <code>True</code> narxi tur tekshiruvidan o'tib ketardi. Qog'ozdagi validatsiya bilan haqiqiysi orasidagi farqni ana shunday mayda narsalar tashkil qiladi.",
+        "en": "Note the <code>isinstance(value, bool)</code>. In Python <code>bool</code> is a subclass of <code>int</code>, so <code>isinstance(True, int)</code> is <code>True</code> and a price of <code>True</code> would pass the type check. Details like this are the difference between validation on paper and validation in fact."
+       }
+      },
+      {
+       "type": "checkpoint",
+       "q": { "ru": "Клиент прислал поле <code>role: \"admin\"</code>, которого нет в схеме. Что делать?", "uz": "Mijoz sxemada yo'q <code>role: \"admin\"</code> maydonini yubordi. Nima qilish kerak?", "en": "The client sent a field <code>role: \"admin\"</code> that is not in the schema. What do you do?" },
+       "options": [
+        { "ru": "Сохранить — вдруг пригодится", "uz": "Saqlash — birdan asqotar", "en": "Save it — it might come in handy" },
+        { "ru": "Игнорировать: сервер сам решает, кто админ", "uz": "E'tiborsiz qoldirish: kim admin ekanini server o'zi hal qiladi", "en": "Ignore it: the server decides who is an admin" },
+        { "ru": "Вернуть 500", "uz": "500 qaytarish", "en": "Return a 500" },
+        { "ru": "Спросить у пользователя", "uz": "Foydalanuvchidan so'rash", "en": "Ask the user" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Роль назначается только на сервере и только тем, у кого есть на это право. Поле из запроса не может влиять на права — иначе любой станет админом одной строкой в консоли браузера.",
+        "uz": "Rol faqat serverda va faqat huquqi borlarga beriladi. So'rovdagi maydon huquqlarga ta'sir qila olmaydi — aks holda har kim brauzer konsolidagi bitta qator bilan admin bo'ladi.",
+        "en": "A role is assigned on the server only, and only by someone entitled to do it. A field from the request must never influence permissions — otherwise anyone becomes an admin with one line in the browser console."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "Кто ты и что тебе можно", "uz": "Siz kimsiz va sizga nima mumkin", "en": "Who you are and what you may do" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Две вещи, которые постоянно путают:</p><ul><li><b>Аутентификация</b> — кто ты. Ответ на неё: «это пользователь azizbek».</li><li><b>Авторизация</b> — что тебе можно. Ответ: «этот заказ не твой, доступа нет».</li></ul><p>Аутентификация происходит один раз, авторизация — на <b>каждом</b> запросе. Забыть вторую при наличии первой — самая частая дыра в API.</p><p>Работает это так. Пользователь один раз присылает логин и пароль, получает <b>токен</b> и дальше прикладывает его к каждому запросу в заголовке <code>Authorization</code>. Пароль больше не передаётся и на сервере хранится только его хеш.</p><p>Токен обязан <b>протухать</b>. Украденный токен без срока годности — это украденный аккаунт навсегда.</p>",
+        "uz": "<p>Doim chalkashtiriladigan ikki narsa:</p><ul><li><b>Autentifikatsiya</b> — siz kimsiz. Unga javob: «bu foydalanuvchi azizbek».</li><li><b>Avtorizatsiya</b> — sizga nima mumkin. Javob: «bu buyurtma sizniki emas, kirish yo'q».</li></ul><p>Autentifikatsiya bir marta, avtorizatsiya esa <b>har</b> so'rovda bo'ladi. Birinchisi bor holda ikkinchisini unutish — API dagi eng ko'p uchraydigan teshik.</p><p>Bu shunday ishlaydi. Foydalanuvchi bir marta login va parol yuboradi, <b>token</b> oladi va keyin uni har so'rovga <code>Authorization</code> sarlavhasida qo'shadi. Parol boshqa uzatilmaydi va serverda faqat uning xeshi saqlanadi.</p><p>Token <b>eskirishi</b> shart. Muddatsiz o'g'irlangan token — bu abadiy o'g'irlangan hisob.</p>",
+        "en": "<p>Two things constantly confused:</p><ul><li><b>Authentication</b> — who you are. Its answer: “this is user azizbek”.</li><li><b>Authorization</b> — what you may do. Its answer: “this order is not yours, access denied”.</li></ul><p>Authentication happens once; authorization happens on <b>every</b> request. Forgetting the second while having the first is the most common hole in an API.</p><p>It works like this. The user sends a login and password once, receives a <b>token</b>, and then attaches it to every request in the <code>Authorization</code> header. The password is never sent again and only its hash is stored on the server.</p><p>A token must <b>expire</b>. A stolen token with no expiry is a stolen account forever.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "SESSIONS = {\"tok-aziz\": \"azizbek\", \"tok-dilnoza\": \"dilnoza\"}\nORDERS = {\n    101: {\"владелец\": \"azizbek\",  \"сумма\": 250000},\n    102: {\"владелец\": \"dilnoza\", \"сумма\": 90000},\n}\n\ndef get_order(token, order_id):\n    # 1. аутентификация: кто ты\n    user = SESSIONS.get(token)\n    if user is None:\n        return 401, \"нужен вход\"\n\n    order = ORDERS.get(order_id)\n    if order is None:\n        return 404, \"нет такого заказа\"\n\n    # 2. авторизация: твоё ли это\n    if order[\"владелец\"] != user:\n        return 404, \"нет такого заказа\"\n\n    return 200, order\n\nfor token, oid in [(\"tok-aziz\", 101), (\"tok-aziz\", 102), (\"нет\", 101), (\"tok-aziz\", 999)]:\n    code, body = get_order(token, oid)\n    print(f\"токен={token:11} заказ={oid:3} -> {code} {body}\")"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Заметь: на чужой заказ сервер отвечает <b>404, а не 403</b>. Это осознанный выбор. Ответ «403 — доступ запрещён» подтверждает, что заказ №102 существует, и злоумышленник за час переберёт все номера, узнав, сколько у сервиса заказов и какие идентификаторы живые.</p><p>Уязвимость, когда доступ к чужому объекту даётся просто по его номеру, называется <b>IDOR</b>. Она стабильно входит в списки самых распространённых, потому что проверка «твоё ли это» — единственная строка, которую легко забыть.</p>",
+        "uz": "<p>E'tibor bering: begona buyurtmaga server <b>403 emas, 404</b> javob beradi. Bu ongli tanlov. «403 — kirish taqiqlangan» javobi 102-buyurtma mavjudligini tasdiqlaydi va buzg'unchi bir soatda barcha raqamlarni tanlab, xizmatda nechta buyurtma borligini va qaysi identifikatorlar tirikligini bilib oladi.</p><p>Begona obyektga shunchaki raqami bo'yicha kirish beriladigan zaiflik <b>IDOR</b> deyiladi. U eng keng tarqalganlar ro'yxatiga barqaror kiradi, chunki «bu sizniki mi» tekshiruvi — unutish oson bo'lgan yagona qator.</p>",
+        "en": "<p>Note: for someone else's order the server answers <b>404, not 403</b>. That is a deliberate choice. A “403 — forbidden” confirms that order #102 exists, and an attacker will enumerate all the numbers within an hour, learning how many orders the service has and which ids are live.</p><p>The vulnerability where access to another person's object is granted purely by its number is called <b>IDOR</b>. It stays firmly in the lists of the most widespread, because the “is this yours” check is the one line that is easy to forget.</p>"
+       }
+      },
+      {
+       "type": "findbug",
+       "lines": [
+        "def delete_comment(token, comment_id):",
+        "    user = SESSIONS.get(token)",
+        "    if user is None:",
+        "        return 401",
+        "    COMMENTS.pop(comment_id, None)",
+        "    return 204"
+       ],
+       "bugLine": 4,
+       "explain": {
+        "ru": "Аутентификация есть, авторизации нет: любой вошедший удалит любой комментарий, подставив чужой номер. Нужна строка вида <code>if COMMENTS[comment_id]['автор'] != user: return 404</code>.",
+        "uz": "Autentifikatsiya bor, avtorizatsiya yo'q: kirgan har kim begona raqamni qo'yib, istalgan izohni o'chiradi. <code>if COMMENTS[comment_id]['автор'] != user: return 404</code> ko'rinishidagi qator kerak.",
+        "en": "Authentication is there, authorization is not: any signed-in user deletes any comment by substituting someone else's id. A line like <code>if COMMENTS[comment_id]['автор'] != user: return 404</code> is needed."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "Пагинация и повторные запросы", "uz": "Sahifalash va takroriy so'rovlar", "en": "Pagination and repeated requests" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Метод <code>GET /orders</code>, который возвращает все заказы, работает ровно до того дня, когда заказов станет миллион. Потом он положит и базу, и сервис, и браузер клиента.</p><p>Поэтому списки всегда отдают <b>страницами</b>. Клиент просит <code>?limit=20&offset=40</code>, сервер возвращает двадцать записей начиная с сорок первой плюс общее количество, чтобы клиент нарисовал номера страниц.</p><p>У сервера при этом есть свои обязанности: ограничить <code>limit</code> сверху (иначе <code>limit=1000000</code> вернёт нас к началу разговора) и не сломаться на отрицательных числах.</p>",
+        "uz": "<p>Barcha buyurtmalarni qaytaradigan <code>GET /orders</code> metodi buyurtmalar million bo'ladigan kungacha aynan ishlaydi. Keyin u bazani ham, xizmatni ham, mijoz brauzerini ham yotqizadi.</p><p>Shuning uchun ro'yxatlar doim <b>sahifalab</b> beriladi. Mijoz <code>?limit=20&offset=40</code> so'raydi, server qirq birinchidan boshlab yigirmata yozuvni va mijoz sahifa raqamlarini chizishi uchun umumiy sonni qaytaradi.</p><p>Serverning esa o'z majburiyatlari bor: <code>limit</code> ni yuqoridan cheklash (aks holda <code>limit=1000000</code> bizni suhbat boshiga qaytaradi) va manfiy sonlarda buzilmaslik.</p>",
+        "en": "<p>A <code>GET /orders</code> that returns every order works right up to the day there are a million orders. Then it takes down the database, the service and the client's browser.</p><p>So lists are always served in <b>pages</b>. The client asks for <code>?limit=20&offset=40</code> and the server returns twenty records starting from the forty-first, plus the total count so the client can draw page numbers.</p><p>The server has duties of its own: cap <code>limit</code> from above (otherwise <code>limit=1000000</code> brings us back to where we started) and not break on negative numbers.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "MAX_LIMIT = 50\nitems = [f\"заказ-{i}\" for i in range(1, 138)]\n\ndef page(items, limit, offset):\n    limit = max(1, min(int(limit), MAX_LIMIT))\n    offset = max(0, int(offset))\n    chunk = items[offset:offset + limit]\n    return {\n        \"items\": chunk,\n        \"всего\": len(items),\n        \"limit\": limit,\n        \"offset\": offset,\n        \"есть_ещё\": offset + limit < len(items),\n    }\n\nfor limit, offset in [(20, 0), (20, 120), (1000, 0), (-5, -10)]:\n    r = page(items, limit, offset)\n    print(f\"запрос limit={limit:5} offset={offset:4} -> отдали {len(r['items']):2} шт, \"\n          f\"limit={r['limit']:2}, offset={r['offset']}, есть ещё: {r['есть_ещё']}\")"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Теперь вторая беда, о которой узнают в проде. Клиент отправил <code>POST /orders</code>, соединение оборвалось, ответ не пришёл. Клиент повторяет запрос — и в базе два одинаковых заказа. Пользователь заплатил дважды.</p><p>Решение называется <b>ключ идемпотентности</b>. Клиент сам генерирует уникальный идентификатор операции и присылает его в заголовке. Сервер запоминает: если такой ключ уже был, он <b>не создаёт ничего нового</b>, а возвращает прежний результат.</p><p>Тот же принцип объясняет, почему <code>GET</code>, <code>PUT</code> и <code>DELETE</code> считаются безопасными для повтора, а <code>POST</code> — нет. Удалить дважды — тот же результат. Создать дважды — два объекта.</p>",
+        "uz": "<p>Endi ishlab chiqarishda bilinadigan ikkinchi balo. Mijoz <code>POST /orders</code> yubordi, ulanish uzildi, javob kelmadi. Mijoz so'rovni takrorlaydi — va bazada ikkita bir xil buyurtma. Foydalanuvchi ikki marta to'ladi.</p><p>Yechim <b>idempotentlik kaliti</b> deyiladi. Mijoz operatsiyaning noyob identifikatorini o'zi yaratadi va uni sarlavhada yuboradi. Server eslab qoladi: bunday kalit allaqachon bo'lgan bo'lsa, u <b>yangi hech nima yaratmaydi</b>, avvalgi natijani qaytaradi.</p><p>Xuddi shu tamoyil nega <code>GET</code>, <code>PUT</code> va <code>DELETE</code> takrorlash uchun xavfsiz, <code>POST</code> esa yo'qligini tushuntiradi. Ikki marta o'chirish — o'sha natija. Ikki marta yaratish — ikkita obyekt.</p>",
+        "en": "<p>Now the second trouble, usually discovered in production. The client sent <code>POST /orders</code>, the connection dropped, no response arrived. The client retries — and the database holds two identical orders. The user paid twice.</p><p>The solution is called an <b>idempotency key</b>. The client generates a unique operation id itself and sends it in a header. The server remembers it: if the key has been seen before, it <b>creates nothing new</b> and returns the previous result.</p><p>The same principle explains why <code>GET</code>, <code>PUT</code> and <code>DELETE</code> are considered safe to repeat while <code>POST</code> is not. Deleting twice gives the same result. Creating twice gives two objects.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "orders = {}\nprocessed = {}      # ключ идемпотентности -> уже созданный заказ\nnext_id = [1]\n\ndef create_order(key, amount):\n    if key in processed:\n        return 200, processed[key], \"повтор, ничего не создали\"\n    order_id = next_id[0]\n    next_id[0] += 1\n    orders[order_id] = amount\n    processed[key] = order_id\n    return 201, order_id, \"создали новый\"\n\nprint(create_order(\"abc-123\", 250000))\nprint(create_order(\"abc-123\", 250000))    # тот же запрос повторился\nprint(create_order(\"xyz-999\", 90000))\nprint(\"заказов в базе:\", len(orders))"
+      },
+      {
+       "type": "summary",
+       "items": [
+        { "ru": "Всё, что пришло от клиента, проверяется на сервере — всегда", "uz": "Mijozdan kelgan hamma narsa serverda tekshiriladi — doim", "en": "Everything from the client is validated on the server — always" },
+        { "ru": "Лишние поля выбрасываются, а не сохраняются", "uz": "Ortiqcha maydonlar saqlanmaydi, tashlanadi", "en": "Extra fields are dropped, not saved" },
+        { "ru": "Аутентификация один раз, авторизация — на каждом запросе", "uz": "Autentifikatsiya bir marta, avtorizatsiya — har so'rovda", "en": "Authenticate once, authorize on every request" },
+        { "ru": "На чужой объект отвечают 404, чтобы не подтверждать его существование", "uz": "Begona obyektga uning mavjudligini tasdiqlamaslik uchun 404 javob beriladi", "en": "Answer 404 for another user's object so you do not confirm it exists" },
+        { "ru": "Списки отдаются страницами, limit ограничен сверху", "uz": "Ro'yxatlar sahifalab beriladi, limit yuqoridan cheklangan", "en": "Lists are paginated and the limit is capped" },
+        { "ru": "Ключ идемпотентности спасает от двойного создания при повторе", "uz": "Idempotentlik kaliti takrorda ikki marta yaratishdan qutqaradi", "en": "An idempotency key prevents double creation on a retry" }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": { "ru": "Форма в браузере уже проверяет поля. Нужна ли проверка на сервере?", "uz": "Brauzerdagi shakl maydonlarni allaqachon tekshiryapti. Serverda tekshiruv kerakmi?", "en": "The browser form already validates fields. Is server validation needed?" },
+     "options": [
+      { "ru": "Нет, это дублирование", "uz": "Yo'q, bu takrorlash", "en": "No, that is duplication" },
+      { "ru": "Да: запрос можно отправить мимо формы", "uz": "Ha: so'rovni shaklni chetlab yuborish mumkin", "en": "Yes: a request can be sent bypassing the form" },
+      { "ru": "Только для платных сервисов", "uz": "Faqat pullik xizmatlar uchun", "en": "Only for paid services" },
+      { "ru": "Только если нет HTTPS", "uz": "Faqat HTTPS bo'lmasa", "en": "Only without HTTPS" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Браузерная проверка — это удобство для пользователя, а не защита. Настоящая граница доверия проходит по серверу.",
+      "uz": "Brauzerdagi tekshiruv — foydalanuvchi qulayligi, himoya emas. Haqiqiy ishonch chegarasi server bo'ylab o'tadi.",
+      "en": "Browser validation is a convenience for the user, not a defence. The real trust boundary runs through the server."
+     }
+    },
+    {
+     "q": { "ru": "Чем авторизация отличается от аутентификации?", "uz": "Avtorizatsiya autentifikatsiyadan nimasi bilan farq qiladi?", "en": "How does authorization differ from authentication?" },
+     "options": [
+      { "ru": "Ничем, это синонимы", "uz": "Hech nimasi bilan, bu sinonimlar", "en": "Not at all, they are synonyms" },
+      { "ru": "Аутентификация — кто ты, авторизация — что тебе можно", "uz": "Autentifikatsiya — siz kimsiz, avtorizatsiya — sizga nima mumkin", "en": "Authentication is who you are, authorization is what you may do" },
+      { "ru": "Авторизация происходит только при входе", "uz": "Avtorizatsiya faqat kirishda bo'ladi", "en": "Authorization happens only at sign-in" },
+      { "ru": "Аутентификация нужна только админам", "uz": "Autentifikatsiya faqat adminlarga kerak", "en": "Authentication is only for admins" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Вошедший пользователь — ещё не значит имеющий право. Второе проверяется отдельно и на каждом запросе.",
+      "uz": "Kirgan foydalanuvchi hali huquqi bor degani emas. Ikkinchisi alohida va har so'rovda tekshiriladi.",
+      "en": "A signed-in user is not yet an entitled one. The second is checked separately and on every request."
+     }
+    },
+    {
+     "q": { "ru": "Пользователь запрашивает чужой заказ. Что вернуть?", "uz": "Foydalanuvchi begona buyurtmani so'rayapti. Nima qaytarish kerak?", "en": "A user requests another person's order. What do you return?" },
+     "options": [
+      { "ru": "403 — так честнее", "uz": "403 — shunday halolroq", "en": "403 — it is more honest" },
+      { "ru": "404: не подтверждаем, что такой заказ существует", "uz": "404: bunday buyurtma mavjudligini tasdiqlamaymiz", "en": "404: we do not confirm such an order exists" },
+      { "ru": "200 с пустым телом", "uz": "Bo'sh tanali 200", "en": "200 with an empty body" },
+      { "ru": "500", "uz": "500", "en": "500" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "403 позволяет перебором узнать, какие идентификаторы существуют. 404 не даёт злоумышленнику никакой информации.",
+      "uz": "403 tanlash orqali qaysi identifikatorlar mavjudligini bilish imkonini beradi. 404 buzg'unchiga hech qanday axborot bermaydi.",
+      "en": "403 lets an attacker enumerate which ids exist. 404 gives them nothing."
+     }
+    },
+    {
+     "q": { "ru": "Клиент прислал <code>limit=1000000</code>. Что сделает хороший сервер?", "uz": "Mijoz <code>limit=1000000</code> yubordi. Yaxshi server nima qiladi?", "en": "The client sent <code>limit=1000000</code>. What does a good server do?" },
+     "options": [
+      { "ru": "Вернёт миллион записей", "uz": "Million yozuv qaytaradi", "en": "Returns a million records" },
+      { "ru": "Ограничит своим максимумом, например 50", "uz": "O'z maksimumi, masalan 50 bilan cheklaydi", "en": "Caps it at its own maximum, say 50" },
+      { "ru": "Вернёт 500", "uz": "500 qaytaradi", "en": "Returns a 500" },
+      { "ru": "Проигнорирует запрос", "uz": "So'rovni e'tiborsiz qoldiradi", "en": "Ignores the request" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Иначе один клиент положит сервис случайно или намеренно. Верхний предел — обязательная часть пагинации.",
+      "uz": "Aks holda bitta mijoz xizmatni tasodifan yoki ataylab yotqizadi. Yuqori chegara — sahifalashning majburiy qismi.",
+      "en": "Otherwise a single client takes the service down, by accident or on purpose. An upper bound is a mandatory part of pagination."
+     }
+    },
+    {
+     "q": { "ru": "Зачем нужен ключ идемпотентности?", "uz": "Idempotentlik kaliti nima uchun kerak?", "en": "What is an idempotency key for?" },
+     "options": [
+      { "ru": "Для шифрования запроса", "uz": "So'rovni shifrlash uchun", "en": "To encrypt the request" },
+      { "ru": "Чтобы повтор запроса не создал второй объект", "uz": "So'rov takrori ikkinchi obyekt yaratmasligi uchun", "en": "So a retried request does not create a second object" },
+      { "ru": "Для ускорения запроса", "uz": "So'rovni tezlashtirish uchun", "en": "To speed up the request" },
+      { "ru": "Для авторизации", "uz": "Avtorizatsiya uchun", "en": "For authorization" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Обрыв связи после отправки — обычное дело. Без ключа клиент не может безопасно повторить платёж или заказ.",
+      "uz": "Yuborgandan keyin aloqa uzilishi — odatiy hol. Kalitsiz mijoz to'lov yoki buyurtmani xavfsiz takrorlay olmaydi.",
+      "en": "A connection dropping after send is routine. Without the key a client cannot safely retry a payment or an order."
+     }
+    },
+    {
+     "q": { "ru": "Какой метод не идемпотентен по своей природе?", "uz": "Qaysi metod tabiatan idempotent emas?", "en": "Which method is not idempotent by nature?" },
+     "options": [
+      { "ru": "GET", "uz": "GET", "en": "GET" },
+      { "ru": "POST", "uz": "POST", "en": "POST" },
+      { "ru": "PUT", "uz": "PUT", "en": "PUT" },
+      { "ru": "DELETE", "uz": "DELETE", "en": "DELETE" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Повторный POST создаёт второй объект. Остальные при повторе приводят систему к тому же состоянию.",
+      "uz": "Takroriy POST ikkinchi obyekt yaratadi. Qolganlari takrorlanganda tizimni o'sha holatga keltiradi.",
+      "en": "A repeated POST creates a second object. The others leave the system in the same state when repeated."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "python",
+     "title": { "ru": "Проверка входящих данных", "uz": "Kiruvchi ma'lumotni tekshirish", "en": "Validating incoming data" },
+     "brief": { "ru": "Схема против клиента", "uz": "Mijozga qarshi sxema", "en": "A schema against the client" },
+     "desc": {
+      "ru": "<p><code>validate(payload, schema)</code>: схема — словарь «поле → правило», где правило это словарь с ключами <code>'type'</code>, <code>'required'</code> и необязательным <code>'min'</code>.</p><p>Верни список сообщений об ошибках в порядке полей схемы:</p><ul><li><code>'&lt;поле&gt;: обязательное'</code> — поля нет, а оно обязательное;</li><li><code>'&lt;поле&gt;: тип'</code> — значение не того типа;</li><li><code>'&lt;поле&gt;: мало'</code> — значение меньше <code>'min'</code>.</li></ul><p>На каждое поле — не больше одной ошибки. Лишние поля payload игнорируй молча. Пустой список означает, что данные приняты.</p>",
+      "uz": "<p><code>validate(payload, schema)</code>: sxema — «maydon → qoida» lug'ati, qoida esa <code>'type'</code>, <code>'required'</code> va ixtiyoriy <code>'min'</code> kalitli lug'at.</p><p>Sxema maydonlari tartibida xato xabarlari ro'yxatini qaytaring:</p><ul><li><code>'&lt;maydon&gt;: обязательное'</code> — maydon yo'q, u esa majburiy;</li><li><code>'&lt;maydon&gt;: тип'</code> — qiymat turi noto'g'ri;</li><li><code>'&lt;maydon&gt;: мало'</code> — qiymat <code>'min'</code> dan kichik.</li></ul><p>Har maydonga bittadan ortiq xato emas. Payload dagi ortiqcha maydonlarni jimgina e'tiborsiz qoldiring. Bo'sh ro'yxat ma'lumot qabul qilinganini bildiradi.</p>",
+      "en": "<p><code>validate(payload, schema)</code>: the schema is a dict “field → rule”, where a rule is a dict with keys <code>'type'</code>, <code>'required'</code> and an optional <code>'min'</code>.</p><p>Return a list of error messages in schema field order:</p><ul><li><code>'&lt;field&gt;: обязательное'</code> — the field is missing and required;</li><li><code>'&lt;field&gt;: тип'</code> — the value has the wrong type;</li><li><code>'&lt;field&gt;: мало'</code> — the value is below <code>'min'</code>.</li></ul><p>At most one error per field. Silently ignore extra payload fields. An empty list means the data is accepted.</p>"
+     },
+     "starter": "def validate(payload, schema):\n    # твой код\n    pass\n\nschema = {'цена': {'type': int, 'required': True, 'min': 0}}\nprint(validate({'цена': -5}, schema))\n",
+     "tests": "schema = {\n    'название': {'type': str, 'required': True},\n    'цена': {'type': int, 'required': True, 'min': 0},\n    'скидка': {'type': int, 'required': False, 'min': 1},\n}\nassert validate({'название': 'кофе', 'цена': 100}, schema) == [], 'Корректные данные'\nassert validate({'цена': 100}, schema) == ['название: обязательное'], 'Нет обязательного поля'\nassert validate({'название': 'чай', 'цена': -1}, schema) == ['цена: мало'], 'Значение ниже минимума'\nassert validate({'название': 1, 'цена': 'дорого'}, schema) == ['название: тип', 'цена: тип'], 'Оба поля не того типа'\nassert validate({'название': 'чай', 'цена': 5, 'лишнее': 1}, schema) == [], 'Лишнее поле игнорируется'\nassert validate({'название': 'чай', 'цена': 5, 'скидка': 0}, schema) == ['скидка: мало'], 'Необязательное поле тоже проверяется'\nassert validate({}, schema) == ['название: обязательное', 'цена: обязательное'], 'Порядок как в схеме'",
+     "hint": {
+      "ru": "Иди по <code>schema.items()</code> — так сохранится порядок. Для каждого поля: нет в payload → сообщение об обязательности или <code>continue</code>; не тот тип → сообщение и <code>continue</code>; иначе проверь <code>min</code>, если он есть в правиле.",
+      "uz": "<code>schema.items()</code> bo'ylab yuring — shunda tartib saqlanadi. Har maydon uchun: payload da yo'q → majburiylik xabari yoki <code>continue</code>; turi noto'g'ri → xabar va <code>continue</code>; aks holda qoidada bo'lsa <code>min</code> ni tekshiring.",
+      "en": "Iterate <code>schema.items()</code> to preserve the order. For each field: missing from payload → the required message or <code>continue</code>; wrong type → message and <code>continue</code>; otherwise check <code>min</code> if the rule has one."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "python",
+     "title": { "ru": "Свой заказ или чужой", "uz": "O'z buyurtmasi yoki begona", "en": "Yours or someone else's" },
+     "brief": { "ru": "Закрываем IDOR", "uz": "IDOR ni yopamiz", "en": "Closing IDOR" },
+     "desc": {
+      "ru": "<p><code>fetch(token, order_id, sessions, orders)</code> возвращает кортеж <code>(код, тело)</code>:</p><ul><li><code>(401, None)</code> — токена нет в <code>sessions</code>;</li><li><code>(404, None)</code> — заказа нет <b>или</b> он принадлежит другому пользователю;</li><li><code>(200, заказ)</code> — всё в порядке.</li></ul><p><code>sessions</code> — словарь «токен → имя пользователя», <code>orders</code> — словарь «номер → заказ», у заказа есть ключ <code>'владелец'</code>.</p>",
+      "uz": "<p><code>fetch(token, order_id, sessions, orders)</code> <code>(kod, tana)</code> kortejini qaytaradi:</p><ul><li><code>(401, None)</code> — token <code>sessions</code> da yo'q;</li><li><code>(404, None)</code> — buyurtma yo'q <b>yoki</b> u boshqa foydalanuvchiga tegishli;</li><li><code>(200, buyurtma)</code> — hammasi joyida.</li></ul><p><code>sessions</code> — «token → foydalanuvchi nomi» lug'ati, <code>orders</code> — «raqam → buyurtma» lug'ati, buyurtmada <code>'владелец'</code> kaliti bor.</p>",
+      "en": "<p><code>fetch(token, order_id, sessions, orders)</code> returns the tuple <code>(code, body)</code>:</p><ul><li><code>(401, None)</code> — the token is not in <code>sessions</code>;</li><li><code>(404, None)</code> — the order does not exist <b>or</b> belongs to another user;</li><li><code>(200, order)</code> — all good.</li></ul><p><code>sessions</code> is a dict “token → user name”, <code>orders</code> is a dict “id → order”, and an order has an <code>'владелец'</code> key.</p>"
+     },
+     "starter": "def fetch(token, order_id, sessions, orders):\n    # твой код\n    pass\n\nS = {'tok': 'aziz'}\nO = {1: {'владелец': 'aziz', 'сумма': 100}}\nprint(fetch('tok', 1, S, O))\n",
+     "tests": "S = {'tok-a': 'aziz', 'tok-d': 'dilnoza'}\nO = {1: {'владелец': 'aziz', 'сумма': 100}, 2: {'владелец': 'dilnoza', 'сумма': 200}}\nassert fetch('tok-a', 1, S, O) == (200, {'владелец': 'aziz', 'сумма': 100}), 'Свой заказ отдаём'\nassert fetch('tok-a', 2, S, O) == (404, None), 'Чужой заказ — как будто его нет'\nassert fetch('нет', 1, S, O) == (401, None), 'Неизвестный токен'\nassert fetch('tok-a', 999, S, O) == (404, None), 'Несуществующий заказ'\nassert fetch('tok-d', 2, S, O)[0] == 200, 'Владелец получает свой заказ'\nassert fetch('нет', 999, S, O) == (401, None), 'Проверка токена идёт первой'",
+     "hint": {
+      "ru": "Три проверки строго по порядку: токен, существование заказа, владелец. Для чужого и несуществующего заказа ответ обязан быть одинаковым.",
+      "uz": "Uch tekshiruv qat'iy tartibda: token, buyurtmaning mavjudligi, egasi. Begona va mavjud bo'lmagan buyurtma uchun javob bir xil bo'lishi shart.",
+      "en": "Three checks in strict order: token, order existence, owner. The answer for someone else's order and for a missing one must be identical."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "python",
+     "title": { "ru": "Страница списка", "uz": "Ro'yxat sahifasi", "en": "A page of a list" },
+     "brief": { "ru": "Пагинация с защитой", "uz": "Himoyali sahifalash", "en": "Pagination with guardrails" },
+     "desc": {
+      "ru": "<p><code>paginate(items, limit, offset, max_limit)</code> возвращает словарь с ключами <code>'items'</code>, <code>'всего'</code> и <code>'есть_ещё'</code>.</p><p><code>limit</code> зажми между <code>1</code> и <code>max_limit</code>, отрицательный <code>offset</code> считай нулём. <code>'есть_ещё'</code> — <code>True</code>, если за отданным куском остались записи.</p>",
+      "uz": "<p><code>paginate(items, limit, offset, max_limit)</code> <code>'items'</code>, <code>'всего'</code> va <code>'есть_ещё'</code> kalitli lug'at qaytaradi.</p><p><code>limit</code> ni <code>1</code> va <code>max_limit</code> orasiga siqing, manfiy <code>offset</code> ni nol deb hisoblang. <code>'есть_ещё'</code> — berilgan bo'lakdan keyin yozuvlar qolgan bo'lsa <code>True</code>.</p>",
+      "en": "<p><code>paginate(items, limit, offset, max_limit)</code> returns a dict with keys <code>'items'</code>, <code>'всего'</code> and <code>'есть_ещё'</code>.</p><p>Clamp <code>limit</code> between <code>1</code> and <code>max_limit</code>, treat a negative <code>offset</code> as zero. <code>'есть_ещё'</code> is <code>True</code> when records remain beyond the chunk returned.</p>"
+     },
+     "starter": "def paginate(items, limit, offset, max_limit):\n    # твой код\n    pass\n\nprint(paginate(list(range(10)), 3, 0, 50))\n",
+     "tests": "data = list(range(10))\nr = paginate(data, 3, 0, 50)\nassert r['items'] == [0, 1, 2] and r['всего'] == 10 and r['есть_ещё'] is True, 'Первая страница из трёх'\nr2 = paginate(data, 3, 9, 50)\nassert r2['items'] == [9] and r2['есть_ещё'] is False, 'Последняя страница'\nr3 = paginate(data, 1000, 0, 50)\nassert len(r3['items']) == 10, 'Огромный limit ограничен максимумом, но записей всего десять'\nassert paginate(data, 0, 0, 50)['items'] == [0], 'Нулевой limit поднимаем до единицы'\nassert paginate(data, 3, -7, 50)['items'] == [0, 1, 2], 'Отрицательный offset — это ноль'\nassert paginate([], 10, 0, 50) == {'items': [], 'всего': 0, 'есть_ещё': False}, 'Пустой список'\nassert paginate(data, 3, 100, 50)['items'] == [], 'Offset за пределами списка'",
+     "hint": {
+      "ru": "Сначала приведи <code>limit</code> и <code>offset</code> к разумным значениям, потом обычный срез <code>items[offset:offset + limit]</code>. Для <code>'есть_ещё'</code> сравни <code>offset + limit</code> с длиной списка.",
+      "uz": "Avval <code>limit</code> va <code>offset</code> ni oqilona qiymatlarga keltiring, keyin oddiy <code>items[offset:offset + limit]</code> kesimi. <code>'есть_ещё'</code> uchun <code>offset + limit</code> ni ro'yxat uzunligi bilan solishtiring.",
+      "en": "First bring <code>limit</code> and <code>offset</code> into sane ranges, then take the plain slice <code>items[offset:offset + limit]</code>. For <code>'есть_ещё'</code> compare <code>offset + limit</code> with the list length."
+     }
+    }
+   ],
+   "exam": {
+    "time": 600,
+    "questions": [
+     {
+      "q": { "ru": "Клиент прислал в теле <code>{\"сумма\": 100, \"статус\": \"оплачен\"}</code>. Кто должен ставить статус?", "uz": "Mijoz tanada <code>{\"сумма\": 100, \"статус\": \"оплачен\"}</code> yubordi. Statusni kim qo'yishi kerak?", "en": "The client sent <code>{\"сумма\": 100, \"статус\": \"оплачен\"}</code> in the body. Who should set the status?" },
+      "options": [
+       { "ru": "Клиент, он же знает", "uz": "Mijoz, u biladi-ku", "en": "The client, they know best" },
+       { "ru": "Только сервер — после подтверждения оплаты", "uz": "Faqat server — to'lov tasdiqlangandan keyin", "en": "The server only — after payment is confirmed" },
+       { "ru": "Тот, кто первый успел", "uz": "Kim birinchi ulgursa", "en": "Whoever gets there first" },
+       { "ru": "База данных", "uz": "Ma'lumotlar bazasi", "en": "The database" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Пользователь вошёл и запрашивает <code>/orders/57</code>, чужой заказ. Чего не хватает в коде, если он его получил?", "uz": "Foydalanuvchi kirdi va begona <code>/orders/57</code> buyurtmasini so'rayapti. Uni olgan bo'lsa, kodda nima yetishmaydi?", "en": "A signed-in user requests <code>/orders/57</code>, someone else's order, and gets it. What is missing in the code?" },
+      "options": [
+       { "ru": "Аутентификации", "uz": "Autentifikatsiya", "en": "Authentication" },
+       { "ru": "Авторизации: проверки владельца", "uz": "Avtorizatsiya: egani tekshirish", "en": "Authorization: the owner check" },
+       { "ru": "Валидации", "uz": "Validatsiya", "en": "Validation" },
+       { "ru": "Пагинации", "uz": "Sahifalash", "en": "Pagination" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Оплата прошла, но ответ не дошёл, и клиент повторил запрос. Что защитит от двойного списания?", "uz": "To'lov o'tdi, lekin javob yetib bormadi va mijoz so'rovni takrorladi. Ikki marta yechishdan nima himoya qiladi?", "en": "A payment went through but the response was lost and the client retried. What prevents a double charge?" },
+      "options": [
+       { "ru": "HTTPS", "uz": "HTTPS", "en": "HTTPS" },
+       { "ru": "Ключ идемпотентности", "uz": "Idempotentlik kaliti", "en": "An idempotency key" },
+       { "ru": "Пагинация", "uz": "Sahifalash", "en": "Pagination" },
+       { "ru": "Код ответа 201", "uz": "201 javob kodi", "en": "A 201 response code" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Почему токен сессии должен иметь срок жизни?", "uz": "Nega sessiya tokeni yashash muddatiga ega bo'lishi kerak?", "en": "Why must a session token have a lifetime?" },
+      "options": [
+       { "ru": "Чтобы экономить память", "uz": "Xotira tejash uchun", "en": "To save memory" },
+       { "ru": "Украденный вечный токен — это украденный аккаунт навсегда", "uz": "O'g'irlangan abadiy token — abadiy o'g'irlangan hisob", "en": "A stolen eternal token is a stolen account forever" },
+       { "ru": "Так требует HTTP", "uz": "HTTP shuni talab qiladi", "en": "HTTP requires it" },
+       { "ru": "Чтобы пользователь чаще вводил пароль", "uz": "Foydalanuvchi parolni tez-tez kiritishi uchun", "en": "So the user types their password more often" }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "python",
+      "title": { "ru": "Обработчик создания заказа", "uz": "Buyurtma yaratish ishlovchisi", "en": "The order-creation handler" },
+      "desc": {
+       "ru": "<p>Собери настоящий обработчик <code>POST /orders</code>. <code>handle(token, key, payload, state)</code> возвращает кортеж <code>(код, тело)</code>.</p><p><code>state</code> — словарь с ключами <code>'sessions'</code> (токен → пользователь), <code>'orders'</code> (номер → заказ), <code>'keys'</code> (ключ идемпотентности → номер заказа) и <code>'next_id'</code> (следующий номер).</p><p>Порядок проверок:</p><ol><li>токена нет в сессиях → <code>(401, None)</code>;</li><li>ключ уже встречался → <code>(200, номер)</code>, ничего не создаём;</li><li>в <code>payload</code> нет <code>'сумма'</code>, или она не число, или не больше нуля → <code>(400, None)</code>;</li><li>иначе создаём заказ с владельцем-пользователем, увеличиваем <code>'next_id'</code>, запоминаем ключ и возвращаем <code>(201, номер)</code>.</li></ol>",
+       "uz": "<p>Haqiqiy <code>POST /orders</code> ishlovchisini yig'ing. <code>handle(token, key, payload, state)</code> <code>(kod, tana)</code> kortejini qaytaradi.</p><p><code>state</code> — <code>'sessions'</code> (token → foydalanuvchi), <code>'orders'</code> (raqam → buyurtma), <code>'keys'</code> (idempotentlik kaliti → buyurtma raqami) va <code>'next_id'</code> (keyingi raqam) kalitli lug'at.</p><p>Tekshiruvlar tartibi:</p><ol><li>token sessiyalarda yo'q → <code>(401, None)</code>;</li><li>kalit allaqachon uchragan → <code>(200, raqam)</code>, hech nima yaratmaymiz;</li><li><code>payload</code> da <code>'сумма'</code> yo'q, yoki u son emas, yoki noldan katta emas → <code>(400, None)</code>;</li><li>aks holda egasi foydalanuvchi bo'lgan buyurtma yaratamiz, <code>'next_id'</code> ni oshiramiz, kalitni eslab qolamiz va <code>(201, raqam)</code> qaytaramiz.</li></ol>",
+       "en": "<p>Assemble a real <code>POST /orders</code> handler. <code>handle(token, key, payload, state)</code> returns the tuple <code>(code, body)</code>.</p><p><code>state</code> is a dict with keys <code>'sessions'</code> (token → user), <code>'orders'</code> (id → order), <code>'keys'</code> (idempotency key → order id) and <code>'next_id'</code> (the next id).</p><p>Order of checks:</p><ol><li>token not in sessions → <code>(401, None)</code>;</li><li>the key has been seen → <code>(200, id)</code>, create nothing;</li><li><code>payload</code> lacks <code>'сумма'</code>, or it is not a number, or not above zero → <code>(400, None)</code>;</li><li>otherwise create an order owned by the user, increment <code>'next_id'</code>, remember the key and return <code>(201, id)</code>.</li></ol>"
+      },
+      "starter": "def handle(token, key, payload, state):\n    # токен -> идемпотентность -> валидация -> создание\n    pass\n\nstate = {'sessions': {'tok': 'aziz'}, 'orders': {}, 'keys': {}, 'next_id': 1}\nprint(handle('tok', 'k1', {'сумма': 100}, state))\nprint(handle('tok', 'k1', {'сумма': 100}, state))\n",
+      "tests": "state = {'sessions': {'tok': 'aziz'}, 'orders': {}, 'keys': {}, 'next_id': 1}\nassert handle('нет', 'k0', {'сумма': 100}, state) == (401, None), 'Чужой токен'\nassert handle('tok', 'k1', {'сумма': 100}, state) == (201, 1), 'Создали первый заказ'\nassert handle('tok', 'k1', {'сумма': 100}, state) == (200, 1), 'Повтор ничего не создаёт'\nassert len(state['orders']) == 1, 'Заказ в базе по-прежнему один'\nassert handle('tok', 'k2', {}, state) == (400, None), 'Нет суммы'\nassert handle('tok', 'k3', {'сумма': 0}, state) == (400, None), 'Сумма должна быть больше нуля'\nassert handle('tok', 'k4', {'сумма': 'много'}, state) == (400, None), 'Сумма не число'\nassert handle('tok', 'k5', {'сумма': 250}, state) == (201, 2), 'Второй заказ получил следующий номер'\nassert state['orders'][2]['владелец'] == 'aziz', 'Владелец берётся из сессии, а не из запроса'",
+      "hint": {
+       "ru": "Порядок проверок важен: ключ идемпотентности проверяется до валидации, иначе повтор с тем же ключом может вернуть 400 вместо прежнего результата. Владельца бери <b>только</b> из <code>state['sessions']</code>.",
+       "uz": "Tekshiruvlar tartibi muhim: idempotentlik kaliti validatsiyadan oldin tekshiriladi, aks holda o'sha kalitli takror avvalgi natija o'rniga 400 qaytarishi mumkin. Egani <b>faqat</b> <code>state['sessions']</code> dan oling.",
+       "en": "The order matters: the idempotency key is checked before validation, otherwise a retry with the same key could return 400 instead of the earlier result. Take the owner <b>only</b> from <code>state['sessions']</code>."
+      }
+     }
+    ]
+   }
   }
  ]
 }

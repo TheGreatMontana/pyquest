@@ -83,18 +83,188 @@ SOLUTIONS = {
 'backend-intro/be-01/t2': "def describe(status):\n    group = status // 100\n    if group == 2:\n        return 'успех'\n    if group == 4:\n        return 'ошибка клиента'\n    if group == 5:\n        return 'ошибка сервера'\n    return 'другое'\n\nprint(describe(200))",
 'backend-intro/be-01/t3': "import json\n\ndef make_response(name, xp):\n    return json.dumps({'name': name, 'xp': xp, 'status': 'ok'})\n\nprint(make_response('Aziz', 340))",
 'backend-intro/be-01/exam0': "def handle(method, path):\n    if method == 'GET' and path == '/api/users':\n        return 200\n    if method == 'POST' and path == '/api/users':\n        return 201\n    return 404\n\nprint(handle('GET', '/api/users'))",
+'backend-intro/be-02/t1': """def validate(payload, schema):
+    errors = []
+    for field, rule in schema.items():
+        if field not in payload:
+            if rule['required']:
+                errors.append(field + ': обязательное')
+            continue
+        value = payload[field]
+        if not isinstance(value, rule['type']) or isinstance(value, bool):
+            errors.append(field + ': тип')
+            continue
+        if 'min' in rule and value < rule['min']:
+            errors.append(field + ': мало')
+    return errors
+
+schema = {'цена': {'type': int, 'required': True, 'min': 0}}
+print(validate({'цена': -5}, schema))""",
+'backend-intro/be-02/t2': """def fetch(token, order_id, sessions, orders):
+    user = sessions.get(token)
+    if user is None:
+        return (401, None)
+    order = orders.get(order_id)
+    if order is None or order['владелец'] != user:
+        return (404, None)
+    return (200, order)
+
+S = {'tok': 'aziz'}
+O = {1: {'владелец': 'aziz', 'сумма': 100}}
+print(fetch('tok', 1, S, O))""",
+'backend-intro/be-02/t3': """def paginate(items, limit, offset, max_limit):
+    limit = max(1, min(int(limit), max_limit))
+    offset = max(0, int(offset))
+    return {
+        'items': items[offset:offset + limit],
+        'всего': len(items),
+        'есть_ещё': offset + limit < len(items),
+    }
+
+print(paginate(list(range(10)), 3, 0, 50))""",
+'backend-intro/be-02/exam0': """def handle(token, key, payload, state):
+    user = state['sessions'].get(token)
+    if user is None:
+        return (401, None)
+    if key in state['keys']:
+        return (200, state['keys'][key])
+
+    amount = payload.get('сумма')
+    if not isinstance(amount, (int, float)) or isinstance(amount, bool) or amount <= 0:
+        return (400, None)
+
+    order_id = state['next_id']
+    state['next_id'] += 1
+    state['orders'][order_id] = {'владелец': user, 'сумма': amount}
+    state['keys'][key] = order_id
+    return (201, order_id)
+
+state = {'sessions': {'tok': 'aziz'}, 'orders': {}, 'keys': {}, 'next_id': 1}
+print(handle('tok', 'k1', {'сумма': 100}, state))
+print(handle('tok', 'k1', {'сумма': 100}, state))""",
 
 # ===== analytics-intro =====
 'analytics-intro/an-01/t1': "def median(values):\n    if not values:\n        return 0\n    s = sorted(values)\n    n = len(s)\n    mid = n // 2\n    if n % 2:\n        return s[mid]\n    return (s[mid - 1] + s[mid]) / 2\n\nprint(median([3, 1, 2]))",
 'analytics-intro/an-01/t2': "def revenue_by_city(orders):\n    result = {}\n    for city, amount in orders:\n        result[city] = result.get(city, 0) + amount\n    return result\n\nprint(revenue_by_city([('Ташкент', 100), ('Бухара', 50), ('Ташкент', 200)]))",
 'analytics-intro/an-01/t3': "def top_share(data):\n    if not data:\n        return 0\n    total = sum(data.values())\n    return round(max(data.values()) / total * 100, 1)\n\nprint(top_share({'A': 300, 'B': 100}))",
 'analytics-intro/an-01/exam0': "def report(orders):\n    totals = {}\n    for name, amount in orders:\n        totals[name] = totals.get(name, 0) + amount\n    ordered = sorted(totals.items(), key=lambda x: -x[1])\n    return [f'{name}: {amount}' for name, amount in ordered]\n\nprint(report([('A', 10), ('B', 30), ('A', 5)]))",
+'analytics-intro/an-02/t1': """def conversions(steps):
+    out = []
+    for i in range(1, len(steps)):
+        prev = steps[i - 1]
+        out.append(round(steps[i] / prev * 100, 1) if prev else 0.0)
+    return out
+
+print(conversions([1000, 300, 270]))""",
+'analytics-intro/an-02/t2': """def bottleneck(names, steps):
+    if len(steps) < 2:
+        return None
+    worst_rate = None
+    worst_index = 1
+    for i in range(1, len(steps)):
+        prev = steps[i - 1]
+        rate = steps[i] / prev if prev else 0.0
+        if worst_rate is None or rate < worst_rate:
+            worst_rate = rate
+            worst_index = i
+    return names[worst_index]
+
+print(bottleneck(['зашли', 'корзина', 'оплата'], [1000, 300, 270]))""",
+'analytics-intro/an-02/t3': """def retention(users, month):
+    groups = {}
+    for u in users:
+        groups.setdefault(u['когорта'], []).append(u['месяцы'])
+    out = {}
+    for name, rows in groups.items():
+        alive = sum(1 for months in rows if month in months)
+        out[name] = round(alive / len(rows) * 100, 1)
+    return out
+
+users = [{'когорта': 'янв', 'месяцы': [0, 1]}, {'когорта': 'янв', 'месяцы': [0]}]
+print(retention(users, 1))""",
+'analytics-intro/an-02/exam0': """def funnel_report(names, steps):
+    if len(steps) < 2:
+        return {'общая': 0.0, 'шаги': [], 'узкое': None}
+
+    rates = []
+    for i in range(1, len(steps)):
+        prev = steps[i - 1]
+        rates.append(round(steps[i] / prev * 100, 1) if prev else 0.0)
+
+    worst_index = 1
+    worst_rate = None
+    for i, rate in enumerate(rates, start=1):
+        if worst_rate is None or rate < worst_rate:
+            worst_rate = rate
+            worst_index = i
+
+    total = round(steps[-1] / steps[0] * 100, 1) if steps[0] else 0.0
+    return {'общая': total, 'шаги': rates, 'узкое': names[worst_index]}
+
+print(funnel_report(['зашли', 'корзина', 'оплата'], [1000, 300, 270]))""",
 
 # ===== security-intro =====
 'security-intro/se-01/t1': "import hashlib\n\ndef hash_password(password):\n    return hashlib.sha256(password.encode()).hexdigest()\n\nprint(hash_password('python123'))",
 'security-intro/se-01/t2': "import hashlib\n\ndef hash_password(password):\n    return hashlib.sha256(password.encode()).hexdigest()\n\ndef verify(password, stored_hash):\n    return hash_password(password) == stored_hash\n\nprint(verify('secret1', hash_password('secret1')))",
 'security-intro/se-01/t3': "def is_dangerous(query):\n    q = query.lower()\n    return '--' in q or 'drop' in q or \"or '1'='1'\" in q\n\nprint(is_dangerous(\"SELECT * FROM users WHERE name = 'admin' --'\"))",
 'security-intro/se-01/exam0': "def build_query(table, column):\n    def safe(name):\n        return all(ch.isalnum() or ch == '_' for ch in name) and len(name) > 0\n    if not safe(table) or not safe(column):\n        return None\n    return f'SELECT * FROM {table} WHERE {column} = ?'\n\nprint(build_query('users', 'id'))",
+'security-intro/se-02/t1': """def escape(text):
+    text = str(text)
+    text = text.replace('&', '&amp;')
+    text = text.replace('<', '&lt;').replace('>', '&gt;')
+    text = text.replace('"', '&quot;').replace("'", '&#39;')
+    return text
+
+print(escape('<script>alert(1)</script>'))""",
+'security-intro/se-02/t2': """def safe_next(path):
+    if not path:
+        return '/'
+    if path.startswith('//') or '://' in path:
+        return '/'
+    if not path.startswith('/'):
+        return '/'
+    return path
+
+print(safe_next('/profile'), safe_next('https://zlo.example'))""",
+'security-intro/se-02/t3': """def can_read(user, doc_id, users, docs):
+    doc = docs.get(doc_id)
+    if doc is None:
+        return False
+    role = users.get(user)
+    if role is None:
+        return False
+    if role == 'admin':
+        return True
+    return doc['владелец'] == user
+
+U = {'aziz': 'user', 'admin': 'admin'}
+D = {1: {'владелец': 'aziz'}}
+print(can_read('aziz', 1, U, D), can_read('chuzhoy', 1, U, D))""",
+'security-intro/se-02/exam0': """def render(comment, user, users, docs):
+    def escape(text):
+        text = str(text)
+        text = text.replace('&', '&amp;')
+        text = text.replace('<', '&lt;').replace('>', '&gt;')
+        text = text.replace('"', '&quot;').replace("'", '&#39;')
+        return text
+
+    doc = docs.get(comment['doc'])
+    if doc is None:
+        return (403, '')
+    role = users.get(user)
+    if role is None:
+        return (403, '')
+    if role != 'admin' and doc['владелец'] != user:
+        return (403, '')
+
+    author = escape(comment['автор'])
+    text = escape(comment['текст'])
+    return (200, '<p><b>' + author + '</b>: ' + text + '</p>')
+
+U = {'aziz': 'user'}
+D = {1: {'владелец': 'aziz'}}
+c = {'doc': 1, 'автор': 'aziz', 'текст': '<script>alert(1)</script>'}
+print(render(c, 'aziz', U, D))""",
 
 # ===== ml-intro =====
 'ml-intro/ml-01/t1': """def mae(actual, predicted):

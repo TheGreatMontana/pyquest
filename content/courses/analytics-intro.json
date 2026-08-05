@@ -135,6 +135,339 @@
        "tests": "assert report([('A', 10), ('B', 30)]) == ['B: 30', 'A: 10'], \"Ожидалось ['B: 30', 'A: 10']\"\nassert report([('A', 10), ('B', 30), ('A', 5)]) == ['B: 30', 'A: 15'], 'Суммы одной категории складываются: A = 15'\nassert report([]) == [], 'Пустой список - пустой результат'" }
     ]
    }
+  },
+  {
+   "id": "an-02",
+   "title": { "ru": "Воронки, когорты и враньё в данных", "uz": "Voronkalar, kogortalar va ma'lumotdagi yolg'on", "en": "Funnels, cohorts and lies in data" },
+   "tagline": { "ru": "Где пользователи теряются, кто возвращается и как одна цифра обманывает целую компанию", "uz": "Foydalanuvchilar qayerda yo'qoladi, kim qaytadi va bitta raqam butun kompaniyani qanday aldaydi", "en": "Where users are lost, who comes back, and how one number fools an entire company" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "Воронка: где мы теряем людей", "uz": "Voronka: odamlarni qayerda yo'qotamiz", "en": "The funnel: where we lose people" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Пользователь не покупает в один шаг. Он заходит на сайт, открывает товар, кладёт в корзину, начинает оформление, платит. На каждом шаге часть людей уходит.</p><p>Последовательность шагов с числом дошедших называется <b>воронкой</b>. У неё считают две разные вещи, и путать их дорого:</p><ul><li><b>Конверсия шага</b> — сколько прошло дальше <i>от предыдущего</i> шага.</li><li><b>Общая конверсия</b> — сколько дошло до конца <i>от самого начала</i>.</li></ul><p>Смысл воронки не в итоговом проценте, а в поиске <b>самого узкого места</b>. Улучшать надо шаг с худшей конверсией: там каждый процент даёт больше всего людей на выходе.</p>",
+        "uz": "<p>Foydalanuvchi bir qadamda sotib olmaydi. U saytga kiradi, mahsulotni ochadi, savatga soladi, rasmiylashtirishni boshlaydi, to'laydi. Har qadamda odamlarning bir qismi ketadi.</p><p>Yetib kelganlar soni bilan qadamlar ketma-ketligi <b>voronka</b> deyiladi. Unda ikki xil narsa hisoblanadi va ularni chalkashtirish qimmatga tushadi:</p><ul><li><b>Qadam konversiyasi</b> — <i>oldingi</i> qadamdan nechtasi keyingiga o'tdi.</li><li><b>Umumiy konversiya</b> — <i>eng boshidan</i> nechtasi oxirigacha yetdi.</li></ul><p>Voronkaning ma'nosi yakuniy foizda emas, <b>eng tor joyni</b> topishda. Konversiyasi eng yomon qadamni yaxshilash kerak: u yerda har foiz chiqishda eng ko'p odam beradi.</p>",
+        "en": "<p>A user does not buy in one step. They visit the site, open a product, add it to the basket, start checkout, pay. At every step some people leave.</p><p>A sequence of steps with the count reaching each is called a <b>funnel</b>. Two different things are computed from it, and confusing them is expensive:</p><ul><li><b>Step conversion</b> — how many moved on <i>from the previous</i> step.</li><li><b>Overall conversion</b> — how many reached the end <i>from the very beginning</i>.</li></ul><p>The point of a funnel is not the final percentage but finding the <b>narrowest place</b>. You improve the step with the worst conversion: there each percentage point yields the most people at the exit.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "funnel = [\n    (\"зашли на сайт\", 10000),\n    (\"открыли товар\", 4200),\n    (\"положили в корзину\", 1800),\n    (\"начали оформление\", 1650),\n    (\"оплатили\", 1400),\n]\n\nstart = funnel[0][1]\nprev = start\nworst = None\n\nfor name, count in funnel:\n    step = count / prev * 100\n    total = count / start * 100\n    print(f\"{name:20} {count:6}  шаг {step:5.1f}%  от начала {total:5.1f}%\")\n    if name != funnel[0][0] and (worst is None or step < worst[1]):\n        worst = (name, step)\n    prev = count\n\nprint()\nprint(f\"узкое место: {worst[0]} — теряем {100 - worst[1]:.0f}% пришедших сюда\")"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Общая конверсия 14% выглядит скромно, но она не подсказывает, что чинить. А вот шаги подсказывают: до карточки товара доходит 42% зашедших, до корзины — 42,9% из них. Два первых перехода съедают почти шесть человек из десяти каждый.</p><p>Типичная ошибка на этом месте — броситься улучшать оплату, потому что она ближе всего к деньгам. Но там теряется 15%, а в начале воронки — 58%. Даже идеальная оплата добавит меньше, чем один процент к первому переходу.</p>",
+        "uz": "<p>Umumiy 14% konversiya kamtarona ko'rinadi, lekin u nimani tuzatish kerakligini aytmaydi. Qadamlar esa aytadi: mahsulot kartochkasiga kirganlarning 42% i, savatga esa ulardan 42,9% i yetadi. Ikki birinchi o'tish har biri o'n kishidan deyarli oltitasini yeydi.</p><p>Bu joydagi odatiy xato — to'lovni yaxshilashga tashlanish, chunki u pulga eng yaqin. Lekin u yerda 15%, voronka boshida esa 58% yo'qoladi. Hatto mukammal to'lov ham birinchi o'tishga qo'shilgan bir foizdan kam natija beradi.</p>",
+        "en": "<p>An overall conversion of 14% looks modest, but it does not tell you what to fix. The steps do: 42% of visitors reach a product page and 42.9% of those reach the basket. The first two transitions each swallow almost six people in ten.</p><p>The typical mistake here is rushing to improve checkout because it sits closest to the money. But 15% is lost there and 58% at the top of the funnel. Even a perfect checkout adds less than one percentage point on the first transition would.</p>"
+       }
+      },
+      {
+       "type": "predict",
+       "code": "steps = [1000, 500, 400, 40]\n\ntotal = steps[-1] / steps[0] * 100\nworst = min((steps[i] / steps[i - 1] for i in range(1, len(steps))))\n\nprint(round(total, 1))\nprint(round(worst * 100, 1))",
+       "options": [
+        { "ru": "4.0 и 10.0", "uz": "4.0 va 10.0", "en": "4.0 and 10.0" },
+        { "ru": "4.0 и 50.0", "uz": "4.0 va 50.0", "en": "4.0 and 50.0" },
+        { "ru": "40.0 и 10.0", "uz": "40.0 va 10.0", "en": "40.0 and 10.0" },
+        { "ru": "10.0 и 4.0", "uz": "10.0 va 4.0", "en": "10.0 and 4.0" }
+       ],
+       "a": 0,
+       "explain": {
+        "ru": "Общая конверсия 40/1000 = 4%. Шаги дают 50%, 80% и 10% — худший последний. Именно он и съедает воронку, хотя выглядит как маленькое число в конце.",
+        "uz": "Umumiy konversiya 40/1000 = 4%. Qadamlar 50%, 80% va 10% beradi — eng yomoni oxirgisi. Aynan u voronkani yeydi, garchi oxirdagi kichik son bo'lib ko'rinsa ham.",
+        "en": "Overall conversion is 40/1000 = 4%. The steps give 50%, 80% and 10% — the last is the worst. It is what eats the funnel, though it looks like a small number at the end."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "Когорты: сравнивать сравнимое", "uz": "Kogortalar: solishtirsa bo'ladiganini solishtirish", "en": "Cohorts: comparing the comparable" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Продукт вырос, метрика удержания упала. Что случилось — стало хуже или просто пришло много новых пользователей, которые ещё не успели вернуться?</p><p>Ответ даёт разбиение на <b>когорты</b>. Когорта — группа пользователей, объединённая моментом начала: «пришли в январе», «пришли в феврале». Дальше каждую когорту наблюдают отдельно и по одинаковым срокам.</p><p>Это снимает главную ловушку средних: смешивая новичков и старожилов, ты сравниваешь несравнимое. Когорты сравнивают январь первого месяца с февралём первого месяца — честно.</p>",
+        "uz": "<p>Mahsulot o'sdi, ushlab qolish metrikasi tushdi. Nima bo'ldi — yomonlashdimi yoki shunchaki hali qaytishga ulgurmagan yangi foydalanuvchilar ko'p keldimi?</p><p>Javobni <b>kogortalarga</b> bo'lish beradi. Kogorta — boshlanish payti bilan birlashgan foydalanuvchilar guruhi: «yanvarda kelganlar», «fevralda kelganlar». Keyin har kogorta alohida va bir xil muddatlarda kuzatiladi.</p><p>Bu o'rtachalarning asosiy tuzog'ini olib tashlaydi: yangilar va eskilarni aralashtirib, siz solishtirib bo'lmaydiganni solishtirasiz. Kogortalar yanvarning birinchi oyini fevralning birinchi oyi bilan solishtiradi — halol.</p>",
+        "en": "<p>The product grew and the retention metric fell. What happened — did things get worse, or did a flood of new users simply arrive who have not had time to come back?</p><p>The answer comes from splitting into <b>cohorts</b>. A cohort is a group of users united by when they started: “joined in January”, “joined in February”. Each cohort is then observed separately over the same elapsed time.</p><p>This removes the main trap of averages: mixing newcomers and veterans means comparing the incomparable. Cohorts compare January's first month with February's first month — honestly.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "# кто из пользователей был активен в каждый из месяцев после прихода\nusers = [\n    {\"когорта\": \"январь\",  \"месяцы\": [0, 1, 2]},\n    {\"когорта\": \"январь\",  \"месяцы\": [0]},\n    {\"когорта\": \"январь\",  \"месяцы\": [0, 1]},\n    {\"когорта\": \"январь\",  \"месяцы\": [0, 1, 2]},\n    {\"когорта\": \"февраль\", \"месяцы\": [0, 1]},\n    {\"когорта\": \"февраль\", \"месяцы\": [0]},\n    {\"когорта\": \"февраль\", \"месяцы\": [0]},\n    {\"когорта\": \"февраль\", \"месяцы\": [0, 1]},\n    {\"когорта\": \"февраль\", \"месяцы\": [0, 1]},\n]\n\ncohorts = {}\nfor u in users:\n    cohorts.setdefault(u[\"когорта\"], []).append(u[\"месяцы\"])\n\nfor name, rows in cohorts.items():\n    size = len(rows)\n    line = []\n    for month in range(3):\n        alive = sum(1 for m in rows if month in m)\n        line.append(f\"м{month}: {alive / size * 100:3.0f}%\")\n    print(f\"{name:8} размер {size}   \" + \"  \".join(line))\n\nprint()\ntotal_alive = sum(1 for u in users if 1 in u[\"месяцы\"])\nprint(f\"если смешать всех: во второй месяц активны {total_alive / len(users) * 100:.0f}%\")"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Смешанная цифра — 67%. По когортам видно другое: январская когорта на первом месяце удержала 75%, февральская — 60%. Продукт стал хуже удерживать, и это заметно только в разбиении.</p><p>А теперь посмотри на <code>0%</code> у февральской когорты в третьем месяце. Это не «все ушли» — это <b>месяц ещё не наступил</b>. Наша программа честно посчитала ноль, и именно так рождаются отчёты с несуществующим обвалом. Правильно такую клетку оставлять пустой и в средние не включать.</p>",
+        "uz": "<p>Aralash raqam — 67%. Kogortalar bo'yicha boshqacha ko'rinadi: yanvar kogortasi birinchi oyda 75% ni, fevral kogortasi 60% ni ushlab qoldi. Mahsulot yomonroq ushlay boshladi va bu faqat bo'linishda sezilarli.</p><p>Endi fevral kogortasining uchinchi oyidagi <code>0%</code> ga qarang. Bu «hamma ketdi» emas — bu <b>oy hali kelmagan</b>. Dasturimiz halol nol hisobladi va mavjud bo'lmagan qulash haqidagi hisobotlar aynan shunday tug'iladi. To'g'risi — bunday katakni bo'sh qoldirish va o'rtachalarga qo'shmaslik.</p>",
+        "en": "<p>The blended number is 67%. The cohorts say something else: the January cohort kept 75% in its first month, February's kept 60%. The product got worse at retaining, and that is visible only in the split.</p><p>Now look at the <code>0%</code> for February's cohort in the third month. That is not “everyone left” — that month <b>has not happened yet</b>. Our program honestly computed zero, and that is exactly how reports with an imaginary collapse are born. Such a cell should be left empty and excluded from averages.</p>"
+       }
+      },
+      {
+       "type": "note",
+       "kind": "tip",
+       "html": {
+        "ru": "Когорты собирают не только по дате прихода. По каналу привлечения — чтобы понять, откуда приходят те, кто остаётся. По первому действию — чтобы найти, что именно «цепляет». Принцип один: сравнивать группы, которые различаются <b>ровно одним</b> признаком.",
+        "uz": "Kogortalar faqat kelish sanasi bo'yicha yig'ilmaydi. Jalb qilish kanali bo'yicha — qoladiganlar qayerdan kelishini tushunish uchun. Birinchi harakat bo'yicha — aynan nima «ilintirishini» topish uchun. Tamoyil bitta: <b>aynan bitta</b> belgisi bilan farq qiladigan guruhlarni solishtirish.",
+        "en": "Cohorts are not built by join date alone. By acquisition channel — to see where the people who stay come from. By first action — to find what actually hooks them. The principle is the same: compare groups that differ by <b>exactly one</b> attribute."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "Как данные врут", "uz": "Ma'lumot qanday aldaydi", "en": "How data lies" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Три ловушки, на которых спотыкаются даже опытные команды.</p><p><b>1. Ошибка выжившего.</b> Опрашивают активных пользователей и делают вывод о продукте. Но те, кому не понравилось, уже ушли и в опрос не попали. Вывод получается ровно обратный правде.</p><p><b>2. Парадокс Симпсона.</b> Показатель растёт в каждой группе по отдельности — и падает в целом. Не ошибка в арифметике: меняются размеры групп.</p><p><b>3. Корреляция вместо причины.</b> Продажи мороженого и число утоплений растут вместе. Не потому, что одно вызывает другое, а потому что летом жарко.</p><p>Общее у всех трёх: цифра верная, вывод неверный. Проверить арифметику мало — надо спросить, кого посчитали и кого забыли.</p>",
+        "uz": "<p>Tajribali jamoalar ham qoqiladigan uch tuzoq.</p><p><b>1. Omon qolgan xatosi.</b> Faol foydalanuvchilar so'raladi va mahsulot haqida xulosa chiqariladi. Lekin yoqmaganlar allaqachon ketgan va so'rovga tushmagan. Xulosa haqiqatga aynan teskari chiqadi.</p><p><b>2. Simpson paradoksi.</b> Ko'rsatkich har guruhda alohida o'sadi — umumiy esa tushadi. Arifmetikadagi xato emas: guruhlar hajmi o'zgaradi.</p><p><b>3. Sabab o'rniga korrelyatsiya.</b> Muzqaymoq sotuvi va cho'kishlar soni birga o'sadi. Biri ikkinchisini keltirib chiqargani uchun emas, yozda issiq bo'lgani uchun.</p><p>Uchalasining umumiysi: raqam to'g'ri, xulosa noto'g'ri. Arifmetikani tekshirish kam — kimni sanab, kimni unutganini so'rash kerak.</p>",
+        "en": "<p>Three traps that trip up even experienced teams.</p><p><b>1. Survivorship bias.</b> You survey active users and draw conclusions about the product. But those who disliked it already left and never entered the survey. The conclusion comes out exactly backwards.</p><p><b>2. Simpson's paradox.</b> A rate rises within every group separately — and falls overall. Not an arithmetic error: the group sizes changed.</p><p><b>3. Correlation instead of cause.</b> Ice cream sales and drownings rise together. Not because one causes the other but because summer is hot.</p><p>What they share: the number is right and the conclusion is wrong. Checking the arithmetic is not enough — you must ask who was counted and who was left out.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "# два канала привлечения, два месяца\ndata = {\n    \"поиск\":   {\"май\": (810, 900), \"июнь\": (95, 100)},    # (купили, пришло)\n    \"реклама\": {\"май\": (20, 100),  \"июнь\": (225, 900)},\n}\n\nfor month in (\"май\", \"июнь\"):\n    print(f\"--- {month}\")\n    bought = seen = 0\n    for channel, months in data.items():\n        b, s = months[month]\n        bought += b\n        seen += s\n        print(f\"  {channel:8} {b/s*100:5.1f}%\")\n    print(f\"  {'ИТОГО':8} {bought/seen*100:5.1f}%\")"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Смотри внимательно. В поиске конверсия выросла с 90% до 95%. В рекламе — с 20% до 25%. <b>Оба канала стали лучше.</b> А общая конверсия рухнула с 83% до 32%.</p><p>Арифметика верна во всех четырёх клетках. Дело в весах: в мае девять из десяти человек приходили из сильного поиска, в июне — из слабой рекламы. Итоговая цифра рассказывает не о качестве продукта, а о том, откуда пришли люди.</p><p>Это и есть парадокс Симпсона. Поэтому у любой агрегированной метрики надо спрашивать: <b>из чего она сложена и не поменялись ли доли</b>. Средняя температура по больнице меняется, когда закрывают морг.</p>",
+        "uz": "<p>Diqqat bilan qarang. Qidiruvda konversiya 90% dan 95% ga o'sdi. Reklamada — 20% dan 25% ga. <b>Ikkala kanal ham yaxshilandi.</b> Umumiy konversiya esa 83% dan 32% ga qulab tushdi.</p><p>To'rtala katakda ham arifmetika to'g'ri. Gap vaznlarda: mayda o'n kishidan to'qqiztasi kuchli qidiruvdan, iyunda esa kuchsiz reklamadan keldi. Yakuniy raqam mahsulot sifati haqida emas, odamlar qayerdan kelgani haqida gapiradi.</p><p>Bu Simpson paradoksidir. Shuning uchun har qanday jamlangan metrikadan so'rash kerak: <b>u nimalardan yig'ilgan va ulushlar o'zgarmadimi</b>. Kasalxona bo'yicha o'rtacha harorat mordan yopilganda o'zgaradi.</p>",
+        "en": "<p>Look closely. Search conversion rose from 90% to 95%. Advertising rose from 20% to 25%. <b>Both channels improved.</b> Yet the overall conversion collapsed from 83% to 32%.</p><p>The arithmetic is correct in all four cells. It is the weights: in May nine people in ten arrived through strong search, in June through weak advertising. The headline number describes not product quality but where the people came from.</p><p>This is Simpson's paradox. So always ask of an aggregate metric: <b>what is it made of, and did the proportions shift</b>. The average temperature in a hospital changes when the morgue closes.</p>"
+       }
+      },
+      {
+       "type": "summary",
+       "items": [
+        { "ru": "Воронка ищет узкое место, а не красивую итоговую цифру", "uz": "Voronka chiroyli yakuniy raqamni emas, tor joyni qidiradi", "en": "A funnel looks for the narrow point, not a pretty final number" },
+        { "ru": "Конверсия шага и общая конверсия — разные величины", "uz": "Qadam konversiyasi va umumiy konversiya — turli kattaliklar", "en": "Step conversion and overall conversion are different quantities" },
+        { "ru": "Когорты сравнивают одинаковые сроки жизни, а не календарь", "uz": "Kogortalar kalendarni emas, bir xil yashash muddatlarini solishtiradi", "en": "Cohorts compare equal ages, not calendar dates" },
+        { "ru": "Ненаступивший месяц — это пусто, а не ноль", "uz": "Kelmagan oy — bu bo'sh, nol emas", "en": "A month that has not happened is empty, not zero" },
+        { "ru": "Опрос активных пользователей ничего не говорит об ушедших", "uz": "Faol foydalanuvchilar so'rovi ketganlar haqida hech nima demaydi", "en": "A survey of active users says nothing about those who left" },
+        { "ru": "У агрегата спрашивай, не изменились ли доли групп", "uz": "Jamlangan ko'rsatkichdan guruh ulushlari o'zgarmadimi deb so'rang", "en": "Ask an aggregate whether the group proportions changed" }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": { "ru": "Воронка: 1000 → 300 → 270 → 250. Где узкое место?", "uz": "Voronka: 1000 → 300 → 270 → 250. Tor joy qayerda?", "en": "A funnel: 1000 → 300 → 270 → 250. Where is the narrow point?" },
+     "options": [
+      { "ru": "На последнем шаге", "uz": "Oxirgi qadamda", "en": "At the last step" },
+      { "ru": "На первом переходе: там теряется 70%", "uz": "Birinchi o'tishda: u yerda 70% yo'qoladi", "en": "At the first transition: 70% is lost there" },
+      { "ru": "Узкого места нет", "uz": "Tor joy yo'q", "en": "There is no narrow point" },
+      { "ru": "На втором шаге", "uz": "Ikkinchi qadamda", "en": "At the second step" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Переходы дают 30%, 90% и 93%. Первый в три раза хуже остальных, и работа над ним даст больше всего людей на выходе.",
+      "uz": "O'tishlar 30%, 90% va 93% beradi. Birinchisi qolganlaridan uch barobar yomon va u ustidagi ish chiqishda eng ko'p odam beradi.",
+      "en": "The transitions are 30%, 90% and 93%. The first is three times worse than the rest, and working on it yields the most people at the exit."
+     }
+    },
+    {
+     "q": { "ru": "Что такое когорта?", "uz": "Kogorta nima?", "en": "What is a cohort?" },
+     "options": [
+      { "ru": "Все пользователи сервиса", "uz": "Xizmatning barcha foydalanuvchilari", "en": "All users of the service" },
+      { "ru": "Группа, объединённая моментом начала, которую наблюдают отдельно", "uz": "Boshlanish payti bilan birlashgan, alohida kuzatiladigan guruh", "en": "A group united by when they started, observed separately" },
+      { "ru": "Пользователи одного возраста", "uz": "Bir yoshdagi foydalanuvchilar", "en": "Users of the same age" },
+      { "ru": "Список платящих клиентов", "uz": "To'lovchi mijozlar ro'yxati", "en": "The list of paying customers" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Ключевое здесь — «отдельно» и «по одинаковым срокам». Иначе новички разбавляют старожилов и метрика становится бессмысленной.",
+      "uz": "Bu yerdagi kalit — «alohida» va «bir xil muddatlarda». Aks holda yangilar eskilarni suyultiradi va metrika ma'nosiz bo'lib qoladi.",
+      "en": "The key words are “separately” and “over equal ages”. Otherwise newcomers dilute veterans and the metric becomes meaningless."
+     }
+    },
+    {
+     "q": { "ru": "Февральская когорта не имеет данных за третий месяц, потому что он не наступил. Как её считать?", "uz": "Fevral kogortasida uchinchi oy ma'lumoti yo'q, chunki u kelmagan. Uni qanday hisoblash kerak?", "en": "February's cohort has no third-month data because it has not happened. How do you count it?" },
+     "options": [
+      { "ru": "Нулём", "uz": "Nol bilan", "en": "As zero" },
+      { "ru": "Никак — клетка пустая, в средние не входит", "uz": "Hech qanday — katak bo'sh, o'rtachaga kirmaydi", "en": "Not at all — the cell is empty and excluded from averages" },
+      { "ru": "Средним по другим когортам", "uz": "Boshqa kogortalar o'rtachasi bilan", "en": "With the average of other cohorts" },
+      { "ru": "Значением предыдущего месяца", "uz": "Oldingi oy qiymati bilan", "en": "With the previous month's value" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Ноль означает «все ушли», а на деле «мы ещё не знаем». Подстановка нуля рисует падение, которого нет.",
+      "uz": "Nol «hamma ketdi» degani, aslida esa «biz hali bilmaymiz». Nol qo'yish yo'q pasayishni chizadi.",
+      "en": "Zero means “everyone left”, whereas the truth is “we do not know yet”. Substituting zero draws a decline that does not exist."
+     }
+    },
+    {
+     "q": { "ru": "Опросили активных пользователей: 90% довольны. Что не так с выводом «продукт нравится»?", "uz": "Faol foydalanuvchilar so'raldi: 90% mamnun. «Mahsulot yoqadi» xulosasida nima nuqson?", "en": "A survey of active users: 90% are happy. What is wrong with concluding “people like the product”?" },
+     "options": [
+      { "ru": "Ничего, вывод верный", "uz": "Hech nima, xulosa to'g'ri", "en": "Nothing, the conclusion is right" },
+      { "ru": "Недовольные уже ушли и в опрос не попали", "uz": "Noroziler allaqachon ketgan va so'rovga tushmagan", "en": "The unhappy ones already left and never entered the survey" },
+      { "ru": "Опрошено слишком мало людей", "uz": "Juda kam odam so'ralgan", "en": "Too few people were surveyed" },
+      { "ru": "Надо было спросить про цену", "uz": "Narx haqida so'rash kerak edi", "en": "The price should have been asked about" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Это ошибка выжившего. Чтобы узнать правду о продукте, надо разговаривать в первую очередь с теми, кто ушёл.",
+      "uz": "Bu omon qolgan xatosi. Mahsulot haqida haqiqatni bilish uchun avvalo ketganlar bilan gaplashish kerak.",
+      "en": "This is survivorship bias. To learn the truth about a product you must talk first of all to those who left."
+     }
+    },
+    {
+     "q": { "ru": "Конверсия выросла в каждом канале, а общая упала. Что это?", "uz": "Konversiya har kanalda o'sdi, umumiy esa tushdi. Bu nima?", "en": "Conversion rose in every channel but fell overall. What is this?" },
+     "options": [
+      { "ru": "Ошибка в вычислениях", "uz": "Hisoblashdagi xato", "en": "A calculation error" },
+      { "ru": "Парадокс Симпсона: изменились доли каналов", "uz": "Simpson paradoksi: kanallar ulushi o'zgardi", "en": "Simpson's paradox: the channel proportions changed" },
+      { "ru": "Ошибка выжившего", "uz": "Omon qolgan xatosi", "en": "Survivorship bias" },
+      { "ru": "Так не бывает", "uz": "Bunday bo'lmaydi", "en": "That cannot happen" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Если трафик перетёк в канал с низкой конверсией, общая цифра упадёт даже при росте в каждом канале.",
+      "uz": "Trafik past konversiyali kanalga oqib o'tsa, har kanalda o'sish bo'lsa ham umumiy raqam tushadi.",
+      "en": "If traffic shifted into a low-converting channel, the overall figure falls even while every channel improves."
+     }
+    },
+    {
+     "q": { "ru": "Мороженое и утопления растут вместе. Верный вывод?", "uz": "Muzqaymoq va cho'kishlar birga o'sadi. To'g'ri xulosa?", "en": "Ice cream and drownings rise together. The correct conclusion?" },
+     "options": [
+      { "ru": "Мороженое опасно", "uz": "Muzqaymoq xavfli", "en": "Ice cream is dangerous" },
+      { "ru": "У обоих общая причина — жара, прямой связи нет", "uz": "Ikkalasining umumiy sababi — issiq, bevosita bog'liqlik yo'q", "en": "Both share a cause — the heat; there is no direct link" },
+      { "ru": "Утопления вызывают спрос на мороженое", "uz": "Cho'kishlar muzqaymoqqa talab tug'diradi", "en": "Drownings create demand for ice cream" },
+      { "ru": "Данные ошибочны", "uz": "Ma'lumot noto'g'ri", "en": "The data is wrong" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Корреляция не доказывает причину. Чтобы её установить, нужен эксперимент, где меняют одно и держат остальное неизменным.",
+      "uz": "Korrelyatsiya sababni isbotlamaydi. Uni aniqlash uchun bittasini o'zgartirib, qolganini o'zgarmas ushlaydigan tajriba kerak.",
+      "en": "Correlation does not prove causation. Establishing it needs an experiment where one thing changes and the rest is held fixed."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "python",
+     "title": { "ru": "Конверсии воронки", "uz": "Voronka konversiyalari", "en": "Funnel conversions" },
+     "brief": { "ru": "Шаг за шагом", "uz": "Qadam-baqadam", "en": "Step by step" },
+     "desc": {
+      "ru": "<p><code>conversions(steps)</code> получает список чисел — сколько людей дошло до каждого шага. Верни список конверсий <b>между соседними шагами</b> в процентах, округлённых до одного знака.</p><p>Для списка короче двух элементов верни пустой список. Если на предыдущем шаге ноль людей, конверсия — <code>0.0</code>.</p>",
+      "uz": "<p><code>conversions(steps)</code> sonlar ro'yxatini oladi — har qadamga nechta odam yetgani. <b>Qo'shni qadamlar orasidagi</b> konversiyalar ro'yxatini bir xonagacha yaxlitlangan foizlarda qaytaring.</p><p>Ikki elementdan qisqa ro'yxat uchun bo'sh ro'yxat qaytaring. Oldingi qadamda nol odam bo'lsa, konversiya — <code>0.0</code>.</p>",
+      "en": "<p><code>conversions(steps)</code> takes a list of numbers — how many people reached each step. Return the list of conversions <b>between adjacent steps</b> as percentages rounded to one decimal.</p><p>For a list shorter than two items return an empty list. If the previous step had zero people, the conversion is <code>0.0</code>.</p>"
+     },
+     "starter": "def conversions(steps):\n    # твой код\n    pass\n\nprint(conversions([1000, 300, 270]))\n",
+     "tests": "assert conversions([1000, 300, 270]) == [30.0, 90.0], 'Два перехода'\nassert conversions([100]) == [], 'Один шаг — переходов нет'\nassert conversions([]) == [], 'Пустая воронка'\nassert conversions([200, 100, 50, 25]) == [50.0, 50.0, 50.0], 'Каждый раз половина'\nassert conversions([0, 5]) == [0.0], 'Деление на ноль не должно ломать расчёт'\nassert conversions([3, 1]) == [33.3], 'Округление до одного знака'",
+     "hint": {
+      "ru": "Пройди по индексам с первого: <code>steps[i] / steps[i-1] * 100</code>. Знаменатель проверь на ноль до деления, результат оберни в <code>round(..., 1)</code>.",
+      "uz": "Indekslar bo'ylab birinchisidan yuring: <code>steps[i] / steps[i-1] * 100</code>. Maxrajni bo'lishdan oldin nolga tekshiring, natijani <code>round(..., 1)</code> ga o'rang.",
+      "en": "Walk the indices from one: <code>steps[i] / steps[i-1] * 100</code>. Check the denominator for zero before dividing and wrap the result in <code>round(..., 1)</code>."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "python",
+     "title": { "ru": "Узкое место", "uz": "Tor joy", "en": "The narrow point" },
+     "brief": { "ru": "Где чинить в первую очередь", "uz": "Birinchi navbatda qayerni tuzatish", "en": "What to fix first" },
+     "desc": {
+      "ru": "<p><code>bottleneck(names, steps)</code> получает названия шагов и числа дошедших. Верни название шага, <b>на который</b> переход оказался худшим.</p><p>Например, для <code>['зашли', 'корзина', 'оплата']</code> и <code>[1000, 300, 270]</code> худший переход ведёт в <code>'корзина'</code>.</p><p>Если шагов меньше двух — верни <code>None</code>. При равных конверсиях бери первый по порядку.</p>",
+      "uz": "<p><code>bottleneck(names, steps)</code> qadam nomlarini va yetganlar sonini oladi. O'tish eng yomon bo'lgan <b>qaysi</b> qadam nomini qaytaring.</p><p>Masalan, <code>['зашли', 'корзина', 'оплата']</code> va <code>[1000, 300, 270]</code> uchun eng yomon o'tish <code>'корзина'</code> ga olib boradi.</p><p>Qadamlar ikkitadan kam bo'lsa — <code>None</code> qaytaring. Konversiyalar teng bo'lsa, tartib bo'yicha birinchisini oling.</p>",
+      "en": "<p><code>bottleneck(names, steps)</code> takes step names and the counts reaching them. Return the name of the step <b>into which</b> the transition was worst.</p><p>For example, with <code>['зашли', 'корзина', 'оплата']</code> and <code>[1000, 300, 270]</code> the worst transition leads into <code>'корзина'</code>.</p><p>With fewer than two steps return <code>None</code>. On equal conversions take the first in order.</p>"
+     },
+     "starter": "def bottleneck(names, steps):\n    # твой код\n    pass\n\nprint(bottleneck(['зашли', 'корзина', 'оплата'], [1000, 300, 270]))\n",
+     "tests": "assert bottleneck(['зашли', 'корзина', 'оплата'], [1000, 300, 270]) == 'корзина', '30% против 90%'\nassert bottleneck(['a', 'b', 'c'], [100, 90, 9]) == 'c', 'Худший переход в конце'\nassert bottleneck(['a'], [100]) is None, 'Один шаг'\nassert bottleneck([], []) is None, 'Пустая воронка'\nassert bottleneck(['a', 'b', 'c'], [100, 50, 25]) == 'b', 'Конверсии равны — берём первый'\nassert bottleneck(['a', 'b'], [0, 0]) == 'b', 'Нулевой знаменатель — конверсия нулевая'",
+     "hint": {
+      "ru": "Считай конверсию каждого перехода и запоминай минимум вместе с индексом. Обновляй только при строгом <code>&lt;</code>, тогда при равенстве останется первый.",
+      "uz": "Har o'tish konversiyasini hisoblang va minimumni indeks bilan eslab qoling. Faqat qat'iy <code>&lt;</code> da yangilang, shunda tenglikda birinchisi qoladi.",
+      "en": "Compute each transition's conversion and remember the minimum together with its index. Update only on a strict <code>&lt;</code> so ties keep the first."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "python",
+     "title": { "ru": "Удержание по когортам", "uz": "Kogortalar bo'yicha ushlab qolish", "en": "Retention by cohort" },
+     "brief": { "ru": "Честное сравнение групп", "uz": "Guruhlarni halol solishtirish", "en": "An honest comparison of groups" },
+     "desc": {
+      "ru": "<p><code>retention(users, month)</code> получает список словарей с ключами <code>'когорта'</code> и <code>'месяцы'</code> (список номеров активных месяцев) плюс номер месяца.</p><p>Верни словарь «когорта → доля активных в этот месяц», округлённую до одного знака. Считай долю от <b>размера своей когорты</b>, а не от всех пользователей.</p><p>Пустой список даёт пустой словарь.</p>",
+      "uz": "<p><code>retention(users, month)</code> <code>'когорта'</code> va <code>'месяцы'</code> (faol oylar raqamlari ro'yxati) kalitli lug'atlar ro'yxatini hamda oy raqamini oladi.</p><p>«Kogorta → shu oyda faollar ulushi» lug'atini bir xonagacha yaxlitlab qaytaring. Ulushni barcha foydalanuvchilardan emas, <b>o'z kogortasi hajmidan</b> hisoblang.</p><p>Bo'sh ro'yxat bo'sh lug'at beradi.</p>",
+      "en": "<p><code>retention(users, month)</code> takes a list of dicts with keys <code>'когорта'</code> and <code>'месяцы'</code> (a list of active month numbers) plus a month number.</p><p>Return a dict “cohort → share active that month”, rounded to one decimal. Compute the share against <b>that cohort's size</b>, not against all users.</p><p>An empty list gives an empty dict.</p>"
+     },
+     "starter": "def retention(users, month):\n    # твой код\n    pass\n\nusers = [{'когорта': 'янв', 'месяцы': [0, 1]}, {'когорта': 'янв', 'месяцы': [0]}]\nprint(retention(users, 1))\n",
+     "tests": "users = [\n    {'когорта': 'янв', 'месяцы': [0, 1, 2]},\n    {'когорта': 'янв', 'месяцы': [0]},\n    {'когорта': 'янв', 'месяцы': [0, 1]},\n    {'когорта': 'янв', 'месяцы': [0, 1]},\n    {'когорта': 'фев', 'месяцы': [0, 1]},\n    {'когорта': 'фев', 'месяцы': [0]},\n]\nassert retention(users, 0) == {'янв': 100.0, 'фев': 100.0}, 'В нулевой месяц активны все'\nassert retention(users, 1) == {'янв': 75.0, 'фев': 50.0}, 'Доля считается от своей когорты'\nassert retention(users, 2) == {'янв': 25.0, 'фев': 0.0}, 'Третий месяц'\nassert retention([], 0) == {}, 'Пустой список'\nassert retention(users, 99) == {'янв': 0.0, 'фев': 0.0}, 'Месяца не было ни у кого'",
+     "hint": {
+      "ru": "Сначала сгруппируй пользователей по когорте — например, через <code>setdefault</code>. Потом для каждой группы посчитай, у скольких <code>month</code> есть в списке месяцев, и подели на размер группы.",
+      "uz": "Avval foydalanuvchilarni kogorta bo'yicha guruhlang — masalan, <code>setdefault</code> orqali. Keyin har guruh uchun nechtasining oylar ro'yxatida <code>month</code> borligini sanang va guruh hajmiga bo'ling.",
+      "en": "First group the users by cohort — with <code>setdefault</code>, say. Then for each group count how many have <code>month</code> in their month list and divide by the group size."
+     }
+    }
+   ],
+   "exam": {
+    "time": 540,
+    "questions": [
+     {
+      "q": { "ru": "Общая конверсия воронки 2%, шаги 80%, 5% и 50%. Что улучшать?", "uz": "Voronkaning umumiy konversiyasi 2%, qadamlar 80%, 5% va 50%. Nimani yaxshilash kerak?", "en": "Overall funnel conversion is 2%, the steps are 80%, 5% and 50%. What do you improve?" },
+      "options": [
+       { "ru": "Первый шаг — он в начале", "uz": "Birinchi qadamni — u boshda", "en": "The first step — it comes first" },
+       { "ru": "Второй: там теряется 95% дошедших", "uz": "Ikkinchisini: u yerda yetganlarning 95% i yo'qoladi", "en": "The second: 95% of those who reach it are lost" },
+       { "ru": "Третий — он ближе к деньгам", "uz": "Uchinchisini — u pulga yaqinroq", "en": "The third — it is closest to the money" },
+       { "ru": "Все одинаково", "uz": "Hammasi bir xil", "en": "All equally" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Зачем разбивать пользователей на когорты?", "uz": "Foydalanuvchilarni nega kogortalarga bo'lish kerak?", "en": "Why split users into cohorts?" },
+      "options": [
+       { "ru": "Чтобы отчёт был длиннее", "uz": "Hisobot uzunroq bo'lishi uchun", "en": "To make the report longer" },
+       { "ru": "Чтобы новички не разбавляли старожилов в одной цифре", "uz": "Yangilar eskilarni bitta raqamda suyultirmasligi uchun", "en": "So newcomers do not dilute veterans inside one number" },
+       { "ru": "Чтобы уменьшить объём данных", "uz": "Ma'lumot hajmini kamaytirish uchun", "en": "To reduce the data volume" },
+       { "ru": "Так требует SQL", "uz": "SQL shuni talab qiladi", "en": "SQL requires it" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Метрика по компании упала, хотя в каждом отделе выросла. Первое, что проверить?", "uz": "Kompaniya bo'yicha metrika tushdi, har bo'limda esa o'sdi. Birinchi nimani tekshirish kerak?", "en": "The company metric fell though every department improved. What do you check first?" },
+      "options": [
+       { "ru": "Арифметику", "uz": "Arifmetikani", "en": "The arithmetic" },
+       { "ru": "Не изменились ли размеры отделов", "uz": "Bo'limlar hajmi o'zgarmadimi", "en": "Whether the department sizes changed" },
+       { "ru": "Версию отчёта", "uz": "Hisobot versiyasini", "en": "The report version" },
+       { "ru": "Ничего, это ошибка", "uz": "Hech nimani, bu xato", "en": "Nothing, it is a bug" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Что доказывает высокая корреляция двух метрик?", "uz": "Ikki metrikaning yuqori korrelyatsiyasi nimani isbotlaydi?", "en": "What does a high correlation between two metrics prove?" },
+      "options": [
+       { "ru": "Что одна вызывает другую", "uz": "Biri ikkinchisini keltirib chiqarishini", "en": "That one causes the other" },
+       { "ru": "Только то, что они меняются вместе", "uz": "Faqat ular birga o'zgarishini", "en": "Only that they move together" },
+       { "ru": "Что данные верны", "uz": "Ma'lumot to'g'riligini", "en": "That the data is correct" },
+       { "ru": "Ничего не доказывает и не показывает", "uz": "Hech nimani isbotlamaydi va ko'rsatmaydi", "en": "Nothing at all" }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "python",
+      "title": { "ru": "Отчёт по воронке", "uz": "Voronka bo'yicha hisobot", "en": "A funnel report" },
+      "desc": {
+       "ru": "<p>Собери отчёт, который аналитик показывает команде. <code>funnel_report(names, steps)</code> возвращает словарь с ключами:</p><ul><li><code>'общая'</code> — конверсия от первого шага к последнему в процентах, округлённая до одного знака;</li><li><code>'шаги'</code> — список конверсий между соседними шагами;</li><li><code>'узкое'</code> — название шага с худшим переходом.</li></ul><p>Для воронки короче двух шагов верни <code>{'общая': 0.0, 'шаги': [], 'узкое': None}</code>.</p>",
+       "uz": "<p>Tahlilchi jamoaga ko'rsatadigan hisobotni yig'ing. <code>funnel_report(names, steps)</code> quyidagi kalitli lug'at qaytaradi:</p><ul><li><code>'общая'</code> — birinchi qadamdan oxirgisiga konversiya foizda, bir xonagacha yaxlitlangan;</li><li><code>'шаги'</code> — qo'shni qadamlar orasidagi konversiyalar ro'yxati;</li><li><code>'узкое'</code> — o'tishi eng yomon qadam nomi.</li></ul><p>Ikki qadamdan qisqa voronka uchun <code>{'общая': 0.0, 'шаги': [], 'узкое': None}</code> qaytaring.</p>",
+       "en": "<p>Assemble the report an analyst shows the team. <code>funnel_report(names, steps)</code> returns a dict with keys:</p><ul><li><code>'общая'</code> — conversion from the first step to the last as a percentage rounded to one decimal;</li><li><code>'шаги'</code> — the list of conversions between adjacent steps;</li><li><code>'узкое'</code> — the name of the step with the worst transition.</li></ul><p>For a funnel shorter than two steps return <code>{'общая': 0.0, 'шаги': [], 'узкое': None}</code>.</p>"
+      },
+      "starter": "def funnel_report(names, steps):\n    # общая конверсия, конверсии шагов и узкое место\n    pass\n\nprint(funnel_report(['зашли', 'корзина', 'оплата'], [1000, 300, 270]))\n",
+      "tests": "r = funnel_report(['зашли', 'корзина', 'оплата'], [1000, 300, 270])\nassert r['общая'] == 27.0, '270 из 1000'\nassert r['шаги'] == [30.0, 90.0], 'Конверсии переходов'\nassert r['узкое'] == 'корзина', 'Худший переход ведёт в корзину'\nassert funnel_report(['a'], [10]) == {'общая': 0.0, 'шаги': [], 'узкое': None}, 'Одного шага мало'\nassert funnel_report([], []) == {'общая': 0.0, 'шаги': [], 'узкое': None}, 'Пустая воронка'\nr2 = funnel_report(['a', 'b'], [0, 0])\nassert r2['общая'] == 0.0 and r2['узкое'] == 'b', 'Нулевой старт не ломает отчёт'\nr3 = funnel_report(['a', 'b', 'c'], [500, 250, 125])\nassert r3['общая'] == 25.0 and r3['узкое'] == 'b', 'При равных конверсиях узкое место первое'",
+      "hint": {
+       "ru": "Три части ты уже написал в задачах 1 и 2. Общая конверсия — <code>steps[-1] / steps[0] * 100</code>, и здесь тоже проверь нулевой знаменатель до деления.",
+       "uz": "Uch qismni 1 va 2-vazifalarda yozgansiz. Umumiy konversiya — <code>steps[-1] / steps[0] * 100</code>, bu yerda ham bo'lishdan oldin nol maxrajni tekshiring.",
+       "en": "Three parts you already wrote in tasks 1 and 2. Overall conversion is <code>steps[-1] / steps[0] * 100</code> — and here too check the zero denominator before dividing."
+      }
+     }
+    ]
+   }
   }
  ]
 }

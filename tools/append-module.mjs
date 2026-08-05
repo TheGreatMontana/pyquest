@@ -29,15 +29,18 @@ if (courseObj.modules.some(m => m.id === modObj.id)) {
   process.exit(1);
 }
 
-/* Хвост файла: закрытие последнего модуля, массива modules и объекта курса */
-const tail = /\n\s*\}\n\s*\]\n\}\s*$/;
+/* Хвост файла: закрытие последнего модуля, массива modules и объекта курса.
+   Часть курсов лежит с CRLF, часть с LF — переводы строк в шаблоне гибкие,
+   а результат пишется тем же стилем, что был в файле. */
+const tail = /\r?\n\s*\}\r?\n\s*\]\r?\n\}\s*$/;
 if (!tail.test(src)) {
   console.error('неожиданный конец файла ' + target + ' — вставка отменена');
   process.exit(1);
 }
 
-const indented = mod.split('\n').map(l => (l ? '  ' + l : l)).join('\n');
-const out = src.replace(tail, '\n  },\n' + indented + '\n ]\n}\n');
+const eol = src.includes('\r\n') ? '\r\n' : '\n';
+const indented = mod.split('\n').map(l => (l ? '  ' + l : l)).join(eol);
+const out = src.replace(tail, eol + '  },' + eol + indented + eol + ' ]' + eol + '}' + eol);
 
 const check = JSON.parse(out);
 if (check.modules.length !== courseObj.modules.length + 1) {

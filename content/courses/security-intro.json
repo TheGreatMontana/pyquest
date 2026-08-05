@@ -156,6 +156,352 @@
        "tests": "assert build_query('users', 'id') == 'SELECT * FROM users WHERE id = ?', 'Нормальные имена -> корректный запрос'\nassert build_query('users; DROP TABLE x', 'id') is None, 'Опасное имя таблицы -> None'\nassert build_query('users', \"id' OR '1'='1\") is None, 'Опасное имя колонки -> None'\nassert build_query('order_items', 'user_id') == 'SELECT * FROM order_items WHERE user_id = ?', 'Подчёркивания разрешены'" }
     ]
    }
+  },
+  {
+   "id": "se-02",
+   "title": { "ru": "Атаки на веб-приложение", "uz": "Veb-ilovaga hujumlar", "en": "Attacks on a web application" },
+   "tagline": { "ru": "XSS, CSRF, обход авторизации и опасные ссылки — четыре дыры, через которые уходят чаще всего", "uz": "XSS, CSRF, avtorizatsiyani chetlab o'tish va xavfli havolalar — eng ko'p ketiladigan to'rt teshik", "en": "XSS, CSRF, broken access control and dangerous links — the four holes most often used" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "XSS: чужой скрипт на твоей странице", "uz": "XSS: sizning sahifangizdagi begona skript", "en": "XSS: someone else's script on your page" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Пользователь оставил комментарий. Сайт вставил его текст в HTML. Если в тексте был <code>&lt;script&gt;</code>, браузер выполнит его — от имени твоего сайта, с доступом к его данным и сессии посетителя.</p><p>Это <b>XSS</b>, межсайтовый скриптинг. Причина всегда одна: <b>данные попали туда, где браузер ждёт код</b>.</p><p>Лечится экранированием. Пять символов превращают в безопасные последовательности:</p><ul><li><code>&amp;</code> → <code>&amp;amp;</code> — обязательно первым, иначе испортит остальные</li><li><code>&lt;</code> → <code>&amp;lt;</code> и <code>&gt;</code> → <code>&amp;gt;</code> — чтобы не открылся тег</li><li><code>\"</code> и <code>'</code> — чтобы не вырваться из значения атрибута</li></ul><p>После этого <code>&lt;script&gt;</code> отобразится на странице как текст, а не выполнится.</p>",
+        "uz": "<p>Foydalanuvchi izoh qoldirdi. Sayt uning matnini HTML ga qo'ydi. Matnda <code>&lt;script&gt;</code> bo'lsa, brauzer uni bajaradi — sizning saytingiz nomidan, uning ma'lumotlari va tashrifchi sessiyasiga kirish bilan.</p><p>Bu <b>XSS</b>, saytlararo skripting. Sabab doim bitta: <b>ma'lumot brauzer kod kutgan joyga tushdi</b>.</p><p>Ekranlash bilan davolanadi. Beshta belgi xavfsiz ketma-ketlikka aylantiriladi:</p><ul><li><code>&amp;</code> → <code>&amp;amp;</code> — albatta birinchi, aks holda qolganlarini buzadi</li><li><code>&lt;</code> → <code>&amp;lt;</code> va <code>&gt;</code> → <code>&amp;gt;</code> — teg ochilmasligi uchun</li><li><code>\"</code> va <code>'</code> — atribut qiymatidan chiqib ketmaslik uchun</li></ul><p>Shundan keyin <code>&lt;script&gt;</code> sahifada bajarilmaydi, matn sifatida ko'rinadi.</p>",
+        "en": "<p>A user left a comment. The site inserted their text into HTML. If the text contained <code>&lt;script&gt;</code>, the browser will execute it — on behalf of your site, with access to its data and the visitor's session.</p><p>This is <b>XSS</b>, cross-site scripting. The cause is always the same: <b>data landed where the browser expects code</b>.</p><p>The cure is escaping. Five characters are turned into safe sequences:</p><ul><li><code>&amp;</code> → <code>&amp;amp;</code> — must go first, or it corrupts the rest</li><li><code>&lt;</code> → <code>&amp;lt;</code> and <code>&gt;</code> → <code>&amp;gt;</code> — so no tag opens</li><li><code>\"</code> and <code>'</code> — so nothing escapes an attribute value</li></ul><p>After that <code>&lt;script&gt;</code> is displayed on the page as text instead of running.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "def escape(text):\n    # порядок важен: амперсанд первым, иначе он испортит остальные замены\n    text = text.replace(\"&\", \"&amp;\")\n    text = text.replace(\"<\", \"&lt;\").replace(\">\", \"&gt;\")\n    text = text.replace('\"', \"&quot;\").replace(\"'\", \"&#39;\")\n    return text\n\ncomments = [\n    \"Отличный курс!\",\n    \"<script>укради_куки()</script>\",\n    'Смотри: <img src=x onerror=\"alert(1)\">',\n    \"5 < 7 && 7 > 5\",\n]\n\nfor c in comments:\n    print(\"вставили как есть:\", c)\n    print(\"после экранирования:\", escape(c))\n    print()"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Обрати внимание на третий комментарий. Он не содержит слова <code>script</code> вовсе — и всё равно выполняет код через обработчик <code>onerror</code> у заведомо битой картинки.</p><p>Отсюда важный вывод: <b>чёрные списки не работают</b>. Запретишь <code>&lt;script&gt;</code> — придут через <code>onerror</code>, <code>onload</code>, <code>javascript:</code> в ссылке, <code>&lt;svg onload&gt;</code>. Способов десятки, и новые появляются с каждой версией браузера.</p><p>Работает только обратный подход: экранировать <b>всё</b>, что пришло от пользователя, и разрешать по белому списку, если разметка действительно нужна.</p>",
+        "uz": "<p>Uchinchi izohga e'tibor bering. Unda <code>script</code> so'zi umuman yo'q — va u baribir ataylab buzuq rasmning <code>onerror</code> ishlovchisi orqali kodni bajaradi.</p><p>Shundan muhim xulosa: <b>qora ro'yxatlar ishlamaydi</b>. <code>&lt;script&gt;</code> ni taqiqlasangiz — <code>onerror</code>, <code>onload</code>, havoladagi <code>javascript:</code>, <code>&lt;svg onload&gt;</code> orqali kelishadi. Usullar o'nlab va har brauzer versiyasi bilan yangilari paydo bo'ladi.</p><p>Faqat teskari yondashuv ishlaydi: foydalanuvchidan kelgan <b>hamma narsani</b> ekranlash va разметка chindan kerak bo'lsa, oq ro'yxat bo'yicha ruxsat berish.</p>",
+        "en": "<p>Note the third comment. It contains no word <code>script</code> at all — and still runs code through the <code>onerror</code> handler of a deliberately broken image.</p><p>Hence an important conclusion: <b>blacklists do not work</b>. Ban <code>&lt;script&gt;</code> and they arrive via <code>onerror</code>, <code>onload</code>, <code>javascript:</code> in a link, <code>&lt;svg onload&gt;</code>. There are dozens of ways and new ones appear with every browser version.</p><p>Only the opposite approach works: escape <b>everything</b> that came from a user, and allow by whitelist if markup is genuinely needed.</p>"
+       }
+      },
+      {
+       "type": "checkpoint",
+       "q": { "ru": "Комментарий не содержит слова script, но выполняет код. Возможно ли это?", "uz": "Izohda script so'zi yo'q, lekin u kodni bajaradi. Bu mumkinmi?", "en": "A comment contains no word “script” yet executes code. Is that possible?" },
+       "options": [
+        { "ru": "Нет, без script код не выполнится", "uz": "Yo'q, scriptsiz kod bajarilmaydi", "en": "No, code cannot run without script" },
+        { "ru": "Да: обработчики вроде onerror и onload запускают код без него", "uz": "Ha: onerror va onload kabi ishlovchilar kodni usiz ishga tushiradi", "en": "Yes: handlers like onerror and onload run code without it" },
+        { "ru": "Только в старых браузерах", "uz": "Faqat eski brauzerlarda", "en": "Only in old browsers" },
+        { "ru": "Только если сайт без HTTPS", "uz": "Faqat sayt HTTPS siz bo'lsa", "en": "Only if the site has no HTTPS" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Поэтому фильтр «вырезать слово script» — иллюзия защиты. Экранировать надо символы разметки, а не искать запрещённые слова.",
+        "uz": "Shuning uchun «script so'zini kesib tashlash» filtri — himoya illyuziyasi. Taqiqlangan so'zlarni qidirish emas, разметка belgilarini ekranlash kerak.",
+        "en": "This is why a “strip the word script” filter is an illusion of safety. You escape markup characters rather than hunt for forbidden words."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "CSRF: запрос от твоего имени", "uz": "CSRF: sizning nomingizdan so'rov", "en": "CSRF: a request in your name" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Ты вошёл в интернет-банк. В соседней вкладке открыл безобидный сайт. На нём спрятана форма, которая отправляет запрос в твой банк — и браузер <b>сам приложит к нему твои куки</b>, потому что так он делает всегда.</p><p>Банк видит корректный запрос с корректной сессией и выполняет перевод. Это <b>CSRF</b>: чужой сайт действует твоими руками.</p><p>Защищаются двумя механизмами сразу:</p><ul><li><b>Токен CSRF.</b> Сервер кладёт в форму случайное значение и требует его обратно. Чужой сайт этого значения не знает и прочитать не может.</li><li><b>Куки <code>SameSite</code>.</b> Браузер просто не отправляет куки в запросах, пришедших с другого сайта. Сегодня это поведение по умолчанию.</li></ul><p>И правило, которое всё упрощает: <b>GET не должен менять состояние</b>. Если удаление доступно по <code>GET /delete?id=5</code>, достаточно картинки на чужом сайте.</p>",
+        "uz": "<p>Siz internet-bankka kirdingiz. Qo'shni ilovada zararsiz saytni ochdingiz. Unda bankingizga so'rov yuboradigan shakl yashiringan — va brauzer <b>unga sizning kukilaringizni o'zi qo'shadi</b>, chunki u doim shunday qiladi.</p><p>Bank to'g'ri sessiyali to'g'ri so'rovni ko'radi va o'tkazmani bajaradi. Bu <b>CSRF</b>: begona sayt sizning qo'llaringiz bilan ish qiladi.</p><p>Bir vaqtda ikki mexanizm bilan himoyalanadi:</p><ul><li><b>CSRF tokeni.</b> Server shaklga tasodifiy qiymat qo'yadi va uni qaytarishni talab qiladi. Begona sayt bu qiymatni bilmaydi va o'qiy olmaydi.</li><li><b>SameSite kukilari.</b> Brauzer boshqa saytdan kelgan so'rovlarga kukilarni shunchaki yubormaydi. Bugun bu sukut bo'yicha xatti-harakat.</li></ul><p>Va hammasini soddalashtiradigan qoida: <b>GET holatni o'zgartirmasligi kerak</b>. O'chirish <code>GET /delete?id=5</code> orqali mavjud bo'lsa, begona saytdagi rasm yetarli.</p>",
+        "en": "<p>You are signed into your bank. In another tab you open a harmless-looking site. Hidden on it is a form that fires a request at your bank — and the browser <b>attaches your cookies itself</b>, because that is what it always does.</p><p>The bank sees a valid request with a valid session and performs the transfer. This is <b>CSRF</b>: another site acting with your hands.</p><p>Two mechanisms defend against it together:</p><ul><li><b>A CSRF token.</b> The server puts a random value in the form and demands it back. A foreign site does not know that value and cannot read it.</li><li><b><code>SameSite</code> cookies.</b> The browser simply does not send cookies on requests originating from another site. Today this is the default.</li></ul><p>And a rule that simplifies everything: <b>GET must not change state</b>. If deletion is available at <code>GET /delete?id=5</code>, an image tag on a foreign site is enough.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "import hashlib\n\n# сервер выдаёт токен вместе с формой и запоминает его для сессии\nissued = {}\n\ndef make_token(session_id, secret=\"серверный-секрет\"):\n    token = hashlib.sha256((session_id + secret).encode()).hexdigest()[:16]\n    issued[session_id] = token\n    return token\n\ndef transfer(session_id, token, amount):\n    if issued.get(session_id) != token:\n        return \"403 отклонено: токен не совпал\"\n    return f\"200 перевод {amount} выполнен\"\n\nsession = \"сессия-азиза\"\ngood = make_token(session)\n\nprint(\"своя форма:      \", transfer(session, good, 100))\nprint(\"чужой сайт:      \", transfer(session, \"угадаю-наугад\", 100000))\nprint(\"чужой сайт без токена:\", transfer(session, None, 100000))"
+      },
+      {
+       "type": "note",
+       "kind": "trap",
+       "html": {
+        "ru": "Токен CSRF не защищает от XSS, а XSS ломает защиту от CSRF. Скрипт, выполняющийся <b>на твоей же странице</b>, спокойно прочитает токен из формы и отправит запрос с ним. Поэтому порядок такой: сначала закрываем XSS, потом всё остальное.",
+        "uz": "CSRF tokeni XSS dan himoya qilmaydi, XSS esa CSRF himoyasini buzadi. <b>Sizning sahifangizda</b> bajarilayotgan skript tokenni shakldan bemalol o'qiydi va u bilan so'rov yuboradi. Shuning uchun tartib shunday: avval XSS ni yopamiz, keyin qolganini.",
+        "en": "A CSRF token does not protect against XSS, and XSS breaks CSRF protection. A script running <b>on your own page</b> will happily read the token out of the form and send the request with it. Hence the order: close XSS first, everything else after."
+       }
+      },
+      {
+       "type": "findbug",
+       "lines": [
+        "@app.route('/posts/delete')",
+        "def delete_post():",
+        "    post_id = request.args.get('id')",
+        "    db.execute('DELETE FROM posts WHERE id = ?', (post_id,))",
+        "    return redirect('/posts')"
+       ],
+       "bugLine": 0,
+       "explain": {
+        "ru": "Удаление выполняется по <code>GET</code>: строка 1 не ограничивает метод. Достаточно вставить на любом сайте <code>&lt;img src=\"/posts/delete?id=5\"&gt;</code> — браузер жертвы сам сходит по адресу с её куками. Такие действия делают через <code>POST</code> с токеном CSRF.",
+        "uz": "O'chirish <code>GET</code> orqali bajariladi: 1-qator metodni cheklamaydi. Istalgan saytga <code>&lt;img src=\"/posts/delete?id=5\"&gt;</code> qo'yish kifoya — qurbon brauzeri o'z kukilari bilan manzilga o'zi boradi. Bunday amallar CSRF tokenli <code>POST</code> orqali qilinadi.",
+        "en": "Deletion happens over <code>GET</code>: line 1 does not restrict the method. Placing <code>&lt;img src=\"/posts/delete?id=5\"&gt;</code> on any site is enough — the victim's browser fetches the URL with her cookies. Such actions go through <code>POST</code> with a CSRF token."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "Права доступа и открытые перенаправления", "uz": "Kirish huquqlari va ochiq yo'naltirishlar", "en": "Access control and open redirects" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Самая частая уязвимость в списках OWASP — не изощрённая атака, а <b>забытая проверка прав</b>. Три её обычных вида:</p><ul><li><b>Доступ по номеру.</b> <code>/orders/57</code> отдаёт чужой заказ, потому что никто не сверил владельца.</li><li><b>Скрытая, но не закрытая кнопка.</b> Ссылку на админку убрали из меню, а сам адрес работает у всех.</li><li><b>Проверка только в интерфейсе.</b> Кнопка «удалить» спрятана у обычных пользователей, но запрос из консоли проходит.</li></ul><p>Общее правило: <b>решение о правах принимается на сервере при каждом обращении к объекту</b>. Всё, что делает фронтенд, — это удобство, а не защита.</p>",
+        "uz": "<p>OWASP ro'yxatlaridagi eng ko'p uchraydigan zaiflik — murakkab hujum emas, <b>unutilgan huquq tekshiruvi</b>. Uning uch odatiy turi:</p><ul><li><b>Raqam bo'yicha kirish.</b> <code>/orders/57</code> begona buyurtmani beradi, chunki hech kim egasini sverka qilmagan.</li><li><b>Yashirilgan, lekin yopilmagan tugma.</b> Adminkaga havola menyudan olib tashlangan, manzilning o'zi esa hammada ishlaydi.</li><li><b>Faqat interfeysdagi tekshiruv.</b> «O'chirish» tugmasi oddiy foydalanuvchilarda yashirilgan, lekin konsoldan so'rov o'tadi.</li></ul><p>Umumiy qoida: <b>huquqlar haqidagi qaror serverda, obyektga har murojaatda qabul qilinadi</b>. Frontend qiladigan hamma narsa — qulaylik, himoya emas.</p>",
+        "en": "<p>The most common vulnerability in OWASP lists is not a sophisticated attack but a <b>forgotten permission check</b>. Its three usual shapes:</p><ul><li><b>Access by id.</b> <code>/orders/57</code> returns someone else's order because nobody compared owners.</li><li><b>Hidden but not closed.</b> The admin link was removed from the menu while the URL still works for everyone.</li><li><b>Checks only in the UI.</b> The “delete” button is hidden from ordinary users but a request from the console goes through.</li></ul><p>The general rule: <b>the permission decision is made on the server on every access to an object</b>. Everything the frontend does is convenience, not defence.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "USERS = {\"aziz\": \"user\", \"admin\": \"admin\"}\nDOCS = {1: {\"владелец\": \"aziz\", \"текст\": \"мой документ\"}}\n\ndef can_read(user, doc_id):\n    doc = DOCS.get(doc_id)\n    if doc is None:\n        return False\n    if USERS.get(user) == \"admin\":\n        return True\n    return doc[\"владелец\"] == user\n\nfor user in (\"aziz\", \"admin\", \"chuzhoy\"):\n    print(f\"{user:9} -> документ 1: {can_read(user, 1)}, документ 42: {can_read(user, 42)}\")"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Теперь четвёртая дыра — <b>открытое перенаправление</b>. После входа сайт возвращает пользователя туда, откуда он пришёл: <code>/login?next=/profile</code>. Если <code>next</code> не проверять, злоумышленник пришлёт <code>/login?next=https://зло.рф/фейк</code>.</p><p>Ссылка настоящая: домен твой, HTTPS твой, пользователь спокойно вводит пароль — и попадает на поддельную страницу уже после успешного входа. Доверие к домену работает против тебя.</p><p>Защита проста: разрешать в <code>next</code> только <b>относительные пути внутри своего сайта</b>. Всё, что начинается с протокола или с двух слэшей, — наружу.</p>",
+        "uz": "<p>Endi to'rtinchi teshik — <b>ochiq yo'naltirish</b>. Kirgandan keyin sayt foydalanuvchini u kelgan joyga qaytaradi: <code>/login?next=/profile</code>. <code>next</code> tekshirilmasa, buzg'unchi <code>/login?next=https://yovuz.uz/feyk</code> yuboradi.</p><p>Havola haqiqiy: domen sizniki, HTTPS sizniki, foydalanuvchi bemalol parol kiritadi — va muvaffaqiyatli kirishdan keyin soxta sahifaga tushadi. Domenga ishonch sizga qarshi ishlaydi.</p><p>Himoya oddiy: <code>next</code> da faqat <b>o'z saytingiz ichidagi nisbiy yo'llarga</b> ruxsat berish. Protokol yoki ikki qiya chiziq bilan boshlanadigan hamma narsa — tashqariga.</p>",
+        "en": "<p>Now the fourth hole — an <b>open redirect</b>. After signing in the site returns the user where they came from: <code>/login?next=/profile</code>. If <code>next</code> is not validated, an attacker sends <code>/login?next=https://evil.example/fake</code>.</p><p>The link is genuine: your domain, your HTTPS, the user calmly types their password — and lands on a fake page after a successful sign-in. Trust in the domain works against you.</p><p>The defence is simple: allow only <b>relative paths inside your own site</b> in <code>next</code>. Anything starting with a protocol or with two slashes points outward.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "def safe_next(path):\n    if not path:\n        return \"/\"\n    # только внутренний путь: одна ведущая косая и без схемы\n    if path.startswith(\"//\") or \"://\" in path or path.startswith(\"\\\\\\\\\"):\n        return \"/\"\n    if not path.startswith(\"/\"):\n        return \"/\"\n    return path\n\nfor candidate in [\"/profile\", \"/orders/5\", \"https://zlo.example/fake\",\n                  \"//zlo.example/fake\", \"javascript:alert(1)\", \"\", None]:\n    print(f\"{str(candidate):28} -> {safe_next(candidate)}\")"
+      },
+      {
+       "type": "summary",
+       "items": [
+        { "ru": "XSS возникает, когда данные попадают туда, где браузер ждёт код", "uz": "XSS ma'lumot brauzer kod kutgan joyga tushganda paydo bo'ladi", "en": "XSS happens when data lands where the browser expects code" },
+        { "ru": "Экранируй все пять символов, амперсанд — первым", "uz": "Beshala belgini ekranlang, ampersand — birinchi", "en": "Escape all five characters, the ampersand first" },
+        { "ru": "Чёрные списки не работают: onerror запускает код без слова script", "uz": "Qora ro'yxatlar ishlamaydi: onerror script so'zisiz kodni ishga tushiradi", "en": "Blacklists fail: onerror runs code without the word script" },
+        { "ru": "CSRF закрывают токеном и куками SameSite", "uz": "CSRF token va SameSite kukilari bilan yopiladi", "en": "CSRF is closed by a token plus SameSite cookies" },
+        { "ru": "GET не должен менять состояние — иначе хватит картинки", "uz": "GET holatni o'zgartirmasligi kerak — aks holda rasm yetadi", "en": "GET must not change state — otherwise an image tag suffices" },
+        { "ru": "Права проверяются на сервере при каждом обращении к объекту", "uz": "Huquqlar serverda, obyektga har murojaatda tekshiriladi", "en": "Permissions are checked on the server on every object access" },
+        { "ru": "В перенаправление пускай только относительные пути своего сайта", "uz": "Yo'naltirishga faqat o'z saytingizning nisbiy yo'llarini kiriting", "en": "Allow only your own site's relative paths in a redirect" }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": { "ru": "Что такое XSS?", "uz": "XSS nima?", "en": "What is XSS?" },
+     "options": [
+      { "ru": "Взлом сервера через SQL", "uz": "SQL orqali serverni buzish", "en": "Breaking the server through SQL" },
+      { "ru": "Выполнение чужого скрипта на странице твоего сайта", "uz": "Sizning sayt sahifangizda begona skriptning bajarilishi", "en": "Execution of someone else's script on your site's page" },
+      { "ru": "Перегрузка сервера запросами", "uz": "Serverni so'rovlar bilan ortiqcha yuklash", "en": "Overloading the server with requests" },
+      { "ru": "Кража куки через сеть", "uz": "Tarmoq orqali kuki o'g'irlash", "en": "Stealing cookies over the network" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Скрипт выполняется в контексте твоего домена — то есть с доступом к куки, токенам и всему, что видит страница.",
+      "uz": "Skript sizning domeningiz kontekstida bajariladi — ya'ni kuki, token va sahifa ko'rgan hamma narsaga kirish bilan.",
+      "en": "The script runs in your domain's context — with access to cookies, tokens and everything the page can see."
+     }
+    },
+    {
+     "q": { "ru": "Почему при экранировании амперсанд заменяют первым?", "uz": "Ekranlashda nega ampersand birinchi almashtiriladi?", "en": "Why is the ampersand replaced first when escaping?" },
+     "options": [
+      { "ru": "Он опаснее остальных", "uz": "U qolganlaridan xavfliroq", "en": "It is the most dangerous" },
+      { "ru": "Иначе он испортит уже вставленные последовательности вроде &amp;lt;", "uz": "Aks holda u &amp;lt; kabi allaqachon qo'yilgan ketma-ketliklarni buzadi", "en": "Otherwise it corrupts already-inserted sequences like &amp;lt;" },
+      { "ru": "Так быстрее", "uz": "Shunday tezroq", "en": "It is faster" },
+      { "ru": "Порядок не важен", "uz": "Tartib muhim emas", "en": "The order does not matter" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Заменив сначала <code>&lt;</code>, получишь <code>&amp;lt;</code>, а потом замена амперсанда превратит это в <code>&amp;amp;lt;</code> — на странице появится текст вместо символа.",
+      "uz": "Avval <code>&lt;</code> ni almashtirsangiz, <code>&amp;lt;</code> olasiz, keyin ampersand almashuvi buni <code>&amp;amp;lt;</code> ga aylantiradi — sahifada belgi o'rniga matn chiqadi.",
+      "en": "Replace <code>&lt;</code> first and you get <code>&amp;lt;</code>; then the ampersand pass turns it into <code>&amp;amp;lt;</code> — the page shows text instead of the character."
+     }
+    },
+    {
+     "q": { "ru": "Фильтр вырезает слово «script» из комментариев. Достаточно ли этого?", "uz": "Filtr izohlardan «script» so'zini kesib tashlaydi. Bu yetarlimi?", "en": "A filter strips the word “script” from comments. Is that enough?" },
+     "options": [
+      { "ru": "Да, XSS закрыт", "uz": "Ha, XSS yopilgan", "en": "Yes, XSS is closed" },
+      { "ru": "Нет: код запускают onerror, onload, javascript: и десятки других способов", "uz": "Yo'q: kodni onerror, onload, javascript: va o'nlab boshqa usullar ishga tushiradi", "en": "No: code runs via onerror, onload, javascript: and dozens of other ways" },
+      { "ru": "Да, если ещё запретить теги", "uz": "Ha, teglar ham taqiqlansa", "en": "Yes, if you also ban tags" },
+      { "ru": "Только для старых браузеров", "uz": "Faqat eski brauzerlar uchun", "en": "Only for old browsers" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Чёрный список всегда отстаёт от изобретательности атакующего. Экранирование не зависит от того, что именно придумают завтра.",
+      "uz": "Qora ro'yxat doim hujumchining ixtirochiligidan orqada. Ekranlash esa ertaga nima o'ylab topilishiga bog'liq emas.",
+      "en": "A blacklist always lags behind the attacker's inventiveness. Escaping does not depend on what is invented tomorrow."
+     }
+    },
+    {
+     "q": { "ru": "Что делает CSRF-атака?", "uz": "CSRF hujumi nima qiladi?", "en": "What does a CSRF attack do?" },
+     "options": [
+      { "ru": "Крадёт пароль из базы", "uz": "Bazadan parolni o'g'irlaydi", "en": "Steals the password from the database" },
+      { "ru": "Заставляет браузер жертвы отправить запрос с её куками", "uz": "Qurbon brauzerini o'z kukilari bilan so'rov yuborishga majbur qiladi", "en": "Makes the victim's browser send a request with her cookies" },
+      { "ru": "Подменяет DNS", "uz": "DNS ni almashtiradi", "en": "Spoofs DNS" },
+      { "ru": "Читает содержимое чужой вкладки", "uz": "Begona ilova mazmunini o'qiydi", "en": "Reads another tab's contents" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Злоумышленник не видит ответа — но действие уже выполнено. Именно поэтому опасны переводы, удаления и смена пароля.",
+      "uz": "Buzg'unchi javobni ko'rmaydi — lekin amal allaqachon bajarilgan. Aynan shuning uchun o'tkazma, o'chirish va parol almashuvi xavfli.",
+      "en": "The attacker never sees the response — but the action is already done. That is why transfers, deletions and password changes are dangerous."
+     }
+    },
+    {
+     "q": { "ru": "Удаление доступно по <code>GET /delete?id=5</code>. Чем это плохо?", "uz": "O'chirish <code>GET /delete?id=5</code> orqali mavjud. Bu nimasi bilan yomon?", "en": "Deletion is available at <code>GET /delete?id=5</code>. Why is that bad?" },
+     "options": [
+      { "ru": "GET медленнее POST", "uz": "GET POST dan sekin", "en": "GET is slower than POST" },
+      { "ru": "Достаточно картинки на чужом сайте, чтобы браузер жертвы удалил запись", "uz": "Qurbon brauzeri yozuvni o'chirishi uchun begona saytdagi rasm yetarli", "en": "An image on any site is enough to make the victim's browser delete the record" },
+      { "ru": "Ничем, это удобно", "uz": "Hech nimasi bilan, bu qulay", "en": "It is not bad, it is convenient" },
+      { "ru": "GET нельзя использовать с базой", "uz": "GET ni baza bilan ishlatib bo'lmaydi", "en": "GET cannot be used with a database" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Браузер загружает картинки автоматически, без клика и без вопросов. Меняющие состояние действия делают через POST с токеном.",
+      "uz": "Brauzer rasmlarni bosishsiz va savolsiz avtomatik yuklaydi. Holatni o'zgartiruvchi amallar tokenli POST orqali qilinadi.",
+      "en": "The browser loads images automatically, with no click and no questions. State-changing actions go through POST with a token."
+     }
+    },
+    {
+     "q": { "ru": "Ссылка <code>/login?next=https://зло.рф</code>. Чем опасна?", "uz": "<code>/login?next=https://yovuz.uz</code> havolasi. Nimasi bilan xavfli?", "en": "The link <code>/login?next=https://evil.example</code>. Why is it dangerous?" },
+     "options": [
+      { "ru": "Ничем, это обычная ссылка", "uz": "Hech nimasi bilan, bu oddiy havola", "en": "It is not, it is an ordinary link" },
+      { "ru": "После входа на твоём домене пользователя уводят на поддельный сайт", "uz": "Sizning domeningizda kirgandan keyin foydalanuvchi soxta saytga olib ketiladi", "en": "After signing in on your domain the user is taken to a fake site" },
+      { "ru": "Она не откроется", "uz": "U ochilmaydi", "en": "It will not open" },
+      { "ru": "Она ломает базу", "uz": "U bazani buzadi", "en": "It breaks the database" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Пользователь проверил домен в начале и больше не проверяет. В параметре <code>next</code> должны приниматься только относительные пути.",
+      "uz": "Foydalanuvchi domenni boshida tekshirgan va boshqa tekshirmaydi. <code>next</code> parametrida faqat nisbiy yo'llar qabul qilinishi kerak.",
+      "en": "The user checked the domain at the start and never checks again. The <code>next</code> parameter must accept relative paths only."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "python",
+     "title": { "ru": "Экранирование HTML", "uz": "HTML ni ekranlash", "en": "Escaping HTML" },
+     "brief": { "ru": "Пять символов против XSS", "uz": "XSS ga qarshi besh belgi", "en": "Five characters against XSS" },
+     "desc": {
+      "ru": "<p><code>escape(text)</code> заменяет пять опасных символов на HTML-последовательности:</p><ul><li><code>&amp;</code> → <code>&amp;amp;</code></li><li><code>&lt;</code> → <code>&amp;lt;</code>, <code>&gt;</code> → <code>&amp;gt;</code></li><li><code>\"</code> → <code>&amp;quot;</code>, <code>'</code> → <code>&amp;#39;</code></li></ul><p>Порядок замен важен: амперсанд первым. Не текст на входе — приведи к строке.</p>",
+      "uz": "<p><code>escape(text)</code> beshta xavfli belgini HTML ketma-ketliklariga almashtiradi:</p><ul><li><code>&amp;</code> → <code>&amp;amp;</code></li><li><code>&lt;</code> → <code>&amp;lt;</code>, <code>&gt;</code> → <code>&amp;gt;</code></li><li><code>\"</code> → <code>&amp;quot;</code>, <code>'</code> → <code>&amp;#39;</code></li></ul><p>Almashtirishlar tartibi muhim: ampersand birinchi. Kirishda matn bo'lmasa — satrga keltiring.</p>",
+      "en": "<p><code>escape(text)</code> replaces five dangerous characters with HTML sequences:</p><ul><li><code>&amp;</code> → <code>&amp;amp;</code></li><li><code>&lt;</code> → <code>&amp;lt;</code>, <code>&gt;</code> → <code>&amp;gt;</code></li><li><code>\"</code> → <code>&amp;quot;</code>, <code>'</code> → <code>&amp;#39;</code></li></ul><p>The replacement order matters: the ampersand first. If the input is not text, convert it to a string.</p>"
+     },
+     "starter": "def escape(text):\n    # твой код\n    pass\n\nprint(escape('<script>alert(1)</script>'))\n",
+     "tests": "assert escape('<b>') == '&lt;b&gt;', 'Угловые скобки'\nassert escape('a & b') == 'a &amp; b', 'Амперсанд'\nassert escape('5 < 7 & 7 > 5') == '5 &lt; 7 &amp; 7 &gt; 5', 'Всё вместе, амперсанд не удвоился'\nassert escape('\\\"кавычки\\\"') == '&quot;кавычки&quot;', 'Двойные кавычки'\nassert escape(\"it's\") == 'it&#39;s', 'Одинарная кавычка'\nassert escape('обычный текст') == 'обычный текст', 'Безопасный текст не меняется'\nassert escape(42) == '42', 'Не строка приводится к строке'\nassert escape('&lt;') == '&amp;lt;', 'Уже экранированное экранируется ещё раз — это правильно'",
+     "hint": {
+      "ru": "Сначала <code>str(text)</code>, потом пять <code>replace</code> подряд. Амперсанд обязательно первым, иначе он испортит <code>&amp;lt;</code>, который сам же и создал.",
+      "uz": "Avval <code>str(text)</code>, keyin ketma-ket beshta <code>replace</code>. Ampersand albatta birinchi, aks holda u o'zi yaratgan <code>&amp;lt;</code> ni buzadi.",
+      "en": "First <code>str(text)</code>, then five <code>replace</code> calls in a row. The ampersand must come first or it corrupts the <code>&amp;lt;</code> it just created."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "python",
+     "title": { "ru": "Безопасное перенаправление", "uz": "Xavfsiz yo'naltirish", "en": "A safe redirect" },
+     "brief": { "ru": "Только внутрь своего сайта", "uz": "Faqat o'z sayt ichiga", "en": "Inside your own site only" },
+     "desc": {
+      "ru": "<p><code>safe_next(path)</code> возвращает путь, если он ведёт внутрь сайта, и <code>'/'</code> в любом другом случае.</p><p>Внутренним считается путь, который начинается с одной косой черты и не содержит <code>://</code>. Всё остальное — пустая строка, <code>None</code>, <code>//чужой.сайт</code>, <code>https://...</code>, <code>javascript:...</code> — заменяется на <code>'/'</code>.</p>",
+      "uz": "<p><code>safe_next(path)</code> yo'l sayt ichiga olib borsa uni, boshqa har qanday holatda <code>'/'</code> qaytaradi.</p><p>Ichki deb bitta qiya chiziq bilan boshlanadigan va <code>://</code> saqlamaydigan yo'l hisoblanadi. Qolgan hammasi — bo'sh satr, <code>None</code>, <code>//begona.sayt</code>, <code>https://...</code>, <code>javascript:...</code> — <code>'/'</code> ga almashtiriladi.</p>",
+      "en": "<p><code>safe_next(path)</code> returns the path if it points inside the site, and <code>'/'</code> in every other case.</p><p>Internal means starting with a single slash and containing no <code>://</code>. Everything else — an empty string, <code>None</code>, <code>//foreign.site</code>, <code>https://...</code>, <code>javascript:...</code> — becomes <code>'/'</code>.</p>"
+     },
+     "starter": "def safe_next(path):\n    # твой код\n    pass\n\nprint(safe_next('/profile'), safe_next('https://zlo.example'))\n",
+     "tests": "assert safe_next('/profile') == '/profile', 'Обычный внутренний путь'\nassert safe_next('/orders/5?tab=all') == '/orders/5?tab=all', 'Параметры не мешают'\nassert safe_next('https://zlo.example/fake') == '/', 'Внешний адрес отвергнут'\nassert safe_next('//zlo.example/fake') == '/', 'Две косые — тоже наружу'\nassert safe_next('javascript:alert(1)') == '/', 'Псевдопротокол отвергнут'\nassert safe_next('') == '/', 'Пустая строка'\nassert safe_next(None) == '/', 'Отсутствующий параметр'\nassert safe_next('profile') == '/', 'Относительный путь без косой не принимаем'",
+     "hint": {
+      "ru": "Порядок проверок: пусто → <code>'/'</code>; начинается с <code>//</code> → <code>'/'</code>; содержит <code>'://'</code> → <code>'/'</code>; не начинается с <code>/</code> → <code>'/'</code>. Иначе путь годится.",
+      "uz": "Tekshiruvlar tartibi: bo'sh → <code>'/'</code>; <code>//</code> bilan boshlanadi → <code>'/'</code>; <code>'://'</code> saqlaydi → <code>'/'</code>; <code>/</code> bilan boshlanmaydi → <code>'/'</code>. Aks holda yo'l yaroqli.",
+      "en": "Order of checks: empty → <code>'/'</code>; starts with <code>//</code> → <code>'/'</code>; contains <code>'://'</code> → <code>'/'</code>; does not start with <code>/</code> → <code>'/'</code>. Otherwise the path is fine."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "python",
+     "title": { "ru": "Проверка прав на документ", "uz": "Hujjatga huquqni tekshirish", "en": "Checking document permissions" },
+     "brief": { "ru": "Владелец, админ, посторонний", "uz": "Ega, admin, begona", "en": "Owner, admin, stranger" },
+     "desc": {
+      "ru": "<p><code>can_read(user, doc_id, users, docs)</code> возвращает <code>True</code>, если пользователю можно читать документ.</p><ul><li>документа нет → <code>False</code>;</li><li>пользователя нет в <code>users</code> → <code>False</code>;</li><li>роль <code>'admin'</code> → <code>True</code>;</li><li>иначе — только если он владелец.</li></ul><p><code>users</code> — словарь «имя → роль», <code>docs</code> — словарь «номер → документ» с ключом <code>'владелец'</code>.</p>",
+      "uz": "<p><code>can_read(user, doc_id, users, docs)</code> foydalanuvchiga hujjatni o'qish mumkin bo'lsa <code>True</code> qaytaradi.</p><ul><li>hujjat yo'q → <code>False</code>;</li><li>foydalanuvchi <code>users</code> da yo'q → <code>False</code>;</li><li>roli <code>'admin'</code> → <code>True</code>;</li><li>aks holda — faqat u ega bo'lsa.</li></ul><p><code>users</code> — «ism → rol» lug'ati, <code>docs</code> — <code>'владелец'</code> kalitli «raqam → hujjat» lug'ati.</p>",
+      "en": "<p><code>can_read(user, doc_id, users, docs)</code> returns <code>True</code> when the user may read the document.</p><ul><li>no such document → <code>False</code>;</li><li>user absent from <code>users</code> → <code>False</code>;</li><li>role <code>'admin'</code> → <code>True</code>;</li><li>otherwise — only if they are the owner.</li></ul><p><code>users</code> is a dict “name → role”, <code>docs</code> is a dict “id → document” with an <code>'владелец'</code> key.</p>"
+     },
+     "starter": "def can_read(user, doc_id, users, docs):\n    # твой код\n    pass\n\nU = {'aziz': 'user', 'admin': 'admin'}\nD = {1: {'владелец': 'aziz'}}\nprint(can_read('aziz', 1, U, D), can_read('chuzhoy', 1, U, D))\n",
+     "tests": "U = {'aziz': 'user', 'dilnoza': 'user', 'admin': 'admin'}\nD = {1: {'владелец': 'aziz'}, 2: {'владелец': 'dilnoza'}}\nassert can_read('aziz', 1, U, D) is True, 'Владелец читает свой документ'\nassert can_read('aziz', 2, U, D) is False, 'Чужой документ закрыт'\nassert can_read('admin', 2, U, D) is True, 'Админ читает любой'\nassert can_read('aziz', 99, U, D) is False, 'Документа нет'\nassert can_read('chuzhoy', 1, U, D) is False, 'Неизвестный пользователь'\nassert can_read('admin', 99, U, D) is False, 'Даже админу нельзя прочитать несуществующее'",
+     "hint": {
+      "ru": "Четыре проверки по порядку. Существование документа проверяй до роли — иначе админ получит <code>True</code> на несуществующий номер.",
+      "uz": "To'rt tekshiruv tartib bilan. Hujjat mavjudligini roldan oldin tekshiring — aks holda admin mavjud bo'lmagan raqamga <code>True</code> oladi.",
+      "en": "Four checks in order. Check the document's existence before the role — otherwise an admin gets <code>True</code> for a non-existent id."
+     }
+    }
+   ],
+   "exam": {
+    "time": 540,
+    "questions": [
+     {
+      "q": { "ru": "Комментарий сохраняется в базу как есть и выводится на странице без обработки. Что произойдёт?", "uz": "Izoh bazaga o'z holicha saqlanadi va sahifada qayta ishlanmasdan chiqariladi. Nima bo'ladi?", "en": "A comment is stored raw and rendered on the page unprocessed. What happens?" },
+      "options": [
+       { "ru": "Ничего, база защищает", "uz": "Hech nima, baza himoya qiladi", "en": "Nothing, the database protects it" },
+       { "ru": "Хранимая XSS: скрипт выполнится у каждого, кто откроет страницу", "uz": "Saqlanuvchi XSS: skript sahifani ochgan har kimda bajariladi", "en": "Stored XSS: the script runs for everyone who opens the page" },
+       { "ru": "SQL-инъекция", "uz": "SQL-in'ektsiya", "en": "SQL injection" },
+       { "ru": "CSRF", "uz": "CSRF", "en": "CSRF" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Что защищает от CSRF?", "uz": "CSRF dan nima himoya qiladi?", "en": "What protects against CSRF?" },
+      "options": [
+       { "ru": "Экранирование HTML", "uz": "HTML ni ekranlash", "en": "HTML escaping" },
+       { "ru": "Токен в форме и куки SameSite", "uz": "Shakldagi token va SameSite kukilari", "en": "A token in the form plus SameSite cookies" },
+       { "ru": "Хеширование паролей", "uz": "Parollarni xeshlash", "en": "Password hashing" },
+       { "ru": "Ограничение длины пароля", "uz": "Parol uzunligini cheklash", "en": "Limiting password length" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "На странице есть XSS. Спасёт ли токен CSRF?", "uz": "Sahifada XSS bor. CSRF tokeni qutqaradimi?", "en": "The page has an XSS hole. Does a CSRF token save you?" },
+      "options": [
+       { "ru": "Да, токен работает всегда", "uz": "Ha, token doim ishlaydi", "en": "Yes, the token always works" },
+       { "ru": "Нет: скрипт на твоей же странице прочитает токен и подставит его", "uz": "Yo'q: sizning sahifangizdagi skript tokenni o'qib qo'yadi", "en": "No: a script on your own page reads the token and includes it" },
+       { "ru": "Да, если токен длинный", "uz": "Ha, token uzun bo'lsa", "en": "Yes, if the token is long" },
+       { "ru": "Зависит от браузера", "uz": "Brauzerga bog'liq", "en": "It depends on the browser" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Кнопку «удалить пользователя» скрыли у обычных ролей в интерфейсе. Достаточно?", "uz": "«Foydalanuvchini o'chirish» tugmasi interfeysda oddiy rollarda yashirildi. Yetarlimi?", "en": "The “delete user” button was hidden from ordinary roles in the UI. Is that enough?" },
+      "options": [
+       { "ru": "Да, кнопки нет — действия нет", "uz": "Ha, tugma yo'q — amal yo'q", "en": "Yes, no button means no action" },
+       { "ru": "Нет: запрос можно отправить напрямую, проверка нужна на сервере", "uz": "Yo'q: so'rovni to'g'ridan-to'g'ri yuborish mumkin, tekshiruv serverda kerak", "en": "No: the request can be sent directly; the check belongs on the server" },
+       { "ru": "Да, если ещё убрать из документации", "uz": "Ha, hujjatlardan ham olib tashlansa", "en": "Yes, if you also remove it from the docs" },
+       { "ru": "Достаточно для внутренних систем", "uz": "Ichki tizimlar uchun yetarli", "en": "Enough for internal systems" }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "python",
+      "title": { "ru": "Безопасный вывод комментария", "uz": "Izohni xavfsiz chiqarish", "en": "Rendering a comment safely" },
+      "desc": {
+       "ru": "<p>Собери обработчик, который отдаёт комментарий на страницу. <code>render(comment, user, users, docs)</code> возвращает кортеж <code>(код, html)</code>.</p><p><code>comment</code> — словарь с ключами <code>'doc'</code> (номер документа), <code>'автор'</code> и <code>'текст'</code>.</p><ol><li>Если пользователю нельзя читать документ (правила из задачи 3) → <code>(403, '')</code>.</li><li>Иначе верни <code>(200, html)</code>, где <code>html</code> — строка <code>'&lt;p&gt;&lt;b&gt;автор&lt;/b&gt;: текст&lt;/p&gt;'</code>, причём <b>и автор, и текст экранированы</b>.</li></ol><p>Экранируется только то, что пришло от пользователя, — сами теги <code>&lt;p&gt;</code> и <code>&lt;b&gt;</code> остаются разметкой.</p>",
+       "uz": "<p>Izohni sahifaga beradigan ishlovchini yig'ing. <code>render(comment, user, users, docs)</code> <code>(kod, html)</code> kortejini qaytaradi.</p><p><code>comment</code> — <code>'doc'</code> (hujjat raqami), <code>'автор'</code> va <code>'текст'</code> kalitli lug'at.</p><ol><li>Foydalanuvchiga hujjatni o'qish mumkin bo'lmasa (3-vazifadagi qoidalar) → <code>(403, '')</code>.</li><li>Aks holda <code>(200, html)</code> qaytaring, bu yerda <code>html</code> — <code>'&lt;p&gt;&lt;b&gt;автор&lt;/b&gt;: текст&lt;/p&gt;'</code> satri, <b>ham muallif, ham matn ekranlangan</b>.</li></ol><p>Faqat foydalanuvchidan kelgan narsa ekranlanadi — <code>&lt;p&gt;</code> va <code>&lt;b&gt;</code> teglarining o'zi разметка bo'lib qoladi.</p>",
+       "en": "<p>Assemble the handler that renders a comment. <code>render(comment, user, users, docs)</code> returns the tuple <code>(code, html)</code>.</p><p><code>comment</code> is a dict with keys <code>'doc'</code> (document id), <code>'автор'</code> and <code>'текст'</code>.</p><ol><li>If the user may not read the document (rules from task 3) → <code>(403, '')</code>.</li><li>Otherwise return <code>(200, html)</code>, where <code>html</code> is the string <code>'&lt;p&gt;&lt;b&gt;author&lt;/b&gt;: text&lt;/p&gt;'</code> with <b>both the author and the text escaped</b>.</li></ol><p>Only user-supplied content is escaped — the <code>&lt;p&gt;</code> and <code>&lt;b&gt;</code> tags themselves stay markup.</p>"
+      },
+      "starter": "def render(comment, user, users, docs):\n    # проверь права, потом экранируй всё пользовательское\n    pass\n\nU = {'aziz': 'user'}\nD = {1: {'владелец': 'aziz'}}\nc = {'doc': 1, 'автор': 'aziz', 'текст': '<script>alert(1)</script>'}\nprint(render(c, 'aziz', U, D))\n",
+      "tests": "U = {'aziz': 'user', 'dilnoza': 'user', 'admin': 'admin'}\nD = {1: {'владелец': 'aziz'}, 2: {'владелец': 'dilnoza'}}\nc = {'doc': 1, 'автор': 'aziz', 'текст': '<script>alert(1)</script>'}\ncode, html = render(c, 'aziz', U, D)\nassert code == 200, 'Владелец видит свой документ'\nassert '<script>' not in html, 'Скрипт обязан быть экранирован'\nassert html == '<p><b>aziz</b>: &lt;script&gt;alert(1)&lt;/script&gt;</p>', 'Разметка своя, содержимое экранировано'\nassert render(c, 'dilnoza', U, D) == (403, ''), 'Чужой документ читать нельзя'\nassert render(c, 'admin', U, D)[0] == 200, 'Админ читает любой документ'\nassert render({'doc': 99, 'автор': 'a', 'текст': 'b'}, 'admin', U, D) == (403, ''), 'Документа нет'\nevil = {'doc': 1, 'автор': '<b>злой</b>', 'текст': 'привет'}\nassert render(evil, 'aziz', U, D)[1] == '<p><b>&lt;b&gt;злой&lt;/b&gt;</b>: привет</p>', 'Имя автора тоже экранируется'",
+      "hint": {
+       "ru": "Переиспользуй <code>can_read</code> и <code>escape</code> из задач 1 и 3. Собирай строку через f-строку, но подставляй в неё <b>уже экранированные</b> значения, а не сырые.",
+       "uz": "1 va 3-vazifalardagi <code>can_read</code> va <code>escape</code> ni qayta ishlating. Satrni f-satr orqali yig'ing, lekin unga xom emas, <b>allaqachon ekranlangan</b> qiymatlarni qo'ying.",
+       "en": "Reuse <code>can_read</code> and <code>escape</code> from tasks 1 and 3. Build the string with an f-string but substitute the <b>already escaped</b> values, not the raw ones."
+      }
+     }
+    ]
+   }
   }
  ]
 }

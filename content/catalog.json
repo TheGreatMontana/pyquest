@@ -543,7 +543,7 @@
    "color": "#34d399",
    "level": "beginner",
    "status": "starter",
-   "estimatedHours": 6,
+   "estimatedHours": 12,
    "requires": [
     "python-syntax"
    ],
@@ -551,7 +551,7 @@
     "http-basics"
    ],
    "legacyIds": [],
-   "moduleCount": 1
+   "moduleCount": 2
   },
   {
    "id": "analytics-intro",
@@ -569,7 +569,7 @@
    "color": "#60a5fa",
    "level": "beginner",
    "status": "starter",
-   "estimatedHours": 6,
+   "estimatedHours": 12,
    "requires": [
     "python-collections"
    ],
@@ -577,7 +577,7 @@
     "data-analysis"
    ],
    "legacyIds": [],
-   "moduleCount": 1
+   "moduleCount": 2
   },
   {
    "id": "security-intro",
@@ -595,13 +595,13 @@
    "color": "#f87171",
    "level": "beginner",
    "status": "starter",
-   "estimatedHours": 6,
+   "estimatedHours": 12,
    "requires": [],
    "grants": [
     "security-basics"
    ],
    "legacyIds": [],
-   "moduleCount": 1
+   "moduleCount": 2
   },
   {
    "id": "de-tools",
