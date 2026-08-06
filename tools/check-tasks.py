@@ -46,15 +46,15 @@ def collect():
             base = course['id'] + '/' + m['id']
             for task in m['tasks']:
                 if task.get('kind') == 'python':
-                    out.append((base + '/' + task['id'], task['tests'], task.get('stdin', [])))
+                    out.append((base + '/' + task['id'], task['tests'], task.get('stdin', []), task.get('packages') or []))
             for i, task in enumerate(m.get('exam', {}).get('tasks', [])):
                 if task.get('kind') == 'python':
-                    out.append((base + '/exam' + str(i), task['tests'], task.get('stdin', [])))
+                    out.append((base + '/exam' + str(i), task['tests'], task.get('stdin', []), task.get('packages') or []))
         fin = course.get('finalExam')
         if fin:
             for i, task in enumerate(fin.get('tasks', [])):
                 if task.get('kind') == 'python':
-                    out.append((course['id'] + '/final/task' + str(i), task['tests'], task.get('stdin', [])))
+                    out.append((course['id'] + '/final/task' + str(i), task['tests'], task.get('stdin', []), task.get('packages') or []))
     return out
 
 
@@ -62,7 +62,19 @@ tasks = collect()
 os.chdir(tempfile.mkdtemp())          # песочница для файловых задач
 fails = []
 
-for key, tests, stdin in tasks:
+def have(pkg):
+    import importlib.util
+    return importlib.util.find_spec(pkg) is not None
+
+
+skipped = []
+
+for key, tests, stdin, packages in tasks:
+    need = [p for p in packages if not have(p)]
+    if need:
+        # Пакета локально нет — задачу проверяет браузерный check-pylibs.mjs
+        skipped.append((key, ', '.join(need)))
+        continue
     sol = SOLUTIONS.get(key)
     if sol is None:
         fails.append((key, 'НЕТ ЭТАЛОННОГО РЕШЕНИЯ'))
@@ -79,4 +91,8 @@ if fails:
     for k, m in fails:
         print(' -', k, '->', m)
     sys.exit(1)
-print('Задачи: все %d эталонных решений проходят автотесты ✔' % len(tasks))
+tail = ''
+if skipped:
+    tail = ', %d пропущено без пакетов (%s) — их проверяет check-pylibs.mjs' % (
+        len(skipped), ', '.join(sorted({p for _, p in skipped})))
+print('Задачи: все %d эталонных решений проходят автотесты%s ✔' % (len(tasks) - len(skipped), tail))

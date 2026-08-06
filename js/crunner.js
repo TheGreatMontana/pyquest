@@ -96,8 +96,12 @@ async function build(code, lang) {
 
   buf = '';
   const clang = await api.getModule(api.clangFilename);
+  /* Без -std clang 8 берёт gnu++14, и половина стандартной библиотеки
+     (std::optional, string_view) прячется за проверкой версии внутри libc++.
+     Язык при этом C++17 понимает и так — расходились только заголовки. */
   await api.run(clang, 'clang', '-cc1', '-emit-obj', ...api.clangCommonArgs,
-                '-O2', '-o', 'main.o', '-x', lang === 'c' ? 'c' : 'c++', src);
+                '-O2', ...(lang === 'c' ? [] : ['-std=c++17']),
+                '-o', 'main.o', '-x', lang === 'c' ? 'c' : 'c++', src);
 
   const lld = await api.getModule(api.lldFilename);
   await api.run(lld, 'wasm-ld', '--no-threads', '--export-dynamic',

@@ -1,0 +1,1047 @@
+{
+ "id": "python-libraries",
+ "schema": 2,
+ "modules": [
+  {
+   "id": "pl-01",
+   "title": { "ru": "Стандартная библиотека: то, что уже установлено", "uz": "Standart kutubxona: allaqachon o'rnatilgani", "en": "The standard library: what is already installed" },
+   "tagline": { "ru": "collections, itertools, datetime, json и re — набор, который экономит недели", "uz": "collections, itertools, datetime, json va re — haftalarni tejaydigan to'plam", "en": "collections, itertools, datetime, json and re — the set that saves you weeks" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "collections: словари и списки с суперсилой", "uz": "collections: super kuchli lug'at va ro'yxatlar", "en": "collections: dictionaries and lists with superpowers" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Python приходит с батарейками: сотня готовых модулей ставится вместе с языком. Половина кода новичка — это переписывание того, что уже написано.</p><p>Модуль <code>collections</code> даёт четыре структуры, которые нужны почти каждый день:</p><ul><li><b>Counter</b> — подсчёт чего угодно одной строкой</li><li><b>defaultdict</b> — словарь, который сам создаёт значение по умолчанию</li><li><b>deque</b> — очередь с быстрой вставкой с обоих концов</li><li><b>namedtuple</b> — кортеж, у которого поля с именами</li></ul>",
+        "uz": "<p>Python batareykalar bilan keladi: yuzta tayyor modul til bilan birga o'rnatiladi. Yangi boshlovchi kodining yarmi — allaqachon yozilgan narsani qayta yozish.</p><p><code>collections</code> moduli deyarli har kuni kerak bo'ladigan to'rt tuzilma beradi:</p><ul><li><b>Counter</b> — istalgan narsani bir qatorda sanash</li><li><b>defaultdict</b> — sukut qiymatini o'zi yaratadigan lug'at</li><li><b>deque</b> — ikki uchidan ham tez qo'shiladigan navbat</li><li><b>namedtuple</b> — maydonlari nomli kortej</li></ul>",
+        "en": "<p>Python comes with batteries included: a hundred ready modules ship with the language. Half of a beginner's code is rewriting what already exists.</p><p>The <code>collections</code> module gives four structures you need almost daily:</p><ul><li><b>Counter</b> — counting anything in one line</li><li><b>defaultdict</b> — a dictionary that creates a default value itself</li><li><b>deque</b> — a queue with fast insertion at both ends</li><li><b>namedtuple</b> — a tuple whose fields have names</li></ul>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "from collections import Counter, defaultdict, deque, namedtuple\n\nwords = \"кот пёс кот мышь кот пёс\".split()\n\n# было: cnt = {}; for w in words: cnt[w] = cnt.get(w, 0) + 1\ncnt = Counter(words)\nprint(cnt)\nprint(\"самое частое:\", cnt.most_common(1))\n\n# defaultdict сам создаёт пустой список под новый ключ\nby_letter = defaultdict(list)\nfor w in words:\n    by_letter[w[0]].append(w)\nprint(dict(by_letter))\n\n# deque: добавление в начало за O(1), у списка это O(n)\nq = deque([2, 3])\nq.appendleft(1)\nq.append(4)\nprint(list(q), \"| слева:\", q.popleft())\n\n# namedtuple: кортеж с именами полей\nPoint = namedtuple(\"Point\", \"x y\")\np = Point(3, 4)\nprint(p, p.x + p.y)"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Обрати внимание на <code>defaultdict(list)</code>. Обычный словарь потребовал бы проверки «а есть ли уже такой ключ» перед каждым <code>append</code>. Здесь список создаётся сам при первом обращении.</p><p>Аргумент — это <b>функция</b>, которую вызовут для нового ключа: <code>list</code> даёт <code>[]</code>, <code>int</code> даёт <code>0</code>, <code>set</code> даёт пустое множество. Скобок после <code>list</code> нет — передаём саму функцию, а не результат её вызова.</p>",
+        "uz": "<p><code>defaultdict(list)</code> ga e'tibor bering. Oddiy lug'at har <code>append</code> dan oldin «bunday kalit bormi» tekshiruvini talab qilardi. Bu yerda ro'yxat birinchi murojaatda o'zi yaratiladi.</p><p>Argument — yangi kalit uchun chaqiriladigan <b>funksiya</b>: <code>list</code> <code>[]</code> beradi, <code>int</code> <code>0</code> beradi, <code>set</code> bo'sh to'plam beradi. <code>list</code> dan keyin qavs yo'q — funksiyaning o'zini uzatamiz, chaqiruv natijasini emas.</p>",
+        "en": "<p>Note <code>defaultdict(list)</code>. An ordinary dictionary would need a “does this key exist yet” check before every <code>append</code>. Here the list is created on first access.</p><p>The argument is a <b>function</b> called for a new key: <code>list</code> gives <code>[]</code>, <code>int</code> gives <code>0</code>, <code>set</code> gives an empty set. There are no brackets after <code>list</code> — we pass the function itself, not the result of calling it.</p>"
+       }
+      },
+      {
+       "type": "checkpoint",
+       "q": { "ru": "Чем <code>deque</code> лучше списка для очереди?", "uz": "Navbat uchun <code>deque</code> ro'yxatdan nimasi bilan yaxshi?", "en": "Why is <code>deque</code> better than a list for a queue?" },
+       "options": [
+        { "ru": "Занимает меньше памяти", "uz": "Kamroq xotira egallaydi", "en": "It uses less memory" },
+        { "ru": "Вставка и удаление в начале — за O(1), а у списка O(n)", "uz": "Boshiga qo'shish va o'chirish — O(1), ro'yxatda esa O(n)", "en": "Insert and remove at the front is O(1), while a list is O(n)" },
+        { "ru": "Умеет хранить любые типы", "uz": "Har qanday turni saqlay oladi", "en": "It can hold any type" },
+        { "ru": "Сортируется быстрее", "uz": "Tezroq saralanadi", "en": "It sorts faster" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "<code>list.pop(0)</code> сдвигает все оставшиеся элементы. На миллионе элементов это заметно, на очереди в BFS — критично.",
+        "uz": "<code>list.pop(0)</code> qolgan barcha elementlarni siljitadi. Million elementda bu sezilarli, BFS navbatida — hal qiluvchi.",
+        "en": "<code>list.pop(0)</code> shifts every remaining element. On a million items that is noticeable; in a BFS queue it is decisive."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "itertools и функции высшего порядка", "uz": "itertools va yuqori tartibli funksiyalar", "en": "itertools and higher-order functions" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><code>itertools</code> — набор инструментов для перебора. Все они <b>ленивые</b>: не строят список в памяти, а отдают элементы по одному. На больших данных это разница между «работает» и «съело всю память».</p><ul><li><code>chain(a, b)</code> — пройти несколько последовательностей подряд</li><li><code>groupby</code> — сгруппировать <b>подряд идущие</b> одинаковые</li><li><code>combinations</code> / <code>permutations</code> — сочетания и перестановки</li><li><code>islice</code> — срез для того, что нельзя нарезать</li></ul><p>Рядом живут встроенные <code>map</code>, <code>filter</code>, <code>zip</code>, <code>enumerate</code>, <code>any</code>, <code>all</code>, <code>sorted(key=)</code> — они тоже ленивые (кроме sorted) и тоже экономят циклы.</p>",
+        "uz": "<p><code>itertools</code> — aylanib chiqish uchun asboblar to'plami. Ularning hammasi <b>dangasa</b>: xotirada ro'yxat qurmaydi, elementlarni bittalab beradi. Katta ma'lumotda bu «ishlaydi» va «butun xotirani yedi» orasidagi farq.</p><ul><li><code>chain(a, b)</code> — bir necha ketma-ketlikni ketma-ket aylanib chiqish</li><li><code>groupby</code> — <b>ketma-ket kelgan</b> bir xillarni guruhlash</li><li><code>combinations</code> / <code>permutations</code> — birikma va o'rin almashtirishlar</li><li><code>islice</code> — kesib bo'lmaydigan narsa uchun kesim</li></ul><p>Yonida o'rnatilgan <code>map</code>, <code>filter</code>, <code>zip</code>, <code>enumerate</code>, <code>any</code>, <code>all</code>, <code>sorted(key=)</code> yashaydi — ular ham dangasa (sorted dan tashqari) va ular ham sikllarni tejaydi.</p>",
+        "en": "<p><code>itertools</code> is a toolkit for iteration. All of them are <b>lazy</b>: they do not build a list in memory but hand out items one at a time. On large data this is the difference between “it works” and “it ate all the memory”.</p><ul><li><code>chain(a, b)</code> — walk several sequences in a row</li><li><code>groupby</code> — group <b>consecutive</b> equal items</li><li><code>combinations</code> / <code>permutations</code> — combinations and permutations</li><li><code>islice</code> — a slice for things you cannot slice</li></ul><p>Beside them live the built-in <code>map</code>, <code>filter</code>, <code>zip</code>, <code>enumerate</code>, <code>any</code>, <code>all</code>, <code>sorted(key=)</code> — also lazy (except sorted) and also loop-savers.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "from itertools import chain, groupby, combinations, islice, count\n\nprint(list(chain([1, 2], [3], [4, 5])))\n\n# groupby видит только ПОДРЯД идущие одинаковые — поэтому сначала сортируем\nrows = [(\"Ташкент\", 100), (\"Бухара\", 50), (\"Ташкент\", 300)]\nrows.sort(key=lambda r: r[0])\nfor city, group in groupby(rows, key=lambda r: r[0]):\n    total = sum(amount for _, amount in group)\n    print(f\"{city}: {total}\")\n\nprint(list(combinations(\"abc\", 2)))\n\n# count() бесконечен — islice берёт из него первые пять\nprint(list(islice(count(10, 5), 5)))\n\nnums = [4, 7, 2, 9]\nprint(any(n > 8 for n in nums), all(n > 1 for n in nums))\nprint(sorted(nums, key=lambda n: -n))"
+      },
+      {
+       "type": "note",
+       "kind": "trap",
+       "html": {
+        "ru": "<code>groupby</code> группирует только <b>подряд идущие</b> элементы — в отличие от SQL <code>GROUP BY</code>. Забудешь отсортировать — получишь «Ташкент» дважды в разных группах, и итог тихо разъедется. Это самая частая ошибка при первой встрече с этой функцией.",
+        "uz": "<code>groupby</code> faqat <b>ketma-ket kelgan</b> elementlarni guruhlaydi — SQL dagi <code>GROUP BY</code> dan farqli. Saralashni unutsangiz — «Toshkent» ni turli guruhlarda ikki marta olasiz va yakun jimgina buziladi. Bu funksiya bilan birinchi uchrashuvdagi eng ko'p uchraydigan xato.",
+        "en": "<code>groupby</code> groups only <b>consecutive</b> items — unlike SQL's <code>GROUP BY</code>. Forget to sort and you get “Tashkent” twice in different groups, and the total quietly drifts. This is the most common mistake on first meeting this function."
+       }
+      },
+      {
+       "type": "predict",
+       "code": "from itertools import groupby\n\ndata = [1, 1, 2, 1, 1]\nprint(len(list(groupby(data))))",
+       "options": [
+        { "ru": "2", "uz": "2", "en": "2" },
+        { "ru": "3", "uz": "3", "en": "3" },
+        { "ru": "5", "uz": "5", "en": "5" },
+        { "ru": "1", "uz": "1", "en": "1" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Группы идут по подряд идущим: [1,1], [2], [1,1] — три группы, хотя разных значений всего два. Отсортируй данные, и групп станет две.",
+        "uz": "Guruhlar ketma-ket kelganlar bo'yicha: [1,1], [2], [1,1] — uchta guruh, garchi turli qiymat ikkitagina. Ma'lumotni saralasangiz, guruh ikkita bo'ladi.",
+        "en": "Groups follow consecutive runs: [1,1], [2], [1,1] — three groups, though there are only two distinct values. Sort the data and you get two."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "Даты, JSON, пути и регулярки", "uz": "Sanalar, JSON, yo'llar va regulyarlar", "en": "Dates, JSON, paths and regexes" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Четыре модуля, без которых не проходит ни один рабочий день.</p><ul><li><b>datetime</b> — даты и разницы между ними. Вычитание дат даёт <code>timedelta</code>.</li><li><b>json</b> — обмен данными: <code>dumps</code> в строку, <code>loads</code> обратно.</li><li><b>pathlib</b> — пути как объекты, а не как склейка строк.</li><li><b>re</b> — поиск по шаблону там, где <code>in</code> и <code>split</code> уже не хватает.</li></ul>",
+        "uz": "<p>Bironta ish kuni ularsiz o'tmaydigan to'rt modul.</p><ul><li><b>datetime</b> — sanalar va ular orasidagi farq. Sanalarni ayirish <code>timedelta</code> beradi.</li><li><b>json</b> — ma'lumot almashish: <code>dumps</code> satrga, <code>loads</code> orqaga.</li><li><b>pathlib</b> — yo'llar satrlarni yopishtirish emas, obyekt sifatida.</li><li><b>re</b> — <code>in</code> va <code>split</code> yetmay qolgan joyda shablon bo'yicha qidiruv.</li></ul>",
+        "en": "<p>Four modules no working day goes without.</p><ul><li><b>datetime</b> — dates and the gaps between them. Subtracting dates gives a <code>timedelta</code>.</li><li><b>json</b> — data exchange: <code>dumps</code> to a string, <code>loads</code> back.</li><li><b>pathlib</b> — paths as objects rather than glued strings.</li><li><b>re</b> — pattern search where <code>in</code> and <code>split</code> are no longer enough.</li></ul>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "import json\nimport re\nfrom datetime import date, datetime, timedelta\nfrom pathlib import Path\n\nstart = date(2026, 1, 10)\nend = date(2026, 3, 1)\nprint(\"дней между:\", (end - start).days)\nprint(\"через неделю:\", start + timedelta(days=7))\nprint(\"разбор строки:\", datetime.strptime(\"2026-08-05\", \"%Y-%m-%d\").date())\nprint(\"формат:\", end.strftime(\"%d.%m.%Y\"))\n\npayload = {\"city\": \"Ташкент\", \"orders\": [1, 2], \"active\": True}\ntext = json.dumps(payload, ensure_ascii=False)\nprint(text)\nback = json.loads(text)\nprint(back[\"city\"], len(back[\"orders\"]), back[\"active\"])\n\np = Path(\"data\") / \"2026\" / \"sales.csv\"\nprint(p.name, \"|\", p.suffix, \"|\", p.stem, \"|\", p.parent)\n\nlog = \"ERROR 2026-08-05 диск полон; INFO ок; ERROR 2026-08-06 сеть\"\nprint(re.findall(r\"ERROR (\\d{4}-\\d{2}-\\d{2})\", log))\nprint(re.sub(r\"\\d{4}-\\d{2}-\\d{2}\", \"<дата>\", log))"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Два места, где чаще всего спотыкаются.</p><p><code>json.dumps</code> без <code>ensure_ascii=False</code> превращает кириллицу в <code>\\u0422...</code>. Файл останется корректным, но читать его человеку станет невозможно.</p><p>В регулярках всегда пиши <code>r\"…\"</code>. Без этой <code>r</code> строка <code>\"\\d\"</code> сначала обрабатывается Python как escape-последовательность, и до модуля <code>re</code> доезжает не то, что ты написал.</p>",
+        "uz": "<p>Eng ko'p qoqiladigan ikki joy.</p><p><code>ensure_ascii=False</code> siz <code>json.dumps</code> kirillni <code>\\u0422...</code> ga aylantiradi. Fayl to'g'ri qoladi, lekin odam uni o'qiy olmaydi.</p><p>Regulyarlarda doim <code>r\"…\"</code> yozing. Bu <code>r</code> siz <code>\"\\d\"</code> satrini avval Python escape-ketma-ketlik sifatida qayta ishlaydi va <code>re</code> moduligacha siz yozgan narsa yetib bormaydi.</p>",
+        "en": "<p>Two places where people trip most often.</p><p><code>json.dumps</code> without <code>ensure_ascii=False</code> turns Cyrillic into <code>\\u0422...</code>. The file stays valid but becomes unreadable for a human.</p><p>In regexes always write <code>r\"…\"</code>. Without that <code>r</code>, the string <code>\"\\d\"</code> is first processed by Python as an escape sequence, and what reaches the <code>re</code> module is not what you wrote.</p>"
+       }
+      },
+      {
+       "type": "summary",
+       "items": [
+        { "ru": "Counter считает, defaultdict создаёт значение сам", "uz": "Counter sanaydi, defaultdict qiymatni o'zi yaratadi", "en": "Counter counts, defaultdict creates the value itself" },
+        { "ru": "deque даёт O(1) на обоих концах — основа очереди", "uz": "deque ikki uchida ham O(1) beradi — navbat asosi", "en": "deque gives O(1) at both ends — the basis of a queue" },
+        { "ru": "itertools ленивы: элементы по одному, без списка в памяти", "uz": "itertools dangasa: elementlar bittalab, xotirada ro'yxatsiz", "en": "itertools are lazy: items one by one, no list in memory" },
+        { "ru": "groupby видит только подряд идущие — сначала сортируй", "uz": "groupby faqat ketma-ket kelganlarni ko'radi — avval sarala", "en": "groupby sees only consecutive runs — sort first" },
+        { "ru": "Разница дат — это timedelta, у неё есть .days", "uz": "Sanalar farqi — timedelta, unda .days bor", "en": "A date difference is a timedelta, and it has .days" },
+        { "ru": "json.dumps без ensure_ascii=False ломает читаемость кириллицы", "uz": "ensure_ascii=False siz json.dumps kirill o'qilishini buzadi", "en": "json.dumps without ensure_ascii=False breaks Cyrillic readability" },
+        { "ru": "Шаблон регулярки пиши сырой строкой r\"…\"", "uz": "Regulyar shablonini xom satr r\"…\" bilan yozing", "en": "Write a regex pattern as a raw string r\"…\"" }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": { "ru": "Что вернёт <code>Counter('aabbbc').most_common(1)</code>?", "uz": "<code>Counter('aabbbc').most_common(1)</code> nima qaytaradi?", "en": "What does <code>Counter('aabbbc').most_common(1)</code> return?" },
+     "options": [
+      { "ru": "[('a', 2)]", "uz": "[('a', 2)]", "en": "[('a', 2)]" },
+      { "ru": "[('b', 3)]", "uz": "[('b', 3)]", "en": "[('b', 3)]" },
+      { "ru": "'b'", "uz": "'b'", "en": "'b'" },
+      { "ru": "3", "uz": "3", "en": "3" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "<code>most_common(n)</code> возвращает список пар «значение, количество», отсортированных по убыванию. Самое частое здесь — <code>b</code>, три раза.",
+      "uz": "<code>most_common(n)</code> kamayish bo'yicha saralangan «qiymat, son» juftliklari ro'yxatini qaytaradi. Bu yerda eng ko'pi — <code>b</code>, uch marta.",
+      "en": "<code>most_common(n)</code> returns a list of “value, count” pairs sorted descending. The most frequent here is <code>b</code>, three times."
+     }
+    },
+    {
+     "q": { "ru": "Что делает <code>defaultdict(int)</code> при обращении к новому ключу?", "uz": "Yangi kalitga murojaatda <code>defaultdict(int)</code> nima qiladi?", "en": "What does <code>defaultdict(int)</code> do on a new key?" },
+     "options": [
+      { "ru": "Бросает KeyError", "uz": "KeyError tashlaydi", "en": "Raises a KeyError" },
+      { "ru": "Создаёт значение 0", "uz": "0 qiymatini yaratadi", "en": "Creates the value 0" },
+      { "ru": "Возвращает None", "uz": "None qaytaradi", "en": "Returns None" },
+      { "ru": "Создаёт пустой список", "uz": "Bo'sh ro'yxat yaratadi", "en": "Creates an empty list" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Аргумент — функция для нового ключа. <code>int()</code> даёт <code>0</code>, <code>list()</code> — пустой список, <code>set()</code> — пустое множество.",
+      "uz": "Argument — yangi kalit uchun funksiya. <code>int()</code> <code>0</code>, <code>list()</code> bo'sh ro'yxat, <code>set()</code> bo'sh to'plam beradi.",
+      "en": "The argument is a function for a new key. <code>int()</code> gives <code>0</code>, <code>list()</code> an empty list, <code>set()</code> an empty set."
+     }
+    },
+    {
+     "q": { "ru": "Почему itertools называют ленивыми?", "uz": "Nega itertools dangasa deyiladi?", "en": "Why are itertools called lazy?" },
+     "options": [
+      { "ru": "Работают медленно", "uz": "Sekin ishlaydi", "en": "They work slowly" },
+      { "ru": "Отдают элементы по одному, не создавая список целиком", "uz": "Elementlarni bittalab beradi, butun ro'yxat yaratmaydi", "en": "They yield items one at a time without building the whole list" },
+      { "ru": "Требуют явного вызова", "uz": "Aniq chaqiruvni talab qiladi", "en": "They require an explicit call" },
+      { "ru": "Кешируют результат", "uz": "Natijani keshlaydi", "en": "They cache the result" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Поэтому <code>count()</code> может быть бесконечным: пока ты не просишь следующий элемент, его никто не вычисляет.",
+      "uz": "Shuning uchun <code>count()</code> cheksiz bo'lishi mumkin: keyingi elementni so'ramaguningizcha uni hech kim hisoblamaydi.",
+      "en": "That is why <code>count()</code> can be infinite: until you ask for the next item, nobody computes it."
+     }
+    },
+    {
+     "q": { "ru": "Перед <code>itertools.groupby</code> данные надо…", "uz": "<code>itertools.groupby</code> dan oldin ma'lumotni…", "en": "Before <code>itertools.groupby</code> the data must be…" },
+     "options": [
+      { "ru": "перемешать", "uz": "aralashtirish kerak", "en": "shuffled" },
+      { "ru": "отсортировать по тому же ключу", "uz": "o'sha kalit bo'yicha saralash kerak", "en": "sorted by the same key" },
+      { "ru": "превратить в словарь", "uz": "lug'atga aylantirish kerak", "en": "turned into a dictionary" },
+      { "ru": "ничего не надо", "uz": "hech nima kerak emas", "en": "nothing is needed" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Функция группирует только подряд идущие элементы. Без сортировки один и тот же ключ даст несколько групп.",
+      "uz": "Funksiya faqat ketma-ket kelgan elementlarni guruhlaydi. Saralashsiz bitta kalit bir necha guruh beradi.",
+      "en": "The function groups only consecutive items. Without sorting, one key produces several groups."
+     }
+    },
+    {
+     "q": { "ru": "Что даёт вычитание двух <code>date</code>?", "uz": "Ikki <code>date</code> ni ayirish nima beradi?", "en": "What does subtracting two <code>date</code> objects give?" },
+     "options": [
+      { "ru": "Число дней", "uz": "Kunlar sonini", "en": "A number of days" },
+      { "ru": "Объект timedelta, у которого есть .days", "uz": "<code>.days</code> ga ega timedelta obyektini", "en": "A timedelta object, which has .days" },
+      { "ru": "Строку", "uz": "Satr", "en": "A string" },
+      { "ru": "Ошибку", "uz": "Xato", "en": "An error" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Число получится, если взять <code>.days</code>. Сам <code>timedelta</code> умеет ещё <code>.total_seconds()</code> и складывается с датами.",
+      "uz": "Son <code>.days</code> ni olganda chiqadi. <code>timedelta</code> ning o'zi yana <code>.total_seconds()</code> ni biladi va sanalar bilan qo'shiladi.",
+      "en": "You get a number by taking <code>.days</code>. The <code>timedelta</code> itself also has <code>.total_seconds()</code> and adds to dates."
+     }
+    },
+    {
+     "q": { "ru": "Зачем в регулярках писать <code>r\"\\d+\"</code>, а не <code>\"\\d+\"</code>?", "uz": "Regulyarlarda nega <code>\"\\d+\"</code> emas, <code>r\"\\d+\"</code> yoziladi?", "en": "Why write <code>r\"\\d+\"</code> rather than <code>\"\\d+\"</code> in regexes?" },
+     "options": [
+      { "ru": "Так быстрее", "uz": "Shunday tezroq", "en": "It is faster" },
+      { "ru": "Чтобы Python не трогал обратные слэши до модуля re", "uz": "Python teskari chiziqlarga re modulidan oldin tegmasligi uchun", "en": "So Python does not touch the backslashes before the re module sees them" },
+      { "ru": "r означает regex", "uz": "r regex degani", "en": "r stands for regex" },
+      { "ru": "Разницы нет", "uz": "Farqi yo'q", "en": "There is no difference" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "В обычной строке <code>\\d</code> ещё может сойти, но <code>\\b</code> Python превратит в символ забоя — и шаблон перестанет работать без единой ошибки.",
+      "uz": "Oddiy satrda <code>\\d</code> hali o'tishi mumkin, lekin <code>\\b</code> ni Python backspace belgisiga aylantiradi — va shablon bitta xatosiz ishlashdan to'xtaydi.",
+      "en": "In an ordinary string <code>\\d</code> may still pass, but Python turns <code>\\b</code> into a backspace character — and the pattern stops working without a single error."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "python",
+     "title": { "ru": "Топ слов через Counter", "uz": "Counter orqali top so'zlar", "en": "Top words with Counter" },
+     "brief": { "ru": "Одна строка вместо цикла", "uz": "Sikl o'rniga bir qator", "en": "One line instead of a loop" },
+     "desc": {
+      "ru": "<p><code>top_words(text, n)</code> возвращает список из <code>n</code> самых частых слов — только сами слова, без счётчиков, в порядке убывания частоты.</p><p>Слова разделены пробелами, регистр приводи к нижнему. Если слов меньше <code>n</code> — верни сколько есть.</p>",
+      "uz": "<p><code>top_words(text, n)</code> eng ko'p uchraydigan <code>n</code> ta so'z ro'yxatini qaytaradi — faqat so'zlarning o'zi, hisoblagichsiz, chastota kamayishi tartibida.</p><p>So'zlar bo'shliq bilan ajratilgan, registrni kichik harfga keltiring. So'zlar <code>n</code> dan kam bo'lsa — borini qaytaring.</p>",
+      "en": "<p><code>top_words(text, n)</code> returns a list of the <code>n</code> most frequent words — the words only, no counts, in descending order of frequency.</p><p>Words are separated by spaces; lowercase them. If there are fewer than <code>n</code> words, return what there is.</p>"
+     },
+     "starter": "from collections import Counter\n\ndef top_words(text, n):\n    # твой код\n    pass\n\nprint(top_words('кот пёс кот мышь кот пёс', 2))\n",
+     "tests": "assert top_words('кот пёс кот мышь кот пёс', 2) == ['кот', 'пёс'], 'Два самых частых по порядку'\nassert top_words('a A a b', 1) == ['a'], 'Регистр не должен разделять слова'\nassert top_words('', 3) == [], 'Пустой текст'\nassert top_words('один два три', 10) == ['один', 'два', 'три'] or sorted(top_words('один два три', 10)) == ['два', 'один', 'три'], 'Слов меньше, чем просили'\nassert len(top_words('a b c d', 2)) == 2, 'Ровно n элементов'",
+     "hint": {
+      "ru": "<code>Counter(text.lower().split()).most_common(n)</code> даст пары. Из них нужны только первые элементы: <code>[w for w, _ in ...]</code>.",
+      "uz": "<code>Counter(text.lower().split()).most_common(n)</code> juftliklar beradi. Ulardan faqat birinchi elementlar kerak: <code>[w for w, _ in ...]</code>.",
+      "en": "<code>Counter(text.lower().split()).most_common(n)</code> gives pairs. You need only the first item of each: <code>[w for w, _ in ...]</code>."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "python",
+     "title": { "ru": "Группировка одной строкой", "uz": "Bir qatorda guruhlash", "en": "Grouping in one line" },
+     "brief": { "ru": "defaultdict вместо проверок", "uz": "Tekshiruvlar o'rniga defaultdict", "en": "defaultdict instead of checks" },
+     "desc": {
+      "ru": "<p><code>group_by_city(rows)</code> получает список пар <code>(город, сумма)</code> и возвращает словарь «город → список сумм» в том порядке, в каком суммы встретились.</p><p>Пустой список даёт пустой словарь. Результат должен быть обычным <code>dict</code>, а не <code>defaultdict</code>.</p>",
+      "uz": "<p><code>group_by_city(rows)</code> <code>(shahar, summa)</code> juftliklar ro'yxatini oladi va «shahar → summalar ro'yxati» lug'atini summalar uchragan tartibda qaytaradi.</p><p>Bo'sh ro'yxat bo'sh lug'at beradi. Natija <code>defaultdict</code> emas, oddiy <code>dict</code> bo'lishi kerak.</p>",
+      "en": "<p><code>group_by_city(rows)</code> takes a list of <code>(city, amount)</code> pairs and returns a dictionary “city → list of amounts” in the order the amounts appeared.</p><p>An empty list gives an empty dictionary. The result must be a plain <code>dict</code>, not a <code>defaultdict</code>.</p>"
+     },
+     "starter": "from collections import defaultdict\n\ndef group_by_city(rows):\n    # твой код\n    pass\n\nprint(group_by_city([('Ташкент', 100), ('Бухара', 50), ('Ташкент', 300)]))\n",
+     "tests": "res = group_by_city([('Ташкент', 100), ('Бухара', 50), ('Ташкент', 300)])\nassert res == {'Ташкент': [100, 300], 'Бухара': [50]}, 'Суммы собраны по городам'\nassert type(res) is dict, 'Верни обычный dict, а не defaultdict'\nassert group_by_city([]) == {}, 'Пустой вход'\nassert group_by_city([('A', 1)]) == {'A': [1]}, 'Одна строка'\nres2 = group_by_city([('A', 2), ('A', 1)])\nassert res2['A'] == [2, 1], 'Порядок сумм сохраняется'",
+     "hint": {
+      "ru": "Заведи <code>defaultdict(list)</code>, в цикле делай <code>d[city].append(amount)</code>, в конце верни <code>dict(d)</code> — это и превратит его в обычный словарь.",
+      "uz": "<code>defaultdict(list)</code> yarating, siklda <code>d[city].append(amount)</code> qiling, oxirida <code>dict(d)</code> qaytaring — bu uni oddiy lug'atga aylantiradi.",
+      "en": "Create a <code>defaultdict(list)</code>, do <code>d[city].append(amount)</code> in the loop, and return <code>dict(d)</code> at the end — that converts it to a plain dictionary."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "python",
+     "title": { "ru": "Разбор лога регуляркой", "uz": "Logni regulyar bilan tahlil qilish", "en": "Parsing a log with a regex" },
+     "brief": { "ru": "re и datetime вместе", "uz": "re va datetime birga", "en": "re and datetime together" },
+     "desc": {
+      "ru": "<p><code>error_dates(log)</code> получает многострочный лог. Каждая строка вида <code>УРОВЕНЬ ГГГГ-ММ-ДД сообщение</code>.</p><p>Верни отсортированный список <b>уникальных</b> дат (строками), в которых был уровень <code>ERROR</code>.</p>",
+      "uz": "<p><code>error_dates(log)</code> ko'p qatorli logni oladi. Har qator <code>DARAJA YYYY-MM-DD xabar</code> ko'rinishida.</p><p><code>ERROR</code> darajasi bo'lgan <b>noyob</b> sanalarning (satr sifatida) saralangan ro'yxatini qaytaring.</p>",
+      "en": "<p><code>error_dates(log)</code> receives a multi-line log. Every line looks like <code>LEVEL YYYY-MM-DD message</code>.</p><p>Return a sorted list of the <b>unique</b> dates (as strings) that had level <code>ERROR</code>.</p>"
+     },
+     "starter": "import re\n\ndef error_dates(log):\n    # твой код\n    pass\n\nprint(error_dates('ERROR 2026-08-05 диск\\nINFO 2026-08-05 ок\\nERROR 2026-08-01 сеть'))\n",
+     "tests": "log = 'ERROR 2026-08-05 диск\\nINFO 2026-08-05 ок\\nERROR 2026-08-01 сеть\\nERROR 2026-08-05 снова'\nassert error_dates(log) == ['2026-08-01', '2026-08-05'], 'Уникальные даты ошибок по возрастанию'\nassert error_dates('INFO 2026-01-01 всё хорошо') == [], 'Ошибок нет'\nassert error_dates('') == [], 'Пустой лог'\nassert error_dates('ERROR 2026-12-31 конец года') == ['2026-12-31'], 'Одна ошибка'\nassert len(error_dates('ERROR 2026-01-01 a\\nERROR 2026-01-01 b')) == 1, 'Дубликаты убираются'",
+     "hint": {
+      "ru": "Шаблон <code>r'ERROR (\\d{4}-\\d{2}-\\d{2})'</code> и <code>re.findall</code> вернут все даты. Уникальность даст <code>set</code>, порядок — <code>sorted</code>.",
+      "uz": "<code>r'ERROR (\\d{4}-\\d{2}-\\d{2})'</code> shabloni va <code>re.findall</code> barcha sanalarni qaytaradi. Noyoblikni <code>set</code>, tartibni <code>sorted</code> beradi.",
+      "en": "The pattern <code>r'ERROR (\\d{4}-\\d{2}-\\d{2})'</code> with <code>re.findall</code> returns every date. <code>set</code> gives uniqueness, <code>sorted</code> the order."
+     }
+    }
+   ],
+   "exam": {
+    "time": 600,
+    "questions": [
+     {
+      "q": { "ru": "Нужно посчитать, сколько раз встретился каждый элемент. Что взять?", "uz": "Har element necha marta uchraganini sanash kerak. Nima olinadi?", "en": "You need to count how many times each item occurs. What do you take?" },
+      "options": [
+       { "ru": "deque", "uz": "deque", "en": "deque" },
+       { "ru": "Counter", "uz": "Counter", "en": "Counter" },
+       { "ru": "namedtuple", "uz": "namedtuple", "en": "namedtuple" },
+       { "ru": "islice", "uz": "islice", "en": "islice" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Очередь в BFS: список или deque?", "uz": "BFS dagi navbat: ro'yxatmi yoki deque?", "en": "A queue in BFS: a list or a deque?" },
+      "options": [
+       { "ru": "Список — он проще", "uz": "Ro'yxat — u sodda", "en": "A list — it is simpler" },
+       { "ru": "deque: pop слева за O(1), у списка O(n)", "uz": "deque: chapdan pop O(1), ro'yxatda O(n)", "en": "A deque: pop from the left is O(1), a list is O(n)" },
+       { "ru": "Разницы нет", "uz": "Farqi yo'q", "en": "It makes no difference" },
+       { "ru": "Множество", "uz": "To'plam", "en": "A set" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "<code>json.dumps({'город': 'Ташкент'})</code> без ensure_ascii даст…", "uz": "ensure_ascii siz <code>json.dumps({'город': 'Ташкент'})</code> nima beradi…", "en": "<code>json.dumps({'город': 'Ташкент'})</code> without ensure_ascii gives…" },
+      "options": [
+       { "ru": "читаемую кириллицу", "uz": "o'qiladigan kirill", "en": "readable Cyrillic" },
+       { "ru": "экранированные \\u-последовательности", "uz": "ekranlangan \\u-ketma-ketliklar", "en": "escaped \\u sequences" },
+       { "ru": "ошибку", "uz": "xato", "en": "an error" },
+       { "ru": "пустую строку", "uz": "bo'sh satr", "en": "an empty string" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Что вернёт <code>(date(2026, 1, 10) - date(2026, 1, 1)).days</code>?", "uz": "<code>(date(2026, 1, 10) - date(2026, 1, 1)).days</code> nima qaytaradi?", "en": "What does <code>(date(2026, 1, 10) - date(2026, 1, 1)).days</code> return?" },
+      "options": [
+       { "ru": "10", "uz": "10", "en": "10" },
+       { "ru": "9", "uz": "9", "en": "9" },
+       { "ru": "1", "uz": "1", "en": "1" },
+       { "ru": "Ошибку", "uz": "Xato", "en": "An error" }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "python",
+      "title": { "ru": "Отчёт по логу", "uz": "Log bo'yicha hisobot", "en": "A report from the log" },
+      "desc": {
+       "ru": "<p>Собери всё вместе. <code>report(log)</code> получает многострочный лог из строк <code>УРОВЕНЬ ГГГГ-ММ-ДД сообщение</code> и возвращает словарь:</p><ul><li><code>'по_уровням'</code> — словарь «уровень → сколько строк»;</li><li><code>'дни_с_ошибками'</code> — отсортированный список уникальных дат с уровнем <code>ERROR</code>;</li><li><code>'первый_день'</code> и <code>'последний_день'</code> — самая ранняя и самая поздняя дата во всём логе, строками.</li></ul><p>Для пустого лога верни <code>{'по_уровням': {}, 'дни_с_ошибками': [], 'первый_день': None, 'последний_день': None}</code>.</p>",
+       "uz": "<p>Hammasini birlashtiring. <code>report(log)</code> <code>DARAJA YYYY-MM-DD xabar</code> qatorlaridan iborat ko'p qatorli logni oladi va lug'at qaytaradi:</p><ul><li><code>'по_уровням'</code> — «daraja → nechta qator» lug'ati;</li><li><code>'дни_с_ошибками'</code> — <code>ERROR</code> darajali noyob sanalarning saralangan ro'yxati;</li><li><code>'первый_день'</code> va <code>'последний_день'</code> — butun logdagi eng erta va eng kech sana, satr sifatida.</li></ul><p>Bo'sh log uchun <code>{'по_уровням': {}, 'дни_с_ошибками': [], 'первый_день': None, 'последний_день': None}</code> qaytaring.</p>",
+       "en": "<p>Put it all together. <code>report(log)</code> receives a multi-line log of <code>LEVEL YYYY-MM-DD message</code> lines and returns a dictionary:</p><ul><li><code>'по_уровням'</code> — a dictionary “level → number of lines”;</li><li><code>'дни_с_ошибками'</code> — a sorted list of unique dates with level <code>ERROR</code>;</li><li><code>'первый_день'</code> and <code>'последний_день'</code> — the earliest and latest date in the whole log, as strings.</li></ul><p>For an empty log return <code>{'по_уровням': {}, 'дни_с_ошибками': [], 'первый_день': None, 'последний_день': None}</code>.</p>"
+      },
+      "starter": "import re\nfrom collections import Counter\n\ndef report(log):\n    # уровни, даты ошибок и границы периода\n    pass\n\nprint(report('ERROR 2026-08-05 диск\\nINFO 2026-08-01 ок'))\n",
+      "tests": "log = 'ERROR 2026-08-05 диск\\nINFO 2026-08-01 ок\\nERROR 2026-08-05 снова\\nWARN 2026-08-09 память'\nr = report(log)\nassert r['по_уровням'] == {'ERROR': 2, 'INFO': 1, 'WARN': 1}, 'Счётчик по уровням'\nassert r['дни_с_ошибками'] == ['2026-08-05'], 'Уникальные дни с ошибками'\nassert r['первый_день'] == '2026-08-01', 'Самая ранняя дата'\nassert r['последний_день'] == '2026-08-09', 'Самая поздняя дата'\nempty = report('')\nassert empty == {'по_уровням': {}, 'дни_с_ошибками': [], 'первый_день': None, 'последний_день': None}, 'Пустой лог'\none = report('INFO 2026-01-01 старт')\nassert one['первый_день'] == one['последний_день'] == '2026-01-01', 'Одна строка — одна дата с обеих сторон'",
+      "hint": {
+       "ru": "Разбери строки регуляркой <code>r'(\\w+) (\\d{4}-\\d{2}-\\d{2})'</code> через <code>re.findall</code> — получишь пары. Дальше <code>Counter</code> по уровням, <code>sorted(set(...))</code> по датам ошибок, <code>min</code> и <code>max</code> по всем датам (строки формата ГГГГ-ММ-ДД сравниваются правильно как есть).",
+       "uz": "Qatorlarni <code>r'(\\w+) (\\d{4}-\\d{2}-\\d{2})'</code> regulyari bilan <code>re.findall</code> orqali ajrating — juftliklar olasiz. Keyin darajalar bo'yicha <code>Counter</code>, xato sanalari bo'yicha <code>sorted(set(...))</code>, barcha sanalar bo'yicha <code>min</code> va <code>max</code> (YYYY-MM-DD formatidagi satrlar o'z holicha to'g'ri solishtiriladi).",
+       "en": "Parse the lines with <code>r'(\\w+) (\\d{4}-\\d{2}-\\d{2})'</code> via <code>re.findall</code> — you get pairs. Then <code>Counter</code> over the levels, <code>sorted(set(...))</code> over the error dates, and <code>min</code> / <code>max</code> over all dates (YYYY-MM-DD strings compare correctly as they are)."
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "pl-02",
+   "title": { "ru": "NumPy: массивы вместо циклов", "uz": "NumPy: sikllar o'rniga massivlar", "en": "NumPy: arrays instead of loops" },
+   "tagline": { "ru": "Векторизация, маски и агрегаты по осям — фундамент под всей аналитикой и ML", "uz": "Vektorlashtirish, niqoblar va o'qlar bo'yicha agregatlar — butun analitika va ML poydevori", "en": "Vectorisation, masks and axis aggregates — the foundation under all analytics and ML" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "Массив против списка", "uz": "Massiv va ro'yxat", "en": "Array versus list" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Python-список умеет хранить что угодно вперемешку — и платит за это. Каждый элемент лежит отдельным объектом, и цикл по миллиону чисел — это миллион обращений по указателям.</p><p><b>Массив NumPy</b> устроен иначе: одна непрерывная область памяти, все элементы одного типа. Отсюда две вещи:</p><ul><li>Операции <b>векторизованы</b>: <code>a * 2</code> умножает весь массив без единого цикла в твоём коде.</li><li>Считает не Python, а скомпилированный код на C — в десятки раз быстрее.</li></ul><p>Правило звучит так: <b>если ты пишешь цикл по массиву NumPy — скорее всего, ты делаешь это неправильно</b>.</p>",
+        "uz": "<p>Python ro'yxati istalgan narsani aralash saqlay oladi — va buning uchun to'laydi. Har element alohida obyekt bo'lib yotadi va million son bo'ylab sikl — bu million ko'rsatkich bo'yicha murojaat.</p><p><b>NumPy massivi</b> boshqacha tuzilgan: bitta uzluksiz xotira sohasi, barcha elementlar bir turda. Shundan ikki narsa:</p><ul><li>Amallar <b>vektorlashtirilgan</b>: <code>a * 2</code> butun massivni kodingizdagi bitta ham siklsiz ko'paytiradi.</li><li>Python emas, C dagi kompilyatsiya qilingan kod hisoblaydi — o'nlab barobar tez.</li></ul><p>Qoida shunday yangraydi: <b>NumPy massivi bo'ylab sikl yozayotgan bo'lsangiz — ehtimol, buni noto'g'ri qilyapsiz</b>.</p>",
+        "en": "<p>A Python list can hold anything mixed together — and pays for it. Every element is a separate object, so a loop over a million numbers means a million pointer lookups.</p><p>A <b>NumPy array</b> is built differently: one contiguous block of memory, all elements of the same type. Two things follow:</p><ul><li>Operations are <b>vectorised</b>: <code>a * 2</code> multiplies the whole array without a single loop in your code.</li><li>The computing is done by compiled C, not by Python — tens of times faster.</li></ul><p>The rule goes: <b>if you are writing a loop over a NumPy array, you are probably doing it wrong</b>.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "packages": ["numpy"],
+       "code": "import numpy as np\n\nnums = [1, 2, 3, 4, 5]\na = np.array(nums)\n\nprint(\"список:\", [x * 2 for x in nums])\nprint(\"массив:\", a * 2)          # без цикла вообще\n\nprint(\"тип элементов:\", a.dtype)\nprint(\"форма:\", a.shape, \"| размер:\", a.size)\n\n# арифметика поэлементная\nb = np.array([10, 20, 30, 40, 50])\nprint(\"сумма массивов:\", a + b)\nprint(\"в квадрате:\", a ** 2)\nprint(\"сравнение:\", a > 3)\n\n# готовые способы создать массив\nprint(np.zeros(3), np.ones(2, dtype=int), np.arange(0, 10, 3), np.linspace(0, 1, 5))"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Обрати внимание на <code>a &gt; 3</code>: результат — не одно <code>True</code>, а <b>массив булевых значений</b>, по одному на элемент. Это ключ ко всему дальнейшему — по такой маске отбирают строки.</p><p>И на <code>dtype</code>. У массива один тип на всех, и он фиксирован. Положишь строку в массив чисел — либо получишь ошибку, либо весь массив молча станет строковым. Это цена скорости.</p>",
+        "uz": "<p><code>a &gt; 3</code> ga e'tibor bering: natija bitta <code>True</code> emas, har elementga bittadan <b>mantiqiy qiymatlar massivi</b>. Bu keyingi hamma narsaning kaliti — shunday niqob bo'yicha qatorlar tanlanadi.</p><p>Va <code>dtype</code> ga. Massivda hamma uchun bitta tur va u qat'iy. Sonlar massiviga satr qo'ysangiz — yo xato olasiz, yo butun massiv jimgina satrli bo'ladi. Bu tezlik narxi.</p>",
+        "en": "<p>Note <code>a &gt; 3</code>: the result is not a single <code>True</code> but an <b>array of booleans</b>, one per element. This is the key to everything that follows — rows are selected by such a mask.</p><p>And note <code>dtype</code>. An array has one type for everything, and it is fixed. Put a string into an array of numbers and you either get an error or the whole array quietly becomes strings. That is the price of speed.</p>"
+       }
+      },
+      {
+       "type": "checkpoint",
+       "q": { "ru": "Что вернёт <code>np.array([1, 2, 3]) &gt; 2</code>?", "uz": "<code>np.array([1, 2, 3]) &gt; 2</code> nima qaytaradi?", "en": "What does <code>np.array([1, 2, 3]) &gt; 2</code> return?" },
+       "options": [
+        { "ru": "True", "uz": "True", "en": "True" },
+        { "ru": "Массив [False, False, True]", "uz": "[False, False, True] massivi", "en": "The array [False, False, True]" },
+        { "ru": "Число 1", "uz": "1 soni", "en": "The number 1" },
+        { "ru": "Ошибку сравнения", "uz": "Solishtirish xatosi", "en": "A comparison error" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Сравнение, как и арифметика, применяется к каждому элементу. Получается булева маска — её потом подставляют в квадратные скобки для отбора.",
+        "uz": "Solishtirish ham arifmetika kabi har elementga qo'llanadi. Mantiqiy niqob chiqadi — keyin uni tanlash uchun kvadrat qavsga qo'yiladi.",
+        "en": "Comparison, like arithmetic, applies to every element. You get a boolean mask, which you then put in square brackets to select."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "Индексы, срезы и булевы маски", "uz": "Indekslar, kesimlar va mantiqiy niqoblar", "en": "Indices, slices and boolean masks" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Индексация похожа на списки, но умеет больше:</p><ul><li><code>a[2]</code>, <code>a[-1]</code>, <code>a[1:4]</code> — как в списках</li><li><code>a[a &gt; 3]</code> — <b>отбор по маске</b>: остаются элементы, где маска True</li><li><code>a[[0, 3]]</code> — выбор по списку индексов</li><li><code>m[1, 2]</code> — у двумерного: строка 1, столбец 2</li><li><code>m[:, 0]</code> — весь нулевой <b>столбец</b></li></ul><p>Маски объединяются: <code>&amp;</code> — и, <code>|</code> — или, <code>~</code> — не. Скобки вокруг условий <b>обязательны</b>: у этих операторов приоритет выше, чем у сравнения.</p>",
+        "uz": "<p>Indekslash ro'yxatlarga o'xshaydi, lekin ko'proqni biladi:</p><ul><li><code>a[2]</code>, <code>a[-1]</code>, <code>a[1:4]</code> — ro'yxatlardagidek</li><li><code>a[a &gt; 3]</code> — <b>niqob bo'yicha tanlash</b>: niqob True bo'lgan elementlar qoladi</li><li><code>a[[0, 3]]</code> — indekslar ro'yxati bo'yicha tanlash</li><li><code>m[1, 2]</code> — ikki o'lchovlida: 1-qator, 2-ustun</li><li><code>m[:, 0]</code> — butun nolinchi <b>ustun</b></li></ul><p>Niqoblar birlashtiriladi: <code>&amp;</code> — va, <code>|</code> — yoki, <code>~</code> — emas. Shartlar atrofidagi qavslar <b>majburiy</b>: bu operatorlarning ustuvorligi solishtirishdan yuqori.</p>",
+        "en": "<p>Indexing resembles lists but can do more:</p><ul><li><code>a[2]</code>, <code>a[-1]</code>, <code>a[1:4]</code> — as in lists</li><li><code>a[a &gt; 3]</code> — <b>selection by mask</b>: the elements where the mask is True remain</li><li><code>a[[0, 3]]</code> — selection by a list of indices</li><li><code>m[1, 2]</code> — in a 2-D array: row 1, column 2</li><li><code>m[:, 0]</code> — the whole zeroth <b>column</b></li></ul><p>Masks combine: <code>&amp;</code> is and, <code>|</code> is or, <code>~</code> is not. Brackets around the conditions are <b>mandatory</b>: these operators bind tighter than comparison.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "packages": ["numpy"],
+       "code": "import numpy as np\n\na = np.array([10, 25, 3, 47, 8, 31])\n\nprint(a[1], a[-1], a[1:4])\nprint(\"больше 20:\", a[a > 20])\nprint(\"по индексам 0 и 3:\", a[[0, 3]])\n\n# скобки обязательны: без них Python сначала выполнит &\nprint(\"от 10 до 40:\", a[(a >= 10) & (a <= 40)])\nprint(\"не больше 20:\", a[~(a > 20)])\n\n# двумерный массив: строки и столбцы\nm = np.array([[1, 2, 3],\n              [4, 5, 6],\n              [7, 8, 9]])\nprint(\"элемент [1, 2]:\", m[1, 2])\nprint(\"вторая строка:\", m[1])\nprint(\"нулевой столбец:\", m[:, 0])\nprint(\"подматрица:\\n\", m[:2, 1:])\n\n# присваивание по маске меняет массив на месте\na[a < 10] = 0\nprint(\"мелкое обнулили:\", a)"
+      },
+      {
+       "type": "note",
+       "kind": "trap",
+       "html": {
+        "ru": "Срез массива NumPy — это <b>вид на ту же память</b>, а не копия. Изменил срез — изменился исходный массив. У списков Python всё наоборот: там срез копирует. Нужна независимая копия — пиши <code>.copy()</code> явно. На этом теряют часы отладки.",
+        "uz": "NumPy massivining kesimi — nusxa emas, <b>o'sha xotiraga qarash</b>. Kesimni o'zgartirdingiz — asl massiv o'zgardi. Python ro'yxatlarida aksincha: u yerda kesim nusxa oladi. Mustaqil nusxa kerak bo'lsa — <code>.copy()</code> ni aniq yozing. Bunda soatlab nosozlik qidiriladi.",
+        "en": "A NumPy slice is a <b>view on the same memory</b>, not a copy. Change the slice and the original array changes. With Python lists it is the opposite: there a slice copies. If you need an independent copy, write <code>.copy()</code> explicitly. Hours of debugging are lost on this."
+       }
+      },
+      {
+       "type": "predict",
+       "packages": ["numpy"],
+       "code": "import numpy as np\n\na = np.array([1, 2, 3, 4])\npart = a[:2]\npart[0] = 99\nprint(a)",
+       "options": [
+        { "ru": "[1 2 3 4] — исходный не изменился", "uz": "[1 2 3 4] — asli o'zgarmadi", "en": "[1 2 3 4] — the original is unchanged" },
+        { "ru": "[99 2 3 4] — срез это вид на ту же память", "uz": "[99 2 3 4] — kesim o'sha xotiraga qarash", "en": "[99 2 3 4] — the slice is a view on the same memory" },
+        { "ru": "[99 99 3 4]", "uz": "[99 99 3 4]", "en": "[99 99 3 4]" },
+        { "ru": "Ошибка: срез только для чтения", "uz": "Xato: kesim faqat o'qish uchun", "en": "An error: the slice is read-only" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Именно этим массив отличается от списка. Хочешь независимую копию — <code>part = a[:2].copy()</code>.",
+        "uz": "Massiv ro'yxatdan aynan shu bilan farq qiladi. Mustaqil nusxa kerak bo'lsa — <code>part = a[:2].copy()</code>.",
+        "en": "This is exactly how an array differs from a list. If you want an independent copy: <code>part = a[:2].copy()</code>."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "Агрегаты, оси и broadcasting", "uz": "Agregatlar, o'qlar va broadcasting", "en": "Aggregates, axes and broadcasting" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>У массива есть готовые агрегаты: <code>sum</code>, <code>mean</code>, <code>min</code>, <code>max</code>, <code>std</code>, <code>argmax</code>. На двумерных данных у них появляется главный параметр — <b>ось</b>.</p><ul><li>Без оси — по всему массиву, одно число</li><li><code>axis=0</code> — вдоль строк, результат <b>по столбцам</b></li><li><code>axis=1</code> — вдоль столбцов, результат <b>по строкам</b></li></ul><p>Запомнить проще так: <code>axis</code> — это измерение, которое <b>схлопывается</b>. Было 3×4, посчитал с <code>axis=0</code> — осталось 4 числа.</p>",
+        "uz": "<p>Massivda tayyor agregatlar bor: <code>sum</code>, <code>mean</code>, <code>min</code>, <code>max</code>, <code>std</code>, <code>argmax</code>. Ikki o'lchovli ma'lumotda ularda asosiy parametr paydo bo'ladi — <b>o'q</b>.</p><ul><li>O'qsiz — butun massiv bo'yicha, bitta son</li><li><code>axis=0</code> — qatorlar bo'ylab, natija <b>ustunlar bo'yicha</b></li><li><code>axis=1</code> — ustunlar bo'ylab, natija <b>qatorlar bo'yicha</b></li></ul><p>Eslab qolish osonroq: <code>axis</code> — bu <b>siqiladigan</b> o'lchov. 3×4 edi, <code>axis=0</code> bilan hisoblandi — 4 ta son qoldi.</p>",
+        "en": "<p>An array has ready aggregates: <code>sum</code>, <code>mean</code>, <code>min</code>, <code>max</code>, <code>std</code>, <code>argmax</code>. On two-dimensional data they gain their main parameter — the <b>axis</b>.</p><ul><li>No axis — over the whole array, a single number</li><li><code>axis=0</code> — along the rows, giving a result <b>per column</b></li><li><code>axis=1</code> — along the columns, giving a result <b>per row</b></li></ul><p>The easy way to remember: <code>axis</code> is the dimension that <b>collapses</b>. It was 3×4; compute with <code>axis=0</code> and 4 numbers remain.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "packages": ["numpy"],
+       "code": "import numpy as np\n\n# продажи: строки — магазины, столбцы — месяцы\nsales = np.array([[100, 120, 90],\n                  [200, 180, 260],\n                  [ 50,  70, 60]])\n\nprint(\"всего:\", sales.sum())\nprint(\"по месяцам (axis=0):\", sales.sum(axis=0))\nprint(\"по магазинам (axis=1):\", sales.sum(axis=1))\nprint(\"среднее по магазинам:\", sales.mean(axis=1))\nprint(\"лучший магазин (индекс):\", sales.sum(axis=1).argmax())\n\n# broadcasting: массив разной формы растягивается автоматически\nprint(\"\\nс наценкой 10%:\\n\", sales * 1.1)\n\nplan = np.array([150, 150, 150])       # один план на все магазины\nprint(\"\\nвыполнение плана по месяцам:\\n\", sales - plan)\n\nprint(\"\\nформа до:\", sales.shape, \"| после reshape:\", sales.reshape(9).shape)"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Последний пример — <b>broadcasting</b>, и он стоит того, чтобы понять его один раз навсегда. Массив <code>plan</code> имеет форму (3,), а <code>sales</code> — (3, 3). NumPy молча растянул план на все три строки и вычел.</p><p>Правило простое: формы сравниваются справа налево, измерение подходит, если оно совпадает или равно единице. (3,3) и (3,) — подходят. (3,3) и (2,) — нет, будет честная ошибка.</p><p>Именно broadcasting позволяет писать <code>x - x.mean()</code> для нормализации данных: одно число растягивается на весь массив без единого цикла.</p>",
+        "uz": "<p>Oxirgi misol — <b>broadcasting</b>, va uni bir marta abadiy tushunib olishga arziydi. <code>plan</code> massivining shakli (3,), <code>sales</code> niki esa (3, 3). NumPy rejani uchala qatorga jimgina cho'zdi va ayirdi.</p><p>Qoida oddiy: shakllar o'ngdan chapga solishtiriladi, o'lchov mos keladi agar u teng bo'lsa yoki birga teng bo'lsa. (3,3) va (3,) — mos. (3,3) va (2,) — yo'q, halol xato bo'ladi.</p><p>Aynan broadcasting ma'lumotni normallashtirish uchun <code>x - x.mean()</code> yozish imkonini beradi: bitta son bitta ham siklsiz butun massivga cho'ziladi.</p>",
+        "en": "<p>The last example is <b>broadcasting</b>, and it is worth understanding once and for all. The <code>plan</code> array has shape (3,) while <code>sales</code> is (3, 3). NumPy silently stretched the plan across all three rows and subtracted.</p><p>The rule is simple: shapes are compared right to left, and a dimension fits if it matches or equals one. (3,3) and (3,) fit. (3,3) and (2,) do not, and you get an honest error.</p><p>Broadcasting is exactly what lets you write <code>x - x.mean()</code> to normalise data: one number is stretched over the whole array without a single loop.</p>"
+       }
+      },
+      {
+       "type": "summary",
+       "items": [
+        { "ru": "Массив — одна память, один тип; операции идут поэлементно без цикла", "uz": "Massiv — bitta xotira, bitta tur; amallar siklsiz elementlar bo'yicha ketadi", "en": "An array is one memory block, one type; operations run element-wise without a loop" },
+        { "ru": "Сравнение даёт булеву маску, а маска отбирает элементы", "uz": "Solishtirish mantiqiy niqob beradi, niqob esa elementlarni tanlaydi", "en": "A comparison yields a boolean mask, and the mask selects elements" },
+        { "ru": "Условия в маске обязательно в скобках: (a > 1) & (a < 5)", "uz": "Niqobdagi shartlar albatta qavsda: (a > 1) & (a < 5)", "en": "Conditions in a mask must be bracketed: (a > 1) & (a < 5)" },
+        { "ru": "Срез — вид на ту же память, копия только через .copy()", "uz": "Kesim — o'sha xotiraga qarash, nusxa faqat .copy() orqali", "en": "A slice is a view on the same memory; a copy comes only from .copy()" },
+        { "ru": "axis — измерение, которое схлопывается агрегатом", "uz": "axis — agregat siqadigan o'lchov", "en": "axis is the dimension the aggregate collapses" },
+        { "ru": "Broadcasting растягивает форму, если измерения совпадают или равны 1", "uz": "Broadcasting o'lchovlar mos yoki 1 ga teng bo'lsa shaklni cho'zadi", "en": "Broadcasting stretches a shape when dimensions match or equal 1" }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": { "ru": "Почему <code>a * 2</code> для массива быстрее, чем цикл по списку?", "uz": "Nega massiv uchun <code>a * 2</code> ro'yxat bo'ylab sikldan tez?", "en": "Why is <code>a * 2</code> on an array faster than a loop over a list?" },
+     "options": [
+      { "ru": "Python оптимизирует циклы", "uz": "Python sikllarni optimallashtiradi", "en": "Python optimises loops" },
+      { "ru": "Считает скомпилированный код по непрерывной памяти одного типа", "uz": "Bir turdagi uzluksiz xotira bo'yicha kompilyatsiya qilingan kod hisoblaydi", "en": "Compiled code works over contiguous memory of a single type" },
+      { "ru": "Массив хранит меньше данных", "uz": "Massiv kamroq ma'lumot saqlaydi", "en": "The array stores less data" },
+      { "ru": "Разницы нет", "uz": "Farqi yo'q", "en": "There is no difference" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Список — это указатели на разбросанные объекты. Массив — сплошной кусок памяти, по которому проходит машинный код без участия интерпретатора.",
+      "uz": "Ro'yxat — sochilgan obyektlarga ko'rsatkichlar. Massiv — mashina kodi interpretatorsiz o'tadigan yaxlit xotira bo'lagi.",
+      "en": "A list is pointers to scattered objects. An array is a solid block of memory that machine code walks without the interpreter."
+     }
+    },
+    {
+     "q": { "ru": "Что делает <code>a[a &gt; 5]</code>?", "uz": "<code>a[a &gt; 5]</code> nima qiladi?", "en": "What does <code>a[a &gt; 5]</code> do?" },
+     "options": [
+      { "ru": "Возвращает True или False", "uz": "True yoki False qaytaradi", "en": "Returns True or False" },
+      { "ru": "Оставляет только элементы больше 5", "uz": "Faqat 5 dan katta elementlarni qoldiradi", "en": "Keeps only the elements above 5" },
+      { "ru": "Заменяет элементы на 5", "uz": "Elementlarni 5 ga almashtiradi", "en": "Replaces the elements with 5" },
+      { "ru": "Считает, сколько элементов больше 5", "uz": "5 dan katta elementlar sonini sanaydi", "en": "Counts the elements above 5" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Внутри скобок вычисляется маска, снаружи по ней идёт отбор. Посчитать количество можно так: <code>(a &gt; 5).sum()</code>.",
+      "uz": "Qavs ichida niqob hisoblanadi, tashqarida u bo'yicha tanlash ketadi. Sonini shunday hisoblash mumkin: <code>(a &gt; 5).sum()</code>.",
+      "en": "The mask is computed inside the brackets and the selection happens outside. To count them: <code>(a &gt; 5).sum()</code>."
+     }
+    },
+    {
+     "q": { "ru": "Почему <code>a[a &gt; 1 &amp; a &lt; 5]</code> сломается?", "uz": "Nega <code>a[a &gt; 1 &amp; a &lt; 5]</code> buziladi?", "en": "Why does <code>a[a &gt; 1 &amp; a &lt; 5]</code> break?" },
+     "options": [
+      { "ru": "NumPy не умеет два условия", "uz": "NumPy ikki shartni bilmaydi", "en": "NumPy cannot do two conditions" },
+      { "ru": "У &amp; приоритет выше сравнения — нужны скобки вокруг условий", "uz": "&amp; ustuvorligi solishtirishdan yuqori — shartlar atrofida qavs kerak", "en": "&amp; binds tighter than comparison — the conditions need brackets" },
+      { "ru": "Надо писать and вместо &amp;", "uz": "&amp; o'rniga and yozish kerak", "en": "You must write and instead of &amp;" },
+      { "ru": "Маски нельзя объединять", "uz": "Niqoblarni birlashtirib bo'lmaydi", "en": "Masks cannot be combined" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Правильно: <code>a[(a &gt; 1) &amp; (a &lt; 5)]</code>. Обычный <code>and</code> здесь тоже не подойдёт — он требует одного True/False, а у нас массив.",
+      "uz": "To'g'risi: <code>a[(a &gt; 1) &amp; (a &lt; 5)]</code>. Oddiy <code>and</code> ham bu yerda yaramaydi — u bitta True/False talab qiladi, bizda esa massiv.",
+      "en": "Correct: <code>a[(a &gt; 1) &amp; (a &lt; 5)]</code>. A plain <code>and</code> will not do either — it wants a single True/False while we have an array."
+     }
+    },
+    {
+     "q": { "ru": "Массив 4×3, вызвали <code>.sum(axis=0)</code>. Сколько чисел в результате?", "uz": "4×3 massiv, <code>.sum(axis=0)</code> chaqirildi. Natijada nechta son?", "en": "A 4×3 array with <code>.sum(axis=0)</code>. How many numbers result?" },
+     "options": [
+      { "ru": "4", "uz": "4", "en": "4" },
+      { "ru": "3", "uz": "3", "en": "3" },
+      { "ru": "12", "uz": "12", "en": "12" },
+      { "ru": "1", "uz": "1", "en": "1" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "<code>axis=0</code> схлопывает строки — остаются столбцы, их три. Сумма по строкам была бы <code>axis=1</code> и дала бы четыре числа.",
+      "uz": "<code>axis=0</code> qatorlarni siqadi — ustunlar qoladi, ular uchta. Qatorlar bo'yicha yig'indi <code>axis=1</code> bo'lardi va to'rt son berardi.",
+      "en": "<code>axis=0</code> collapses the rows, leaving the columns — three of them. A per-row sum would be <code>axis=1</code> and give four numbers."
+     }
+    },
+    {
+     "q": { "ru": "<code>part = a[:3]</code>, затем <code>part[0] = 0</code>. Что с массивом <code>a</code>?", "uz": "<code>part = a[:3]</code>, keyin <code>part[0] = 0</code>. <code>a</code> massiviga nima bo'ladi?", "en": "<code>part = a[:3]</code>, then <code>part[0] = 0</code>. What happens to <code>a</code>?" },
+     "options": [
+      { "ru": "Не изменится — срез копирует", "uz": "O'zgarmaydi — kesim nusxa oladi", "en": "Nothing — the slice copies" },
+      { "ru": "Первый элемент станет нулём: срез это вид на ту же память", "uz": "Birinchi element nol bo'ladi: kesim o'sha xotiraga qarash", "en": "Its first element becomes zero: the slice is a view on the same memory" },
+      { "ru": "Массив станет короче", "uz": "Massiv qisqaradi", "en": "The array becomes shorter" },
+      { "ru": "Будет ошибка", "uz": "Xato bo'ladi", "en": "There will be an error" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Это главное отличие от списков Python. Нужна независимость — <code>a[:3].copy()</code>.",
+      "uz": "Bu Python ro'yxatlaridan asosiy farq. Mustaqillik kerak bo'lsa — <code>a[:3].copy()</code>.",
+      "en": "This is the key difference from Python lists. If you need independence: <code>a[:3].copy()</code>."
+     }
+    },
+    {
+     "q": { "ru": "Формы (3, 4) и (4,). Сработает ли broadcasting?", "uz": "Shakllar (3, 4) va (4,). Broadcasting ishlaydimi?", "en": "Shapes (3, 4) and (4,). Does broadcasting work?" },
+     "options": [
+      { "ru": "Нет, формы разные", "uz": "Yo'q, shakllar har xil", "en": "No, the shapes differ" },
+      { "ru": "Да: справа измерения совпали, второй массив растянется на 3 строки", "uz": "Ha: o'ngda o'lchovlar mos keldi, ikkinchi massiv 3 qatorga cho'ziladi", "en": "Yes: the rightmost dimensions match, so the second array stretches over 3 rows" },
+      { "ru": "Только если сделать reshape", "uz": "Faqat reshape qilinsa", "en": "Only after a reshape" },
+      { "ru": "Да, но результат будет одномерным", "uz": "Ha, lekin natija bir o'lchovli bo'ladi", "en": "Yes, but the result will be one-dimensional" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Формы сравниваются справа налево: 4 против 4 — совпало, дальше у второго массива измерений нет, он растягивается. Результат снова (3, 4).",
+      "uz": "Shakllar o'ngdan chapga solishtiriladi: 4 ga qarshi 4 — mos keldi, keyin ikkinchi massivda o'lchov yo'q, u cho'ziladi. Natija yana (3, 4).",
+      "en": "Shapes compare right to left: 4 against 4 matches, then the second array has no more dimensions and is stretched. The result is (3, 4) again."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "python",
+     "packages": ["numpy"],
+     "title": { "ru": "Нормализация без цикла", "uz": "Siklsiz normallashtirish", "en": "Normalisation without a loop" },
+     "brief": { "ru": "Векторизация в чистом виде", "uz": "Sof ko'rinishdagi vektorlashtirish", "en": "Vectorisation in its purest form" },
+     "desc": {
+      "ru": "<p><code>normalize(values)</code> получает список чисел и возвращает <b>массив NumPy</b>, сжатый в отрезок от 0 до 1 по формуле <code>(x − min) / (max − min)</code>.</p><p>Циклы и списковые включения запрещены — только операции над массивом. Если все значения одинаковы, верни массив нулей той же длины. Пустой список даёт пустой массив.</p>",
+      "uz": "<p><code>normalize(values)</code> sonlar ro'yxatini oladi va <code>(x − min) / (max − min)</code> formulasi bo'yicha 0 dan 1 gacha siqilgan <b>NumPy massivini</b> qaytaradi.</p><p>Sikllar va ro'yxat inklyuziyalari taqiqlangan — faqat massiv ustidagi amallar. Barcha qiymatlar bir xil bo'lsa, o'sha uzunlikdagi nollar massivini qaytaring. Bo'sh ro'yxat bo'sh massiv beradi.</p>",
+      "en": "<p><code>normalize(values)</code> takes a list of numbers and returns a <b>NumPy array</b> squeezed into the range 0 to 1 with <code>(x − min) / (max − min)</code>.</p><p>Loops and comprehensions are forbidden — array operations only. If every value is the same, return an array of zeros of the same length. An empty list gives an empty array.</p>"
+     },
+     "starter": "import numpy as np\n\ndef normalize(values):\n    # твой код\n    pass\n\nprint(normalize([10, 20, 30]))\n",
+     "tests": "import numpy as np\nr = normalize([10, 20, 30])\nassert isinstance(r, np.ndarray), 'Верни массив NumPy, а не список'\nassert np.allclose(r, [0.0, 0.5, 1.0]), 'Минимум в 0, максимум в 1'\nassert np.allclose(normalize([5, 5, 5]), [0.0, 0.0, 0.0]), 'Все значения одинаковы'\nassert len(normalize([])) == 0, 'Пустой вход'\nassert np.allclose(normalize([-10, 0, 10]), [0.0, 0.5, 1.0]), 'Отрицательные тоже работают'\nassert np.allclose(normalize([7]), [0.0]), 'Одно значение'",
+     "hint": {
+      "ru": "Сначала <code>a = np.array(values, dtype=float)</code>. Дальше <code>lo, hi = a.min(), a.max()</code> и одна строка <code>(a - lo) / (hi - lo)</code>. Пустой массив и случай <code>hi == lo</code> обработай до деления.",
+      "uz": "Avval <code>a = np.array(values, dtype=float)</code>. Keyin <code>lo, hi = a.min(), a.max()</code> va bitta qator <code>(a - lo) / (hi - lo)</code>. Bo'sh massiv va <code>hi == lo</code> holatini bo'lishdan oldin qayta ishlang.",
+      "en": "First <code>a = np.array(values, dtype=float)</code>. Then <code>lo, hi = a.min(), a.max()</code> and one line <code>(a - lo) / (hi - lo)</code>. Handle the empty array and the <code>hi == lo</code> case before dividing."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "python",
+     "packages": ["numpy"],
+     "title": { "ru": "Отбор по маске", "uz": "Niqob bo'yicha tanlash", "en": "Selection by mask" },
+     "brief": { "ru": "Два условия сразу", "uz": "Ikki shart birdan", "en": "Two conditions at once" },
+     "desc": {
+      "ru": "<p><code>in_range(values, lo, hi)</code> возвращает массив тех значений, которые попадают в отрезок от <code>lo</code> до <code>hi</code> включительно.</p><p>Только маска, без циклов. Порядок значений сохраняется.</p>",
+      "uz": "<p><code>in_range(values, lo, hi)</code> <code>lo</code> dan <code>hi</code> gacha (chegaralar bilan) kesmaga tushadigan qiymatlar massivini qaytaradi.</p><p>Faqat niqob, siklsiz. Qiymatlar tartibi saqlanadi.</p>",
+      "en": "<p><code>in_range(values, lo, hi)</code> returns an array of the values that fall between <code>lo</code> and <code>hi</code> inclusive.</p><p>Mask only, no loops. The order of the values is preserved.</p>"
+     },
+     "starter": "import numpy as np\n\ndef in_range(values, lo, hi):\n    # твой код\n    pass\n\nprint(in_range([10, 25, 3, 47, 8], 5, 30))\n",
+     "tests": "import numpy as np\nr = in_range([10, 25, 3, 47, 8], 5, 30)\nassert isinstance(r, np.ndarray), 'Верни массив NumPy'\nassert list(r) == [10, 25, 8], 'Границы включаются, порядок сохраняется'\nassert list(in_range([1, 2, 3], 2, 2)) == [2], 'Отрезок из одной точки'\nassert len(in_range([1, 2, 3], 10, 20)) == 0, 'Ничего не подошло'\nassert list(in_range([5, 10], 5, 10)) == [5, 10], 'Обе границы включительно'\nassert len(in_range([], 0, 1)) == 0, 'Пустой вход'",
+     "hint": {
+      "ru": "<code>a = np.array(values)</code>, затем <code>a[(a &gt;= lo) &amp; (a &lt;= hi)]</code>. Скобки вокруг каждого условия обязательны.",
+      "uz": "<code>a = np.array(values)</code>, keyin <code>a[(a &gt;= lo) &amp; (a &lt;= hi)]</code>. Har shart atrofidagi qavs majburiy.",
+      "en": "<code>a = np.array(values)</code>, then <code>a[(a &gt;= lo) &amp; (a &lt;= hi)]</code>. Brackets around each condition are mandatory."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "python",
+     "packages": ["numpy"],
+     "title": { "ru": "Отчёт по матрице продаж", "uz": "Sotuv matritsasi bo'yicha hisobot", "en": "A report over the sales matrix" },
+     "brief": { "ru": "Оси в деле", "uz": "O'qlar ishda", "en": "Axes at work" },
+     "desc": {
+      "ru": "<p><code>summary(matrix)</code> получает двумерный список: строки — магазины, столбцы — месяцы. Верни словарь:</p><ul><li><code>'по_магазинам'</code> — список сумм по каждой строке;</li><li><code>'по_месяцам'</code> — список сумм по каждому столбцу;</li><li><code>'лучший'</code> — индекс магазина с наибольшей суммой.</li></ul><p>Списки должны быть обычными Python-списками. Пустая матрица даёт <code>{'по_магазинам': [], 'по_месяцам': [], 'лучший': None}</code>.</p>",
+      "uz": "<p><code>summary(matrix)</code> ikki o'lchovli ro'yxat oladi: qatorlar — do'konlar, ustunlar — oylar. Lug'at qaytaring:</p><ul><li><code>'по_магазинам'</code> — har qator bo'yicha summalar ro'yxati;</li><li><code>'по_месяцам'</code> — har ustun bo'yicha summalar ro'yxati;</li><li><code>'лучший'</code> — eng katta summali do'kon indeksi.</li></ul><p>Ro'yxatlar oddiy Python ro'yxatlari bo'lishi kerak. Bo'sh matritsa <code>{'по_магазинам': [], 'по_месяцам': [], 'лучший': None}</code> beradi.</p>",
+      "en": "<p><code>summary(matrix)</code> receives a two-dimensional list: rows are shops, columns are months. Return a dictionary:</p><ul><li><code>'по_магазинам'</code> — a list of sums per row;</li><li><code>'по_месяцам'</code> — a list of sums per column;</li><li><code>'лучший'</code> — the index of the shop with the largest total.</li></ul><p>The lists must be plain Python lists. An empty matrix gives <code>{'по_магазинам': [], 'по_месяцам': [], 'лучший': None}</code>.</p>"
+     },
+     "starter": "import numpy as np\n\ndef summary(matrix):\n    # твой код\n    pass\n\nprint(summary([[100, 120], [200, 180]]))\n",
+     "tests": "res = summary([[100, 120, 90], [200, 180, 260], [50, 70, 60]])\nassert res['по_магазинам'] == [310, 640, 180], 'Суммы по строкам'\nassert res['по_месяцам'] == [350, 370, 410], 'Суммы по столбцам'\nassert res['лучший'] == 1, 'Второй магазин заработал больше всех'\nassert type(res['по_магазинам']) is list, 'Верни обычный список, а не массив'\nempty = summary([])\nassert empty == {'по_магазинам': [], 'по_месяцам': [], 'лучший': None}, 'Пустая матрица'\none = summary([[5, 5]])\nassert one['по_магазинам'] == [10] and one['лучший'] == 0, 'Один магазин'",
+     "hint": {
+      "ru": "<code>m = np.array(matrix)</code>. Суммы: <code>m.sum(axis=1)</code> по строкам и <code>m.sum(axis=0)</code> по столбцам. Массив в список превращает <code>.tolist()</code>, индекс лучшего даёт <code>.argmax()</code> — оберни его в <code>int()</code>.",
+      "uz": "<code>m = np.array(matrix)</code>. Summalar: qatorlar bo'yicha <code>m.sum(axis=1)</code> va ustunlar bo'yicha <code>m.sum(axis=0)</code>. Massivni ro'yxatga <code>.tolist()</code> aylantiradi, eng yaxshi indeksni <code>.argmax()</code> beradi — uni <code>int()</code> ga o'rang.",
+      "en": "<code>m = np.array(matrix)</code>. Sums: <code>m.sum(axis=1)</code> per row and <code>m.sum(axis=0)</code> per column. <code>.tolist()</code> turns an array into a list, and <code>.argmax()</code> gives the best index — wrap it in <code>int()</code>."
+     }
+    }
+   ],
+   "exam": {
+    "time": 600,
+    "questions": [
+     {
+      "q": { "ru": "Что напечатает <code>np.array([1, 2, 3]) + np.array([10, 20, 30])</code>?", "uz": "<code>np.array([1, 2, 3]) + np.array([10, 20, 30])</code> nima chiqaradi?", "en": "What does <code>np.array([1, 2, 3]) + np.array([10, 20, 30])</code> print?" },
+      "options": [
+       { "ru": "[1 2 3 10 20 30] — как у списков", "uz": "[1 2 3 10 20 30] — ro'yxatlardagidek", "en": "[1 2 3 10 20 30] — as with lists" },
+       { "ru": "[11 22 33] — сложение поэлементное", "uz": "[11 22 33] — elementlar bo'yicha qo'shish", "en": "[11 22 33] — element-wise addition" },
+       { "ru": "66", "uz": "66", "en": "66" },
+       { "ru": "Ошибку", "uz": "Xato", "en": "An error" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Как посчитать, сколько элементов массива больше 100?", "uz": "Massivning nechta elementi 100 dan katta ekanini qanday sanash mumkin?", "en": "How do you count how many array elements exceed 100?" },
+      "options": [
+       { "ru": "len(a > 100)", "uz": "len(a > 100)", "en": "len(a > 100)" },
+       { "ru": "(a > 100).sum()", "uz": "(a > 100).sum()", "en": "(a > 100).sum()" },
+       { "ru": "a.count(100)", "uz": "a.count(100)", "en": "a.count(100)" },
+       { "ru": "a.max(100)", "uz": "a.max(100)", "en": "a.max(100)" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Матрица 5×2. Что вернёт <code>.mean(axis=1)</code>?", "uz": "5×2 matritsa. <code>.mean(axis=1)</code> nima qaytaradi?", "en": "A 5×2 matrix. What does <code>.mean(axis=1)</code> return?" },
+      "options": [
+       { "ru": "2 числа — среднее по столбцам", "uz": "2 son — ustunlar bo'yicha o'rtacha", "en": "2 numbers — the mean per column" },
+       { "ru": "5 чисел — среднее по строкам", "uz": "5 son — qatorlar bo'yicha o'rtacha", "en": "5 numbers — the mean per row" },
+       { "ru": "Одно число", "uz": "Bitta son", "en": "A single number" },
+       { "ru": "Матрицу 5×2", "uz": "5×2 matritsani", "en": "A 5×2 matrix" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Зачем NumPy требует одинакового типа для всех элементов?", "uz": "NumPy nega barcha elementlar uchun bir xil turni talab qiladi?", "en": "Why does NumPy require one type for all elements?" },
+      "options": [
+       { "ru": "Так удобнее программисту", "uz": "Dasturchiga shunday qulay", "en": "It is more convenient for the programmer" },
+       { "ru": "Иначе нельзя держать данные сплошным куском памяти и считать быстро", "uz": "Aks holda ma'lumotni yaxlit xotira bo'lagida ushlab, tez hisoblab bo'lmaydi", "en": "Otherwise the data cannot sit in one contiguous block and be computed fast" },
+       { "ru": "Так требует Python", "uz": "Python shuni talab qiladi", "en": "Python requires it" },
+       { "ru": "Для экономии диска", "uz": "Diskni tejash uchun", "en": "To save disk space" }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "python",
+      "packages": ["numpy"],
+      "title": { "ru": "Анализ оценок", "uz": "Baholarni tahlil qilish", "en": "Analysing the scores" },
+      "desc": {
+       "ru": "<p>Собери всё вместе. <code>analyze(scores, passing)</code> получает двумерный список оценок (строки — студенты, столбцы — предметы) и проходной балл.</p><p>Верни словарь:</p><ul><li><code>'средние'</code> — список средних по каждому студенту, округлённых до одного знака;</li><li><code>'сдали'</code> — сколько студентов имеют средний балл не ниже <code>passing</code>;</li><li><code>'сложный_предмет'</code> — индекс предмета с наименьшим средним.</li></ul><p>Циклов не пиши — только массивы. Пустой вход даёт <code>{'средние': [], 'сдали': 0, 'сложный_предмет': None}</code>.</p>",
+       "uz": "<p>Hammasini birlashtiring. <code>analyze(scores, passing)</code> ikki o'lchovli baholar ro'yxatini (qatorlar — talabalar, ustunlar — fanlar) va o'tish balini oladi.</p><p>Lug'at qaytaring:</p><ul><li><code>'средние'</code> — har talaba bo'yicha bir xonagacha yaxlitlangan o'rtachalar ro'yxati;</li><li><code>'сдали'</code> — o'rtacha bali <code>passing</code> dan past bo'lmagan talabalar soni;</li><li><code>'сложный_предмет'</code> — o'rtachasi eng kichik fan indeksi.</li></ul><p>Sikl yozmang — faqat massivlar. Bo'sh kirish <code>{'средние': [], 'сдали': 0, 'сложный_предмет': None}</code> beradi.</p>",
+       "en": "<p>Put it all together. <code>analyze(scores, passing)</code> receives a two-dimensional list of scores (rows are students, columns are subjects) and a passing mark.</p><p>Return a dictionary:</p><ul><li><code>'средние'</code> — a list of each student's average rounded to one decimal;</li><li><code>'сдали'</code> — how many students have an average of at least <code>passing</code>;</li><li><code>'сложный_предмет'</code> — the index of the subject with the lowest average.</li></ul><p>Write no loops — arrays only. Empty input gives <code>{'средние': [], 'сдали': 0, 'сложный_предмет': None}</code>.</p>"
+      },
+      "starter": "import numpy as np\n\ndef analyze(scores, passing):\n    # средние по студентам, счётчик сдавших и самый сложный предмет\n    pass\n\nprint(analyze([[90, 80, 70], [50, 40, 60]], 60))\n",
+      "tests": "res = analyze([[90, 80, 70], [50, 40, 60], [100, 90, 95]], 60)\nassert res['средние'] == [80.0, 50.0, 95.0], 'Средние по студентам с округлением'\nassert res['сдали'] == 2, 'Двое набрали не меньше 60'\nassert res['сложный_предмет'] == 1, 'Второй предмет самый сложный по среднему'\nassert type(res['средние']) is list, 'Верни обычный список'\nempty = analyze([], 60)\nassert empty == {'средние': [], 'сдали': 0, 'сложный_предмет': None}, 'Пустой вход'\none = analyze([[60, 60]], 60)\nassert one['сдали'] == 1, 'Ровно проходной балл засчитывается'",
+      "hint": {
+       "ru": "<code>m = np.array(scores, dtype=float)</code>. Средние по студентам — <code>m.mean(axis=1).round(1)</code>, сдавшие — <code>(means &gt;= passing).sum()</code> (оберни в <code>int()</code>), сложный предмет — <code>m.mean(axis=0).argmin()</code>.",
+       "uz": "<code>m = np.array(scores, dtype=float)</code>. Talabalar o'rtachasi — <code>m.mean(axis=1).round(1)</code>, o'tganlar — <code>(means &gt;= passing).sum()</code> (<code>int()</code> ga o'rang), qiyin fan — <code>m.mean(axis=0).argmin()</code>.",
+       "en": "<code>m = np.array(scores, dtype=float)</code>. Student averages: <code>m.mean(axis=1).round(1)</code>; those who passed: <code>(means &gt;= passing).sum()</code> (wrap in <code>int()</code>); the hardest subject: <code>m.mean(axis=0).argmin()</code>."
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "pl-03",
+   "title": { "ru": "Pandas: таблицы в Python", "uz": "Pandas: Python dagi jadvallar", "en": "Pandas: tables in Python" },
+   "tagline": { "ru": "DataFrame, фильтры, groupby и слияние — тот же SQL, только в коде", "uz": "DataFrame, filtrlar, groupby va birlashtirish — o'sha SQL, faqat kodda", "en": "DataFrame, filters, groupby and merge — the same SQL, only in code" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "DataFrame: таблица как объект", "uz": "DataFrame: obyekt sifatidagi jadval", "en": "DataFrame: a table as an object" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Pandas построен поверх NumPy и добавляет то, чего массиву не хватает: <b>имена колонок и разные типы в одной таблице</b>.</p><ul><li><b>Series</b> — одна колонка: массив плюс индекс.</li><li><b>DataFrame</b> — таблица: словарь из Series с общим индексом.</li></ul><p>Если ты знаешь SQL, ты уже знаешь Pandas — просто другой синтаксис:</p><table><tr><th>SQL</th><th>Pandas</th></tr><tr><td><code>SELECT city, amount</code></td><td><code>df[['city', 'amount']]</code></td></tr><tr><td><code>WHERE amount &gt; 100</code></td><td><code>df[df['amount'] &gt; 100]</code></td></tr><tr><td><code>ORDER BY amount DESC</code></td><td><code>df.sort_values('amount', ascending=False)</code></td></tr><tr><td><code>GROUP BY city</code></td><td><code>df.groupby('city')</code></td></tr><tr><td><code>JOIN</code></td><td><code>df.merge(other, on='id')</code></td></tr></table>",
+        "uz": "<p>Pandas NumPy ustiga qurilgan va massivga yetishmaydigan narsani qo'shadi: <b>ustun nomlari va bitta jadvaldagi turli turlar</b>.</p><ul><li><b>Series</b> — bitta ustun: massiv qo'shimcha indeks.</li><li><b>DataFrame</b> — jadval: umumiy indeksli Series lar lug'ati.</li></ul><p>SQL ni bilsangiz, siz allaqachon Pandas ni bilasiz — shunchaki boshqa sintaksis:</p><table><tr><th>SQL</th><th>Pandas</th></tr><tr><td><code>SELECT city, amount</code></td><td><code>df[['city', 'amount']]</code></td></tr><tr><td><code>WHERE amount &gt; 100</code></td><td><code>df[df['amount'] &gt; 100]</code></td></tr><tr><td><code>ORDER BY amount DESC</code></td><td><code>df.sort_values('amount', ascending=False)</code></td></tr><tr><td><code>GROUP BY city</code></td><td><code>df.groupby('city')</code></td></tr><tr><td><code>JOIN</code></td><td><code>df.merge(other, on='id')</code></td></tr></table>",
+        "en": "<p>Pandas is built on top of NumPy and adds what an array lacks: <b>column names and different types in one table</b>.</p><ul><li><b>Series</b> — one column: an array plus an index.</li><li><b>DataFrame</b> — a table: a dictionary of Series sharing an index.</li></ul><p>If you know SQL you already know Pandas — it is just different syntax:</p><table><tr><th>SQL</th><th>Pandas</th></tr><tr><td><code>SELECT city, amount</code></td><td><code>df[['city', 'amount']]</code></td></tr><tr><td><code>WHERE amount &gt; 100</code></td><td><code>df[df['amount'] &gt; 100]</code></td></tr><tr><td><code>ORDER BY amount DESC</code></td><td><code>df.sort_values('amount', ascending=False)</code></td></tr><tr><td><code>GROUP BY city</code></td><td><code>df.groupby('city')</code></td></tr><tr><td><code>JOIN</code></td><td><code>df.merge(other, on='id')</code></td></tr></table>"
+       }
+      },
+      {
+       "type": "run",
+       "packages": ["pandas"],
+       "code": "import pandas as pd\n\ndf = pd.DataFrame({\n    \"city\": [\"Ташкент\", \"Бухара\", \"Ташкент\", \"Самарканд\", \"Бухара\"],\n    \"amount\": [250, 100, 400, 180, 90],\n    \"channel\": [\"поиск\", \"реклама\", \"поиск\", \"реклама\", \"поиск\"],\n})\n\nprint(df)\nprint()\nprint(\"форма:\", df.shape)\nprint(\"колонки:\", list(df.columns))\nprint(\"типы:\\n\", df.dtypes)\nprint()\nprint(\"первые две строки:\\n\", df.head(2))\nprint()\nprint(\"одна колонка (Series):\\n\", df[\"amount\"])\nprint()\nprint(\"описание чисел:\\n\", df[\"amount\"].describe())"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Первое, что делают с новой таблицей, — <b>смотрят на неё</b>, а не пишут анализ вслепую:</p><ul><li><code>df.shape</code> — сколько строк и колонок</li><li><code>df.head()</code> — первые пять строк глазами</li><li><code>df.dtypes</code> — типы колонок (числа точно числа?)</li><li><code>df.describe()</code> — минимум, максимум, среднее, квартили</li><li><code>df.isna().sum()</code> — где пропуски</li></ul><p>Пять секунд на эти команды экономят час поиска ошибки в отчёте.</p><p>Обрати внимание: <code>df['amount']</code> даёт <b>Series</b> — одну колонку. А <code>df[['amount']]</code> с двойными скобками даёт <b>DataFrame</b> из одной колонки. Разница всплывёт, когда результат пойдёт дальше по цепочке.</p>",
+        "uz": "<p>Yangi jadval bilan birinchi qilinadigan ish — ko'r-ko'rona tahlil yozish emas, <b>unga qarash</b>:</p><ul><li><code>df.shape</code> — nechta qator va ustun</li><li><code>df.head()</code> — birinchi besh qatorni ko'z bilan</li><li><code>df.dtypes</code> — ustun turlari (sonlar aniq sonmi?)</li><li><code>df.describe()</code> — minimum, maksimum, o'rtacha, kvartillar</li><li><code>df.isna().sum()</code> — bo'shliqlar qayerda</li></ul><p>Bu buyruqlarga besh soniya hisobotdagi xatoni qidirishning bir soatini tejaydi.</p><p>E'tibor bering: <code>df['amount']</code> <b>Series</b> — bitta ustun beradi. Ikki qavsli <code>df[['amount']]</code> esa bitta ustunli <b>DataFrame</b> beradi. Farq natija zanjir bo'ylab ketganda chiqadi.</p>",
+        "en": "<p>The first thing you do with a new table is <b>look at it</b>, not write analysis blind:</p><ul><li><code>df.shape</code> — how many rows and columns</li><li><code>df.head()</code> — the first five rows with your own eyes</li><li><code>df.dtypes</code> — the column types (are the numbers really numbers?)</li><li><code>df.describe()</code> — min, max, mean, quartiles</li><li><code>df.isna().sum()</code> — where the gaps are</li></ul><p>Five seconds on these commands saves an hour of hunting a bug in a report.</p><p>Note: <code>df['amount']</code> gives a <b>Series</b> — one column. But <code>df[['amount']]</code> with double brackets gives a <b>DataFrame</b> of one column. The difference surfaces when the result travels further down a chain.</p>"
+       }
+      },
+      {
+       "type": "checkpoint",
+       "q": { "ru": "Что вернёт <code>df['amount']</code>?", "uz": "<code>df['amount']</code> nima qaytaradi?", "en": "What does <code>df['amount']</code> return?" },
+       "options": [
+        { "ru": "DataFrame из одной колонки", "uz": "Bitta ustunli DataFrame", "en": "A DataFrame of one column" },
+        { "ru": "Series — одну колонку с индексом", "uz": "Series — indeksli bitta ustun", "en": "A Series — one column with an index" },
+        { "ru": "Список чисел", "uz": "Sonlar ro'yxati", "en": "A list of numbers" },
+        { "ru": "Массив NumPy", "uz": "NumPy massivi", "en": "A NumPy array" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "DataFrame из одной колонки даст <code>df[['amount']]</code> — с двойными скобками. Список получится через <code>.tolist()</code>, массив — через <code>.values</code>.",
+        "uz": "Bitta ustunli DataFrame ni ikki qavsli <code>df[['amount']]</code> beradi. Ro'yxat <code>.tolist()</code> orqali, massiv <code>.values</code> orqali chiqadi.",
+        "en": "A one-column DataFrame comes from <code>df[['amount']]</code> — with double brackets. A list comes from <code>.tolist()</code>, an array from <code>.values</code>."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "Фильтры, новые колонки, сортировка", "uz": "Filtrlar, yangi ustunlar, saralash", "en": "Filters, new columns, sorting" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Фильтрация работает точно как маски NumPy — потому что это они и есть:</p><pre class=\"code\">df[df[\"amount\"] &gt; 150]\ndf[(df[\"amount\"] &gt; 150) &amp; (df[\"city\"] == \"Ташкент\")]</pre><p>Скобки вокруг условий так же обязательны, и <code>and</code> вместо <code>&amp;</code> так же не работает.</p><p>Новая колонка создаётся присваиванием и считается сразу для всей таблицы:</p><pre class=\"code\">df[\"with_tax\"] = df[\"amount\"] * 1.12</pre><p>Никакого цикла по строкам. Если тянет написать <code>for index, row in df.iterrows()</code> — почти наверняка есть векторное решение, и оно будет в сотни раз быстрее.</p>",
+        "uz": "<p>Filtrlash aynan NumPy niqoblari kabi ishlaydi — chunki bu o'shaning o'zi:</p><pre class=\"code\">df[df[\"amount\"] &gt; 150]\ndf[(df[\"amount\"] &gt; 150) &amp; (df[\"city\"] == \"Ташкент\")]</pre><p>Shartlar atrofidagi qavslar ham xuddi shunday majburiy va <code>&amp;</code> o'rniga <code>and</code> ham xuddi shunday ishlamaydi.</p><p>Yangi ustun tayinlash bilan yaratiladi va darhol butun jadval uchun hisoblanadi:</p><pre class=\"code\">df[\"with_tax\"] = df[\"amount\"] * 1.12</pre><p>Qatorlar bo'ylab hech qanday sikl yo'q. <code>for index, row in df.iterrows()</code> yozgingiz kelsa — deyarli aniq vektor yechim bor va u yuzlab barobar tez bo'ladi.</p>",
+        "en": "<p>Filtering works exactly like NumPy masks — because that is what it is:</p><pre class=\"code\">df[df[\"amount\"] &gt; 150]\ndf[(df[\"amount\"] &gt; 150) &amp; (df[\"city\"] == \"Ташкент\")]</pre><p>Brackets around the conditions are just as mandatory, and <code>and</code> instead of <code>&amp;</code> fails just the same.</p><p>A new column is created by assignment and computed for the whole table at once:</p><pre class=\"code\">df[\"with_tax\"] = df[\"amount\"] * 1.12</pre><p>No loop over rows. If you feel the urge to write <code>for index, row in df.iterrows()</code>, there is almost certainly a vectorised solution, and it will be hundreds of times faster.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "packages": ["pandas"],
+       "code": "import pandas as pd\n\ndf = pd.DataFrame({\n    \"city\": [\"Ташкент\", \"Бухара\", \"Ташкент\", \"Самарканд\", \"Бухара\"],\n    \"amount\": [250, 100, 400, 180, 90],\n    \"channel\": [\"поиск\", \"реклама\", \"поиск\", \"реклама\", \"поиск\"],\n})\n\nbig = df[df[\"amount\"] > 150]\nprint(\"крупные заказы:\\n\", big)\nprint()\n\ntashkent_big = df[(df[\"city\"] == \"Ташкент\") & (df[\"amount\"] > 300)]\nprint(\"Ташкент дороже 300:\\n\", tashkent_big)\nprint()\n\n# новые колонки считаются сразу для всей таблицы\ndf[\"with_tax\"] = (df[\"amount\"] * 1.12).round(1)\ndf[\"big\"] = df[\"amount\"] > 150\nprint(df)\nprint()\n\nprint(\"по убыванию суммы:\\n\", df.sort_values(\"amount\", ascending=False)[[\"city\", \"amount\"]])\nprint()\nprint(\"городов уникальных:\", df[\"city\"].nunique(), \"|\", list(df[\"city\"].unique()))\nprint(\"сколько заказов по каналам:\\n\", df[\"channel\"].value_counts())"
+      },
+      {
+       "type": "note",
+       "kind": "trap",
+       "html": {
+        "ru": "Запись вида <code>df[df['amount'] &gt; 100]['city'] = 'X'</code> может тихо не сработать: слева получается временная копия, и Pandas обычно предупреждает <code>SettingWithCopyWarning</code>. Правильно менять через <code>.loc</code>: <code>df.loc[df['amount'] &gt; 100, 'city'] = 'X'</code> — одна операция вместо двух, и никакой копии.",
+        "uz": "<code>df[df['amount'] &gt; 100]['city'] = 'X'</code> ko'rinishidagi yozuv jimgina ishlamasligi mumkin: chapda vaqtinchalik nusxa chiqadi va Pandas odatda <code>SettingWithCopyWarning</code> bilan ogohlantiradi. To'g'risi <code>.loc</code> orqali o'zgartirish: <code>df.loc[df['amount'] &gt; 100, 'city'] = 'X'</code> — ikkita o'rniga bitta amal va hech qanday nusxa yo'q.",
+        "en": "Writing <code>df[df['amount'] &gt; 100]['city'] = 'X'</code> may silently do nothing: the left side becomes a temporary copy, and Pandas usually warns with <code>SettingWithCopyWarning</code>. The correct way is <code>.loc</code>: <code>df.loc[df['amount'] &gt; 100, 'city'] = 'X'</code> — one operation instead of two, and no copy."
+       }
+      },
+      {
+       "type": "predict",
+       "packages": ["pandas"],
+       "code": "import pandas as pd\n\ndf = pd.DataFrame({\"a\": [1, 2, 3, 4]})\nprint(len(df[df[\"a\"] > 2]))",
+       "options": [
+        { "ru": "4", "uz": "4", "en": "4" },
+        { "ru": "2", "uz": "2", "en": "2" },
+        { "ru": "3", "uz": "3", "en": "3" },
+        { "ru": "Ошибка", "uz": "Xato", "en": "An error" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Условию отвечают значения 3 и 4 — две строки. <code>len(df)</code> у DataFrame возвращает именно число строк.",
+        "uz": "Shartga 3 va 4 qiymatlari javob beradi — ikki qator. DataFrame da <code>len(df)</code> aynan qatorlar sonini qaytaradi.",
+        "en": "The values 3 and 4 satisfy the condition — two rows. For a DataFrame, <code>len(df)</code> returns exactly the row count."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "groupby, слияние и пропуски", "uz": "groupby, birlashtirish va bo'shliqlar", "en": "groupby, merge and missing values" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><code>groupby</code> — это тот самый <code>GROUP BY</code>, и работает он в три шага: разбить на группы → применить агрегат → собрать обратно.</p><pre class=\"code\">df.groupby(\"city\")[\"amount\"].sum()\ndf.groupby(\"city\").agg(total=(\"amount\", \"sum\"), orders=(\"amount\", \"count\"))</pre><p>В отличие от <code>itertools.groupby</code>, сортировать заранее <b>не нужно</b>: Pandas сам соберёт все строки группы, где бы они ни лежали.</p><p><code>merge</code> — это <code>JOIN</code>, с теми же видами: <code>how='inner'</code> по умолчанию, ещё есть <code>'left'</code>, <code>'right'</code>, <code>'outer'</code>.</p><p>И главное про реальные данные: там <b>всегда есть пропуски</b>. <code>NaN</code> ведёт себя как SQL-ный <code>NULL</code> — <code>NaN == NaN</code> ложно, а сравнение ничего не даёт. Ищут пропуски через <code>.isna()</code>, лечат через <code>.fillna(значение)</code> или <code>.dropna()</code>.</p>",
+        "uz": "<p><code>groupby</code> — bu o'sha <code>GROUP BY</code> va u uch qadamda ishlaydi: guruhlarga bo'lish → agregat qo'llash → qaytarib yig'ish.</p><pre class=\"code\">df.groupby(\"city\")[\"amount\"].sum()\ndf.groupby(\"city\").agg(total=(\"amount\", \"sum\"), orders=(\"amount\", \"count\"))</pre><p><code>itertools.groupby</code> dan farqli, oldindan saralash <b>shart emas</b>: Pandas guruh qatorlarini qayerda bo'lishidan qat'i nazar o'zi yig'adi.</p><p><code>merge</code> — bu <code>JOIN</code>, o'sha turlari bilan: sukut bo'yicha <code>how='inner'</code>, yana <code>'left'</code>, <code>'right'</code>, <code>'outer'</code> bor.</p><p>Va haqiqiy ma'lumot haqida eng muhimi: u yerda <b>doim bo'shliqlar bor</b>. <code>NaN</code> SQL dagi <code>NULL</code> kabi tutadi — <code>NaN == NaN</code> yolg'on, solishtirish esa hech nima bermaydi. Bo'shliqlar <code>.isna()</code> bilan qidiriladi, <code>.fillna(qiymat)</code> yoki <code>.dropna()</code> bilan davolanadi.</p>",
+        "en": "<p><code>groupby</code> is that same <code>GROUP BY</code>, and it works in three steps: split into groups → apply an aggregate → combine back.</p><pre class=\"code\">df.groupby(\"city\")[\"amount\"].sum()\ndf.groupby(\"city\").agg(total=(\"amount\", \"sum\"), orders=(\"amount\", \"count\"))</pre><p>Unlike <code>itertools.groupby</code>, you do <b>not</b> need to sort first: Pandas gathers every row of a group wherever it sits.</p><p><code>merge</code> is <code>JOIN</code>, with the same kinds: <code>how='inner'</code> by default, plus <code>'left'</code>, <code>'right'</code>, <code>'outer'</code>.</p><p>And the main thing about real data: it <b>always has gaps</b>. <code>NaN</code> behaves like SQL's <code>NULL</code> — <code>NaN == NaN</code> is false and comparison gives nothing. You find gaps with <code>.isna()</code> and treat them with <code>.fillna(value)</code> or <code>.dropna()</code>.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "packages": ["pandas"],
+       "code": "import pandas as pd\nimport numpy as np\n\norders = pd.DataFrame({\n    \"city_id\": [1, 2, 1, 3, 2],\n    \"amount\": [250, 100, 400, 180, np.nan],\n})\ncities = pd.DataFrame({\n    \"city_id\": [1, 2, 3],\n    \"city\": [\"Ташкент\", \"Бухара\", \"Самарканд\"],\n})\n\nprint(\"пропусков по колонкам:\\n\", orders.isna().sum())\nprint()\n\n# NaN пропускается агрегатами, но ломает сравнение — заполним честным нулём\norders[\"amount\"] = orders[\"amount\"].fillna(0)\n\n# merge — это JOIN по ключу\nfull = orders.merge(cities, on=\"city_id\", how=\"left\")\nprint(full)\nprint()\n\nby_city = full.groupby(\"city\").agg(\n    total=(\"amount\", \"sum\"),\n    orders=(\"amount\", \"count\"),\n    avg=(\"amount\", \"mean\"),\n).sort_values(\"total\", ascending=False)\nprint(by_city)\nprint()\nprint(\"словарём:\", full.groupby(\"city\")[\"amount\"].sum().to_dict())"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Результат <code>groupby</code> — таблица, у которой городом стал <b>индекс</b>, а не обычная колонка. Часто это неудобно: обратиться к нему как к <code>df['city']</code> не выйдет.</p><p>Лечится одной командой: <code>.reset_index()</code> возвращает индекс обратно в колонки. Второй способ — сразу <code>groupby('city', as_index=False)</code>.</p><p>Проверь себя вопросом: «сколько строк в результате?» После <code>groupby</code> их ровно столько, сколько разных значений ключа. Если получилось больше — где-то в ключе прячутся невидимые различия: пробелы по краям или разный регистр.</p>",
+        "uz": "<p><code>groupby</code> natijasi — shahar oddiy ustun emas, <b>indeks</b> bo'lgan jadval. Ko'pincha bu noqulay: unga <code>df['city']</code> kabi murojaat qilib bo'lmaydi.</p><p>Bitta buyruq bilan davolanadi: <code>.reset_index()</code> indeksni ustunlarga qaytaradi. Ikkinchi yo'l — darhol <code>groupby('city', as_index=False)</code>.</p><p>O'zingizni savol bilan tekshiring: «natijada nechta qator?» <code>groupby</code> dan keyin ular kalitning turli qiymatlari qanchaligicha. Ko'proq chiqsa — kalitda ko'rinmas farqlar yashiringan: chetlardagi bo'shliqlar yoki har xil registr.</p>",
+        "en": "<p>The result of <code>groupby</code> is a table where the city became the <b>index</b> rather than an ordinary column. That is often inconvenient: you cannot reach it as <code>df['city']</code>.</p><p>One command fixes it: <code>.reset_index()</code> puts the index back into the columns. The other way is <code>groupby('city', as_index=False)</code> from the start.</p><p>Check yourself with a question: “how many rows are in the result?” After <code>groupby</code> there are exactly as many as there are distinct key values. If you got more, invisible differences hide in the key: stray spaces at the edges or mixed case.</p>"
+       }
+      },
+      {
+       "type": "summary",
+       "items": [
+        { "ru": "Series — колонка, DataFrame — таблица; df['x'] даёт Series", "uz": "Series — ustun, DataFrame — jadval; df['x'] Series beradi", "en": "A Series is a column, a DataFrame a table; df['x'] gives a Series" },
+        { "ru": "Начинай с shape, head, dtypes, describe и isna — а не с анализа", "uz": "Tahlildan emas, shape, head, dtypes, describe va isna dan boshlang", "en": "Start with shape, head, dtypes, describe and isna — not with analysis" },
+        { "ru": "Фильтр — это маска: условия в скобках, & вместо and", "uz": "Filtr — niqob: shartlar qavsda, and o'rniga &", "en": "A filter is a mask: conditions in brackets, & instead of and" },
+        { "ru": "Новая колонка считается сразу для всей таблицы, без цикла", "uz": "Yangi ustun siklsiz, butun jadval uchun birdan hisoblanadi", "en": "A new column is computed for the whole table at once, with no loop" },
+        { "ru": "Менять значения по условию надо через .loc, иначе меняешь копию", "uz": "Shart bo'yicha qiymatlarni .loc orqali o'zgartirish kerak, aks holda nusxani o'zgartirasiz", "en": "Change values by condition through .loc, or you change a copy" },
+        { "ru": "groupby не требует сортировки; merge — это JOIN", "uz": "groupby saralashni talab qilmaydi; merge — bu JOIN", "en": "groupby needs no sorting; merge is a JOIN" },
+        { "ru": "NaN ведёт себя как NULL: ищи через isna, лечи fillna или dropna", "uz": "NaN NULL kabi tutadi: isna bilan qidiring, fillna yoki dropna bilan davolang", "en": "NaN behaves like NULL: find it with isna, treat it with fillna or dropna" }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": { "ru": "Чем DataFrame отличается от массива NumPy?", "uz": "DataFrame NumPy massividan nimasi bilan farq qiladi?", "en": "How does a DataFrame differ from a NumPy array?" },
+     "options": [
+      { "ru": "Он быстрее", "uz": "U tezroq", "en": "It is faster" },
+      { "ru": "У колонок есть имена, и типы могут быть разными", "uz": "Ustunlarning nomi bor va turlari har xil bo'lishi mumkin", "en": "The columns have names and the types may differ" },
+      { "ru": "Он хранит только числа", "uz": "U faqat sonlarni saqlaydi", "en": "It stores only numbers" },
+      { "ru": "Он не поддерживает фильтры", "uz": "U filtrlarni qo'llab-quvvatlamaydi", "en": "It does not support filters" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Внутри каждой колонки лежит массив NumPy — поэтому скорость та же, а сверху добавлены имена, индекс и смешанные типы.",
+      "uz": "Har ustun ichida NumPy massivi yotadi — shuning uchun tezlik o'sha, ustiga esa nomlar, indeks va aralash turlar qo'shilgan.",
+      "en": "Inside each column sits a NumPy array — so the speed is the same, with names, an index and mixed types added on top."
+     }
+    },
+    {
+     "q": { "ru": "Аналог SQL <code>WHERE amount &gt; 100</code> в Pandas?", "uz": "Pandas da SQL <code>WHERE amount &gt; 100</code> ning analogi?", "en": "The Pandas equivalent of SQL <code>WHERE amount &gt; 100</code>?" },
+     "options": [
+      { "ru": "df.where(100)", "uz": "df.where(100)", "en": "df.where(100)" },
+      { "ru": "df[df['amount'] &gt; 100]", "uz": "df[df['amount'] &gt; 100]", "en": "df[df['amount'] &gt; 100]" },
+      { "ru": "df.filter('amount &gt; 100')", "uz": "df.filter('amount &gt; 100')", "en": "df.filter('amount &gt; 100')" },
+      { "ru": "df.select(amount=100)", "uz": "df.select(amount=100)", "en": "df.select(amount=100)" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Внутри скобок — булева маска, снаружи по ней идёт отбор строк. Ровно как в NumPy.",
+      "uz": "Qavs ichida — mantiqiy niqob, tashqarida u bo'yicha qatorlar tanlanadi. Xuddi NumPy dagidek.",
+      "en": "Inside the brackets is a boolean mask; outside, rows are selected by it. Exactly as in NumPy."
+     }
+    },
+    {
+     "q": { "ru": "Почему <code>df[df['a'] &gt; 1 and df['b'] &lt; 5]</code> упадёт?", "uz": "Nega <code>df[df['a'] &gt; 1 and df['b'] &lt; 5]</code> yiqiladi?", "en": "Why does <code>df[df['a'] &gt; 1 and df['b'] &lt; 5]</code> fail?" },
+     "options": [
+      { "ru": "Pandas не умеет два условия", "uz": "Pandas ikki shartni bilmaydi", "en": "Pandas cannot do two conditions" },
+      { "ru": "<code>and</code> требует одного True/False, а тут целые колонки — нужен <code>&amp;</code> и скобки", "uz": "<code>and</code> bitta True/False talab qiladi, bu yerda esa butun ustunlar — <code>&amp;</code> va qavs kerak", "en": "<code>and</code> wants a single True/False, but these are whole columns — you need <code>&amp;</code> and brackets" },
+      { "ru": "Колонки называются неправильно", "uz": "Ustunlar noto'g'ri nomlangan", "en": "The columns are named wrongly" },
+      { "ru": "Нужно сначала отсортировать", "uz": "Avval saralash kerak", "en": "You must sort first" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Правильно: <code>df[(df['a'] &gt; 1) &amp; (df['b'] &lt; 5)]</code>. Ошибка звучит как «truth value of a Series is ambiguous» — теперь ты знаешь, что она значит.",
+      "uz": "To'g'risi: <code>df[(df['a'] &gt; 1) &amp; (df['b'] &lt; 5)]</code>. Xato «truth value of a Series is ambiguous» deb yangraydi — endi uning ma'nosini bilasiz.",
+      "en": "Correct: <code>df[(df['a'] &gt; 1) &amp; (df['b'] &lt; 5)]</code>. The error reads “truth value of a Series is ambiguous” — now you know what it means."
+     }
+    },
+    {
+     "q": { "ru": "Как правильно изменить колонку у отобранных строк?", "uz": "Tanlangan qatorlarning ustunini qanday to'g'ri o'zgartirish mumkin?", "en": "What is the correct way to change a column on selected rows?" },
+     "options": [
+      { "ru": "df[df['a'] &gt; 1]['b'] = 0", "uz": "df[df['a'] &gt; 1]['b'] = 0", "en": "df[df['a'] &gt; 1]['b'] = 0" },
+      { "ru": "df.loc[df['a'] &gt; 1, 'b'] = 0", "uz": "df.loc[df['a'] &gt; 1, 'b'] = 0", "en": "df.loc[df['a'] &gt; 1, 'b'] = 0" },
+      { "ru": "df.set(df['a'] &gt; 1, 0)", "uz": "df.set(df['a'] &gt; 1, 0)", "en": "df.set(df['a'] &gt; 1, 0)" },
+      { "ru": "Циклом по строкам", "uz": "Qatorlar bo'ylab sikl bilan", "en": "With a loop over rows" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Первый вариант меняет временную копию и может тихо ничего не сделать — Pandas на это ругается предупреждением SettingWithCopyWarning.",
+      "uz": "Birinchi variant vaqtinchalik nusxani o'zgartiradi va jimgina hech nima qilmasligi mumkin — Pandas bunga SettingWithCopyWarning ogohlantirishi bilan javob beradi.",
+      "en": "The first option modifies a temporary copy and may silently do nothing — Pandas complains about it with a SettingWithCopyWarning."
+     }
+    },
+    {
+     "q": { "ru": "После <code>df.groupby('city')['amount'].sum()</code> город становится…", "uz": "<code>df.groupby('city')['amount'].sum()</code> dan keyin shahar…", "en": "After <code>df.groupby('city')['amount'].sum()</code> the city becomes…" },
+     "options": [
+      { "ru": "обычной колонкой", "uz": "oddiy ustun bo'ladi", "en": "an ordinary column" },
+      { "ru": "индексом результата — вернуть в колонки поможет reset_index()", "uz": "natija indeksi bo'ladi — ustunlarga reset_index() qaytaradi", "en": "the index of the result — reset_index() puts it back into the columns" },
+      { "ru": "исчезает", "uz": "yo'qoladi", "en": "disappears" },
+      { "ru": "дублируется", "uz": "takrorlanadi", "en": "gets duplicated" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Либо <code>.reset_index()</code> после, либо <code>as_index=False</code> сразу — обе дороги ведут к обычной таблице.",
+      "uz": "Yo keyin <code>.reset_index()</code>, yo darhol <code>as_index=False</code> — ikkala yo'l ham oddiy jadvalga olib boradi.",
+      "en": "Either <code>.reset_index()</code> afterwards or <code>as_index=False</code> up front — both roads lead to an ordinary table."
+     }
+    },
+    {
+     "q": { "ru": "Чем <code>NaN</code> похож на SQL-ный <code>NULL</code>?", "uz": "<code>NaN</code> SQL dagi <code>NULL</code> ga nimasi bilan o'xshaydi?", "en": "How is <code>NaN</code> like SQL's <code>NULL</code>?" },
+     "options": [
+      { "ru": "Он равен нулю", "uz": "U nolga teng", "en": "It equals zero" },
+      { "ru": "Сравнение с ним ничего не даёт: NaN == NaN ложно, ищут через isna()", "uz": "U bilan solishtirish hech nima bermaydi: NaN == NaN yolg'on, isna() bilan qidiriladi", "en": "Comparison tells you nothing: NaN == NaN is false, you find it with isna()" },
+      { "ru": "Он ломает всю таблицу", "uz": "U butun jadvalni buzadi", "en": "It breaks the whole table" },
+      { "ru": "Ничем не похож", "uz": "Hech nimasi bilan o'xshamaydi", "en": "It is not alike at all" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Агрегаты вроде <code>sum</code> пропуски пропускают, но <code>count</code> их не считает — отсюда расхождения в отчётах, если не посмотреть на <code>isna().sum()</code> заранее.",
+      "uz": "<code>sum</code> kabi agregatlar bo'shliqlarni o'tkazib yuboradi, lekin <code>count</code> ularni sanamaydi — oldindan <code>isna().sum()</code> ga qaralmasa, hisobotlardagi farq shundan.",
+      "en": "Aggregates like <code>sum</code> skip the gaps, but <code>count</code> does not count them — hence the discrepancies in reports if you did not look at <code>isna().sum()</code> first."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "python",
+     "packages": ["pandas"],
+     "title": { "ru": "Крупные заказы", "uz": "Yirik buyurtmalar", "en": "Large orders" },
+     "brief": { "ru": "Фильтр и сортировка", "uz": "Filtr va saralash", "en": "Filter and sort" },
+     "desc": {
+      "ru": "<p><code>big_orders(rows, limit)</code> получает список словарей с ключами <code>city</code> и <code>amount</code>.</p><p>Собери из них DataFrame, оставь строки с суммой строго больше <code>limit</code>, отсортируй по сумме по убыванию и верни <b>список городов</b> в этом порядке.</p><p>Пустой вход даёт пустой список.</p>",
+      "uz": "<p><code>big_orders(rows, limit)</code> <code>city</code> va <code>amount</code> kalitli lug'atlar ro'yxatini oladi.</p><p>Ulardan DataFrame yig'ing, summasi <code>limit</code> dan qat'iy katta qatorlarni qoldiring, summa bo'yicha kamayish tartibida saralang va shu tartibdagi <b>shaharlar ro'yxatini</b> qaytaring.</p><p>Bo'sh kirish bo'sh ro'yxat beradi.</p>",
+      "en": "<p><code>big_orders(rows, limit)</code> receives a list of dictionaries with the keys <code>city</code> and <code>amount</code>.</p><p>Build a DataFrame from them, keep the rows whose amount is strictly above <code>limit</code>, sort by amount descending and return the <b>list of cities</b> in that order.</p><p>Empty input gives an empty list.</p>"
+     },
+     "starter": "import pandas as pd\n\ndef big_orders(rows, limit):\n    # твой код\n    pass\n\nprint(big_orders([{'city': 'Ташкент', 'amount': 250}, {'city': 'Бухара', 'amount': 100}], 150))\n",
+     "tests": "rows = [{'city': 'Ташкент', 'amount': 250}, {'city': 'Бухара', 'amount': 100},\n        {'city': 'Самарканд', 'amount': 400}, {'city': 'Хива', 'amount': 150}]\nassert big_orders(rows, 150) == ['Самарканд', 'Ташкент'], 'Строго больше лимита, по убыванию'\nassert big_orders(rows, 1000) == [], 'Никто не прошёл'\nassert big_orders([], 10) == [], 'Пустой вход'\nassert big_orders(rows, 0) == ['Самарканд', 'Ташкент', 'Хива', 'Бухара'], 'Все четыре по убыванию'\nassert type(big_orders(rows, 150)) is list, 'Верни обычный список'",
+     "hint": {
+      "ru": "<code>df = pd.DataFrame(rows)</code>, потом <code>df[df['amount'] &gt; limit].sort_values('amount', ascending=False)['city'].tolist()</code>. Пустой список отсеки до создания DataFrame — у пустого нет колонок.",
+      "uz": "<code>df = pd.DataFrame(rows)</code>, keyin <code>df[df['amount'] &gt; limit].sort_values('amount', ascending=False)['city'].tolist()</code>. Bo'sh ro'yxatni DataFrame yaratishdan oldin ajrating — bo'shda ustunlar yo'q.",
+      "en": "<code>df = pd.DataFrame(rows)</code>, then <code>df[df['amount'] &gt; limit].sort_values('amount', ascending=False)['city'].tolist()</code>. Filter out the empty list before creating the DataFrame — an empty one has no columns."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "python",
+     "packages": ["pandas"],
+     "title": { "ru": "Выручка по городам", "uz": "Shaharlar bo'yicha tushum", "en": "Revenue by city" },
+     "brief": { "ru": "groupby в одну строку", "uz": "Bir qatorda groupby", "en": "groupby in one line" },
+     "desc": {
+      "ru": "<p><code>revenue_by_city(rows)</code> возвращает словарь «город → сумма всех его заказов».</p><p>Пропуски в <code>amount</code> (значения <code>None</code>) считай нулями. Пустой вход даёт пустой словарь.</p>",
+      "uz": "<p><code>revenue_by_city(rows)</code> «shahar → uning barcha buyurtmalari summasi» lug'atini qaytaradi.</p><p><code>amount</code> dagi bo'shliqlarni (<code>None</code> qiymatlari) nol deb hisoblang. Bo'sh kirish bo'sh lug'at beradi.</p>",
+      "en": "<p><code>revenue_by_city(rows)</code> returns a dictionary “city → the total of all its orders”.</p><p>Treat gaps in <code>amount</code> (<code>None</code> values) as zeros. Empty input gives an empty dictionary.</p>"
+     },
+     "starter": "import pandas as pd\n\ndef revenue_by_city(rows):\n    # твой код\n    pass\n\nprint(revenue_by_city([{'city': 'Ташкент', 'amount': 250}, {'city': 'Ташкент', 'amount': 400}]))\n",
+     "tests": "rows = [{'city': 'Ташкент', 'amount': 250}, {'city': 'Бухара', 'amount': 100},\n        {'city': 'Ташкент', 'amount': 400}, {'city': 'Бухара', 'amount': None}]\nres = revenue_by_city(rows)\nassert res == {'Ташкент': 650, 'Бухара': 100}, 'Суммы по городам, пропуск как ноль'\nassert type(res) is dict, 'Верни обычный словарь'\nassert revenue_by_city([]) == {}, 'Пустой вход'\nassert revenue_by_city([{'city': 'A', 'amount': None}]) == {'A': 0}, 'Единственный пропуск даёт ноль'\nassert revenue_by_city([{'city': 'A', 'amount': 5}]) == {'A': 5}, 'Один заказ'",
+     "hint": {
+      "ru": "<code>df['amount'] = df['amount'].fillna(0)</code>, потом <code>df.groupby('city')['amount'].sum().to_dict()</code>. Числа могут получиться дробными — приведи колонку к <code>int</code> или сравнивай значения, а не типы.",
+      "uz": "<code>df['amount'] = df['amount'].fillna(0)</code>, keyin <code>df.groupby('city')['amount'].sum().to_dict()</code>. Sonlar kasrli chiqishi mumkin — ustunni <code>int</code> ga keltiring yoki turlarni emas, qiymatlarni solishtiring.",
+      "en": "<code>df['amount'] = df['amount'].fillna(0)</code>, then <code>df.groupby('city')['amount'].sum().to_dict()</code>. The numbers may come out as floats — cast the column to <code>int</code> or compare values rather than types."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "python",
+     "packages": ["pandas"],
+     "title": { "ru": "Соединить две таблицы", "uz": "Ikki jadvalni birlashtirish", "en": "Joining two tables" },
+     "brief": { "ru": "merge вместо JOIN", "uz": "JOIN o'rniga merge", "en": "merge instead of JOIN" },
+     "desc": {
+      "ru": "<p><code>join_names(orders, users)</code> получает два списка словарей:</p><ul><li><code>orders</code> — ключи <code>user_id</code> и <code>amount</code>;</li><li><code>users</code> — ключи <code>user_id</code> и <code>name</code>.</li></ul><p>Соедини их по <code>user_id</code> так, чтобы <b>остались все заказы</b> (даже те, чей пользователь не найден), и верни список пар <code>(имя, сумма)</code> в исходном порядке заказов. Для ненайденного пользователя имя — строка <code>'неизвестно'</code>.</p>",
+      "uz": "<p><code>join_names(orders, users)</code> ikki lug'atlar ro'yxatini oladi:</p><ul><li><code>orders</code> — <code>user_id</code> va <code>amount</code> kalitlari;</li><li><code>users</code> — <code>user_id</code> va <code>name</code> kalitlari.</li></ul><p>Ularni <code>user_id</code> bo'yicha shunday birlashtiringki, <b>barcha buyurtmalar qolsin</b> (foydalanuvchisi topilmaganlari ham), va buyurtmalarning dastlabki tartibida <code>(ism, summa)</code> juftliklar ro'yxatini qaytaring. Topilmagan foydalanuvchi uchun ism — <code>'неизвестно'</code> satri.</p>",
+      "en": "<p><code>join_names(orders, users)</code> receives two lists of dictionaries:</p><ul><li><code>orders</code> — keys <code>user_id</code> and <code>amount</code>;</li><li><code>users</code> — keys <code>user_id</code> and <code>name</code>.</li></ul><p>Join them on <code>user_id</code> so that <b>all orders remain</b> (even those whose user is not found), and return a list of <code>(name, amount)</code> pairs in the original order of the orders. For a missing user the name is the string <code>'неизвестно'</code>.</p>"
+     },
+     "starter": "import pandas as pd\n\ndef join_names(orders, users):\n    # твой код\n    pass\n\no = [{'user_id': 1, 'amount': 250}, {'user_id': 9, 'amount': 100}]\nu = [{'user_id': 1, 'name': 'Азиз'}]\nprint(join_names(o, u))\n",
+     "tests": "o = [{'user_id': 1, 'amount': 250}, {'user_id': 2, 'amount': 100}, {'user_id': 9, 'amount': 70}]\nu = [{'user_id': 1, 'name': 'Азиз'}, {'user_id': 2, 'name': 'Дилноза'}]\nres = join_names(o, u)\nassert res == [('Азиз', 250), ('Дилноза', 100), ('неизвестно', 70)], 'Все заказы, порядок сохранён'\nassert join_names([], u) == [], 'Нет заказов'\nassert join_names(o, []) == [('неизвестно', 250), ('неизвестно', 100), ('неизвестно', 70)], 'Нет пользователей'\nassert type(res[0]) is tuple, 'Верни список кортежей'",
+     "hint": {
+      "ru": "<code>merge(..., on='user_id', how='left')</code> сохранит все заказы. Пропавшие имена станут <code>NaN</code> — замени их через <code>.fillna('неизвестно')</code>. Пары собери как <code>list(zip(df['name'], df['amount']))</code>. Пустые входы обработай до merge.",
+      "uz": "<code>merge(..., on='user_id', how='left')</code> barcha buyurtmalarni saqlaydi. Yo'qolgan ismlar <code>NaN</code> bo'ladi — ularni <code>.fillna('неизвестно')</code> bilan almashtiring. Juftliklarni <code>list(zip(df['name'], df['amount']))</code> deb yig'ing. Bo'sh kirishlarni merge dan oldin qayta ishlang.",
+      "en": "<code>merge(..., on='user_id', how='left')</code> keeps every order. Missing names become <code>NaN</code> — replace them with <code>.fillna('неизвестно')</code>. Build the pairs as <code>list(zip(df['name'], df['amount']))</code>. Handle empty inputs before the merge."
+     }
+    }
+   ],
+   "exam": {
+    "time": 660,
+    "questions": [
+     {
+      "q": { "ru": "Что соответствует SQL <code>GROUP BY city</code> в Pandas?", "uz": "Pandas da SQL <code>GROUP BY city</code> ga nima mos keladi?", "en": "What corresponds to SQL <code>GROUP BY city</code> in Pandas?" },
+      "options": [
+       { "ru": "df.sort_values('city')", "uz": "df.sort_values('city')", "en": "df.sort_values('city')" },
+       { "ru": "df.groupby('city')", "uz": "df.groupby('city')", "en": "df.groupby('city')" },
+       { "ru": "df.merge('city')", "uz": "df.merge('city')", "en": "df.merge('city')" },
+       { "ru": "df['city'].unique()", "uz": "df['city'].unique()", "en": "df['city'].unique()" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Нужны все заказы, даже без совпадения в справочнике. Какой merge?", "uz": "Barcha buyurtmalar kerak, ma'lumotnomada mosligi bo'lmaganlari ham. Qaysi merge?", "en": "You need every order, even without a match in the reference table. Which merge?" },
+      "options": [
+       { "ru": "how='inner'", "uz": "how='inner'", "en": "how='inner'" },
+       { "ru": "how='left', если заказы слева", "uz": "buyurtmalar chapda bo'lsa how='left'", "en": "how='left', with the orders on the left" },
+       { "ru": "how='right'", "uz": "how='right'", "en": "how='right'" },
+       { "ru": "merge такого не умеет", "uz": "merge buni bilmaydi", "en": "merge cannot do that" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "В колонке есть NaN. Что вернёт <code>df['x'].sum()</code>?", "uz": "Ustunda NaN bor. <code>df['x'].sum()</code> nima qaytaradi?", "en": "A column contains NaN. What does <code>df['x'].sum()</code> return?" },
+      "options": [
+       { "ru": "NaN — один пропуск портит всё", "uz": "NaN — bitta bo'shliq hammasini buzadi", "en": "NaN — one gap spoils everything" },
+       { "ru": "Сумму остальных: агрегаты пропуски пропускают", "uz": "Qolganlarning summasini: agregatlar bo'shliqlarni o'tkazib yuboradi", "en": "The sum of the rest: aggregates skip the gaps" },
+       { "ru": "Ноль", "uz": "Nol", "en": "Zero" },
+       { "ru": "Ошибку", "uz": "Xato", "en": "An error" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Хочется пройти циклом <code>iterrows</code> по миллиону строк. Что делать?", "uz": "Million qator bo'ylab <code>iterrows</code> bilan yurgingiz kelyapti. Nima qilish kerak?", "en": "You feel like looping with <code>iterrows</code> over a million rows. What do you do?" },
+      "options": [
+       { "ru": "Так и сделать, это нормально", "uz": "Shunday qilish, bu normal", "en": "Just do it, it is fine" },
+       { "ru": "Найти векторное решение: операция над колонкой в сотни раз быстрее", "uz": "Vektor yechim topish: ustun ustidagi amal yuzlab barobar tez", "en": "Find a vectorised solution: an operation on a column is hundreds of times faster" },
+       { "ru": "Разбить таблицу на части", "uz": "Jadvalni qismlarga bo'lish", "en": "Split the table into parts" },
+       { "ru": "Перейти на списки", "uz": "Ro'yxatlarga o'tish", "en": "Switch to lists" }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "python",
+      "packages": ["pandas"],
+      "title": { "ru": "Отчёт для бизнеса", "uz": "Biznes uchun hisobot", "en": "A report for the business" },
+      "desc": {
+       "ru": "<p>Собери настоящий рабочий отчёт. <code>city_report(orders, users)</code> получает те же две таблицы, что и раньше, только у пользователей есть ещё колонка <code>city</code>.</p><p>Соедини заказы с пользователями (все заказы сохраняются), пропуски в <code>amount</code> замени нулями, город без совпадения назови <code>'неизвестно'</code>, и верни список словарей — по одному на город:</p><ul><li><code>'city'</code>, <code>'total'</code> (сумма, целым числом), <code>'orders'</code> (сколько заказов)</li></ul><p>Отсортируй по <code>total</code> по убыванию. Пустые заказы дают пустой список.</p>",
+       "uz": "<p>Haqiqiy ishchi hisobotni yig'ing. <code>city_report(orders, users)</code> avvalgi ikki jadvalni oladi, faqat foydalanuvchilarda yana <code>city</code> ustuni bor.</p><p>Buyurtmalarni foydalanuvchilar bilan birlashtiring (barcha buyurtmalar saqlanadi), <code>amount</code> dagi bo'shliqlarni nol bilan almashtiring, mosligi yo'q shaharni <code>'неизвестно'</code> deb nomlang va lug'atlar ro'yxatini qaytaring — har shaharga bittadan:</p><ul><li><code>'city'</code>, <code>'total'</code> (summa, butun son), <code>'orders'</code> (nechta buyurtma)</li></ul><p><code>total</code> bo'yicha kamayish tartibida saralang. Bo'sh buyurtmalar bo'sh ro'yxat beradi.</p>",
+       "en": "<p>Assemble a real working report. <code>city_report(orders, users)</code> receives the same two tables as before, only the users now also have a <code>city</code> column.</p><p>Join the orders with the users (all orders survive), replace gaps in <code>amount</code> with zeros, name a city without a match <code>'неизвестно'</code>, and return a list of dictionaries — one per city:</p><ul><li><code>'city'</code>, <code>'total'</code> (the sum as an integer), <code>'orders'</code> (how many orders)</li></ul><p>Sort by <code>total</code> descending. Empty orders give an empty list.</p>"
+      },
+      "starter": "import pandas as pd\n\ndef city_report(orders, users):\n    # merge, пропуски, groupby, сортировка\n    pass\n\no = [{'user_id': 1, 'amount': 250}, {'user_id': 1, 'amount': 100}]\nu = [{'user_id': 1, 'name': 'Азиз', 'city': 'Ташкент'}]\nprint(city_report(o, u))\n",
+      "tests": "o = [{'user_id': 1, 'amount': 250}, {'user_id': 2, 'amount': 100},\n     {'user_id': 1, 'amount': 400}, {'user_id': 9, 'amount': 70},\n     {'user_id': 2, 'amount': None}]\nu = [{'user_id': 1, 'name': 'Азиз', 'city': 'Ташкент'},\n     {'user_id': 2, 'name': 'Дилноза', 'city': 'Бухара'}]\nres = city_report(o, u)\nassert res[0] == {'city': 'Ташкент', 'total': 650, 'orders': 2}, 'Ташкент первый по сумме'\nassert {'city': 'Бухара', 'total': 100, 'orders': 2} in res, 'Бухара: два заказа, один пустой'\nassert {'city': 'неизвестно', 'total': 70, 'orders': 1} in res, 'Заказ без пользователя не потерялся'\nassert [r['total'] for r in res] == sorted([r['total'] for r in res], reverse=True), 'Сортировка по убыванию'\nassert city_report([], u) == [], 'Нет заказов'\nassert all(type(r['total']) is int for r in res), 'total должен быть целым'",
+      "hint": {
+       "ru": "Порядок шагов: <code>merge(how='left')</code> → <code>fillna</code> отдельно для <code>amount</code> (ноль) и <code>city</code> (строка) → <code>groupby('city', as_index=False).agg(...)</code> → <code>sort_values</code>. Целое число из суммы даст <code>int(...)</code>, а список словарей — <code>.to_dict('records')</code>.",
+       "uz": "Qadamlar tartibi: <code>merge(how='left')</code> → <code>amount</code> (nol) va <code>city</code> (satr) uchun alohida <code>fillna</code> → <code>groupby('city', as_index=False).agg(...)</code> → <code>sort_values</code>. Summadan butun sonni <code>int(...)</code>, lug'atlar ro'yxatini esa <code>.to_dict('records')</code> beradi.",
+       "en": "Order of steps: <code>merge(how='left')</code> → <code>fillna</code> separately for <code>amount</code> (zero) and <code>city</code> (a string) → <code>groupby('city', as_index=False).agg(...)</code> → <code>sort_values</code>. <code>int(...)</code> gives a whole number from the sum, and <code>.to_dict('records')</code> gives the list of dictionaries."
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

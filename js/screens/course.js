@@ -10,7 +10,7 @@ import { hintLevels, explainError } from '../core/mentor.js';
 
 /* ---------- раннеры для блоков и задач ---------- */
 const runners = {
-  py: async (code, onStatus) => window.PyRunner.run(code, '', [], onStatus),
+  py: async (code, onStatus, packages) => window.PyRunner.run(code, '', [], onStatus, packages),
   js: async (code, onStatus) => window.JsRunner.run(code, '', [], onStatus),
   c: async (code, onStatus) => window.CRunner.run(code, 'c', '', onStatus),
   cpp: async (code, onStatus) => window.CRunner.run(code, 'cpp', '', onStatus),
@@ -453,7 +453,8 @@ function renderTask(root, courseId, course, m, taskId, remember) {
         if (withCheck) solved();
       } else {
         const runner = runnerKey === 'js' ? window.JsRunner : window.PyRunner;
-        const res = await runner.run(ed.value, withCheck ? task.tests : '', task.stdin || [], s => { status.textContent = s; });
+        const res = await runner.run(ed.value, withCheck ? task.tests : '', task.stdin || [],
+          s => { status.textContent = s; }, task.packages);
         status.textContent = '';
         if (res.err) {
           out.innerHTML = '<span class="err">' + esc(res.err) + '</span>' +

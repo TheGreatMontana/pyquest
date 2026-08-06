@@ -87,7 +87,7 @@ check('дашборд: навыки отображаются', txt().includes('�
 catalogScreen.renderCatalog(app);
 check('каталог: 16 рабочих направлений карточками', app.querySelectorAll('.domain-card').length === 16, app.querySelectorAll('.domain-card').length);
 check('каталог: 0 будущих направлений компактной строкой', app.querySelectorAll('.domain-chip').length === 0, app.querySelectorAll('.domain-chip').length);
-check('каталог: 26 карточек курсов', app.querySelectorAll('.course-grid .course-card').length === 26, app.querySelectorAll('.course-grid .course-card').length);
+check('каталог: 27 карточек курсов', app.querySelectorAll('.course-grid .course-card').length === 27, app.querySelectorAll('.course-grid .course-card').length);
 /* Пустых направлений не осталось — строка «в разработке» и не должна появляться */
 check('каталог: строки «в разработке» нет, все направления заполнены', !app.querySelector('.planned-row'));
 
@@ -95,8 +95,8 @@ check('каталог: строки «в разработке» нет, все �
 catalogScreen.renderDomain(app, 'data-engineering');
 check('направление: заголовок', txt().includes('Data Engineering'));
 check('направление: 4 стадии пути', app.querySelectorAll('.rm-stage').length === 4, app.querySelectorAll('.rm-stage').length);
-check('направление: узлы курсов (вкл. инструменты DE)', app.querySelectorAll('.rm-node').length === 7, app.querySelectorAll('.rm-node').length);
-check('направление: статус-бейджи есть у узлов', app.querySelectorAll('.rm-node .status-badge').length === 7);
+check('направление: узлы курсов (вкл. библиотеки Python и инструменты DE)', app.querySelectorAll('.rm-node').length === 8, app.querySelectorAll('.rm-node').length);
+check('направление: статус-бейджи есть у узлов', app.querySelectorAll('.rm-node .status-badge').length === 8);
 check('направление: 4-я стадия ведёт на курс инструментов', app.innerHTML.includes('#/course/de-tools'));
 
 check('направление: рассказ «что это за работа»', !!app.querySelector('.about-domain'));

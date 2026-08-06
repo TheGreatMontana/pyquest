@@ -73,12 +73,27 @@ def _pq_run(code, tests, stdin_lines):
     return loading;
   }
 
+  /* Что уже догружено: pyodide.loadPackage повторный вызов переживает, но
+     лишний раунд по сети на каждый запуск нам не нужен. */
+  const loaded = new Set();
+
+  /** Догружает пакеты Pyodide (numpy, pandas и т.п.) перед запуском. */
+  async function ensurePackages(py, packages, onStatus) {
+    const need = (packages || []).filter(p => !loaded.has(p));
+    if (!need.length) return;
+    if (onStatus) onStatus('Загружаю ' + need.join(', ') + '…');
+    await py.loadPackage(need);
+    need.forEach(p => loaded.add(p));
+  }
+
   /**
    * Запускает код пользователя, опционально с тестами и подставным stdin.
+   * `packages` — список пакетов Pyodide, нужных этому коду.
    * Возвращает {out, err, test_err}.
    */
-  async function run(code, tests, stdinLines, onStatus) {
+  async function run(code, tests, stdinLines, onStatus, packages) {
     const py = await ensure(onStatus);
+    await ensurePackages(py, packages, onStatus);
     if (onStatus) onStatus('');
     const fn = py.globals.get('_pq_run');
     try {

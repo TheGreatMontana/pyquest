@@ -85,7 +85,8 @@ async function build(code, lang) {
   api.memfs.addFile(src, bytes(wrap(code, lang)));
   buf = '';
   await api.run(clang, 'clang', '-cc1', '-emit-obj', ...api.clangCommonArgs,
-                '-O2', '-o', 'main.o', '-x', lang === 'c' ? 'c' : 'c++', src);
+                '-O2', ...(lang === 'c' ? [] : ['-std=c++17']),
+                '-o', 'main.o', '-x', lang === 'c' ? 'c' : 'c++', src);
   const lld = await api.getModule(api.lldFilename);
   await api.run(lld, 'wasm-ld', '--no-threads', '--export-dynamic', '-z', 'stack-size=1048576',
                 '-Llib/wasm32-wasi', 'lib/wasm32-wasi/crt1.o', 'main.o', 'compat.o',

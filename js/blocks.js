@@ -163,7 +163,7 @@ export function bindBlocks(container, blocks, runners) {
           const res = await runners.sql(b.code, s => { out.textContent = s || '…'; });
           out.innerHTML = res.error ? '<span class="err">' + esc(res.error) + '</span>' : res.html;
         } else {
-          const res = await runners[kind](b.code, s => { out.textContent = s || '…'; });
+          const res = await runners[kind](b.code, s => { out.textContent = s || '…'; }, b.packages);
           out.textContent = res.err ? res.err : (res.out || t('lesson.noOutput'));
         }
       } catch (e) { out.textContent = '⚠ ' + e.message; }

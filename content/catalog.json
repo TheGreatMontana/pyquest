@@ -115,6 +115,33 @@
    }
   },
   {
+   "id": "python-stdlib",
+   "category": "language",
+   "title": {
+    "ru": "Стандартная библиотека Python",
+    "uz": "Python standart kutubxonasi",
+    "en": "Python standard library"
+   }
+  },
+  {
+   "id": "numpy-basics",
+   "category": "data",
+   "title": {
+    "ru": "NumPy: массивы и векторизация",
+    "uz": "NumPy: massivlar va vektorlashtirish",
+    "en": "NumPy: arrays and vectorisation"
+   }
+  },
+  {
+   "id": "pandas-basics",
+   "category": "data",
+   "title": {
+    "ru": "Pandas: таблицы в Python",
+    "uz": "Pandas: Python dagi jadvallar",
+    "en": "Pandas: tables in Python"
+   }
+  },
+  {
    "id": "data-analysis",
    "category": "data",
    "title": {
@@ -435,6 +462,35 @@
     "final"
    ],
    "moduleCount": 2
+  },
+  {
+   "id": "python-libraries",
+   "title": {
+    "ru": "Python: библиотеки",
+    "uz": "Python: kutubxonalar",
+    "en": "Python: Libraries"
+   },
+   "description": {
+    "ru": "Стандартная библиотека, NumPy и Pandas. Настоящие пакеты выполняются прямо в браузере — не пересказ, а работающий код.",
+    "uz": "Standart kutubxona, NumPy va Pandas. Haqiqiy paketlar to‘g‘ridan-to‘g‘ri brauzerda ishlaydi — qayta hikoya emas, ishlaydigan kod.",
+    "en": "The standard library, NumPy and Pandas. Real packages run right in the browser — not a retelling but working code."
+   },
+   "glyph": "code",
+   "color": "#22d3ee",
+   "level": "intermediate",
+   "status": "full",
+   "estimatedHours": 30,
+   "requires": [
+    "python-collections"
+   ],
+   "grants": [
+    "python-stdlib",
+    "numpy-basics",
+    "pandas-basics"
+   ],
+   "legacyIds": [],
+   "moduleCount": 3,
+   "runner": "python"
   },
   {
    "id": "sql-basics",
@@ -1079,7 +1135,8 @@
      "courses": [
       "python-basics",
       "python-intermediate",
-      "python-advanced"
+      "python-advanced",
+      "python-libraries"
      ]
     },
     {
@@ -1131,7 +1188,8 @@
      "courses": [
       "python-basics",
       "python-intermediate",
-      "python-advanced"
+      "python-advanced",
+      "python-libraries"
      ]
     },
     {
@@ -1195,7 +1253,8 @@
      },
      "courses": [
       "python-basics",
-      "python-intermediate"
+      "python-intermediate",
+      "python-libraries"
      ]
     },
     {
@@ -1235,7 +1294,8 @@
      },
      "courses": [
       "python-basics",
-      "python-intermediate"
+      "python-intermediate",
+      "python-libraries"
      ]
     },
     {
@@ -1411,7 +1471,8 @@
      "courses": [
       "python-basics",
       "python-intermediate",
-      "python-advanced"
+      "python-advanced",
+      "python-libraries"
      ]
     },
     {
@@ -1464,7 +1525,8 @@
      },
      "courses": [
       "python-basics",
-      "python-intermediate"
+      "python-intermediate",
+      "python-libraries"
      ]
     },
     {
@@ -1515,7 +1577,8 @@
      },
      "courses": [
       "python-basics",
-      "python-intermediate"
+      "python-intermediate",
+      "python-libraries"
      ]
     },
     {
@@ -1565,7 +1628,8 @@
      },
      "courses": [
       "python-basics",
-      "python-intermediate"
+      "python-intermediate",
+      "python-libraries"
      ]
     },
     {
@@ -1616,7 +1680,8 @@
      },
      "courses": [
       "python-basics",
-      "python-intermediate"
+      "python-intermediate",
+      "python-libraries"
      ]
     },
     {
@@ -1656,7 +1721,8 @@
      },
      "courses": [
       "python-basics",
-      "python-intermediate"
+      "python-intermediate",
+      "python-libraries"
      ]
     },
     {

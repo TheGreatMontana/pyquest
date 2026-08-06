@@ -24,6 +24,160 @@ SOLUTIONS = {
 'python-basics/pb-05/t3': "age = int(input('Возраст: '))\nticket = input('Билет (да/нет): ')\nif age >= 18 and ticket == 'да':\n    print('Добро пожаловать')\nelse:\n    print('Вход запрещён')",
 'python-basics/pb-05/exam0': "total = int(input('Сумма: '))\nif total >= 5000:\n    pay = total * 0.75\nelif total >= 1000:\n    pay = total * 0.9\nelse:\n    pay = total\nprint(f'К оплате: {pay}')",
 
+# ===== python-libraries =====
+'python-libraries/pl-01/t1': """from collections import Counter
+
+def top_words(text, n):
+    counts = Counter(text.lower().split())
+    return [word for word, _ in counts.most_common(n)]
+
+print(top_words('кот пёс кот мышь кот пёс', 2))""",
+'python-libraries/pl-01/t2': """from collections import defaultdict
+
+def group_by_city(rows):
+    grouped = defaultdict(list)
+    for city, amount in rows:
+        grouped[city].append(amount)
+    return dict(grouped)
+
+print(group_by_city([('Ташкент', 100), ('Бухара', 50), ('Ташкент', 300)]))""",
+'python-libraries/pl-01/t3': r"""import re
+
+def error_dates(log):
+    return sorted(set(re.findall(r'ERROR (\d{4}-\d{2}-\d{2})', log)))
+
+print(error_dates('ERROR 2026-08-05 диск\nINFO 2026-08-05 ок\nERROR 2026-08-01 сеть'))""",
+'python-libraries/pl-01/exam0': r"""import re
+from collections import Counter
+
+def report(log):
+    pairs = re.findall(r'(\w+) (\d{4}-\d{2}-\d{2})', log)
+    if not pairs:
+        return {'по_уровням': {}, 'дни_с_ошибками': [], 'первый_день': None, 'последний_день': None}
+    levels = Counter(level for level, _ in pairs)
+    dates = [day for _, day in pairs]
+    errors = sorted({day for level, day in pairs if level == 'ERROR'})
+    return {
+        'по_уровням': dict(levels),
+        'дни_с_ошибками': errors,
+        'первый_день': min(dates),
+        'последний_день': max(dates),
+    }
+
+print(report('ERROR 2026-08-05 диск\nINFO 2026-08-01 ок'))""",
+
+'python-libraries/pl-02/t1': """import numpy as np
+
+def normalize(values):
+    a = np.array(values, dtype=float)
+    if a.size == 0:
+        return a
+    lo, hi = a.min(), a.max()
+    if hi == lo:
+        return np.zeros_like(a)
+    return (a - lo) / (hi - lo)
+
+print(normalize([10, 20, 30]))""",
+'python-libraries/pl-02/t2': """import numpy as np
+
+def in_range(values, lo, hi):
+    a = np.array(values)
+    if a.size == 0:
+        return a
+    return a[(a >= lo) & (a <= hi)]
+
+print(in_range([10, 25, 3, 47, 8], 5, 30))""",
+'python-libraries/pl-02/t3': """import numpy as np
+
+def summary(matrix):
+    if not matrix:
+        return {'по_магазинам': [], 'по_месяцам': [], 'лучший': None}
+    m = np.array(matrix)
+    by_shop = m.sum(axis=1)
+    return {
+        'по_магазинам': by_shop.tolist(),
+        'по_месяцам': m.sum(axis=0).tolist(),
+        'лучший': int(by_shop.argmax()),
+    }
+
+print(summary([[100, 120], [200, 180]]))""",
+'python-libraries/pl-02/exam0': """import numpy as np
+
+def analyze(scores, passing):
+    if not scores:
+        return {'средние': [], 'сдали': 0, 'сложный_предмет': None}
+    m = np.array(scores, dtype=float)
+    means = m.mean(axis=1).round(1)
+    return {
+        'средние': means.tolist(),
+        'сдали': int((means >= passing).sum()),
+        'сложный_предмет': int(m.mean(axis=0).argmin()),
+    }
+
+print(analyze([[90, 80, 70], [50, 40, 60]], 60))""",
+
+'python-libraries/pl-03/t1': """import pandas as pd
+
+def big_orders(rows, limit):
+    if not rows:
+        return []
+    df = pd.DataFrame(rows)
+    picked = df[df['amount'] > limit].sort_values('amount', ascending=False)
+    return picked['city'].tolist()
+
+print(big_orders([{'city': 'Ташкент', 'amount': 250}, {'city': 'Бухара', 'amount': 100}], 150))""",
+'python-libraries/pl-03/t2': """import pandas as pd
+
+def revenue_by_city(rows):
+    if not rows:
+        return {}
+    df = pd.DataFrame(rows)
+    df['amount'] = df['amount'].fillna(0)
+    totals = df.groupby('city')['amount'].sum()
+    return {city: int(value) for city, value in totals.items()}
+
+print(revenue_by_city([{'city': 'Ташкент', 'amount': 250}, {'city': 'Ташкент', 'amount': 400}]))""",
+'python-libraries/pl-03/t3': """import pandas as pd
+
+def join_names(orders, users):
+    if not orders:
+        return []
+    df = pd.DataFrame(orders)
+    if users:
+        df = df.merge(pd.DataFrame(users), on='user_id', how='left')
+    else:
+        df['name'] = None
+    df['name'] = df['name'].fillna('неизвестно')
+    return list(zip(df['name'], df['amount']))
+
+o = [{'user_id': 1, 'amount': 250}, {'user_id': 9, 'amount': 100}]
+u = [{'user_id': 1, 'name': 'Азиз'}]
+print(join_names(o, u))""",
+'python-libraries/pl-03/exam0': """import pandas as pd
+
+def city_report(orders, users):
+    if not orders:
+        return []
+    df = pd.DataFrame(orders)
+    if users:
+        df = df.merge(pd.DataFrame(users), on='user_id', how='left')
+    else:
+        df['city'] = None
+    df['amount'] = df['amount'].fillna(0)
+    df['city'] = df['city'].fillna('неизвестно')
+    grouped = df.groupby('city', as_index=False).agg(
+        total=('amount', 'sum'),
+        orders=('amount', 'count'),
+    ).sort_values('total', ascending=False)
+    return [
+        {'city': row['city'], 'total': int(row['total']), 'orders': int(row['orders'])}
+        for _, row in grouped.iterrows()
+    ]
+
+o = [{'user_id': 1, 'amount': 250}, {'user_id': 1, 'amount': 100}]
+u = [{'user_id': 1, 'name': 'Азиз', 'city': 'Ташкент'}]
+print(city_report(o, u))""",
+
 # ===== python-intermediate =====
 'python-intermediate/pi-01/t1': "hero = {'name': 'Рыцарь', 'hp': 100}\nhero['gold'] = 50\nhero['hp'] -= 30\nprint(hero)",
 'python-intermediate/pi-01/t2': "shop = {'зелье': 30, 'эликсир': 80, 'яд': 45}\nfor name, price in shop.items():\n    print(f'{name} - {price} монет')\nprint(f'Всего: {sum(shop.values())}')",

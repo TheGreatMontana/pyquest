@@ -212,7 +212,7 @@ function checkBlocks(blocks, where, oKey) {
     switch (b.type) {
       case 'text': case 'note': checkMl(b.html, w + '.html', true, ok && ok + '.html'); break;
       case 'code': if (!b.code) err(w + ': нет кода'); break;
-      case 'run': pySnippets.push({ name: w, code: b.code, exec: true }); break;
+      case 'run': pySnippets.push({ name: w, code: b.code, exec: true, packages: b.packages }); break;
       case 'jsrun': jsItems.push({ name: w, code: b.code, exec: true }); break;
       case 'crun': clangItems.push({ name: w, lang: 'c', code: b.code }); break;
       case 'cpprun': clangItems.push({ name: w, lang: 'cpp', code: b.code }); break;
@@ -230,7 +230,7 @@ function checkBlocks(blocks, where, oKey) {
           /* Код проверяется движком своего языка: Python — компиляцией, JS — в Node,
              компилируемые языки не проверяются (компилятора в тестах нет). */
           const lang = b.lang || 'python';
-          if (lang === 'python') pySnippets.push({ name: w, code: b.code, exec: true });
+          if (lang === 'python') pySnippets.push({ name: w, code: b.code, exec: true, packages: b.packages });
           else if (lang === 'javascript') jsItems.push({ name: w, code: b.code, syntaxOnly: true });
           else if (CLANG_KINDS.includes(lang)) clangItems.push({ name: w, lang, code: b.code });
           else if (JAVA_KINDS.includes(lang)) javaItems.push({ name: w, lang, code: b.code });
