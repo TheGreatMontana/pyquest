@@ -1102,4 +1102,60 @@ print(is_ours('support@example.com', 'example.com'))""",
 
 log = [{'кто': 'a', 'адрес': '1.1.1.1', 'успех': False, 'токен': 'abcdefgh'}]
 print(report(log, 1))""",
+# ===== de-tools =====
+'de-tools/dt-03/t1': """def upsert(table, rows, key='id'):
+    for row in rows:
+        if key not in row:
+            continue
+        table[row[key]] = row
+    return table
+
+t = {}
+upsert(t, [{'id': 1, 'sum': 100}])
+upsert(t, [{'id': 1, 'sum': 100}])
+print(len(t))""",
+'de-tools/dt-03/t2': """def quality(rows, min_rows):
+    problems = []
+    if len(rows) < min_rows:
+        problems.append('мало строк')
+    ids = [r.get('id') for r in rows]
+    if len(ids) != len(set(ids)):
+        problems.append('дубли')
+    if any((r.get('amount') or 0) < 0 for r in rows):
+        problems.append('отрицательные')
+    return sorted(problems)
+
+print(quality([{'id': 1, 'amount': 100}, {'id': 2, 'amount': 50}], 2))""",
+'de-tools/dt-03/t3': """def can_run(deps, state):
+    waiting = sorted(d for d in deps if not state.get(d))
+    return (not waiting), waiting
+
+print(can_run(['orders', 'customers'], {'orders': True, 'customers': False}))""",
+'de-tools/dt-03/exam0': """def run_step(mart, day, rows, deps, state, min_rows):
+    waiting = sorted(d for d in deps if not state.get(d))
+    if waiting:
+        return ('ждём', waiting)
+
+    day_rows = [r for r in rows if r['day'] == day]
+
+    problems = []
+    if len(day_rows) < min_rows:
+        problems.append('мало строк')
+    ids = [r.get('id') for r in day_rows]
+    if len(ids) != len(set(ids)):
+        problems.append('дубли')
+    if any((r.get('amount') or 0) < 0 for r in day_rows):
+        problems.append('отрицательные')
+    if problems:
+        return ('отклонено', sorted(problems))
+
+    mart[day] = {'orders': len(day_rows), 'total': sum(r['amount'] for r in day_rows)}
+    return ('готово', [])
+
+mart = {}
+rows = [{'day': '2026-08-01', 'id': 1, 'amount': 100},
+        {'day': '2026-08-01', 'id': 2, 'amount': 250}]
+print(run_step(mart, '2026-08-01', rows, ['orders'], {'orders': True}, 2))
+print(mart)""",
+
 }

@@ -675,7 +675,7 @@
    "color": "#f59e0b",
    "level": "advanced",
    "status": "full",
-   "estimatedHours": 12,
+   "estimatedHours": 18,
    "requires": [
     "python-io",
     "sql-joins"
@@ -684,7 +684,7 @@
     "de-pipelines"
    ],
    "legacyIds": [],
-   "moduleCount": 2
+   "moduleCount": 3
   },
   {
    "id": "javascript-basics",

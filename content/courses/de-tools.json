@@ -257,6 +257,349 @@
        "tests": "assert execution_order({'extract': [], 'transform': ['extract'], 'load': ['transform']}) == ['extract', 'transform', 'load'], 'Линейный порядок'\nassert execution_order({'b': ['a'], 'a': [], 'c': ['a']}) == ['a', 'b', 'c'], 'При выборе - алфавитный порядок'\nassert execution_order({'a': ['b'], 'b': ['a']}) == [], 'Цикл - пустой список'\nassert execution_order({}) == [], 'Пустой DAG'\nassert execution_order({'x': []}) == ['x'], 'Одна задача'" }
     ]
    }
+  },
+  {
+   "id": "dt-03",
+   "title": { "ru": "Качество данных и надёжный пайплайн", "uz": "Ma'lumot sifati va ishonchli payplayn", "en": "Data quality and a reliable pipeline" },
+   "tagline": { "ru": "Идемпотентность, проверки и обратное заполнение — то, за что платят инженеру данных", "uz": "Idempotentlik, tekshiruvlar va qayta to'ldirish — ma'lumot muhandisiga shuning uchun to'lashadi", "en": "Idempotency, checks and backfill — what a data engineer is actually paid for" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "Идемпотентность: запусти дважды — получи то же", "uz": "Idempotentlik: ikki marta ishga tushiring — o'shani oling", "en": "Idempotency: run it twice, get the same" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Пайплайн падает. Всегда. Сеть моргнула, диск кончился, соседний сервис ответил ошибкой. Вопрос не «упадёт ли», а <b>что будет, когда его перезапустят</b>.</p><p>Задача <b>идемпотентна</b>, если повторный запуск на тех же данных даёт тот же результат. Это главное требование к любому шагу пайплайна, и оно почти всегда нарушается одинаково:</p><ul><li><code>INSERT</code> без ключа — после перезапуска строки задвоятся</li><li><code>append</code> в файл — данные допишутся второй раз</li><li>счётчик <code>total += x</code> в базе — вырастет вдвое</li></ul><p>Лечится тремя способами: <b>перезапись партиции целиком</b> вместо дозаписи, <code>INSERT ... ON CONFLICT</code> по ключу (upsert), или <b>ключ идемпотентности</b> — как в курсе бэкенда.</p>",
+        "uz": "<p>Payplayn yiqiladi. Doim. Tarmoq uzildi, disk tugadi, qo'shni xizmat xato bilan javob berdi. Savol «yiqiladimi» emas, <b>uni qayta ishga tushirganda nima bo'lishida</b>.</p><p>Vazifa <b>idempotent</b>, agar o'sha ma'lumotda qayta ishga tushirish o'sha natijani bersa. Bu payplayn har qadamiga asosiy talab va u deyarli doim bir xil buziladi:</p><ul><li>kalitsiz <code>INSERT</code> — qayta ishga tushirishdan keyin qatorlar ikkilanadi</li><li>faylga <code>append</code> — ma'lumot ikkinchi marta yoziladi</li><li>bazadagi <code>total += x</code> hisoblagichi — ikki barobar o'sadi</li></ul><p>Uch usul bilan davolanadi: qo'shib yozish o'rniga <b>partitsiyani butunlay qayta yozish</b>, kalit bo'yicha <code>INSERT ... ON CONFLICT</code> (upsert) yoki <b>idempotentlik kaliti</b> — bekend kursidagi kabi.</p>",
+        "en": "<p>A pipeline fails. Always. The network blinked, the disk filled up, a neighbouring service returned an error. The question is not “will it fail” but <b>what happens when it is restarted</b>.</p><p>A task is <b>idempotent</b> if rerunning it on the same data gives the same result. This is the primary requirement for any pipeline step, and it is broken in the same ways almost every time:</p><ul><li>an <code>INSERT</code> with no key — rows double after a restart</li><li>an <code>append</code> to a file — the data is written a second time</li><li>a <code>total += x</code> counter in a database — it grows twice</li></ul><p>Three cures: <b>overwrite the whole partition</b> instead of appending, <code>INSERT ... ON CONFLICT</code> on a key (an upsert), or an <b>idempotency key</b> — as in the backend course.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "# как выглядит НЕидемпотентный шаг\nwarehouse = []\n\ndef load_bad(rows):\n    warehouse.extend(rows)          # дозапись: повтор задвоит данные\n\nbatch = [{\"id\": 1, \"sum\": 100}, {\"id\": 2, \"sum\": 250}]\nload_bad(batch)\nprint(\"после первого запуска:\", len(warehouse))\nload_bad(batch)                     # упали и перезапустили\nprint(\"после перезапуска:\", len(warehouse), \"<- данные задвоились\")\n\nprint()\n\n# идемпотентный: перезапись партиции целиком\nstore = {}\n\ndef load_good(partition, rows):\n    store[partition] = list(rows)   # что было в этой партиции — заменяется\n\nload_good(\"2026-08-05\", batch)\nprint(\"после первого запуска:\", len(store[\"2026-08-05\"]))\nload_good(\"2026-08-05\", batch)\nprint(\"после перезапуска:\", len(store[\"2026-08-05\"]), \"<- столько же\")\n\nprint()\n\n# идемпотентный: upsert по ключу\ntable = {}\n\ndef upsert(rows):\n    for row in rows:\n        table[row[\"id\"]] = row      # тот же ключ — та же строка\n\nupsert(batch)\nupsert(batch)\nupsert([{\"id\": 2, \"sum\": 999}])     # обновление, а не дубль\nprint(\"строк в таблице:\", len(table), \"| id=2:\", table[2][\"sum\"])"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Обрати внимание на третий пример: <code>upsert</code> не только защищает от дублей, но и корректно обрабатывает <b>исправленные данные</b>. Источник прислал заказ №2 заново с другой суммой — в таблице оказалась новая версия, а не две строки.</p><p>Отсюда практическое правило проектирования: у каждой строки в хранилище должен быть <b>ключ, по которому её можно узнать повторно</b>. Без такого ключа идемпотентность недостижима в принципе — нечем отличить «та же строка» от «новая похожая».</p>",
+        "uz": "<p>Uchinchi misolga e'tibor bering: <code>upsert</code> nafaqat dublikatlardan himoya qiladi, balki <b>tuzatilgan ma'lumotni</b> ham to'g'ri qayta ishlaydi. Manba 2-buyurtmani boshqa summa bilan qayta yubordi — jadvalda ikki qator emas, yangi versiya paydo bo'ldi.</p><p>Shundan amaliy loyihalash qoidasi: omboridagi har qatorda <b>uni qayta tanib olish mumkin bo'lgan kalit</b> bo'lishi kerak. Bunday kalitsiz idempotentlikka printsipial erishib bo'lmaydi — «o'sha qator» ni «yangi o'xshash» dan ajratadigan narsa yo'q.</p>",
+        "en": "<p>Note the third example: <code>upsert</code> not only guards against duplicates but also handles <b>corrected data</b> properly. The source resent order 2 with a different amount — the table ended up with the new version, not with two rows.</p><p>Hence a practical design rule: every row in storage must have a <b>key by which it can be recognised again</b>. Without such a key idempotency is unreachable in principle — there is nothing to tell “the same row” from “a new similar one”.</p>"
+       }
+      },
+      {
+       "type": "checkpoint",
+       "q": { "ru": "Пайплайн упал на середине и его перезапустили. Что должно произойти с данными?", "uz": "Payplayn o'rtada yiqildi va qayta ishga tushirildi. Ma'lumot bilan nima bo'lishi kerak?", "en": "A pipeline failed halfway and was restarted. What should happen to the data?" },
+       "options": [
+        { "ru": "Часть данных задвоится — это нормально", "uz": "Ma'lumotning bir qismi ikkilanadi — bu normal", "en": "Some data doubles — that is fine" },
+        { "ru": "Результат должен быть таким же, как при одном успешном запуске", "uz": "Natija bitta muvaffaqiyatli ishga tushirishdagidek bo'lishi kerak", "en": "The result must be identical to a single successful run" },
+        { "ru": "Данные надо удалить вручную", "uz": "Ma'lumotni qo'lda o'chirish kerak", "en": "The data must be deleted by hand" },
+        { "ru": "Запускать повторно нельзя", "uz": "Qayta ishga tushirib bo'lmaydi", "en": "You must not rerun it" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Это и есть идемпотентность. Без неё каждый сбой превращается в ручную чистку данных ночью — а сбои бывают каждую неделю.",
+        "uz": "Bu idempotentlikning o'zi. Usiz har nosozlik kechasi qo'lda ma'lumot tozalashga aylanadi — nosozliklar esa har hafta bo'ladi.",
+        "en": "That is idempotency. Without it every failure turns into manual data cleanup at night — and failures happen weekly."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "Проверки качества данных", "uz": "Ma'lumot sifati tekshiruvlari", "en": "Data quality checks" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Пайплайн может отработать «успешно» и при этом залить в витрину мусор. Зелёный статус в Airflow не значит, что данные правильные.</p><p>Поэтому между загрузкой и публикацией ставят <b>проверки</b>. Классический набор:</p><ul><li><b>Полнота</b> — строк не меньше ожидаемого. Вчера было 100 тысяч, сегодня 12 — источник сломался.</li><li><b>Уникальность</b> — ключ не повторяется.</li><li><b>Пропуски</b> — доля <code>NULL</code> в важных колонках не выросла.</li><li><b>Диапазон</b> — сумма заказа не отрицательная, дата не из будущего.</li><li><b>Ссылочная целостность</b> — все <code>customer_id</code> есть в справочнике клиентов.</li></ul><p>Ключевое решение: что делать при провале. Правило простое — <b>лучше не обновить витрину, чем обновить её мусором</b>. Старые данные хотя бы честные; неверные новые расходятся по отчётам и решениям за час.</p>",
+        "uz": "<p>Payplayn «muvaffaqiyatli» ishlab, ayni paytda vitrinaga axlat quyishi mumkin. Airflow dagi yashil status ma'lumot to'g'ri degani emas.</p><p>Shuning uchun yuklash va nashr orasiga <b>tekshiruvlar</b> qo'yiladi. Klassik to'plam:</p><ul><li><b>To'liqlik</b> — qatorlar kutilganidan kam emas. Kecha 100 ming edi, bugun 12 — manba buzilgan.</li><li><b>Noyoblik</b> — kalit takrorlanmaydi.</li><li><b>Bo'shliqlar</b> — muhim ustunlardagi <code>NULL</code> ulushi oshmagan.</li><li><b>Diapazon</b> — buyurtma summasi manfiy emas, sana kelajakdan emas.</li><li><b>Havola yaxlitligi</b> — barcha <code>customer_id</code> mijozlar ma'lumotnomasida bor.</li></ul><p>Asosiy qaror: muvaffaqiyatsizlikda nima qilish. Qoida oddiy — <b>vitrinani yangilamagan, uni axlat bilan yangilagandan yaxshi</b>. Eski ma'lumot hech bo'lmasa halol; noto'g'ri yangisi bir soatda hisobot va qarorlarga tarqaladi.</p>",
+        "en": "<p>A pipeline can finish “successfully” while pouring rubbish into the data mart. A green status in Airflow does not mean the data is correct.</p><p>So <b>checks</b> sit between loading and publishing. The classic set:</p><ul><li><b>Completeness</b> — no fewer rows than expected. Yesterday 100 thousand, today 12 — the source broke.</li><li><b>Uniqueness</b> — the key does not repeat.</li><li><b>Nulls</b> — the share of <code>NULL</code> in important columns has not grown.</li><li><b>Range</b> — an order amount is not negative, a date is not in the future.</li><li><b>Referential integrity</b> — every <code>customer_id</code> exists in the customer reference.</li></ul><p>The key decision is what to do on failure. The rule is simple: <b>better not to refresh the mart than to refresh it with rubbish</b>. Old data is at least honest; wrong new data spreads into reports and decisions within an hour.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "def check_batch(rows, expected_min, key=\"id\"):\n    \"\"\"Возвращает список проблем. Пустой список значит «можно публиковать».\"\"\"\n    problems = []\n\n    if len(rows) < expected_min:\n        problems.append(f\"мало строк: {len(rows)} при ожидаемых {expected_min}\")\n\n    keys = [r.get(key) for r in rows]\n    if len(keys) != len(set(keys)):\n        problems.append(\"ключ не уникален\")\n\n    empty = sum(1 for r in rows if r.get(\"amount\") is None)\n    if rows and empty / len(rows) > 0.1:\n        problems.append(f\"слишком много пропусков: {empty} из {len(rows)}\")\n\n    negative = [r[key] for r in rows if (r.get(\"amount\") or 0) < 0]\n    if negative:\n        problems.append(f\"отрицательные суммы у {negative}\")\n\n    return problems\n\ngood = [{\"id\": 1, \"amount\": 100}, {\"id\": 2, \"amount\": 250}, {\"id\": 3, \"amount\": 90}]\nprint(\"хорошая пачка:\", check_batch(good, 3) or \"проблем нет\")\n\nbroken = [{\"id\": 1, \"amount\": 100}, {\"id\": 1, \"amount\": -50}]\nfor p in check_batch(broken, 3):\n    print(\" -\", p)\n\nprint()\n\n# решение о публикации принимается по результатам проверок\ndef publish(rows, expected_min):\n    problems = check_batch(rows, expected_min)\n    if problems:\n        return f\"НЕ публикуем, витрина осталась вчерашней ({len(problems)} проблем)\"\n    return f\"публикуем {len(rows)} строк\"\n\nprint(publish(good, 3))\nprint(publish(broken, 3))"
+      },
+      {
+       "type": "note",
+       "kind": "trap",
+       "html": {
+        "ru": "Проверка «строк не меньше, чем вчера» ловит поломку источника, но <b>ломается в праздники и выходные</b>: в воскресенье заказов честно меньше. Сравнивать надо с тем же днём недели или держать нижнюю границу с запасом. Иначе команда за месяц привыкнет к ложным тревогам и перестанет их читать — а это хуже, чем не иметь проверки вовсе.",
+        "uz": "«Qatorlar kechagidan kam emas» tekshiruvi manba buzilishini tutadi, lekin <b>bayram va dam olish kunlarida buziladi</b>: yakshanbada buyurtmalar halol kam. O'sha hafta kuni bilan solishtirish yoki zaxirali quyi chegara ushlash kerak. Aks holda jamoa bir oyda yolg'on signallarga o'rganib, ularni o'qimay qo'yadi — bu esa tekshiruvsiz qolishdan yomonroq.",
+        "en": "A “no fewer rows than yesterday” check catches a broken source but <b>breaks on holidays and weekends</b>: on Sunday there are honestly fewer orders. Compare with the same weekday instead, or keep a lower bound with slack. Otherwise within a month the team learns to ignore false alarms — and that is worse than having no check at all."
+       }
+      },
+      {
+       "type": "checkpoint",
+       "q": { "ru": "Проверка качества провалилась. Что делать с витриной?", "uz": "Sifat tekshiruvi muvaffaqiyatsiz bo'ldi. Vitrina bilan nima qilish kerak?", "en": "A quality check failed. What do you do with the data mart?" },
+       "options": [
+        { "ru": "Обновить: свежие данные всегда лучше", "uz": "Yangilash: yangi ma'lumot doim yaxshi", "en": "Refresh it: fresh data is always better" },
+        { "ru": "Не обновлять и разбираться — старые данные честнее неверных новых", "uz": "Yangilamaslik va aniqlash — eski ma'lumot noto'g'ri yangisidan halolroq", "en": "Leave it and investigate — old data is more honest than wrong new data" },
+        { "ru": "Удалить витрину", "uz": "Vitrinani o'chirish", "en": "Delete the mart" },
+        { "ru": "Обновить наполовину", "uz": "Yarimta yangilash", "en": "Refresh it halfway" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Отчёт с вчерашними данными объясним одной фразой. Отчёт с неверными данными приведёт к неверному решению, и узнают об этом через неделю.",
+        "uz": "Kechagi ma'lumotli hisobotni bitta jumla bilan tushuntirish mumkin. Noto'g'ri ma'lumotli hisobot noto'g'ri qarorga olib keladi va bu haqda bir haftadan keyin bilishadi.",
+        "en": "A report with yesterday's data is explained in one sentence. A report with wrong data leads to a wrong decision, discovered a week later."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "Обратное заполнение и зависимости", "uz": "Qayta to'ldirish va bog'liqliklar", "en": "Backfill and dependencies" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>В логику пайплайна закралась ошибка, и три месяца витрина считалась неправильно. Ошибку исправили — но старые данные остались кривыми. Пересчёт истории называется <b>backfill</b>, обратное заполнение.</p><p>Хорошо спроектированный пайплайн переживает это спокойно, потому что построен на двух принципах:</p><ul><li><b>Партиционирование по дате.</b> Каждый запуск обрабатывает <b>свой</b> день и пишет в свою партицию. Тогда пересчёт мая не трогает июнь.</li><li><b>Идемпотентность.</b> Пересчёт того же дня просто заменяет партицию.</li></ul><p>Второй частый вопрос — <b>зависимости между шагами</b>. Витрина продаж зависит от загрузки заказов и от справочника клиентов. Если справочник ещё не приехал, витрина посчитает часть заказов «без клиента» — и это не будет видно как ошибка. Поэтому шаг должен <b>дождаться</b> своих источников, а не запускаться по расписанию вслепую.</p>",
+        "uz": "<p>Payplayn mantig'iga xato kirib qoldi va uch oy vitrina noto'g'ri hisoblandi. Xato tuzatildi — lekin eski ma'lumot qiyshiq qoldi. Tarixni qayta hisoblash <b>backfill</b>, qayta to'ldirish deyiladi.</p><p>Yaxshi loyihalangan payplayn buni bemalol o'tkazadi, chunki ikki tamoyilga qurilgan:</p><ul><li><b>Sana bo'yicha partitsiyalash.</b> Har ishga tushirish <b>o'z</b> kunini qayta ishlaydi va o'z partitsiyasiga yozadi. Shunda mayni qayta hisoblash iyunga tegmaydi.</li><li><b>Idempotentlik.</b> O'sha kunni qayta hisoblash shunchaki partitsiyani almashtiradi.</li></ul><p>Ikkinchi tez-tez uchraydigan savol — <b>qadamlar orasidagi bog'liqlik</b>. Sotuv vitrinasi buyurtmalar yuklanishiga va mijozlar ma'lumotnomasiga bog'liq. Ma'lumotnoma hali kelmagan bo'lsa, vitrina buyurtmalarning bir qismini «mijozsiz» deb hisoblaydi — va bu xato sifatida ko'rinmaydi. Shuning uchun qadam jadval bo'yicha ko'r-ko'rona ishga tushmasdan, o'z manbalarini <b>kutishi</b> kerak.</p>",
+        "en": "<p>A bug crept into the pipeline's logic and for three months the mart computed the wrong numbers. The bug is fixed — but the old data is still wrong. Recomputing history is called a <b>backfill</b>.</p><p>A well-designed pipeline survives this calmly because it rests on two principles:</p><ul><li><b>Partitioning by date.</b> Each run processes <b>its own</b> day and writes into its own partition. Then recomputing May does not touch June.</li><li><b>Idempotency.</b> Recomputing the same day simply replaces the partition.</li></ul><p>The second frequent question is <b>dependencies between steps</b>. The sales mart depends on the order load and on the customer reference. If the reference has not arrived yet, the mart counts some orders as “no customer” — and that will not surface as an error. So a step must <b>wait</b> for its sources rather than firing blindly on a schedule.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "from datetime import date, timedelta\n\n# витрина по партициям: ключ — день\nmart = {}\n\ndef build_day(day, orders):\n    \"\"\"Считает витрину за один день. Идемпотентно: перезаписывает партицию.\"\"\"\n    rows = [o for o in orders if o[\"day\"] == day]\n    mart[day] = {\"orders\": len(rows), \"total\": sum(o[\"sum\"] for o in rows)}\n\norders = [\n    {\"day\": \"2026-08-01\", \"sum\": 100},\n    {\"day\": \"2026-08-01\", \"sum\": 250},\n    {\"day\": \"2026-08-02\", \"sum\": 90},\n    {\"day\": \"2026-08-03\", \"sum\": 400},\n]\n\nfor d in [\"2026-08-01\", \"2026-08-02\", \"2026-08-03\"]:\n    build_day(d, orders)\nprint(\"витрина:\", mart)\n\n# нашли ошибку и пересчитали только один день — остальные не тронуты\nbuild_day(\"2026-08-02\", orders)\nprint(\"после пересчёта 02-го:\", mart)\n\nprint()\n\n# backfill: пройти диапазон дней подряд\ndef backfill(start, end, orders):\n    d = date.fromisoformat(start)\n    last = date.fromisoformat(end)\n    done = []\n    while d <= last:\n        build_day(d.isoformat(), orders)\n        done.append(d.isoformat())\n        d += timedelta(days=1)\n    return done\n\nprint(\"пересчитали дни:\", backfill(\"2026-08-01\", \"2026-08-03\", orders))\n\nprint()\n\n# зависимость: не считаем витрину, пока не готовы все источники\nready = {\"orders\": True, \"customers\": False}\n\ndef can_run(deps, state):\n    missing = [d for d in deps if not state.get(d)]\n    return (not missing), missing\n\nok, missing = can_run([\"orders\", \"customers\"], ready)\nprint(\"можно считать витрину:\", ok, \"| ждём:\", missing)"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Обрати внимание, насколько дёшево обошёлся пересчёт: одна строка <code>build_day(\"2026-08-02\", orders)</code>, и остальные дни не тронуты. Это прямое следствие партиционирования — если бы витрина считалась одним куском по всей истории, пришлось бы пересчитывать всё.</p><p>И на функцию <code>can_run</code>: она возвращает не только «можно или нет», но и <b>чего именно не хватает</b>. Дежурный инженер в три часа ночи должен видеть «ждём customers», а не «задача не запустилась».</p>",
+        "uz": "<p>Qayta hisoblash qanchalik arzon tushganiga e'tibor bering: bitta <code>build_day(\"2026-08-02\", orders)</code> qatori va qolgan kunlarga tegilmadi. Bu partitsiyalashning bevosita natijasi — vitrina butun tarix bo'yicha bitta bo'lak bo'lib hisoblanganida, hammasini qayta hisoblashga to'g'ri kelardi.</p><p>Va <code>can_run</code> funksiyasiga: u nafaqat «mumkinmi yo'qmi», balki <b>aynan nima yetishmayotganini</b> ham qaytaradi. Tunning uchida navbatchi muhandis «task ishga tushmadi» emas, «customers ni kutyapmiz» ni ko'rishi kerak.</p>",
+        "en": "<p>Note how cheap the recomputation was: one line, <code>build_day(\"2026-08-02\", orders)</code>, and the other days went untouched. That follows directly from partitioning — had the mart been computed as one block over all of history, everything would have to be recomputed.</p><p>And note <code>can_run</code>: it returns not just “yes or no” but <b>exactly what is missing</b>. At three in the morning the on-call engineer must see “waiting for customers”, not “the task did not start”.</p>"
+       }
+      },
+      {
+       "type": "summary",
+       "items": [
+        { "ru": "Пайплайн упадёт — вопрос только в том, что будет при перезапуске", "uz": "Payplayn yiqiladi — savol faqat qayta ishga tushirishda nima bo'lishida", "en": "A pipeline will fail — the only question is what a restart does" },
+        { "ru": "Идемпотентность: повторный запуск даёт тот же результат", "uz": "Idempotentlik: qayta ishga tushirish o'sha natijani beradi", "en": "Idempotency: a rerun gives the same result" },
+        { "ru": "Дозапись и INSERT без ключа задваивают данные при повторе", "uz": "Qo'shib yozish va kalitsiz INSERT takrorda ma'lumotni ikkilaydi", "en": "Appending and keyless INSERT double the data on a rerun" },
+        { "ru": "Перезапись партиции и upsert по ключу — рабочие решения", "uz": "Partitsiyani qayta yozish va kalit bo'yicha upsert — ishlaydigan yechimlar", "en": "Overwriting a partition and upserting by key are the working fixes" },
+        { "ru": "Зелёный статус задачи не значит, что данные правильные", "uz": "Vazifaning yashil statusi ma'lumot to'g'ri degani emas", "en": "A green task status does not mean the data is correct" },
+        { "ru": "Лучше не обновить витрину, чем обновить её мусором", "uz": "Vitrinani axlat bilan yangilagandan ko'ra yangilamagan yaxshi", "en": "Better not to refresh the mart than to refresh it with rubbish" },
+        { "ru": "Партиционирование по дате делает backfill дешёвым", "uz": "Sana bo'yicha partitsiyalash backfill ni arzon qiladi", "en": "Partitioning by date makes a backfill cheap" },
+        { "ru": "Шаг должен ждать источники, а не запускаться по расписанию вслепую", "uz": "Qadam jadval bo'yicha ko'r-ko'rona emas, manbalarni kutishi kerak", "en": "A step must wait for its sources rather than fire blindly on a schedule" }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": { "ru": "Что значит «задача идемпотентна»?", "uz": "«Vazifa idempotent» nima degani?", "en": "What does “the task is idempotent” mean?" },
+     "options": [
+      { "ru": "Она быстро работает", "uz": "U tez ishlaydi", "en": "It runs fast" },
+      { "ru": "Повторный запуск на тех же данных даёт тот же результат", "uz": "O'sha ma'lumotda qayta ishga tushirish o'sha natijani beradi", "en": "Rerunning it on the same data gives the same result" },
+      { "ru": "Она никогда не падает", "uz": "U hech qachon yiqilmaydi", "en": "It never fails" },
+      { "ru": "Она не зависит от других задач", "uz": "U boshqa vazifalarga bog'liq emas", "en": "It does not depend on other tasks" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Падать она как раз будет — на то и требование. Важно, чтобы перезапуск чинил ситуацию, а не удваивал данные.",
+      "uz": "U yiqiladi ham — talab shuning uchun. Muhimi, qayta ishga tushirish vaziyatni tuzatsin, ma'lumotni ikkilamasin.",
+      "en": "It will fail — that is the whole point of the requirement. What matters is that a restart fixes things instead of doubling the data."
+     }
+    },
+    {
+     "q": { "ru": "Что задвоит данные при перезапуске?", "uz": "Qayta ishga tushirishda ma'lumotni nima ikkilaydi?", "en": "What doubles the data on a restart?" },
+     "options": [
+      { "ru": "Перезапись партиции целиком", "uz": "Partitsiyani butunlay qayta yozish", "en": "Overwriting the whole partition" },
+      { "ru": "Дозапись в конец без ключа", "uz": "Kalitsiz oxiriga qo'shib yozish", "en": "Appending to the end with no key" },
+      { "ru": "Upsert по ключу", "uz": "Kalit bo'yicha upsert", "en": "An upsert by key" },
+      { "ru": "Чтение источника", "uz": "Manbani o'qish", "en": "Reading the source" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Дозапись не умеет отличить «эти строки уже есть» от «пришли новые». Нужен ключ или перезапись целиком.",
+      "uz": "Qo'shib yozish «bu qatorlar allaqachon bor» ni «yangilari keldi» dan ajrata olmaydi. Kalit yoki butunlay qayta yozish kerak.",
+      "en": "Appending cannot tell “these rows already exist” from “new ones arrived”. You need a key or a full overwrite."
+     }
+    },
+    {
+     "q": { "ru": "Задача в Airflow зелёная. Значит ли это, что данные верны?", "uz": "Airflow dagi vazifa yashil. Bu ma'lumot to'g'ri degani mi?", "en": "The Airflow task is green. Does that mean the data is correct?" },
+     "options": [
+      { "ru": "Да, зелёный статус это гарантия", "uz": "Ha, yashil status kafolat", "en": "Yes, a green status is a guarantee" },
+      { "ru": "Нет: код отработал без ошибок, но данные могли приехать мусорные", "uz": "Yo'q: kod xatosiz ishladi, lekin ma'lumot axlat bo'lib kelgan bo'lishi mumkin", "en": "No: the code ran without errors, but the data may have arrived as rubbish" },
+      { "ru": "Да, если нет предупреждений", "uz": "Ha, ogohlantirishlar bo'lmasa", "en": "Yes, if there are no warnings" },
+      { "ru": "Только для витрин", "uz": "Faqat vitrinalar uchun", "en": "Only for data marts" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Поэтому между загрузкой и публикацией ставят отдельный шаг проверок качества: полнота, уникальность, пропуски, диапазоны.",
+      "uz": "Shuning uchun yuklash va nashr orasiga sifat tekshiruvlarining alohida qadami qo'yiladi: to'liqlik, noyoblik, bo'shliqlar, diapazonlar.",
+      "en": "That is why a separate quality-check step sits between loading and publishing: completeness, uniqueness, nulls, ranges."
+     }
+    },
+    {
+     "q": { "ru": "Проверка «строк не меньше вчерашнего» сработала в воскресенье. Что не так?", "uz": "«Qatorlar kechagidan kam emas» tekshiruvi yakshanbada ishladi. Nima nuqson?", "en": "The “no fewer rows than yesterday” check fired on Sunday. What is wrong?" },
+     "options": [
+      { "ru": "Ничего, источник сломан", "uz": "Hech nima, manba buzilgan", "en": "Nothing, the source is broken" },
+      { "ru": "В выходные заказов честно меньше — сравнивать надо с тем же днём недели", "uz": "Dam olish kunlarida buyurtmalar halol kam — o'sha hafta kuni bilan solishtirish kerak", "en": "At weekends there are honestly fewer orders — compare with the same weekday" },
+      { "ru": "Проверка вообще не нужна", "uz": "Tekshiruv umuman kerak emas", "en": "The check is unnecessary" },
+      { "ru": "Надо понизить порог до нуля", "uz": "Chegarani nolgacha tushirish kerak", "en": "Lower the threshold to zero" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Ложные тревоги опаснее, чем кажется: через месяц команда перестаёт читать оповещения, и настоящая поломка проходит незамеченной.",
+      "uz": "Yolg'on signallar ko'ringanidan xavfliroq: bir oydan keyin jamoa xabarlarni o'qimay qo'yadi va haqiqiy nosozlik sezilmay o'tadi.",
+      "en": "False alarms are more dangerous than they look: within a month the team stops reading alerts and a real failure slips through."
+     }
+    },
+    {
+     "q": { "ru": "Зачем партиционировать витрину по дате?", "uz": "Vitrinani nega sana bo'yicha partitsiyalash kerak?", "en": "Why partition a mart by date?" },
+     "options": [
+      { "ru": "Чтобы файлы были мельче", "uz": "Fayllar mayda bo'lishi uchun", "en": "To make the files smaller" },
+      { "ru": "Чтобы пересчитать один день, не трогая остальные", "uz": "Qolganlariga tegmasdan bir kunni qayta hisoblash uchun", "en": "So one day can be recomputed without touching the rest" },
+      { "ru": "Так требует Airflow", "uz": "Airflow shuni talab qiladi", "en": "Airflow requires it" },
+      { "ru": "Для красоты в интерфейсе", "uz": "Interfeys chiroyi uchun", "en": "For a nicer interface" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Без партиций исправление ошибки за один день превращается в пересчёт всей истории — а это часы работы кластера и риск задеть свежие данные.",
+      "uz": "Partitsiyalarsiz bir kunlik xatoni tuzatish butun tarixni qayta hisoblashga aylanadi — bu klaster soatlari va yangi ma'lumotga tegish xavfi.",
+      "en": "Without partitions, fixing one day's bug turns into recomputing all of history — hours of cluster time and a risk of disturbing fresh data."
+     }
+    },
+    {
+     "q": { "ru": "Витрина запустилась раньше, чем приехал справочник клиентов. Что будет?", "uz": "Vitrina mijozlar ma'lumotnomasi kelishidan oldin ishga tushdi. Nima bo'ladi?", "en": "The mart ran before the customer reference arrived. What happens?" },
+     "options": [
+      { "ru": "Задача упадёт с ошибкой", "uz": "Vazifa xato bilan yiqiladi", "en": "The task fails with an error" },
+      { "ru": "Посчитает часть заказов «без клиента» — и это не будет видно как ошибка", "uz": "Buyurtmalarning bir qismini «mijozsiz» deb hisoblaydi — va bu xato sifatida ko'rinmaydi", "en": "It counts some orders as “no customer” — and that will not look like an error" },
+      { "ru": "Airflow сам подождёт", "uz": "Airflow o'zi kutadi", "en": "Airflow waits by itself" },
+      { "ru": "Ничего, данные догрузятся позже", "uz": "Hech nima, ma'lumot keyin yuklanadi", "en": "Nothing, the data loads later" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Самый неприятный вид ошибки: всё зелёное, отчёт готов, цифры занижены. Поэтому шаг должен явно дожидаться своих источников.",
+      "uz": "Xatoning eng yoqimsiz turi: hammasi yashil, hisobot tayyor, raqamlar past. Shuning uchun qadam o'z manbalarini aniq kutishi kerak.",
+      "en": "The nastiest kind of bug: everything green, the report ready, the numbers understated. Hence a step must explicitly wait for its sources."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "python",
+     "title": { "ru": "Идемпотентная загрузка", "uz": "Idempotent yuklash", "en": "An idempotent load" },
+     "brief": { "ru": "Upsert вместо дозаписи", "uz": "Qo'shib yozish o'rniga upsert", "en": "Upsert instead of append" },
+     "desc": {
+      "ru": "<p><code>upsert(table, rows, key='id')</code> получает словарь-таблицу «ключ → строка» и список новых строк.</p><p>Для каждой строки положи её в таблицу по значению поля <code>key</code>: если такой ключ уже был, строка <b>заменяется</b>, а не добавляется второй раз. Верни ту же таблицу.</p><p>Строки без поля <code>key</code> пропускай молча.</p>",
+      "uz": "<p><code>upsert(table, rows, key='id')</code> «kalit → qator» lug'at-jadvalini va yangi qatorlar ro'yxatini oladi.</p><p>Har qatorni <code>key</code> maydoni qiymati bo'yicha jadvalga qo'ying: bunday kalit allaqachon bo'lgan bo'lsa, qator ikkinchi marta qo'shilmasdan <b>almashtiriladi</b>. O'sha jadvalni qaytaring.</p><p><code>key</code> maydoni yo'q qatorlarni jimgina o'tkazib yuboring.</p>",
+      "en": "<p><code>upsert(table, rows, key='id')</code> receives a dictionary-table “key → row” and a list of new rows.</p><p>Put each row into the table under the value of its <code>key</code> field: if that key already existed the row is <b>replaced</b> rather than added a second time. Return the same table.</p><p>Silently skip rows without the <code>key</code> field.</p>"
+     },
+     "starter": "def upsert(table, rows, key='id'):\n    # твой код\n    pass\n\nt = {}\nupsert(t, [{'id': 1, 'sum': 100}])\nupsert(t, [{'id': 1, 'sum': 100}])\nprint(len(t))\n",
+     "tests": "t = {}\nbatch = [{'id': 1, 'sum': 100}, {'id': 2, 'sum': 250}]\nupsert(t, batch)\nassert len(t) == 2, 'Две строки после первой загрузки'\nupsert(t, batch)\nassert len(t) == 2, 'Повтор не должен задваивать данные'\nupsert(t, [{'id': 2, 'sum': 999}])\nassert t[2]['sum'] == 999, 'Строка с тем же ключом обновляется'\nassert len(t) == 2, 'Обновление не добавляет строк'\nupsert(t, [{'sum': 5}])\nassert len(t) == 2, 'Строка без ключа пропускается'\nres = upsert(t, [{'id': 3, 'sum': 1}])\nassert res is t and len(t) == 3, 'Возвращается та же таблица'",
+     "hint": {
+      "ru": "Цикл по <code>rows</code>: если <code>key not in row</code> — <code>continue</code>, иначе <code>table[row[key]] = row</code>. В конце <code>return table</code>.",
+      "uz": "<code>rows</code> bo'ylab sikl: <code>key not in row</code> bo'lsa — <code>continue</code>, aks holda <code>table[row[key]] = row</code>. Oxirida <code>return table</code>.",
+      "en": "Loop over <code>rows</code>: if <code>key not in row</code> then <code>continue</code>, otherwise <code>table[row[key]] = row</code>. Finish with <code>return table</code>."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "python",
+     "title": { "ru": "Проверки перед публикацией", "uz": "Nashrdan oldingi tekshiruvlar", "en": "Checks before publishing" },
+     "brief": { "ru": "Полнота, уникальность, диапазон", "uz": "To'liqlik, noyoblik, diapazon", "en": "Completeness, uniqueness, range" },
+     "desc": {
+      "ru": "<p><code>quality(rows, min_rows)</code> возвращает <b>отсортированный</b> список названий проваленных проверок:</p><ul><li><code>'мало строк'</code> — строк меньше <code>min_rows</code>;</li><li><code>'дубли'</code> — поле <code>id</code> повторяется;</li><li><code>'отрицательные'</code> — есть <code>amount</code> меньше нуля.</li></ul><p>Если всё в порядке — пустой список.</p>",
+      "uz": "<p><code>quality(rows, min_rows)</code> muvaffaqiyatsiz tekshiruvlar nomlarining <b>saralangan</b> ro'yxatini qaytaradi:</p><ul><li><code>'мало строк'</code> — qatorlar <code>min_rows</code> dan kam;</li><li><code>'дубли'</code> — <code>id</code> maydoni takrorlanadi;</li><li><code>'отрицательные'</code> — noldan kichik <code>amount</code> bor.</li></ul><p>Hammasi joyida bo'lsa — bo'sh ro'yxat.</p>",
+      "en": "<p><code>quality(rows, min_rows)</code> returns a <b>sorted</b> list of the names of the failed checks:</p><ul><li><code>'мало строк'</code> — fewer rows than <code>min_rows</code>;</li><li><code>'дубли'</code> — the <code>id</code> field repeats;</li><li><code>'отрицательные'</code> — there is an <code>amount</code> below zero.</li></ul><p>If everything is fine, an empty list.</p>"
+     },
+     "starter": "def quality(rows, min_rows):\n    # твой код\n    pass\n\nprint(quality([{'id': 1, 'amount': 100}, {'id': 2, 'amount': 50}], 2))\n",
+     "tests": "good = [{'id': 1, 'amount': 100}, {'id': 2, 'amount': 50}]\nassert quality(good, 2) == [], 'Хорошая пачка проходит'\nassert quality(good, 5) == ['мало строк'], 'Мало строк'\ndup = [{'id': 1, 'amount': 10}, {'id': 1, 'amount': 20}]\nassert quality(dup, 2) == ['дубли'], 'Повторяющийся id'\nneg = [{'id': 1, 'amount': -5}, {'id': 2, 'amount': 10}]\nassert quality(neg, 2) == ['отрицательные'], 'Отрицательная сумма'\nbad = [{'id': 1, 'amount': -5}, {'id': 1, 'amount': 10}]\nassert quality(bad, 5) == ['дубли', 'мало строк', 'отрицательные'], 'Все три проблемы, по алфавиту'\nassert quality([], 0) == [], 'Пустая пачка при нулевом пороге проходит'",
+     "hint": {
+      "ru": "Собери проблемы в список, потом верни <code>sorted(problems)</code>. Дубли ловятся сравнением <code>len(ids) != len(set(ids))</code>, отрицательные — через <code>any(r['amount'] &lt; 0 for r in rows)</code>.",
+      "uz": "Muammolarni ro'yxatga yig'ing, keyin <code>sorted(problems)</code> qaytaring. Dublikatlar <code>len(ids) != len(set(ids))</code> solishtirish bilan, manfiylar esa <code>any(r['amount'] &lt; 0 for r in rows)</code> orqali tutiladi.",
+      "en": "Collect the problems into a list and return <code>sorted(problems)</code>. Duplicates are caught by <code>len(ids) != len(set(ids))</code>, negatives by <code>any(r['amount'] &lt; 0 for r in rows)</code>."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "python",
+     "title": { "ru": "Готовы ли источники", "uz": "Manbalar tayyormi", "en": "Are the sources ready" },
+     "brief": { "ru": "Зависимости шага", "uz": "Qadam bog'liqliklari", "en": "Step dependencies" },
+     "desc": {
+      "ru": "<p><code>can_run(deps, state)</code> получает список нужных источников и словарь «источник → готов ли».</p><p>Верни кортеж <code>(можно_запускать, чего_ждём)</code>, где второй элемент — <b>отсортированный</b> список неготовых источников. Источник, которого нет в словаре, считается неготовым.</p>",
+      "uz": "<p><code>can_run(deps, state)</code> kerakli manbalar ro'yxatini va «manba → tayyormi» lug'atini oladi.</p><p><code>(ishga_tushirsa_bo'ladi, nima_kutyapmiz)</code> kortejini qaytaring, ikkinchi element — tayyor bo'lmagan manbalarning <b>saralangan</b> ro'yxati. Lug'atda yo'q manba tayyor emas deb hisoblanadi.</p>",
+      "en": "<p><code>can_run(deps, state)</code> receives a list of required sources and a dictionary “source → is it ready”.</p><p>Return the tuple <code>(can_start, waiting_for)</code>, where the second element is a <b>sorted</b> list of the sources that are not ready. A source absent from the dictionary counts as not ready.</p>"
+     },
+     "starter": "def can_run(deps, state):\n    # твой код\n    pass\n\nprint(can_run(['orders', 'customers'], {'orders': True, 'customers': False}))\n",
+     "tests": "ok, waiting = can_run(['orders', 'customers'], {'orders': True, 'customers': False})\nassert ok is False and waiting == ['customers'], 'Ждём один источник'\nok2, w2 = can_run(['orders'], {'orders': True})\nassert ok2 is True and w2 == [], 'Всё готово'\nok3, w3 = can_run(['a', 'b'], {})\nassert ok3 is False and w3 == ['a', 'b'], 'Ничего не готово, список по алфавиту'\nok4, w4 = can_run([], {})\nassert ok4 is True and w4 == [], 'Без зависимостей можно запускать'\nok5, w5 = can_run(['z', 'a'], {'z': False, 'a': False})\nassert w5 == ['a', 'z'], 'Список отсортирован'",
+     "hint": {
+      "ru": "Списковое включение с <code>state.get(d)</code>: отсутствующий ключ даст <code>None</code>, а это ложь — как раз то, что нужно. Первый элемент кортежа — <code>not waiting</code>.",
+      "uz": "<code>state.get(d)</code> bilan ro'yxat inklyuziyasi: yo'q kalit <code>None</code> beradi, bu esa yolg'on — aynan kerakli narsa. Kortejning birinchi elementi — <code>not waiting</code>.",
+      "en": "A comprehension with <code>state.get(d)</code>: a missing key gives <code>None</code>, which is falsy — exactly what is wanted. The tuple's first element is <code>not waiting</code>."
+     }
+    }
+   ],
+   "exam": {
+    "time": 600,
+    "questions": [
+     {
+      "q": { "ru": "Пайплайн дозаписывает строки в файл. Его перезапустили после сбоя. Что в файле?", "uz": "Payplayn faylga qatorlar qo'shib yozadi. Nosozlikdan keyin qayta ishga tushirildi. Faylda nima?", "en": "A pipeline appends rows to a file and was restarted after a failure. What is in the file?" },
+      "options": [
+       { "ru": "Ровно то, что должно быть", "uz": "Aynan bo'lishi kerak bo'lgan narsa", "en": "Exactly what should be there" },
+       { "ru": "Часть строк записана дважды", "uz": "Qatorlarning bir qismi ikki marta yozilgan", "en": "Some rows are written twice" },
+       { "ru": "Файл пустой", "uz": "Fayl bo'sh", "en": "The file is empty" },
+       { "ru": "Ошибка чтения", "uz": "O'qish xatosi", "en": "A read error" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Что делает шаг идемпотентным проще всего?", "uz": "Qadamni idempotent qilishning eng oson yo'li?", "en": "What most easily makes a step idempotent?" },
+      "options": [
+       { "ru": "Логирование", "uz": "Loglash", "en": "Logging" },
+       { "ru": "Перезапись партиции целиком или upsert по ключу", "uz": "Partitsiyani butunlay qayta yozish yoki kalit bo'yicha upsert", "en": "Overwriting the whole partition or upserting by key" },
+       { "ru": "Ретраи", "uz": "Qayta urinishlar", "en": "Retries" },
+       { "ru": "Увеличение таймаута", "uz": "Taymautni oshirish", "en": "Increasing the timeout" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Проверка качества провалилась ночью. Что должно случиться?", "uz": "Sifat tekshiruvi kechasi muvaffaqiyatsiz bo'ldi. Nima bo'lishi kerak?", "en": "A quality check failed at night. What should happen?" },
+      "options": [
+       { "ru": "Витрина обновится, разберёмся утром", "uz": "Vitrina yangilanadi, ertalab aniqlaymiz", "en": "The mart refreshes, we will look into it in the morning" },
+       { "ru": "Публикация останавливается, приходит оповещение", "uz": "Nashr to'xtaydi, ogohlantirish keladi", "en": "Publishing stops and an alert is sent" },
+       { "ru": "Данные удаляются", "uz": "Ma'lumot o'chiriladi", "en": "The data is deleted" },
+       { "ru": "Задача просто перезапустится", "uz": "Vazifa shunchaki qayta ishga tushadi", "en": "The task simply restarts" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Нашли ошибку в логике за три месяца назад. Что нужно, чтобы пересчёт был дешёвым?", "uz": "Uch oy oldingi mantiqda xato topildi. Qayta hisoblash arzon bo'lishi uchun nima kerak?", "en": "A logic bug from three months ago was found. What makes the recompute cheap?" },
+      "options": [
+       { "ru": "Больше памяти на кластере", "uz": "Klasterda ko'proq xotira", "en": "More cluster memory" },
+       { "ru": "Партиционирование по дате и идемпотентность шага", "uz": "Sana bo'yicha partitsiyalash va qadam idempotentligi", "en": "Date partitioning and an idempotent step" },
+       { "ru": "Ручная выгрузка в Excel", "uz": "Excel ga qo'lda yuklash", "en": "A manual export to Excel" },
+       { "ru": "Отключить проверки качества", "uz": "Sifat tekshiruvlarini o'chirish", "en": "Disabling the quality checks" }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "python",
+      "title": { "ru": "Шаг пайплайна целиком", "uz": "Payplayn qadami to'liq", "en": "A whole pipeline step" },
+      "desc": {
+       "ru": "<p>Собери настоящий шаг. <code>run_step(mart, day, rows, deps, state, min_rows)</code>:</p><ol><li>Если не все зависимости готовы — верни <code>('ждём', список_неготовых)</code>, ничего не меняя.</li><li>Иначе проверь качество строк за этот день (<code>row['day'] == day</code>): их должно быть не меньше <code>min_rows</code>, <code>id</code> без дублей, <code>amount</code> не отрицательный. При проблемах верни <code>('отклонено', отсортированный_список_проблем)</code> и <b>не трогай витрину</b>.</li><li>Если всё хорошо — запиши в <code>mart[day]</code> словарь <code>{'orders': N, 'total': сумма}</code> и верни <code>('готово', [])</code>.</li></ol><p>Названия проблем те же: <code>'мало строк'</code>, <code>'дубли'</code>, <code>'отрицательные'</code>. Повторный запуск на тех же данных обязан дать тот же результат.</p>",
+       "uz": "<p>Haqiqiy qadamni yig'ing. <code>run_step(mart, day, rows, deps, state, min_rows)</code>:</p><ol><li>Barcha bog'liqliklar tayyor bo'lmasa — hech nimani o'zgartirmasdan <code>('ждём', tayyor_emaslar_ro'yxati)</code> qaytaring.</li><li>Aks holda shu kundagi qatorlar sifatini tekshiring (<code>row['day'] == day</code>): ular <code>min_rows</code> dan kam bo'lmasligi, <code>id</code> dublikatsiz, <code>amount</code> manfiy emasligi kerak. Muammolarda <code>('отклонено', saralangan_muammolar)</code> qaytaring va <b>vitrinaga tegmang</b>.</li><li>Hammasi yaxshi bo'lsa — <code>mart[day]</code> ga <code>{'orders': N, 'total': summa}</code> lug'atini yozing va <code>('готово', [])</code> qaytaring.</li></ol><p>Muammolar nomlari o'sha: <code>'мало строк'</code>, <code>'дубли'</code>, <code>'отрицательные'</code>. O'sha ma'lumotda qayta ishga tushirish o'sha natijani berishi shart.</p>",
+       "en": "<p>Assemble a real step. <code>run_step(mart, day, rows, deps, state, min_rows)</code>:</p><ol><li>If not all dependencies are ready, return <code>('ждём', list_of_missing)</code> and change nothing.</li><li>Otherwise check the quality of the rows for that day (<code>row['day'] == day</code>): there must be at least <code>min_rows</code>, the <code>id</code> must not repeat, and <code>amount</code> must not be negative. On problems return <code>('отклонено', sorted_problem_list)</code> and <b>do not touch the mart</b>.</li><li>If all is well, write <code>{'orders': N, 'total': sum}</code> into <code>mart[day]</code> and return <code>('готово', [])</code>.</li></ol><p>The problem names are the same: <code>'мало строк'</code>, <code>'дубли'</code>, <code>'отрицательные'</code>. Rerunning on the same data must give the same result.</p>"
+      },
+      "starter": "def run_step(mart, day, rows, deps, state, min_rows):\n    # зависимости -> качество -> публикация\n    pass\n\nmart = {}\nrows = [{'day': '2026-08-01', 'id': 1, 'amount': 100},\n        {'day': '2026-08-01', 'id': 2, 'amount': 250}]\nprint(run_step(mart, '2026-08-01', rows, ['orders'], {'orders': True}, 2))\nprint(mart)\n",
+      "tests": "rows = [{'day': '2026-08-01', 'id': 1, 'amount': 100},\n        {'day': '2026-08-01', 'id': 2, 'amount': 250},\n        {'day': '2026-08-02', 'id': 3, 'amount': 90}]\n\nmart = {}\nstatus, info = run_step(mart, '2026-08-01', rows, ['orders'], {'orders': False}, 2)\nassert status == 'ждём' and info == ['orders'], 'Источник не готов'\nassert mart == {}, 'Витрину трогать нельзя, пока ждём'\n\nstatus, info = run_step(mart, '2026-08-01', rows, ['orders'], {'orders': True}, 2)\nassert status == 'готово' and info == [], 'Всё хорошо'\nassert mart['2026-08-01'] == {'orders': 2, 'total': 350}, 'Витрина за день'\n\nbefore = dict(mart['2026-08-01'])\nrun_step(mart, '2026-08-01', rows, ['orders'], {'orders': True}, 2)\nassert mart['2026-08-01'] == before, 'Повторный запуск не должен менять результат'\n\nstatus, info = run_step(mart, '2026-08-02', rows, ['orders'], {'orders': True}, 5)\nassert status == 'отклонено' and info == ['мало строк'], 'Мало строк за день'\nassert '2026-08-02' not in mart, 'При отклонении витрина не пишется'\n\nbad = [{'day': 'd', 'id': 1, 'amount': -5}, {'day': 'd', 'id': 1, 'amount': 10}]\nstatus, info = run_step(mart, 'd', bad, [], {}, 5)\nassert status == 'отклонено' and info == ['дубли', 'мало строк', 'отрицательные'], 'Три проблемы по алфавиту'",
+      "hint": {
+       "ru": "Три шага по порядку, каждый с ранним возвратом. Строки за день отбери один раз: <code>day_rows = [r for r in rows if r['day'] == day]</code> — и дальше проверяй уже их. Сумму считай через <code>sum(r['amount'] for r in day_rows)</code>.",
+       "uz": "Uch qadam tartib bilan, har biri erta qaytish bilan. Kun qatorlarini bir marta ajrating: <code>day_rows = [r for r in rows if r['day'] == day]</code> — va keyin ularni tekshiring. Summani <code>sum(r['amount'] for r in day_rows)</code> orqali hisoblang.",
+       "en": "Three steps in order, each with an early return. Select the day's rows once: <code>day_rows = [r for r in rows if r['day'] == day]</code> — and check those from then on. Compute the total with <code>sum(r['amount'] for r in day_rows)</code>."
+      }
+     }
+    ]
+   }
   }
  ]
 }
