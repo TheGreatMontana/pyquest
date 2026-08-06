@@ -625,7 +625,7 @@
    "color": "#60a5fa",
    "level": "beginner",
    "status": "starter",
-   "estimatedHours": 12,
+   "estimatedHours": 18,
    "requires": [
     "python-collections"
    ],
@@ -633,7 +633,7 @@
     "data-analysis"
    ],
    "legacyIds": [],
-   "moduleCount": 2
+   "moduleCount": 3
   },
   {
    "id": "security-intro",

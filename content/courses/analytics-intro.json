@@ -468,6 +468,349 @@
      }
     ]
    }
+  },
+  {
+   "id": "an-03",
+   "title": { "ru": "A/B-тесты: как проверить идею", "uz": "A/B testlar: g'oyani qanday tekshirish", "en": "A/B tests: how to check an idea" },
+   "tagline": { "ru": "Гипотеза, случайность и подглядывание — почему половина «побед» не подтверждается", "uz": "Gipoteza, tasodif va ko'z tashlash — nega «g'alaba» larning yarmi tasdiqlanmaydi", "en": "Hypothesis, randomness and peeking — why half the “wins” never hold up" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "Гипотеза и две группы", "uz": "Gipoteza va ikki guruh", "en": "A hypothesis and two groups" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>«Давайте перекрасим кнопку в зелёный, будет больше заказов» — это не решение, а <b>гипотеза</b>. Проверить её можно только одним способом: показать одной части пользователей старую версию, другой новую, и сравнить.</p><p>Такой эксперимент называется <b>A/B-тестом</b>. Группа A — контрольная, всё как было. Группа B — с изменением. Правила простые, но нарушают их постоянно:</p><ul><li>Пользователь попадает в группу <b>случайно</b> и остаётся в ней до конца теста.</li><li>Группы отличаются <b>только</b> проверяемым изменением.</li><li><b>Метрика выбрана заранее.</b> Не «посмотрим, что улучшилось», а «мы измеряем конверсию в заказ».</li></ul><p>Последний пункт защищает от главного самообмана: если смотреть на двадцать метрик, одна улучшится случайно почти наверняка.</p>",
+        "uz": "<p>«Keling, tugmani yashilga bo'yaymiz, buyurtma ko'payadi» — bu qaror emas, <b>gipoteza</b>. Uni faqat bitta usulda tekshirish mumkin: foydalanuvchilarning bir qismiga eski, boshqasiga yangi versiyani ko'rsatib, solishtirish.</p><p>Bunday tajriba <b>A/B test</b> deyiladi. A guruh — nazorat, hammasi avvalgidek. B guruh — o'zgarish bilan. Qoidalar oddiy, lekin ular doim buziladi:</p><ul><li>Foydalanuvchi guruhga <b>tasodifan</b> tushadi va test oxirigacha unda qoladi.</li><li>Guruhlar <b>faqat</b> tekshirilayotgan o'zgarish bilan farq qiladi.</li><li><b>Metrika oldindan tanlanadi.</b> «Nima yaxshilanibdi, ko'ramiz» emas, «biz buyurtmaga konversiyani o'lchaymiz».</li></ul><p>Oxirgi band asosiy o'z-o'zini aldashdan himoya qiladi: yigirmata metrikaga qaralsa, bittasi tasodifan yaxshilanishi deyarli aniq.</p>",
+        "en": "<p>“Let's paint the button green, we'll get more orders” is not a decision but a <b>hypothesis</b>. There is only one way to check it: show one part of the users the old version, another the new one, and compare.</p><p>Such an experiment is an <b>A/B test</b>. Group A is the control, everything as before. Group B carries the change. The rules are simple and broken constantly:</p><ul><li>A user lands in a group <b>at random</b> and stays there until the test ends.</li><li>The groups differ in <b>nothing but</b> the change under test.</li><li>The <b>metric is chosen in advance.</b> Not “let's see what improved” but “we measure conversion to order”.</li></ul><p>The last point guards against the main self-deception: look at twenty metrics and one of them improves by chance almost certainly.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "events = [\n    {\"user\": 1, \"group\": \"A\", \"ordered\": False},\n    {\"user\": 2, \"group\": \"A\", \"ordered\": True},\n    {\"user\": 3, \"group\": \"A\", \"ordered\": False},\n    {\"user\": 4, \"group\": \"A\", \"ordered\": False},\n    {\"user\": 5, \"group\": \"B\", \"ordered\": True},\n    {\"user\": 6, \"group\": \"B\", \"ordered\": True},\n    {\"user\": 7, \"group\": \"B\", \"ordered\": False},\n    {\"user\": 8, \"group\": \"B\", \"ordered\": False},\n]\n\ndef conversion(events):\n    stats = {}\n    for e in events:\n        g = stats.setdefault(e[\"group\"], {\"users\": 0, \"orders\": 0})\n        g[\"users\"] += 1\n        g[\"orders\"] += 1 if e[\"ordered\"] else 0\n    return {k: round(v[\"orders\"] / v[\"users\"] * 100, 1) for k, v in stats.items()}\n\nconv = conversion(events)\nprint(\"конверсия:\", conv)\n\nlift = (conv[\"B\"] - conv[\"A\"]) / conv[\"A\"] * 100\nprint(f\"относительный прирост: {lift:.0f}%\")\nprint(\"пользователей в тесте:\", len(events), \"<- и вот здесь начинаются проблемы\")"
+      },
+      {
+       "type": "note",
+       "kind": "trap",
+       "html": {
+        "ru": "Прирост «в два раза» на восьми пользователях — это не результат, а совпадение. Разница в один заказ переворачивает картину целиком. Прежде чем радоваться проценту, всегда смотри на <b>абсолютные числа</b>: 2 заказа из 4 против 1 из 4 звучит как +100%, но это ровно один человек.",
+        "uz": "Sakkiz foydalanuvchida «ikki barobar» o'sish — natija emas, tasodif. Bitta buyurtma farqi butun manzarani ag'daradi. Foizdan quvonishdan oldin doim <b>mutlaq raqamlarga</b> qarang: 4 tadan 2 buyurtma 4 tadan 1 ga qarshi +100% dek eshitiladi, lekin bu aynan bitta odam.",
+        "en": "A “twofold” lift on eight users is a coincidence, not a result. A difference of one order flips the whole picture. Before celebrating a percentage, always look at the <b>absolute numbers</b>: 2 orders out of 4 against 1 out of 4 sounds like +100%, but it is exactly one person."
+       }
+      },
+      {
+       "type": "checkpoint",
+       "q": { "ru": "Что значит «метрика выбрана заранее»?", "uz": "«Metrika oldindan tanlangan» nima degani?", "en": "What does “the metric is chosen in advance” mean?" },
+       "options": [
+        { "ru": "Метрику считает аналитик, а не разработчик", "uz": "Metrikani dasturchi emas, analitik hisoblaydi", "en": "An analyst computes the metric, not a developer" },
+        { "ru": "До старта теста решено, какое именно число мы сравниваем", "uz": "Test boshlanishidan oldin qaysi raqamni solishtirish hal qilingan", "en": "Before the test starts it is decided which number exactly we compare" },
+        { "ru": "Метрику нельзя менять никогда", "uz": "Metrikani hech qachon o'zgartirib bo'lmaydi", "en": "The metric can never be changed" },
+        { "ru": "Метрик должно быть много", "uz": "Metrikalar ko'p bo'lishi kerak", "en": "There should be many metrics" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Иначе после теста всегда найдётся метрика, которая «выросла» — и решение будет принято по случайному шуму.",
+        "uz": "Aks holda testdan keyin doim «o'sgan» metrika topiladi — va qaror tasodifiy shovqin bo'yicha qabul qilinadi.",
+        "en": "Otherwise, after the test there is always some metric that “grew” — and the decision gets made on random noise."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "Случайность и размер выборки", "uz": "Tasodif va tanlanma hajmi", "en": "Randomness and sample size" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Главный вопрос A/B-теста: разница между группами <b>настоящая</b> или это просто случайность? Ответ можно почувствовать без формул — достаточно провести тест, в котором изменения нет вообще.</p><p>Разделим одних и тех же пользователей на две группы случайно. Изменения нет, значит и разницы быть не должно. Посмотрим, какая разница получается на самом деле.</p>",
+        "uz": "<p>A/B testning asosiy savoli: guruhlar orasidagi farq <b>haqiqiymi</b> yoki shunchaki tasodifmi? Javobni formulalarsiz his qilish mumkin — o'zgarish umuman yo'q testni o'tkazish kifoya.</p><p>O'sha foydalanuvchilarni tasodifan ikki guruhga bo'lamiz. O'zgarish yo'q, demak farq ham bo'lmasligi kerak. Aslida qanday farq chiqishini ko'ramiz.</p>",
+        "en": "<p>The central question of an A/B test: is the difference between the groups <b>real</b> or just chance? You can feel the answer without formulas — just run a test in which there is no change at all.</p><p>Split the very same users into two groups at random. There is no change, so there should be no difference. Let us see what difference actually appears.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "import random\n\nrandom.seed(7)\n\ndef fake_test(n, true_rate=0.10):\n    \"\"\"Никакого изменения нет: обе группы одинаковые. Смотрим на разброс.\"\"\"\n    a = sum(1 for _ in range(n) if random.random() < true_rate)\n    b = sum(1 for _ in range(n) if random.random() < true_rate)\n    return a / n * 100, b / n * 100\n\nfor n in (50, 500, 5000, 50000):\n    diffs = []\n    for _ in range(20):\n        ca, cb = fake_test(n)\n        diffs.append(abs(cb - ca))\n    worst = max(diffs)\n    print(f\"{n:>6} человек в группе: худшая случайная разница {worst:.2f} п.п.\")"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Смотри, что получилось. На 50 пользователях в группе разница в несколько процентных пунктов возникает <b>сама собой</b>, без всякого изменения. На 50 000 случайный разброс — доли пункта.</p><p>Отсюда главный вывод: <b>размер выборки решает, какую разницу вообще можно заметить</b>. Если ожидаемый эффект — прирост конверсии на 0,5 п.п., а в тесте по 200 человек, тест бесполезен: шум больше эффекта.</p><p>Практическое следствие для аналитика: количество пользователей и срок теста считают <b>до запуска</b>, а не после. Иначе результат читается как «ну вроде выросло» — и это уже не измерение, а гадание.</p>",
+        "uz": "<p>Qarang, nima chiqdi. Guruhda 50 foydalanuvchi bo'lganda bir necha foiz punkt farq hech qanday o'zgarishsiz <b>o'z-o'zidan</b> paydo bo'ladi. 50 000 da tasodifiy tarqalish — punkt ulushlari.</p><p>Bundan asosiy xulosa: <b>tanlanma hajmi qanday farqni umuman sezish mumkinligini hal qiladi</b>. Kutilgan effekt konversiyaning 0,5 p.p. o'sishi bo'lsa, testda esa 200 tadan odam bo'lsa, test foydasiz: shovqin effektdan katta.</p><p>Analitik uchun amaliy natija: foydalanuvchilar soni va test muddati <b>ishga tushirishdan oldin</b> hisoblanadi, keyin emas. Aks holda natija «xo'sh, o'sganga o'xshaydi» deb o'qiladi — bu esa o'lchov emas, folbinlik.</p>",
+        "en": "<p>Look at what happened. With 50 users per group a difference of several percentage points appears <b>by itself</b>, with no change at all. At 50,000 the random spread is fractions of a point.</p><p>Hence the main conclusion: <b>the sample size decides what difference can be noticed at all</b>. If the expected effect is a 0.5 pp lift in conversion but the test has 200 people per group, the test is useless: the noise is larger than the effect.</p><p>The practical consequence for an analyst: the number of users and the duration are computed <b>before the launch</b>, not after. Otherwise the result reads as “well, it seems to have grown” — and that is guesswork, not measurement.</p>"
+       }
+      },
+      {
+       "type": "checkpoint",
+       "q": { "ru": "В тесте по 100 человек в группе конверсия выросла с 10% до 13%. Что это значит?", "uz": "Guruhda 100 tadan odam bo'lgan testda konversiya 10% dan 13% ga o'sdi. Bu nima degani?", "en": "In a test with 100 people per group conversion rose from 10% to 13%. What does that mean?" },
+       "options": [
+        { "ru": "Изменение работает, катим на всех", "uz": "O'zgarish ishlaydi, hammaga chiqaramiz", "en": "The change works, roll it out to everyone" },
+        { "ru": "Это три человека разницы — такой разброс бывает и без изменений", "uz": "Bu uch kishilik farq — bunday tarqalish o'zgarishsiz ham bo'ladi", "en": "That is a three-person difference — such spread happens without any change" },
+        { "ru": "Изменение вредит", "uz": "O'zgarish zarar keltiradi", "en": "The change is harmful" },
+        { "ru": "Нужно сменить метрику", "uz": "Metrikani almashtirish kerak", "en": "The metric should be changed" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "10 заказов против 13 — ровно то, что мы получили выше в тесте без изменений. Чтобы увидеть такой эффект, нужны тысячи пользователей.",
+        "uz": "10 buyurtmaga qarshi 13 — aynan yuqorida o'zgarishsiz testda olganimiz. Bunday effektni ko'rish uchun minglab foydalanuvchi kerak.",
+        "en": "10 orders against 13 is exactly what we got above in the test with no change. Seeing such an effect requires thousands of users."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "Как испортить хороший тест", "uz": "Yaxshi testni qanday buzish mumkin", "en": "How to ruin a good test" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Даже правильно спланированный тест легко испортить. Четыре способа, которые встречаются чаще всего:</p><ul><li><b>Подглядывание.</b> Смотреть результат каждый день и остановить тест, «как только стало значимо». При таком подходе можно получить «победу» вообще без эффекта — надо просто дождаться удачного дня.</li><li><b>Слишком короткий срок.</b> Тест на три дня ловит поведение вторника, но не выходных и не зарплатного дня.</li><li><b>Много метрик.</b> Смотрим на двадцать чисел, объявляем победой то, что выросло.</li><li><b>Разные группы по составу.</b> Если в B случайно попали в основном мобильные пользователи, ты сравниваешь не кнопку, а платформы.</li></ul>",
+        "uz": "<p>To'g'ri rejalashtirilgan testni ham buzish oson. Eng ko'p uchraydigan to'rt usul:</p><ul><li><b>Ko'z tashlash.</b> Natijaga har kuni qarab, «ahamiyatli bo'lishi bilanoq» testni to'xtatish. Bunday yondashuvda effektsiz ham «g'alaba» olish mumkin — shunchaki omadli kunni kutish kerak.</li><li><b>Juda qisqa muddat.</b> Uch kunlik test seshanba xatti-harakatini tutadi, dam olish kunlari va oylik kunini emas.</li><li><b>Ko'p metrika.</b> Yigirmata raqamga qaraymiz, o'sganini g'alaba deb e'lon qilamiz.</li><li><b>Tarkibi turli guruhlar.</b> B ga tasodifan asosan mobil foydalanuvchilar tushgan bo'lsa, siz tugmani emas, platformalarni solishtiryapsiz.</li></ul>",
+        "en": "<p>Even a well-planned test is easy to ruin. The four most common ways:</p><ul><li><b>Peeking.</b> Checking the result every day and stopping the test “as soon as it became significant”. With that approach you can get a “win” with no effect at all — just wait for a lucky day.</li><li><b>Too short a run.</b> A three-day test captures Tuesday behaviour, not weekends and not payday.</li><li><b>Too many metrics.</b> Look at twenty numbers, declare whichever grew the winner.</li><li><b>Groups differing in composition.</b> If B happened to get mostly mobile users, you are comparing platforms, not buttons.</li></ul>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "import random\n\nrandom.seed(3)\n\n# изменения нет, но мы смотрим результат каждый день и ждём «победу»\ndef peeking(days=14, per_day=200, rate=0.10):\n    a = b = na = nb = 0\n    for day in range(1, days + 1):\n        a += sum(1 for _ in range(per_day) if random.random() < rate)\n        b += sum(1 for _ in range(per_day) if random.random() < rate)\n        na += per_day\n        nb += per_day\n        ca, cb = a / na * 100, b / nb * 100\n        if cb - ca > 1.0:                       # «B выигрывает больше пункта!»\n            return day, round(ca, 2), round(cb, 2)\n    return None, round(a / na * 100, 2), round(b / nb * 100, 2)\n\nwins = 0\nfor attempt in range(10):\n    day, ca, cb = peeking()\n    if day:\n        wins += 1\n        print(f\"тест {attempt + 1}: остановились на {day}-й день, A={ca}% B={cb}%\")\n\nprint()\nprint(f\"«побед» из 10 тестов, где эффекта нет вообще: {wins}\")"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Эффекта нет ни в одном из этих тестов — обе группы генерируются с одной и той же вероятностью. Тем не менее «победы» находятся: чем чаще смотришь и чем раньше готов остановиться, тем больше шансов поймать удачный день.</p><p>Защита простая и скучная: <b>заранее зафиксировать срок и размер выборки</b> и смотреть результат в конце. Если очень нужно останавливать тест раньше, для этого есть отдельные методы последовательного анализа — но «просто смотреть каждый день» к ним не относится.</p>",
+        "uz": "<p>Bu testlarning hech birida effekt yo'q — ikkala guruh bir xil ehtimol bilan generatsiya qilinadi. Shunga qaramay «g'alaba» lar topiladi: qanchalik tez-tez qarasang va qanchalik erta to'xtashga tayyor bo'lsang, omadli kunni tutish shansi shuncha ko'p.</p><p>Himoya oddiy va zerikarli: <b>muddat va tanlanma hajmini oldindan qayd etish</b> va natijaga oxirida qarash. Testni erta to'xtatish juda kerak bo'lsa, buning uchun alohida ketma-ket tahlil usullari bor — lekin «shunchaki har kuni qarash» ularga kirmaydi.</p>",
+        "en": "<p>There is no effect in any of these tests — both groups are generated with the very same probability. Yet “wins” turn up: the more often you look and the sooner you are willing to stop, the better your chance of catching a lucky day.</p><p>The defence is simple and boring: <b>fix the duration and sample size in advance</b> and look at the result at the end. If stopping early really matters, there are dedicated sequential-analysis methods for that — but “just looking every day” is not one of them.</p>"
+       }
+      },
+      {
+       "type": "summary",
+       "items": [
+        { "ru": "Идея — это гипотеза, пока её не проверили на двух группах", "uz": "G'oya — ikki guruhda tekshirilmaguncha gipoteza", "en": "An idea is a hypothesis until it is checked on two groups" },
+        { "ru": "Группа выбирается случайно, отличие между группами — только тестируемое", "uz": "Guruh tasodifan tanlanadi, guruhlar farqi — faqat sinovdagi o'zgarish", "en": "The group is chosen at random; the only difference between groups is the change" },
+        { "ru": "Метрику фиксируют до старта, иначе победит случайный шум", "uz": "Metrika startdan oldin qayd etiladi, aks holda tasodifiy shovqin yutadi", "en": "Fix the metric before the start, or random noise wins" },
+        { "ru": "Процент без абсолютных чисел ничего не значит", "uz": "Mutlaq raqamlarsiz foiz hech nimani anglatmaydi", "en": "A percentage means nothing without the absolute numbers" },
+        { "ru": "На маленькой выборке разница возникает сама собой", "uz": "Kichik tanlanmada farq o'z-o'zidan paydo bo'ladi", "en": "On a small sample a difference appears by itself" },
+        { "ru": "Размер выборки определяет, какой эффект вообще заметен", "uz": "Tanlanma hajmi qanday effekt umuman sezilishini belgilaydi", "en": "The sample size determines which effect is noticeable at all" },
+        { "ru": "Подглядывание даёт «победы» там, где эффекта нет", "uz": "Ko'z tashlash effekt yo'q joyda «g'alaba» beradi", "en": "Peeking produces “wins” where there is no effect" },
+        { "ru": "Срок и размер теста фиксируют заранее", "uz": "Test muddati va hajmi oldindan qayd etiladi", "en": "The duration and size of a test are fixed in advance" }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": { "ru": "Зачем в A/B-тесте нужна контрольная группа?", "uz": "A/B testda nazorat guruhi nega kerak?", "en": "Why does an A/B test need a control group?" },
+     "options": [
+      { "ru": "Чтобы тест шёл быстрее", "uz": "Test tezroq borishi uchun", "en": "To make the test run faster" },
+      { "ru": "Чтобы было с чем сравнить: без неё непонятно, что изменилось из-за нас", "uz": "Solishtirish uchun: usiz bizning tufaylimizdan nima o'zgarganini tushunib bo'lmaydi", "en": "To have something to compare with: without it you cannot tell what changed because of us" },
+      { "ru": "Так требует закон", "uz": "Qonun shuni talab qiladi", "en": "The law requires it" },
+      { "ru": "Чтобы уменьшить нагрузку на сервер", "uz": "Serverga yukni kamaytirish uchun", "en": "To reduce server load" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Конверсия меняется сама по себе от сезона, рекламы и дня недели. Контрольная группа живёт в тех же условиях — поэтому сравнение честное.",
+      "uz": "Konversiya mavsum, reklama va hafta kunidan o'z-o'zidan o'zgaradi. Nazorat guruhi o'sha sharoitda yashaydi — shuning uchun solishtirish halol.",
+      "en": "Conversion changes on its own with the season, advertising and day of week. The control group lives in the same conditions — so the comparison is fair."
+     }
+    },
+    {
+     "q": { "ru": "Конверсия B выше A в два раза, но в каждой группе по 5 человек. Вывод?", "uz": "B konversiyasi A dan ikki barobar yuqori, lekin har guruhda 5 kishi. Xulosa?", "en": "B's conversion is twice A's, but each group has 5 people. The conclusion?" },
+     "options": [
+      { "ru": "Отличный результат, катим", "uz": "Ajoyib natija, chiqaramiz", "en": "Great result, ship it" },
+      { "ru": "Данных слишком мало, разница ничего не значит", "uz": "Ma'lumot juda kam, farq hech nimani anglatmaydi", "en": "Far too little data, the difference means nothing" },
+      { "ru": "Надо посмотреть другие метрики", "uz": "Boshqa metrikalarga qarash kerak", "en": "We should look at other metrics" },
+      { "ru": "Изменение вредное", "uz": "O'zgarish zararli", "en": "The change is harmful" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Разница в одного человека даёт «плюс 100%». Проценты на крошечных выборках — самый лёгкий способ обмануть себя.",
+      "uz": "Bir kishilik farq «plyus 100%» beradi. Kichkina tanlanmalardagi foizlar — o'zini aldashning eng oson usuli.",
+      "en": "A one-person difference gives “plus 100%”. Percentages on tiny samples are the easiest way to fool yourself."
+     }
+    },
+    {
+     "q": { "ru": "Что происходит с разбросом при росте выборки?", "uz": "Tanlanma o'sganda tarqalish bilan nima bo'ladi?", "en": "What happens to the spread as the sample grows?" },
+     "options": [
+      { "ru": "Растёт", "uz": "O'sadi", "en": "It grows" },
+      { "ru": "Уменьшается: случайная разница между одинаковыми группами становится меньше", "uz": "Kamayadi: bir xil guruhlar orasidagi tasodifiy farq kichrayadi", "en": "It shrinks: the random difference between identical groups gets smaller" },
+      { "ru": "Не меняется", "uz": "O'zgarmaydi", "en": "It stays the same" },
+      { "ru": "Зависит от метрики", "uz": "Metrikaga bog'liq", "en": "It depends on the metric" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Поэтому маленький ожидаемый эффект требует большой выборки: иначе он утонет в шуме.",
+      "uz": "Shuning uchun kichik kutilgan effekt katta tanlanmani talab qiladi: aks holda u shovqinda cho'kadi.",
+      "en": "That is why a small expected effect needs a large sample: otherwise it drowns in the noise."
+     }
+    },
+    {
+     "q": { "ru": "Аналитик смотрит результат теста каждый день и остановит его, как только B впереди. Что не так?", "uz": "Analitik test natijasiga har kuni qaraydi va B oldinda bo'lishi bilan to'xtatadi. Nima nuqson?", "en": "An analyst checks the test daily and will stop it as soon as B is ahead. What is wrong?" },
+     "options": [
+      { "ru": "Ничего, это экономит время", "uz": "Hech nima, bu vaqt tejaydi", "en": "Nothing, it saves time" },
+      { "ru": "Подглядывание: рано или поздно случайный день даст «победу» даже без эффекта", "uz": "Ko'z tashlash: ertami-kechmi tasodifiy kun effektsiz ham «g'alaba» beradi", "en": "Peeking: sooner or later a random day gives a “win” even with no effect" },
+      { "ru": "Надо смотреть чаще", "uz": "Tez-tez qarash kerak", "en": "You should look more often" },
+      { "ru": "Метрика выбрана неверно", "uz": "Metrika noto'g'ri tanlangan", "en": "The metric is wrong" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Мы видели это в коде: десять тестов без всякого эффекта, а «победы» всё равно нашлись.",
+      "uz": "Buni kodda ko'rdik: effektsiz o'nta test, «g'alaba» lar baribir topildi.",
+      "en": "We saw it in the code: ten tests with no effect whatsoever, and “wins” still turned up."
+     }
+    },
+    {
+     "q": { "ru": "Почему тест на три дня — плохая идея?", "uz": "Uch kunlik test nega yomon g'oya?", "en": "Why is a three-day test a bad idea?" },
+     "options": [
+      { "ru": "Сервер не выдержит", "uz": "Server chiday olmaydi", "en": "The server cannot cope" },
+      { "ru": "Поведение зависит от дня недели — три дня не покрывают цикл", "uz": "Xatti-harakat hafta kuniga bog'liq — uch kun siklni qoplamaydi", "en": "Behaviour depends on the day of week — three days do not cover the cycle" },
+      { "ru": "Пользователи не успеют заметить изменение", "uz": "Foydalanuvchilar o'zgarishni sezishga ulgurmaydi", "en": "Users will not notice the change in time" },
+      { "ru": "Три дня — это всегда достаточно", "uz": "Uch kun — doim yetarli", "en": "Three days is always enough" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Будни и выходные ведут себя по-разному, зарплатные дни тоже. Обычно тест берут кратным целой неделе.",
+      "uz": "Ish kunlari va dam olish kunlari turlicha, oylik kunlari ham. Odatda test butun haftaga karrali olinadi.",
+      "en": "Weekdays and weekends behave differently, and so do paydays. A test is usually taken as a whole number of weeks."
+     }
+    },
+    {
+     "q": { "ru": "В группе B случайно оказалось 80% мобильных пользователей, в A — 40%. Что делать?", "uz": "B guruhida tasodifan 80% mobil foydalanuvchi, A da — 40%. Nima qilish kerak?", "en": "Group B happened to get 80% mobile users, group A 40%. What now?" },
+     "options": [
+      { "ru": "Ничего, случайность есть случайность", "uz": "Hech nima, tasodif tasodifligicha qoladi", "en": "Nothing, chance is chance" },
+      { "ru": "Тест невалиден: группы отличаются не только изменением", "uz": "Test yaroqsiz: guruhlar faqat o'zgarish bilan farq qilmaydi", "en": "The test is invalid: the groups differ in more than the change" },
+      { "ru": "Считать результат только по мобильным", "uz": "Natijani faqat mobil bo'yicha hisoblash", "en": "Compute the result on mobile only" },
+      { "ru": "Увеличить срок теста вдвое", "uz": "Test muddatini ikki barobar oshirish", "en": "Double the test duration" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Сравнение получилось между платформами, а не между версиями кнопки. Такой тест перезапускают, а состав групп проверяют сразу после старта.",
+      "uz": "Solishtirish tugma versiyalari emas, platformalar orasida bo'lib chiqdi. Bunday test qayta ishga tushiriladi, guruhlar tarkibi esa startdan keyin darhol tekshiriladi.",
+      "en": "The comparison ended up being between platforms, not between button versions. Such a test is restarted, and group composition is checked right after launch."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "python",
+     "title": { "ru": "Конверсия по группам", "uz": "Guruhlar bo'yicha konversiya", "en": "Conversion by group" },
+     "brief": { "ru": "Считаем базовую метрику теста", "uz": "Test asosiy metrikasini hisoblaymiz", "en": "Compute the test's base metric" },
+     "desc": {
+      "ru": "<p><code>conversion(events)</code> получает список событий вида <code>{'group': 'A', 'ordered': True}</code>.</p><p>Верни словарь «группа → конверсия в процентах, округлённая до одного знака». Группы, которых нет в данных, в ответе не появляются. На пустом списке верни пустой словарь.</p>",
+      "uz": "<p><code>conversion(events)</code> <code>{'group': 'A', 'ordered': True}</code> ko'rinishidagi hodisalar ro'yxatini oladi.</p><p>«Guruh → foizdagi konversiya, bir xonagacha yaxlitlangan» lug'atini qaytaring. Ma'lumotda yo'q guruhlar javobda paydo bo'lmaydi. Bo'sh ro'yxatda bo'sh lug'at qaytaring.</p>",
+      "en": "<p><code>conversion(events)</code> receives a list of events like <code>{'group': 'A', 'ordered': True}</code>.</p><p>Return a dictionary “group → conversion in per cent, rounded to one decimal”. Groups absent from the data do not appear in the answer. For an empty list return an empty dictionary.</p>"
+     },
+     "starter": "def conversion(events):\n    # твой код\n    pass\n\nprint(conversion([{'group': 'A', 'ordered': True}, {'group': 'A', 'ordered': False}]))\n",
+     "tests": "e = [{'group': 'A', 'ordered': True}, {'group': 'A', 'ordered': False},\n     {'group': 'B', 'ordered': True}, {'group': 'B', 'ordered': True}]\nassert conversion(e) == {'A': 50.0, 'B': 100.0}, 'Две группы'\nassert conversion([]) == {}, 'Пустые данные'\nsingle = [{'group': 'A', 'ordered': False}]\nassert conversion(single) == {'A': 0.0}, 'Нулевая конверсия'\nthirds = [{'group': 'A', 'ordered': True}] + [{'group': 'A', 'ordered': False}] * 2\nassert conversion(thirds) == {'A': 33.3}, 'Округление до одного знака'\nassert 'B' not in conversion(thirds), 'Лишних групп нет'",
+     "hint": {
+      "ru": "Пройди события один раз, накапливая в словаре пару «сколько всего» и «сколько заказало». Потом посчитай проценты через <code>round(orders / users * 100, 1)</code>.",
+      "uz": "Hodisalarni bir marta aylanib, lug'atda «jami qancha» va «qanchasi buyurtma qilgan» juftini to'plang. Keyin foizlarni <code>round(orders / users * 100, 1)</code> orqali hisoblang.",
+      "en": "Walk the events once, accumulating a pair “how many total” and “how many ordered” in a dictionary. Then compute the percentages with <code>round(orders / users * 100, 1)</code>."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "python",
+     "title": { "ru": "Прирост и абсолютные числа", "uz": "O'sish va mutlaq raqamlar", "en": "Lift and absolute numbers" },
+     "brief": { "ru": "Процент без контекста врёт", "uz": "Kontekstsiz foiz aldaydi", "en": "A percentage without context lies" },
+     "desc": {
+      "ru": "<p><code>uplift(a_orders, a_users, b_orders, b_users)</code> возвращает словарь с ключами:</p><ul><li><code>'a'</code> и <code>'b'</code> — конверсии в процентах, округлённые до одного знака;</li><li><code>'diff'</code> — разница <code>b - a</code> в процентных пунктах, округлённая до одного знака;</li><li><code>'extra'</code> — сколько <b>дополнительных заказов</b> дала бы версия B на аудитории группы A: <code>round(a_users * (конверсия_b - конверсия_a) / 100)</code>.</li></ul><p>Если в какой-то группе ноль пользователей — верни <code>None</code>.</p>",
+      "uz": "<p><code>uplift(a_orders, a_users, b_orders, b_users)</code> quyidagi kalitli lug'at qaytaradi:</p><ul><li><code>'a'</code> va <code>'b'</code> — foizdagi konversiyalar, bir xonagacha yaxlitlangan;</li><li><code>'diff'</code> — <code>b - a</code> farqi foiz punktda, bir xonagacha yaxlitlangan;</li><li><code>'extra'</code> — B versiyasi A guruh auditoriyasida qancha <b>qo'shimcha buyurtma</b> berardi: <code>round(a_users * (b_konversiya - a_konversiya) / 100)</code>.</li></ul><p>Biror guruhda nol foydalanuvchi bo'lsa — <code>None</code> qaytaring.</p>",
+      "en": "<p><code>uplift(a_orders, a_users, b_orders, b_users)</code> returns a dictionary with the keys:</p><ul><li><code>'a'</code> and <code>'b'</code> — conversions in per cent, rounded to one decimal;</li><li><code>'diff'</code> — the difference <code>b - a</code> in percentage points, rounded to one decimal;</li><li><code>'extra'</code> — how many <b>additional orders</b> version B would bring on group A's audience: <code>round(a_users * (conv_b - conv_a) / 100)</code>.</li></ul><p>If either group has zero users, return <code>None</code>.</p>"
+     },
+     "starter": "def uplift(a_orders, a_users, b_orders, b_users):\n    # твой код\n    pass\n\nprint(uplift(100, 1000, 120, 1000))\n",
+     "tests": "res = uplift(100, 1000, 120, 1000)\nassert res == {'a': 10.0, 'b': 12.0, 'diff': 2.0, 'extra': 20}, 'Обычный расчёт'\nsmall = uplift(1, 4, 2, 4)\nassert small['a'] == 25.0 and small['b'] == 50.0, 'Крошечная выборка тоже считается'\nassert small['extra'] == 1, 'Всего один дополнительный заказ за +100%'\nworse = uplift(120, 1000, 100, 1000)\nassert worse['diff'] == -2.0 and worse['extra'] == -20, 'Отрицательный эффект'\nassert uplift(0, 0, 5, 10) is None, 'Пустая группа A'\nassert uplift(5, 10, 0, 0) is None, 'Пустая группа B'\nsame = uplift(50, 500, 50, 500)\nassert same['diff'] == 0.0 and same['extra'] == 0, 'Нет разницы'",
+     "hint": {
+      "ru": "Сначала проверь <code>a_users</code> и <code>b_users</code> на ноль и верни <code>None</code>. Для <code>extra</code> бери <b>неокруглённые</b> конверсии — иначе на больших числах ответ уедет.",
+      "uz": "Avval <code>a_users</code> va <code>b_users</code> ni nolga tekshirib, <code>None</code> qaytaring. <code>extra</code> uchun <b>yaxlitlanmagan</b> konversiyalarni oling — aks holda katta raqamlarda javob siljiydi.",
+      "en": "Check <code>a_users</code> and <code>b_users</code> for zero first and return <code>None</code>. For <code>extra</code> use the <b>unrounded</b> conversions — otherwise the answer drifts on large numbers."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "python",
+     "title": { "ru": "Решение по тесту", "uz": "Test bo'yicha qaror", "en": "The test's verdict" },
+     "brief": { "ru": "Хватает ли данных для вывода", "uz": "Xulosa uchun ma'lumot yetarlimi", "en": "Is there enough data to conclude" },
+     "desc": {
+      "ru": "<p><code>decide(a_orders, a_users, b_orders, b_users, min_users, min_diff)</code> возвращает строку:</p><ul><li><code>'мало данных'</code> — если в любой из групп меньше <code>min_users</code> пользователей;</li><li><code>'B лучше'</code> — если конверсия B выше A хотя бы на <code>min_diff</code> процентных пунктов;</li><li><code>'A лучше'</code> — если наоборот;</li><li><code>'нет разницы'</code> — если разница меньше порога.</li></ul><p>Проверка на количество данных идёт <b>первой</b>: при маленькой выборке разница ни о чём не говорит.</p>",
+      "uz": "<p><code>decide(a_orders, a_users, b_orders, b_users, min_users, min_diff)</code> satr qaytaradi:</p><ul><li><code>'мало данных'</code> — biror guruhda <code>min_users</code> dan kam foydalanuvchi bo'lsa;</li><li><code>'B лучше'</code> — B konversiyasi A dan hech bo'lmasa <code>min_diff</code> foiz punktga yuqori bo'lsa;</li><li><code>'A лучше'</code> — aksincha bo'lsa;</li><li><code>'нет разницы'</code> — farq chegaradan kichik bo'lsa.</li></ul><p>Ma'lumot miqdori tekshiruvi <b>birinchi</b> boradi: kichik tanlanmada farq hech nimani anglatmaydi.</p>",
+      "en": "<p><code>decide(a_orders, a_users, b_orders, b_users, min_users, min_diff)</code> returns a string:</p><ul><li><code>'мало данных'</code> — if either group has fewer than <code>min_users</code> users;</li><li><code>'B лучше'</code> — if B's conversion exceeds A's by at least <code>min_diff</code> percentage points;</li><li><code>'A лучше'</code> — if the reverse holds;</li><li><code>'нет разницы'</code> — if the difference is below the threshold.</li></ul><p>The data-volume check comes <b>first</b>: on a small sample the difference says nothing.</p>"
+     },
+     "starter": "def decide(a_orders, a_users, b_orders, b_users, min_users, min_diff):\n    # твой код\n    pass\n\nprint(decide(100, 1000, 130, 1000, 500, 1.0))\n",
+     "tests": "assert decide(100, 1000, 130, 1000, 500, 1.0) == 'B лучше', 'B заметно выше'\nassert decide(130, 1000, 100, 1000, 500, 1.0) == 'A лучше', 'A заметно выше'\nassert decide(100, 1000, 103, 1000, 500, 1.0) == 'нет разницы', 'Разница ниже порога'\nassert decide(1, 4, 2, 4, 500, 1.0) == 'мало данных', 'Крошечные группы'\nassert decide(50, 400, 90, 600, 500, 1.0) == 'мало данных', 'Одной группы не хватает'\nassert decide(100, 1000, 110, 1000, 500, 1.0) == 'B лучше', 'Ровно порог засчитывается'\nassert decide(0, 500, 0, 500, 500, 1.0) == 'нет разницы', 'Нулевые конверсии равны'",
+     "hint": {
+      "ru": "Порядок проверок важен: сначала <code>min_users</code>, потом знак разницы. «Ровно порог» означает сравнение через <code>&gt;=</code>, а не <code>&gt;</code>.",
+      "uz": "Tekshiruvlar tartibi muhim: avval <code>min_users</code>, keyin farq ishorasi. «Aynan chegara» <code>&gt;</code> emas, <code>&gt;=</code> orqali solishtirishni bildiradi.",
+      "en": "The order of checks matters: <code>min_users</code> first, then the sign of the difference. “Exactly the threshold” means comparing with <code>&gt;=</code>, not <code>&gt;</code>."
+     }
+    }
+   ],
+   "exam": {
+    "time": 600,
+    "questions": [
+     {
+      "q": { "ru": "Что обязательно фиксируют до старта A/B-теста?", "uz": "A/B test startidan oldin nima albatta qayd etiladi?", "en": "What must be fixed before an A/B test starts?" },
+      "options": [
+       { "ru": "Имя дизайнера", "uz": "Dizayner ismi", "en": "The designer's name" },
+       { "ru": "Метрику, размер выборки и срок", "uz": "Metrika, tanlanma hajmi va muddat", "en": "The metric, the sample size and the duration" },
+       { "ru": "Цвет кнопки в группе A", "uz": "A guruhdagi tugma rangi", "en": "The button colour in group A" },
+       { "ru": "Ничего, всё решается по ходу", "uz": "Hech nima, hammasi yo'l-yo'lakay hal qilinadi", "en": "Nothing, it is all decided as you go" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Конверсия выросла с 10,0% до 10,3% на выборке 100 человек в группе. Это эффект?", "uz": "Guruhda 100 kishilik tanlanmada konversiya 10,0% dan 10,3% ga o'sdi. Bu effektmi?", "en": "Conversion rose from 10.0% to 10.3% with 100 people per group. Is that an effect?" },
+      "options": [
+       { "ru": "Да, рост есть", "uz": "Ha, o'sish bor", "en": "Yes, there is growth" },
+       { "ru": "Нет: на такой выборке это в пределах случайного разброса", "uz": "Yo'q: bunday tanlanmada bu tasodifiy tarqalish doirasida", "en": "No: on such a sample that is within the random spread" },
+       { "ru": "Да, если посмотреть другие метрики", "uz": "Ha, boshqa metrikalarga qaralsa", "en": "Yes, if you look at other metrics" },
+       { "ru": "Нельзя сказать вообще ничего", "uz": "Umuman hech nima deb bo'lmaydi", "en": "Nothing can be said at all" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Почему нельзя останавливать тест в момент, когда B впереди?", "uz": "B oldinda bo'lgan lahzada testni nega to'xtatib bo'lmaydi?", "en": "Why must you not stop the test the moment B is ahead?" },
+      "options": [
+       { "ru": "Так дольше собирать данные", "uz": "Shunda ma'lumot uzoqroq to'planadi", "en": "It takes longer to collect data" },
+       { "ru": "При частых проверках случайный день даст «победу» даже без эффекта", "uz": "Tez-tez tekshirishda tasodifiy kun effektsiz ham «g'alaba» beradi", "en": "With frequent checks a random day gives a “win” even with no effect" },
+       { "ru": "Пользователи заметят", "uz": "Foydalanuvchilar sezadi", "en": "Users will notice" },
+       { "ru": "Это запрещено правилами аналитики", "uz": "Bu analitika qoidalarida taqiqlangan", "en": "Analytics rules forbid it" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Тест показал +0,2 п.п. конверсии. Что нужно, чтобы решить, катить ли изменение?", "uz": "Test +0,2 p.p. konversiya ko'rsatdi. O'zgarishni chiqarishni hal qilish uchun nima kerak?", "en": "The test showed +0.2 pp of conversion. What is needed to decide whether to ship?" },
+      "options": [
+       { "ru": "Только процент, этого достаточно", "uz": "Faqat foiz, shuning o'zi yetarli", "en": "Just the percentage, that is enough" },
+       { "ru": "Размер выборки и сколько это заказов в абсолютных числах", "uz": "Tanlanma hajmi va bu mutlaq raqamda qancha buyurtma ekani", "en": "The sample size and how many orders that is in absolute numbers" },
+       { "ru": "Мнение команды", "uz": "Jamoa fikri", "en": "The team's opinion" },
+       { "ru": "Количество проверенных метрик", "uz": "Tekshirilgan metrikalar soni", "en": "The number of metrics checked" }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "python",
+      "title": { "ru": "Отчёт по A/B-тесту", "uz": "A/B test bo'yicha hisobot", "en": "An A/B test report" },
+      "desc": {
+       "ru": "<p><code>report(events, min_users, min_diff)</code> получает список событий вида <code>{'group': 'A', 'ordered': True}</code> и возвращает словарь:</p><ul><li><code>'users'</code> — словарь «группа → сколько пользователей»;</li><li><code>'conv'</code> — словарь «группа → конверсия в процентах, округлённая до одного знака»;</li><li><code>'verdict'</code> — строка по тем же правилам, что в третьей задаче: <code>'мало данных'</code>, <code>'B лучше'</code>, <code>'A лучше'</code> или <code>'нет разницы'</code>.</li></ul><p>Если в данных нет обеих групп <code>'A'</code> и <code>'B'</code>, вердикт — <code>'мало данных'</code>. Разницу считай по <b>неокруглённым</b> конверсиям.</p>",
+       "uz": "<p><code>report(events, min_users, min_diff)</code> <code>{'group': 'A', 'ordered': True}</code> ko'rinishidagi hodisalar ro'yxatini oladi va lug'at qaytaradi:</p><ul><li><code>'users'</code> — «guruh → qancha foydalanuvchi» lug'ati;</li><li><code>'conv'</code> — «guruh → foizdagi konversiya, bir xonagacha yaxlitlangan» lug'ati;</li><li><code>'verdict'</code> — uchinchi vazifadagi qoidalar bo'yicha satr: <code>'мало данных'</code>, <code>'B лучше'</code>, <code>'A лучше'</code> yoki <code>'нет разницы'</code>.</li></ul><p>Ma'lumotda <code>'A'</code> va <code>'B'</code> guruhlarining ikkalasi ham bo'lmasa, hukm — <code>'мало данных'</code>. Farqni <b>yaxlitlanmagan</b> konversiyalar bo'yicha hisoblang.</p>",
+       "en": "<p><code>report(events, min_users, min_diff)</code> receives a list of events like <code>{'group': 'A', 'ordered': True}</code> and returns a dictionary:</p><ul><li><code>'users'</code> — a dictionary “group → number of users”;</li><li><code>'conv'</code> — a dictionary “group → conversion in per cent, rounded to one decimal”;</li><li><code>'verdict'</code> — a string by the same rules as in the third task: <code>'мало данных'</code>, <code>'B лучше'</code>, <code>'A лучше'</code> or <code>'нет разницы'</code>.</li></ul><p>If the data lacks either group <code>'A'</code> or <code>'B'</code>, the verdict is <code>'мало данных'</code>. Compute the difference from the <b>unrounded</b> conversions.</p>"
+      },
+      "starter": "def report(events, min_users, min_diff):\n    # считаем группы -> конверсии -> вердикт\n    pass\n\ne = [{'group': 'A', 'ordered': True}, {'group': 'B', 'ordered': False}]\nprint(report(e, 1, 1.0))\n",
+      "tests": "def make(group, users, orders):\n    return [{'group': group, 'ordered': i < orders} for i in range(users)]\n\ne = make('A', 1000, 100) + make('B', 1000, 130)\nres = report(e, 500, 1.0)\nassert res['users'] == {'A': 1000, 'B': 1000}, 'Пользователи по группам'\nassert res['conv'] == {'A': 10.0, 'B': 13.0}, 'Конверсии'\nassert res['verdict'] == 'B лучше', 'B выигрывает'\n\nres = report(make('A', 1000, 130) + make('B', 1000, 100), 500, 1.0)\nassert res['verdict'] == 'A лучше', 'A выигрывает'\n\nres = report(make('A', 1000, 100) + make('B', 1000, 103), 500, 1.0)\nassert res['verdict'] == 'нет разницы', 'Разница ниже порога'\n\nres = report(make('A', 10, 1) + make('B', 10, 5), 500, 1.0)\nassert res['verdict'] == 'мало данных', 'Мало пользователей'\nassert res['conv'] == {'A': 10.0, 'B': 50.0}, 'Конверсии считаем всё равно'\n\nres = report(make('A', 1000, 100), 500, 1.0)\nassert res['verdict'] == 'мало данных', 'Второй группы вообще нет'\nassert res['users'] == {'A': 1000}, 'Лишних групп не выдумываем'\n\nres = report([], 1, 1.0)\nassert res == {'users': {}, 'conv': {}, 'verdict': 'мало данных'}, 'Пустые данные'",
+      "hint": {
+       "ru": "Собери счётчики за один проход, потом отдельно посчитай <code>conv</code>. Вердикт удобно вынести в конец: сначала проверь наличие обеих групп и <code>min_users</code>, и только потом сравнивай.",
+       "uz": "Hisoblagichlarni bir o'tishda yig'ing, keyin alohida <code>conv</code> ni hisoblang. Hukmni oxiriga chiqarish qulay: avval ikkala guruh borligini va <code>min_users</code> ni tekshiring, keyingina solishtiring.",
+       "en": "Collect the counters in one pass, then compute <code>conv</code> separately. It is convenient to leave the verdict last: check that both groups exist and <code>min_users</code> holds, and only then compare."
+      }
+     }
+    ]
+   }
   }
  ]
 }

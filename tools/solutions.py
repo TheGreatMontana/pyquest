@@ -1219,4 +1219,70 @@ print(work(q, lambda job: None, 3))""",
 state = {'accounts': {'aziz': 500}, 'orders': {}, 'queue': [], 'cache': {}}
 print(create_order(state, 'aziz', 200, 'ord-1'))
 print(state)""",
+
+# ===== analytics-intro an-03 =====
+'analytics-intro/an-03/t1': """def conversion(events):
+    stats = {}
+    for e in events:
+        g = stats.setdefault(e['group'], [0, 0])
+        g[0] += 1
+        if e['ordered']:
+            g[1] += 1
+    return {k: round(v[1] / v[0] * 100, 1) for k, v in stats.items()}
+
+print(conversion([{'group': 'A', 'ordered': True}, {'group': 'A', 'ordered': False}]))""",
+'analytics-intro/an-03/t2': """def uplift(a_orders, a_users, b_orders, b_users):
+    if a_users == 0 or b_users == 0:
+        return None
+    ca = a_orders / a_users * 100
+    cb = b_orders / b_users * 100
+    return {
+        'a': round(ca, 1),
+        'b': round(cb, 1),
+        'diff': round(cb - ca, 1),
+        'extra': round(a_users * (cb - ca) / 100),
+    }
+
+print(uplift(100, 1000, 120, 1000))""",
+'analytics-intro/an-03/t3': """def decide(a_orders, a_users, b_orders, b_users, min_users, min_diff):
+    if a_users < min_users or b_users < min_users:
+        return '\u043c\u0430\u043b\u043e \u0434\u0430\u043d\u043d\u044b\u0445'
+    ca = a_orders / a_users * 100
+    cb = b_orders / b_users * 100
+    if cb - ca >= min_diff:
+        return 'B \u043b\u0443\u0447\u0448\u0435'
+    if ca - cb >= min_diff:
+        return 'A \u043b\u0443\u0447\u0448\u0435'
+    return '\u043d\u0435\u0442 \u0440\u0430\u0437\u043d\u0438\u0446\u044b'
+
+print(decide(100, 1000, 130, 1000, 500, 1.0))""",
+'analytics-intro/an-03/exam0': """def report(events, min_users, min_diff):
+    stats = {}
+    for e in events:
+        g = stats.setdefault(e['group'], [0, 0])
+        g[0] += 1
+        if e['ordered']:
+            g[1] += 1
+
+    users = {k: v[0] for k, v in stats.items()}
+    conv = {k: round(v[1] / v[0] * 100, 1) for k, v in stats.items()}
+
+    if 'A' not in stats or 'B' not in stats:
+        verdict = '\u043c\u0430\u043b\u043e \u0434\u0430\u043d\u043d\u044b\u0445'
+    elif users['A'] < min_users or users['B'] < min_users:
+        verdict = '\u043c\u0430\u043b\u043e \u0434\u0430\u043d\u043d\u044b\u0445'
+    else:
+        ca = stats['A'][1] / stats['A'][0] * 100
+        cb = stats['B'][1] / stats['B'][0] * 100
+        if cb - ca >= min_diff:
+            verdict = 'B \u043b\u0443\u0447\u0448\u0435'
+        elif ca - cb >= min_diff:
+            verdict = 'A \u043b\u0443\u0447\u0448\u0435'
+        else:
+            verdict = '\u043d\u0435\u0442 \u0440\u0430\u0437\u043d\u0438\u0446\u044b'
+
+    return {'users': users, 'conv': conv, 'verdict': verdict}
+
+e = [{'group': 'A', 'ordered': True}, {'group': 'B', 'ordered': False}]
+print(report(e, 1, 1.0))""",
 }
