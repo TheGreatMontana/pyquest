@@ -655,6 +655,510 @@
      }
     ]
    }
+  },
+  {
+    "id": "ml-03",
+    "title": {
+      "ru": "Дерево решений, кросс-валидация и утечка данных",
+      "uz": "Qaror daraxti, kross-validatsiya va ma'lumot oqishi",
+      "en": "Decision trees, cross-validation and data leakage"
+    },
+    "tagline": {
+      "ru": "Модель, которая объясняет себя, честная оценка на нескольких разбиениях и главная причина завышенных результатов",
+      "uz": "O'zini tushuntiradigan model, bir nechta bo'linishdagi halol baho va oshirib ko'rsatilgan natijalarning asosiy sababi",
+      "en": "A model that explains itself, an honest score across several splits, and the main reason results come out too good"
+    },
+    "lessons": [
+      {
+        "id": "l1",
+        "title": {
+          "ru": "Дерево решений: вопросы вместо формулы",
+          "uz": "Qaror daraxti: formula o'rniga savollar",
+          "en": "Decision tree: questions instead of a formula"
+        },
+        "blocks": [
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>В ml-01 модель была формулой с коэффициентом. Но модель может выглядеть иначе — как список вопросов «да / нет». Такую модель называют <b>деревом решений</b>.</p><p>Каждый внутренний узел дерева — это вопрос об одном признаке: «доход больше 400?», «возраст больше 40?». Каждый лист — готовый ответ. Чтобы получить предсказание, объект идёт от корня вниз, отвечая на вопросы, и останавливается в листе.</p><p>Главное достоинство дерева — его можно прочитать вслух. Логистическая регрессия отвечает «0.73», а дерево отвечает «потому что доход меньше 400 и возраст меньше 40». В задачах, где решение нужно объяснять человеку — в банке, в медицине, в найме, — это решает.</p>",
+              "uz": "<p>ml-01 da model koeffitsiyentli formula edi. Lekin model boshqacha ham ko'rinishi mumkin — «ha / yo'q» savollari ro'yxati sifatida. Bunday modelni <b>qaror daraxti</b> deyishadi.</p><p>Daraxtning har bir ichki tuguni — bitta belgi haqidagi savol: «daromad 400 dan katta-mi?», «yosh 40 dan katta-mi?». Har bir barg — tayyor javob. Bashorat olish uchun obyekt ildizdan pastga tushadi, savollarga javob beradi va bargda to'xtaydi.</p><p>Daraxtning asosiy afzalligi — uni ovoz chiqarib o'qish mumkin. Logistik regressiya «0.73» deb javob beradi, daraxt esa «chunki daromad 400 dan kichik va yosh 40 dan kichik» deydi. Qaror odamga tushuntirilishi kerak bo'lgan vazifalarda — bankda, tibbiyotda, ishga qabulda — bu hal qiluvchi.</p>",
+              "en": "<p>In ml-01 the model was a formula with a coefficient. But a model can look different — like a list of yes/no questions. Such a model is called a <b>decision tree</b>.</p><p>Every internal node of the tree is a question about one feature: \"is income above 400?\", \"is age above 40?\". Every leaf is a ready answer. To get a prediction, an object walks down from the root answering questions and stops at a leaf.</p><p>The tree's main virtue is that you can read it out loud. Logistic regression answers \"0.73\", while a tree answers \"because income is below 400 and age is below 40\". In tasks where the decision must be explained to a person — banking, medicine, hiring — that settles it.</p>"
+            }
+          },
+          {
+            "type": "run",
+            "code": "clients = [\n    {\"age\": 25, \"income\": 400, \"paid\": True},\n    {\"age\": 41, \"income\": 300, \"paid\": True},\n    {\"age\": 19, \"income\": 150, \"paid\": False},\n    {\"age\": 33, \"income\": 220, \"paid\": False},\n    {\"age\": 52, \"income\": 1200, \"paid\": True},\n]\n\ndef predict(client):\n    if client[\"income\"] >= 400:      # первый вопрос\n        return True\n    if client[\"age\"] >= 40:          # второй вопрос\n        return True\n    return False\n\nfor c in clients:\n    guess = predict(c)\n    mark = \"ok\" if guess == c[\"paid\"] else \"ошибка\"\n    print(c[\"age\"], c[\"income\"], \"-> предсказание\", guess, \"| факт\", c[\"paid\"], \"|\", mark)"
+          },
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>Вопросы в примере выше я выбрал руками. Настоящее дерево выбирает их само — и выбирает по одному критерию: <b>насколько чистыми стали половинки</b> после разбиения.</p><p>Чистота узла измеряется индексом Джини. Если в узле все объекты одного класса — Джини равен нулю, это идеально чистый лист. Если классы поделены поровну — Джини максимален.</p><pre><code>gini = 1 − (p₁² + p₂² + …)</code></pre><p>Алгоритм перебирает все признаки и все пороги, для каждого варианта считает <b>взвешенное</b> Джини двух половинок (взвешенное — значит с учётом того, сколько объектов в каждой) и берёт разбиение с наименьшим значением. Потом повторяет то же в каждой половинке. Так дерево и растёт.</p>",
+              "uz": "<p>Yuqoridagi misolda savollarni men qo'lda tanladim. Haqiqiy daraxt ularni o'zi tanlaydi — va bitta mezon bo'yicha tanlaydi: <b>bo'linishdan keyin yarimlar qanchalik toza bo'ldi</b>.</p><p>Tugunning tozaligi Jini indeksi bilan o'lchanadi. Agar tugunda barcha obyektlar bitta sinfdan bo'lsa — Jini nolga teng, bu mukammal toza barg. Agar sinflar teng bo'lingan bo'lsa — Jini maksimal.</p><pre><code>gini = 1 − (p₁² + p₂² + …)</code></pre><p>Algoritm barcha belgilar va barcha chegaralarni ko'rib chiqadi, har bir variant uchun ikki yarimning <b>o'lchovli</b> Jinisini hisoblaydi (o'lchovli — ya'ni har birida nechta obyekt borligini hisobga olib) va eng kichik qiymatli bo'linishni oladi. Keyin har bir yarimda shuni takrorlaydi. Daraxt shunday o'sadi.</p>",
+              "en": "<p>I picked the questions above by hand. A real tree picks them itself — and by a single criterion: <b>how pure the two halves became</b> after the split.</p><p>Node purity is measured with the Gini index. If every object in a node belongs to one class, Gini is zero — a perfectly pure leaf. If the classes are split evenly, Gini is at its maximum.</p><pre><code>gini = 1 − (p₁² + p₂² + …)</code></pre><p>The algorithm goes through every feature and every threshold, computes the <b>weighted</b> Gini of the two halves for each option (weighted meaning it accounts for how many objects each half holds) and takes the split with the smallest value. Then it repeats the same inside each half. That is how the tree grows.</p>"
+            }
+          },
+          {
+            "type": "run",
+            "code": "def gini(labels):\n    if not labels:\n        return 0.0\n    total = len(labels)\n    result = 1.0\n    for value in set(labels):\n        p = labels.count(value) / total\n        result -= p * p\n    return result\n\nnode = [True, True, False, False, True]\nleft = [True, True, True]     # доход >= 400\nright = [False, False]        # доход < 400\n\nprint(\"до разбиения:\", round(gini(node), 3))\nprint(\"слева:\", round(gini(left), 3), \" справа:\", round(gini(right), 3))\n\nweighted = (len(left) * gini(left) + len(right) * gini(right)) / len(node)\nprint(\"после разбиения (взвешенно):\", round(weighted, 3))"
+          },
+          {
+            "type": "checkpoint",
+            "q": {
+              "ru": "В узле 8 объектов: 4 класса «да» и 4 класса «нет». Чему равен индекс Джини?",
+              "uz": "Tugunda 8 obyekt bor: 4 tasi «ha», 4 tasi «yo'q» sinfidan. Jini indeksi nechaga teng?",
+              "en": "A node holds 8 objects: 4 of class \"yes\" and 4 of class \"no\". What is the Gini index?"
+            },
+            "options": [
+              { "ru": "0 — узел чистый", "uz": "0 — tugun toza", "en": "0 — the node is pure" },
+              { "ru": "0.5 — максимум для двух классов", "uz": "0.5 — ikki sinf uchun maksimum", "en": "0.5 — the maximum for two classes" },
+              { "ru": "1 — полная неопределённость", "uz": "1 — to'liq noaniqlik", "en": "1 — total uncertainty" },
+              { "ru": "8 — по числу объектов", "uz": "8 — obyektlar soniga ko'ra", "en": "8 — the number of objects" }
+            ],
+            "a": 1,
+            "explain": {
+              "ru": "<code>p₁ = p₂ = 0.5</code>, значит <code>1 − (0.25 + 0.25) = 0.5</code>. Для двух классов это худшее возможное значение: узел ничего не различает, и алгоритм будет искать разбиение, которое его уменьшит.",
+              "uz": "<code>p₁ = p₂ = 0.5</code>, demak <code>1 − (0.25 + 0.25) = 0.5</code>. Ikki sinf uchun bu eng yomon qiymat: tugun hech nimani ajratmaydi va algoritm uni kamaytiradigan bo'linish qidiradi.",
+              "en": "<code>p₁ = p₂ = 0.5</code>, so <code>1 − (0.25 + 0.25) = 0.5</code>. For two classes that is the worst possible value: the node distinguishes nothing, and the algorithm will look for a split that lowers it."
+            }
+          }
+        ]
+      },
+      {
+        "id": "l2",
+        "title": {
+          "ru": "Кросс-валидация: одна отложенная выборка врёт",
+          "uz": "Kross-validatsiya: bitta ajratilgan tanlanma aldaydi",
+          "en": "Cross-validation: a single hold-out lies"
+        },
+        "blocks": [
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>В ml-01 мы делили данные на train и test и мерили качество на тесте. Это правильно — но у такой оценки есть слабое место: она зависит от того, <b>какие именно</b> объекты попали в тест.</p><p>Если данных мало, одно разбиение может дать 0.9, а другое — 0.6, причём модель ровно та же. Ты получишь не качество модели, а качество жребия.</p>",
+              "uz": "<p>ml-01 da biz ma'lumotlarni train va test ga bo'lib, sifatni testda o'lchadik. Bu to'g'ri — lekin bunday bahoning zaif tomoni bor: u testga <b>aynan qaysi</b> obyektlar tushganiga bog'liq.</p><p>Agar ma'lumot kam bo'lsa, bitta bo'linish 0.9, boshqasi 0.6 berishi mumkin, model esa aynan o'sha. Siz modelning sifatini emas, qur'aning sifatini olasiz.</p>",
+              "en": "<p>In ml-01 we split the data into train and test and measured quality on the test set. That is correct — but such a score has a weak spot: it depends on <b>which</b> objects landed in the test set.</p><p>With little data, one split can give 0.9 and another 0.6 — with exactly the same model. What you get is not the quality of the model but the quality of the draw.</p>"
+            }
+          },
+          {
+            "type": "run",
+            "code": "import random\n\n# 30 объектов, у 20 из них метка True\ndata = [(i, i % 3 != 0) for i in range(30)]\n\ndef accuracy_on(sample):\n    # простейшая «модель»: всегда отвечает True\n    return sum(1 for _, label in sample if label) / len(sample)\n\nrandom.seed(4)\nfor attempt in range(5):\n    shuffled = data[:]\n    random.shuffle(shuffled)\n    test = shuffled[:10]\n    print(\"разбиение\", attempt + 1, \"-> точность на тесте:\", round(accuracy_on(test), 2))"
+          },
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>Модель тут вообще не менялась — а числа разъезжаются на десятки процентов. Значит, по одному разбиению нельзя сказать, стала модель лучше или просто повезло с тестом.</p><p>Лечение называется <b>k-fold кросс-валидацией</b>. Данные делят на <code>k</code> равных частей (фолдов). Дальше <code>k</code> раз повторяют одно и то же: одна часть становится тестом, остальные <code>k − 1</code> — обучением. Получается <code>k</code> оценок, и итогом считают их <b>среднее</b>.</p><p>Каждый объект побывал в тесте ровно один раз, а средняя оценка почти не зависит от жребия. Стандартный выбор — <code>k = 5</code>: пять прогонов вместо одного, зато число, которому можно верить. Полезно смотреть и на разброс: если фолды дали 0.9, 0.5 и 0.8, средние 0.73 мало что говорят — данные слишком разнородные.</p>",
+              "uz": "<p>Model bu yerda umuman o'zgargani yo'q — raqamlar esa o'nlab foizga tarqalyapti. Demak, bitta bo'linish bo'yicha model yaxshilandimi yoki shunchaki test bilan omad kelganmi, ayta olmaysiz.</p><p>Davosi <b>k-fold kross-validatsiya</b> deyiladi. Ma'lumotlar <code>k</code> ta teng qismga (foldga) bo'linadi. Keyin <code>k</code> marta bir xil ish takrorlanadi: bitta qism test bo'ladi, qolgan <code>k − 1</code> tasi — o'qitish. <code>k</code> ta baho chiqadi va yakun sifatida ularning <b>o'rtachasi</b> olinadi.</p><p>Har bir obyekt testda aynan bir marta bo'ldi, o'rtacha baho esa qur'aga deyarli bog'liq emas. Standart tanlov — <code>k = 5</code>: bitta o'rniga besh o'tish, buning evaziga ishonsa bo'ladigan raqam. Tarqoqlikka ham qarash foydali: agar foldlar 0.9, 0.5 va 0.8 bergan bo'lsa, o'rtacha 0.73 kam narsa aytadi — ma'lumot juda xilma-xil.</p>",
+              "en": "<p>The model never changed here — yet the numbers swing by tens of percent. So a single split cannot tell you whether the model got better or the test set was simply kind.</p><p>The cure is called <b>k-fold cross-validation</b>. The data is divided into <code>k</code> equal parts (folds). Then the same thing is repeated <code>k</code> times: one part becomes the test set, the other <code>k − 1</code> become training. That yields <code>k</code> scores, and the result is their <b>mean</b>.</p><p>Every object served as test data exactly once, and the mean score barely depends on the draw. The standard choice is <code>k = 5</code>: five runs instead of one, in exchange for a number you can trust. It also pays to look at the spread: if the folds gave 0.9, 0.5 and 0.8, a mean of 0.73 says little — the data is too heterogeneous.</p>"
+            }
+          },
+          {
+            "type": "order",
+            "steps": [
+              { "ru": "Перемешали данные и разделили на 5 равных фолдов", "uz": "Ma'lumotlarni aralashtirib, 5 ta teng foldga bo'ldik", "en": "Shuffled the data and split it into 5 equal folds" },
+              { "ru": "Взяли фолд №1 как тест, фолды 2–5 как обучение", "uz": "1-foldni test, 2–5-foldlarni o'qitish sifatida oldik", "en": "Took fold #1 as test and folds 2–5 as training" },
+              { "ru": "Обучили модель и записали её точность на фолде №1", "uz": "Modelni o'qitib, 1-folddagi aniqligini yozib oldik", "en": "Trained the model and recorded its accuracy on fold #1" },
+              { "ru": "Повторили то же самое ещё четыре раза, меняя тестовый фолд", "uz": "Test foldini almashtirib, xuddi shuni yana to'rt marta takrorladik", "en": "Repeated the same four more times, rotating the test fold" },
+              { "ru": "Усреднили пять оценок и посмотрели на их разброс", "uz": "Beshta bahoni o'rtachaladik va tarqoqligiga qaradik", "en": "Averaged the five scores and looked at their spread" }
+            ]
+          },
+          {
+            "type": "checkpoint",
+            "q": {
+              "ru": "5-fold кросс-валидация дала оценки 0.91, 0.52, 0.88, 0.61, 0.83. Какой вывод верный?",
+              "uz": "5-fold kross-validatsiya 0.91, 0.52, 0.88, 0.61, 0.83 bahoni berdi. Qaysi xulosa to'g'ri?",
+              "en": "5-fold cross-validation gave 0.91, 0.52, 0.88, 0.61, 0.83. Which conclusion is right?"
+            },
+            "options": [
+              { "ru": "Качество модели — 0.91, берём лучший фолд", "uz": "Model sifati — 0.91, eng yaxshi foldni olamiz", "en": "Model quality is 0.91 — take the best fold" },
+              { "ru": "Среднее 0.75, но разброс огромный — оценке нельзя доверять как есть", "uz": "O'rtacha 0.75, lekin tarqoqlik juda katta — bahoga shundayligicha ishonib bo'lmaydi", "en": "The mean is 0.75, but the spread is huge — the score can't be trusted as is" },
+              { "ru": "Нужно выбросить плохие фолды и усреднить остальные", "uz": "Yomon foldlarni tashlab, qolganlarini o'rtachalash kerak", "en": "Drop the bad folds and average the rest" },
+              { "ru": "Модель переобучена, это видно по среднему", "uz": "Model qayta o'qitilgan, bu o'rtachadan ko'rinib turibdi", "en": "The model is overfitted, you can see it from the mean" }
+            ],
+            "a": 1,
+            "explain": {
+              "ru": "Среднее считается по всем фолдам — выбрасывать неудачные нельзя, иначе оценка снова станет нечестной. Но разброс от 0.52 до 0.91 — сигнал: данные неоднородны, фолдов мало или в выборке есть группы, которые модель не понимает. Сначала разбираются с этим, а потом уже сравнивают модели.",
+              "uz": "O'rtacha barcha foldlar bo'yicha hisoblanadi — muvaffaqiyatsizlarini tashlab bo'lmaydi, aks holda baho yana insofsiz bo'ladi. Lekin 0.52 dan 0.91 gacha tarqoqlik — signal: ma'lumot bir xil emas, foldlar kam yoki tanlanmada model tushunmaydigan guruhlar bor. Avval shuni hal qilishadi, keyin modellarni taqqoslashadi.",
+              "en": "The mean is taken over all folds — dropping the bad ones would make the score dishonest again. But a spread from 0.52 to 0.91 is a signal: the data is heterogeneous, there are too few folds, or the sample contains groups the model does not understand. You deal with that first and compare models afterwards."
+            }
+          }
+        ]
+      },
+      {
+        "id": "l3",
+        "title": {
+          "ru": "Утечка данных и подбор гиперпараметров",
+          "uz": "Ma'lumot oqishi va giperparametrlarni tanlash",
+          "en": "Data leakage and hyperparameter tuning"
+        },
+        "blocks": [
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>Когда модель показывает подозрительно хороший результат, в девяти случаях из десяти это <b>утечка данных</b> — leakage. Так называют ситуацию, когда в обучение просочилась информация, которой в реальный момент предсказания не будет.</p><p>Три самых частых источника:</p><ul><li><b>Подготовка признаков до разбиения.</b> Посчитал минимум и максимум по всем данным, потом разделил на train и test — тест уже повлиял на масштаб.</li><li><b>Признак из будущего.</b> Предсказываешь, оплатит ли клиент заказ, а среди признаков есть <code>дата оплаты</code>. Модель выдаст почти 100% — и рухнет в проде, где этого поля ещё нет.</li><li><b>Дубликаты.</b> Одна и та же запись попала и в train, и в test. Модель просто вспоминает ответ.</li></ul>",
+              "uz": "<p>Model shubhali darajada yaxshi natija ko'rsatsa, o'n holatning to'qqiztasida bu <b>ma'lumot oqishi</b> — leakage. Bu o'qitishga bashorat qilish paytida bo'lmaydigan ma'lumot sizib kirgan holat.</p><p>Uchta eng ko'p uchraydigan manba:</p><ul><li><b>Belgilarni bo'linishdan oldin tayyorlash.</b> Minimum va maksimumni barcha ma'lumot bo'yicha hisoblab, keyin train va test ga bo'ldingiz — test allaqachon masshtabga ta'sir qildi.</li><li><b>Kelajakdan kelgan belgi.</b> Mijoz buyurtmani to'laydimi degan bashorat qilyapsiz, belgilar orasida esa <code>to'lov sanasi</code> bor. Model deyarli 100% beradi — va bu maydon hali yo'q bo'lgan prodda quladi.</li><li><b>Dublikatlar.</b> Bitta yozuv ham train ga, ham test ga tushdi. Model shunchaki javobni eslaydi.</li></ul>",
+              "en": "<p>When a model shows a suspiciously good result, nine times out of ten it is <b>data leakage</b>. That is the name for information sneaking into training that will not exist at real prediction time.</p><p>The three most common sources:</p><ul><li><b>Feature preparation before the split.</b> You computed the minimum and maximum over all data, then split into train and test — the test set has already influenced the scale.</li><li><b>A feature from the future.</b> You predict whether a customer will pay for an order, and among the features sits <code>payment date</code>. The model will report nearly 100% — and collapse in production, where that field does not exist yet.</li><li><b>Duplicates.</b> The same record landed in both train and test. The model simply recalls the answer.</li></ul>"
+            }
+          },
+          {
+            "type": "run",
+            "code": "train = [10, 12, 14, 16]\ntest = [1000]\n\ndef normalize(values, lo, hi):\n    return [round((v - lo) / (hi - lo), 3) for v in values]\n\nall_values = train + test\nprint(\"масштаб по всем данным:\", normalize(train, min(all_values), max(all_values)))\nprint(\"масштаб только по train:\", normalize(train, min(train), max(train)))"
+          },
+          {
+            "type": "note",
+            "kind": "trap",
+            "html": {
+              "ru": "Слева все обучающие значения слиплись около нуля: один тестовый объект-выброс задал масштаб для всей обучающей выборки. Правило простое — <b>любая подготовка признаков считается только по train</b>, а к test применяются уже готовые числа. Нормализация, заполнение пропусков средним, кодирование категорий — всё это часть модели, а не часть данных.",
+              "uz": "Chapda barcha o'qitish qiymatlari nol atrofida yopishib qoldi: bitta chetlashgan test obyekti butun o'qitish tanlanmasi uchun masshtabni belgiladi. Qoida oddiy — <b>belgilarni har qanday tayyorlash faqat train bo'yicha hisoblanadi</b>, testga esa tayyor raqamlar qo'llanadi. Normalizatsiya, bo'shliqlarni o'rtacha bilan to'ldirish, kategoriyalarni kodlash — bularning hammasi modelning qismi, ma'lumotning emas.",
+              "en": "On the left all training values clumped near zero: a single outlying test object set the scale for the entire training set. The rule is simple — <b>any feature preparation is computed on train only</b>, and the finished numbers are then applied to test. Normalization, filling gaps with the mean, encoding categories — all of it is part of the model, not part of the data."
+            }
+          },
+          {
+            "type": "predict",
+            "lang": "python",
+            "code": "train = [10, 20, 30]\ntest = [70]\n\nlo = min(train + test)\nhi = max(train + test)\nprint(round((train[1] - lo) / (hi - lo), 2))",
+            "options": [
+              { "ru": "0.5", "uz": "0.5", "en": "0.5" },
+              { "ru": "0.17", "uz": "0.17", "en": "0.17" },
+              { "ru": "0.33", "uz": "0.33", "en": "0.33" },
+              { "ru": "Ошибка", "uz": "Xato", "en": "Error" }
+            ],
+            "a": 1,
+            "explain": {
+              "ru": "Тестовое значение 70 попало в <code>min</code> и <code>max</code>, поэтому масштаб — от 10 до 70: <code>(20 − 10) / 60 ≈ 0.17</code>. Если бы масштаб считали честно, только по train, вышло бы <code>(20 − 10) / (30 − 10) = 0.5</code>. Одна строка кода — и обучающие признаки уже знают про тест.",
+              "uz": "70 test qiymati <code>min</code> va <code>max</code> ga tushdi, shuning uchun masshtab — 10 dan 70 gacha: <code>(20 − 10) / 60 ≈ 0.17</code>. Agar masshtab halol, faqat train bo'yicha hisoblanganda <code>(20 − 10) / (30 − 10) = 0.5</code> chiqardi. Bitta qator kod — va o'qitish belgilari test haqida allaqachon biladi.",
+              "en": "The test value 70 got into <code>min</code> and <code>max</code>, so the scale runs from 10 to 70: <code>(20 − 10) / 60 ≈ 0.17</code>. Had the scale been computed honestly, on train only, it would be <code>(20 − 10) / (30 − 10) = 0.5</code>. One line of code, and the training features already know about the test set."
+            }
+          },
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>Последний кусок пазла — <b>гиперпараметры</b>. Это настройки, которые модель не выучивает сама: глубина дерева, число соседей <code>k</code>, скорость обучения. Их подбирают перебором: для каждого значения гоняют кросс-валидацию и берут то, где средняя оценка выше.</p><p>Два правила при переборе. Первое: при равных средних выбирают <b>более простую</b> модель — дерево глубины 3 надёжнее дерева глубины 12 с тем же результатом. Второе: если перебирать долго по одному и тому же тесту, ты в итоге подгонишь параметры под этот тест — поэтому для финальной цифры оставляют отдельную выборку, которую не трогали вообще.</p>",
+              "uz": "<p>Boshqotirmaning oxirgi bo'lagi — <b>giperparametrlar</b>. Bular model o'zi o'rganmaydigan sozlamalar: daraxt chuqurligi, qo'shnilar soni <code>k</code>, o'qitish tezligi. Ularni saralab tanlashadi: har bir qiymat uchun kross-validatsiya o'tkazib, o'rtacha bahosi yuqori bo'lganini olishadi.</p><p>Saralashda ikki qoida. Birinchisi: o'rtachalar teng bo'lsa, <b>soddaroq</b> model tanlanadi — 3 chuqurlikdagi daraxt xuddi shu natijali 12 chuqurlikdagi daraxtdan ishonchliroq. Ikkinchisi: bitta test bo'yicha uzoq saralasangiz, oxir-oqibat parametrlarni o'sha testga moslashtirasiz — shuning uchun yakuniy raqam uchun umuman tegilmagan alohida tanlanma qoldiriladi.</p>",
+              "en": "<p>The last piece of the puzzle is <b>hyperparameters</b>. These are settings the model does not learn on its own: tree depth, the number of neighbours <code>k</code>, the learning rate. You pick them by search: run cross-validation for each value and take the one with the higher mean score.</p><p>Two rules during the search. First: on equal means, choose the <b>simpler</b> model — a depth-3 tree is more reliable than a depth-12 tree with the same result. Second: search long enough against the same test set and you end up fitting the parameters to that test — which is why a separate untouched sample is kept aside for the final number.</p>"
+            }
+          },
+          {
+            "type": "summary",
+            "items": [
+              { "ru": "Дерево решений — цепочка вопросов; его можно прочитать и объяснить человеку", "uz": "Qaror daraxti — savollar zanjiri; uni o'qib, odamga tushuntirish mumkin", "en": "A decision tree is a chain of questions; you can read it and explain it to a person" },
+              { "ru": "Разбиение выбирают по чистоте узлов: <code>gini = 1 − Σpᵢ²</code>, меньше — лучше", "uz": "Bo'linish tugunlar tozaligi bo'yicha tanlanadi: <code>gini = 1 − Σpᵢ²</code>, kichikroq — yaxshiroq", "en": "Splits are chosen by node purity: <code>gini = 1 − Σpᵢ²</code>, lower is better" },
+              { "ru": "Одна отложенная выборка даёт случайное число; k-fold усредняет k оценок", "uz": "Bitta ajratilgan tanlanma tasodifiy raqam beradi; k-fold k ta bahoni o'rtachalaydi", "en": "A single hold-out gives a random number; k-fold averages k scores" },
+              { "ru": "Разброс по фолдам важен не меньше среднего", "uz": "Foldlar bo'yicha tarqoqlik o'rtachadan kam ahamiyatli emas", "en": "The spread across folds matters as much as the mean" },
+              { "ru": "Подготовка признаков считается только по train — иначе утечка", "uz": "Belgilarni tayyorlash faqat train bo'yicha hisoblanadi — aks holda oqish", "en": "Feature preparation is computed on train only — otherwise it leaks" },
+              { "ru": "При равных средних выбирают модель попроще", "uz": "O'rtachalar teng bo'lsa, soddaroq model tanlanadi", "en": "On equal means, pick the simpler model" }
+            ]
+          }
+        ]
+      }
+    ],
+    "quiz": [
+      {
+        "q": {
+          "ru": "Что находится во внутреннем узле дерева решений?",
+          "uz": "Qaror daraxtining ichki tugunida nima bo'ladi?",
+          "en": "What sits in an internal node of a decision tree?"
+        },
+        "options": [
+          { "ru": "Готовый ответ модели", "uz": "Modelning tayyor javobi", "en": "The model's final answer" },
+          { "ru": "Вопрос об одном признаке с порогом", "uz": "Bitta belgi haqida chegarali savol", "en": "A question about one feature with a threshold" },
+          { "ru": "Коэффициент формулы", "uz": "Formula koeffitsiyenti", "en": "A formula coefficient" },
+          { "ru": "Список всех объектов выборки", "uz": "Tanlanmadagi barcha obyektlar ro'yxati", "en": "A list of every object in the sample" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Внутренний узел спрашивает: «признак больше порога?» — и отправляет объект в левую или правую ветку. Готовые ответы лежат в листьях.",
+          "uz": "Ichki tugun so'raydi: «belgi chegaradan kattami?» — va obyektni chap yoki o'ng shoxga yuboradi. Tayyor javoblar barglarda yotadi.",
+          "en": "An internal node asks \"is the feature above the threshold?\" and sends the object down the left or right branch. Final answers live in the leaves."
+        }
+      },
+      {
+        "q": {
+          "ru": "Индекс Джини узла равен 0. Что это значит?",
+          "uz": "Tugunning Jini indeksi 0 ga teng. Bu nimani anglatadi?",
+          "en": "A node's Gini index is 0. What does that mean?"
+        },
+        "options": [
+          { "ru": "Узел пуст", "uz": "Tugun bo'sh", "en": "The node is empty" },
+          { "ru": "Все объекты в узле одного класса — узел чистый", "uz": "Tugundagi barcha obyektlar bitta sinfdan — tugun toza", "en": "All objects in the node are of one class — the node is pure" },
+          { "ru": "Классы разделены поровну", "uz": "Sinflar teng bo'lingan", "en": "The classes are split evenly" },
+          { "ru": "Дерево переобучилось", "uz": "Daraxt qayta o'qitilgan", "en": "The tree has overfitted" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Если класс один, его доля <code>p = 1</code>, и <code>1 − 1² = 0</code>. Такой узел дальше делить незачем — он уже лист.",
+          "uz": "Agar sinf bitta bo'lsa, uning ulushi <code>p = 1</code>, va <code>1 − 1² = 0</code>. Bunday tugunni bo'lishning hojati yo'q — u allaqachon barg.",
+          "en": "With a single class its share is <code>p = 1</code>, and <code>1 − 1² = 0</code>. There is no point splitting such a node further — it is already a leaf."
+        }
+      },
+      {
+        "q": {
+          "ru": "Зачем нужна k-fold кросс-валидация, если есть обычное разбиение на train и test?",
+          "uz": "Oddiy train/test bo'linishi bor bo'lsa, k-fold kross-validatsiya nimaga kerak?",
+          "en": "Why use k-fold cross-validation when a plain train/test split exists?"
+        },
+        "options": [
+          { "ru": "Чтобы обучение шло быстрее", "uz": "O'qitish tezroq ketishi uchun", "en": "To make training faster" },
+          { "ru": "Чтобы оценка не зависела от того, какие объекты случайно попали в тест", "uz": "Baho testga tasodifan qaysi obyektlar tushganiga bog'liq bo'lmasligi uchun", "en": "So the score doesn't depend on which objects randomly landed in the test set" },
+          { "ru": "Чтобы модель увидела тестовые ответы", "uz": "Model test javoblarini ko'rishi uchun", "en": "So the model can see the test answers" },
+          { "ru": "Чтобы уменьшить объём данных", "uz": "Ma'lumot hajmini kamaytirish uchun", "en": "To reduce the amount of data" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Одно разбиение — один жребий. k-fold прогоняет k разных разбиений и усредняет, поэтому итог гораздо устойчивее. Платишь за это k-кратным временем обучения.",
+          "uz": "Bitta bo'linish — bitta qur'a. k-fold k xil bo'linishni o'tkazadi va o'rtachalaydi, shuning uchun natija ancha barqaror. Buning evaziga o'qitish vaqti k barobar ortadi.",
+          "en": "One split is one draw. k-fold runs k different splits and averages them, so the result is far more stable. You pay for it with k times the training time."
+        }
+      },
+      {
+        "q": {
+          "ru": "Что из этого — утечка данных?",
+          "uz": "Bulardan qaysi biri ma'lumot oqishi?",
+          "en": "Which of these is data leakage?"
+        },
+        "options": [
+          { "ru": "Разбить данные на train и test до нормализации", "uz": "Ma'lumotlarni normalizatsiyadan oldin train va test ga bo'lish", "en": "Splitting the data into train and test before normalizing" },
+          { "ru": "Посчитать минимум и максимум по всем данным, а потом разделить на train и test", "uz": "Minimum va maksimumni barcha ma'lumot bo'yicha hisoblab, keyin train va test ga bo'lish", "en": "Computing min and max over all the data and only then splitting into train and test" },
+          { "ru": "Перемешать данные перед разбиением", "uz": "Bo'linishdan oldin ma'lumotlarni aralashtirish", "en": "Shuffling the data before the split" },
+          { "ru": "Использовать 5 фолдов вместо 3", "uz": "3 ta o'rniga 5 ta fold ishlatish", "en": "Using 5 folds instead of 3" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Минимум и максимум по всем данным включают тест — значит, тест повлиял на обучающие признаки. Правильный порядок: сначала разбиение, потом подготовка по train, потом применение тех же чисел к test.",
+          "uz": "Barcha ma'lumot bo'yicha minimum va maksimum testni ham qamraydi — demak, test o'qitish belgilariga ta'sir qildi. To'g'ri tartib: avval bo'linish, keyin train bo'yicha tayyorlash, keyin xuddi shu raqamlarni testga qo'llash.",
+          "en": "Min and max over all the data include the test set — so the test influenced the training features. The correct order is: split first, prepare on train, then apply those same numbers to test."
+        }
+      },
+      {
+        "q": {
+          "ru": "Модель предсказывает, оплатит ли клиент заказ, и показывает точность 0.99. Среди признаков есть «дата оплаты». В чём проблема?",
+          "uz": "Model mijoz buyurtmani to'laydimi degan bashorat qiladi va 0.99 aniqlik ko'rsatadi. Belgilar orasida «to'lov sanasi» bor. Muammo nimada?",
+          "en": "A model predicts whether a customer will pay and reports 0.99 accuracy. Among the features is \"payment date\". What's wrong?"
+        },
+        "options": [
+          { "ru": "Ничего, отличная модель", "uz": "Hech nima, ajoyib model", "en": "Nothing, it is an excellent model" },
+          { "ru": "Признак из будущего: в момент предсказания даты оплаты ещё нет", "uz": "Kelajakdan kelgan belgi: bashorat paytida to'lov sanasi hali yo'q", "en": "A feature from the future: at prediction time the payment date does not exist yet" },
+          { "ru": "Слишком мало признаков", "uz": "Belgilar juda kam", "en": "Too few features" },
+          { "ru": "Нужно увеличить глубину дерева", "uz": "Daraxt chuqurligini oshirish kerak", "en": "The tree depth should be increased" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Дата оплаты появляется только после оплаты — то есть после того события, которое мы предсказываем. На истории модель почти безошибочна, в проде это поле пустое, и качество падает до случайного.",
+          "uz": "To'lov sanasi faqat to'lovdan keyin paydo bo'ladi — ya'ni biz bashorat qilayotgan hodisadan keyin. Tarixda model deyarli xatosiz, proddа bu maydon bo'sh va sifat tasodifiy darajaga tushadi.",
+          "en": "A payment date appears only after payment — that is, after the very event being predicted. On history the model is nearly flawless; in production the field is empty and quality drops to chance."
+        }
+      },
+      {
+        "q": {
+          "ru": "Дерево глубины 3 и дерево глубины 12 дали одинаковую среднюю оценку на кросс-валидации. Что выбрать?",
+          "uz": "3 chuqurlikdagi daraxt va 12 chuqurlikdagi daraxt kross-validatsiyada bir xil o'rtacha baho berdi. Nimani tanlash kerak?",
+          "en": "A depth-3 tree and a depth-12 tree gave the same mean cross-validation score. Which do you pick?"
+        },
+        "options": [
+          { "ru": "Глубины 12 — она сложнее, значит умнее", "uz": "12 chuqurlikdagisini — u murakkabroq, demak aqlliroq", "en": "Depth 12 — it is more complex, so it is smarter" },
+          { "ru": "Глубины 3 — при равном качестве берут модель попроще", "uz": "3 chuqurlikdagisini — sifat teng bo'lsa, soddaroq model olinadi", "en": "Depth 3 — on equal quality you take the simpler model" },
+          { "ru": "Любую, разницы нет", "uz": "Ixtiyoriysini, farqi yo'q", "en": "Either one, it makes no difference" },
+          { "ru": "Нужно обучить обе и усреднить предсказания", "uz": "Ikkalasini o'qitib, bashoratlarni o'rtachalash kerak", "en": "Train both and average the predictions" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Более глубокое дерево запоминает больше частностей обучающей выборки, поэтому на новых данных сломается раньше. При равном результате простая модель ещё и быстрее и понятнее.",
+          "uz": "Chuqurroq daraxt o'qitish tanlanmasining ko'proq xususiyatlarini yodlaydi, shuning uchun yangi ma'lumotda tezroq sinadi. Natija teng bo'lsa, sodda model yana tezroq va tushunarliroq.",
+          "en": "A deeper tree memorizes more quirks of the training sample, so it breaks sooner on new data. With equal results the simple model is also faster and easier to read."
+        }
+      }
+    ],
+    "tasks": [
+      {
+        "id": "t1",
+        "kind": "python",
+        "title": {
+          "ru": "Индекс Джини",
+          "uz": "Jini indeksi",
+          "en": "Gini index"
+        },
+        "brief": {
+          "ru": "Измерь чистоту узла дерева",
+          "uz": "Daraxt tugunining tozaligini o'lchang",
+          "en": "Measure the purity of a tree node"
+        },
+        "desc": {
+          "ru": "Напиши функцию <code>gini(labels)</code>, которая принимает список меток классов и возвращает индекс Джини: <code>1 − (p₁² + p₂² + …)</code>, где <code>pᵢ</code> — доля объектов класса <code>i</code> в списке. Для пустого списка верни <code>0.0</code>. Метки могут быть любыми — строками, числами, <code>True</code>/<code>False</code>.",
+          "uz": "<code>gini(labels)</code> funksiyasini yozing: u sinf belgilari ro'yxatini oladi va Jini indeksini qaytaradi: <code>1 − (p₁² + p₂² + …)</code>, bu yerda <code>pᵢ</code> — ro'yxatdagi <code>i</code> sinf obyektlarining ulushi. Bo'sh ro'yxat uchun <code>0.0</code> qaytaring. Belgilar har qanday bo'lishi mumkin — satrlar, sonlar, <code>True</code>/<code>False</code>.",
+          "en": "Write a function <code>gini(labels)</code> that takes a list of class labels and returns the Gini index: <code>1 − (p₁² + p₂² + …)</code>, where <code>pᵢ</code> is the share of class <code>i</code> objects in the list. Return <code>0.0</code> for an empty list. Labels can be anything — strings, numbers, <code>True</code>/<code>False</code>."
+        },
+        "starter": "def gini(labels):\n    # 1 минус сумма квадратов долей каждого класса\n    ...\n",
+        "tests": "assert gini([]) == 0.0\nassert gini([\"a\", \"a\", \"a\"]) == 0.0\nassert abs(gini([\"a\", \"b\"]) - 0.5) < 1e-9\nassert abs(gini([\"a\", \"a\", \"b\", \"b\"]) - 0.5) < 1e-9\nassert abs(gini([\"a\", \"a\", \"a\", \"b\"]) - 0.375) < 1e-9\nassert abs(gini([0, 1, 2]) - 2 / 3) < 1e-9\nassert abs(gini([True, True, False, False, True]) - 0.48) < 1e-9\n",
+        "hint": {
+          "ru": "Уникальные метки даёт <code>set(labels)</code>, а сколько раз встретилась метка — <code>labels.count(value)</code>. Доля — это количество, делённое на <code>len(labels)</code>. Начни с <code>result = 1.0</code> и вычитай <code>p * p</code> в цикле.",
+          "uz": "Noyob belgilarni <code>set(labels)</code> beradi, belgi necha marta uchraganini — <code>labels.count(value)</code>. Ulush — bu miqdorning <code>len(labels)</code> ga bo'lingani. <code>result = 1.0</code> dan boshlab, siklda <code>p * p</code> ni ayiring.",
+          "en": "<code>set(labels)</code> gives the unique labels, and <code>labels.count(value)</code> how many times each occurs. The share is that count divided by <code>len(labels)</code>. Start with <code>result = 1.0</code> and subtract <code>p * p</code> in a loop."
+        }
+      },
+      {
+        "id": "t2",
+        "kind": "python",
+        "title": {
+          "ru": "Разбиение на фолды",
+          "uz": "Foldlarga bo'lish",
+          "en": "Splitting into folds"
+        },
+        "brief": {
+          "ru": "Раздели индексы на k почти равных частей",
+          "uz": "Indekslarni k ta deyarli teng qismga bo'ling",
+          "en": "Divide indices into k nearly equal parts"
+        },
+        "desc": {
+          "ru": "Напиши функцию <code>kfold_indices(n, k)</code>. Она возвращает список из <code>k</code> списков: индексы от <code>0</code> до <code>n − 1</code>, разложенные подряд по фолдам. Если <code>n</code> не делится на <code>k</code> нацело, остаток раздают <b>первым</b> фолдам — по одному лишнему индексу каждому. Индексы внутри фолда идут подряд и по возрастанию.<br><br>Пример: <code>kfold_indices(10, 3)</code> → <code>[[0,1,2,3], [4,5,6], [7,8,9]]</code>.",
+          "uz": "<code>kfold_indices(n, k)</code> funksiyasini yozing. U <code>k</code> ta ro'yxatdan iborat ro'yxat qaytaradi: <code>0</code> dan <code>n − 1</code> gacha indekslar foldlarga ketma-ket taqsimlangan. Agar <code>n</code> <code>k</code> ga butun bo'linmasa, qoldiq <b>birinchi</b> foldlarga beriladi — har biriga bittadan ortiqcha indeks. Fold ichidagi indekslar ketma-ket va o'sish tartibida.<br><br>Misol: <code>kfold_indices(10, 3)</code> → <code>[[0,1,2,3], [4,5,6], [7,8,9]]</code>.",
+          "en": "Write a function <code>kfold_indices(n, k)</code>. It returns a list of <code>k</code> lists: the indices from <code>0</code> to <code>n − 1</code> laid out consecutively across folds. If <code>n</code> is not divisible by <code>k</code>, the remainder goes to the <b>first</b> folds — one extra index each. Indices inside a fold are consecutive and ascending.<br><br>Example: <code>kfold_indices(10, 3)</code> → <code>[[0,1,2,3], [4,5,6], [7,8,9]]</code>."
+        },
+        "starter": "def kfold_indices(n, k):\n    # верни список из k списков индексов\n    ...\n",
+        "tests": "assert kfold_indices(6, 3) == [[0, 1], [2, 3], [4, 5]]\nassert kfold_indices(10, 3) == [[0, 1, 2, 3], [4, 5, 6], [7, 8, 9]]\nassert kfold_indices(5, 5) == [[0], [1], [2], [3], [4]]\nassert kfold_indices(4, 1) == [[0, 1, 2, 3]]\nfolds = kfold_indices(11, 4)\nassert [len(f) for f in folds] == [3, 3, 3, 2]\nassert sorted(i for f in folds for i in f) == list(range(11))\nassert kfold_indices(2, 3) == [[0], [1], []]\n",
+        "hint": {
+          "ru": "Базовый размер — <code>n // k</code>, остаток — <code>n % k</code>. Веди переменную <code>start</code>: для фолда с номером <code>i</code> размер равен <code>base + 1</code>, пока <code>i &lt; остаток</code>, иначе <code>base</code>. Потом <code>list(range(start, start + size))</code> и сдвинь <code>start</code>.",
+          "uz": "Asosiy o'lcham — <code>n // k</code>, qoldiq — <code>n % k</code>. <code>start</code> o'zgaruvchisini yuriting: <code>i</code> raqamli fold uchun o'lcham <code>i &lt; qoldiq</code> bo'lguncha <code>base + 1</code>, aks holda <code>base</code>. Keyin <code>list(range(start, start + size))</code> va <code>start</code> ni suring.",
+          "en": "The base size is <code>n // k</code>, the remainder <code>n % k</code>. Track a <code>start</code> variable: for fold number <code>i</code> the size is <code>base + 1</code> while <code>i &lt; remainder</code>, otherwise <code>base</code>. Then <code>list(range(start, start + size))</code> and advance <code>start</code>."
+        }
+      },
+      {
+        "id": "t3",
+        "kind": "python",
+        "title": {
+          "ru": "Выбор гиперпараметра",
+          "uz": "Giperparametrni tanlash",
+          "en": "Choosing a hyperparameter"
+        },
+        "brief": {
+          "ru": "Возьми лучшее среднее, а при равенстве — модель попроще",
+          "uz": "Eng yaxshi o'rtachani oling, tenglikda — soddaroq modelni",
+          "en": "Take the best mean, and on a tie the simpler model"
+        },
+        "desc": {
+          "ru": "Напиши функцию <code>best_param(results)</code>. <code>results</code> — словарь «значение гиперпараметра (целое число) → список оценок по фолдам». Верни то значение, у которого <b>средняя</b> оценка максимальна. Если максимум делят несколько значений, верни <b>наименьшее</b> из них — более простую модель. Для пустого словаря верни <code>None</code>.",
+          "uz": "<code>best_param(results)</code> funksiyasini yozing. <code>results</code> — «giperparametr qiymati (butun son) → foldlar bo'yicha baholar ro'yxati» lug'ati. <b>O'rtacha</b> bahosi maksimal bo'lgan qiymatni qaytaring. Agar maksimumni bir necha qiymat bo'lishsa, ulardan <b>eng kichigini</b> qaytaring — soddaroq modelni. Bo'sh lug'at uchun <code>None</code> qaytaring.",
+          "en": "Write a function <code>best_param(results)</code>. <code>results</code> maps a hyperparameter value (an integer) to a list of per-fold scores. Return the value whose <b>mean</b> score is highest. If several values share the maximum, return the <b>smallest</b> of them — the simpler model. Return <code>None</code> for an empty dict."
+        },
+        "starter": "def best_param(results):\n    # лучшее среднее; при равенстве — меньшее значение параметра\n    ...\n",
+        "tests": "assert best_param({}) is None\nassert best_param({7: [1.0]}) == 7\nassert best_param({1: [0.7, 0.7], 3: [0.9, 0.8], 5: [0.85, 0.85]}) == 3\nassert best_param({1: [0.7, 0.7], 3: [0.9, 0.8], 5: [0.8, 0.9]}) == 3\nassert best_param({2: [0.5], 4: [0.5]}) == 2\nassert best_param({1: [0.1, 0.3], 2: [0.2, 0.2], 3: [0.0, 0.4]}) == 1\nassert best_param({10: [0.2], 2: [0.9], 5: [0.4]}) == 2\n",
+        "hint": {
+          "ru": "Среднее списка — <code>sum(scores) / len(scores)</code>. Проще всего отсортировать элементы так, чтобы нужный оказался первым: <code>sorted(results, key=lambda p: (-mean(p), p))[0]</code> — минус перед средним сортирует по убыванию качества, а второй ключ разрешает ничьи в пользу меньшего параметра.",
+          "uz": "Ro'yxat o'rtachasi — <code>sum(scores) / len(scores)</code>. Eng osoni — elementlarni keraklisi birinchi bo'ladigan qilib tartiblash: <code>sorted(results, key=lambda p: (-mean(p), p))[0]</code> — o'rtacha oldidagi minus sifat bo'yicha kamayish tartibida saralaydi, ikkinchi kalit esa tenglikni kichikroq parametr foydasiga hal qiladi.",
+          "en": "The mean of a list is <code>sum(scores) / len(scores)</code>. The easiest way is to sort so the one you want lands first: <code>sorted(results, key=lambda p: (-mean(p), p))[0]</code> — the minus sorts by descending quality, and the second key breaks ties in favour of the smaller parameter."
+        }
+      }
+    ],
+    "exam": {
+      "time": 600,
+      "questions": [
+        {
+          "q": {
+            "ru": "Какое разбиение выберет дерево решений?",
+            "uz": "Qaror daraxti qaysi bo'linishni tanlaydi?",
+            "en": "Which split will a decision tree choose?"
+          },
+          "options": [
+            { "ru": "То, где взвешенный Джини половинок наименьший", "uz": "Yarimlarning o'lchovli Jinisi eng kichik bo'lganini", "en": "The one with the smallest weighted Gini of the halves" },
+            { "ru": "То, где половинки одинакового размера", "uz": "Yarimlari bir xil o'lchamdagisini", "en": "The one where the halves are the same size" },
+            { "ru": "Первое подходящее — порядок признаков решает", "uz": "Birinchi mos kelganini — belgilar tartibi hal qiladi", "en": "The first one that fits — feature order decides" },
+            { "ru": "Случайное, поэтому деревья нестабильны", "uz": "Tasodifiysini, shuning uchun daraxtlar beqaror", "en": "A random one, which is why trees are unstable" }
+          ],
+          "a": 0
+        },
+        {
+          "q": {
+            "ru": "Сколько раз каждый объект попадает в тестовую часть при 5-fold кросс-валидации?",
+            "uz": "5-fold kross-validatsiyada har bir obyekt test qismiga necha marta tushadi?",
+            "en": "How many times does each object end up in the test part during 5-fold cross-validation?"
+          },
+          "options": [
+            { "ru": "Ровно один раз", "uz": "Aynan bir marta", "en": "Exactly once" },
+            { "ru": "Пять раз", "uz": "Besh marta", "en": "Five times" },
+            { "ru": "Ни разу, тест отдельный", "uz": "Bir marta ham, test alohida", "en": "Never, the test set is separate" },
+            { "ru": "Случайное число раз", "uz": "Tasodifiy marta", "en": "A random number of times" }
+          ],
+          "a": 0
+        },
+        {
+          "q": {
+            "ru": "Правильный порядок действий при нормализации признаков?",
+            "uz": "Belgilarni normalizatsiya qilishda to'g'ri tartib?",
+            "en": "The correct order of steps when normalizing features?"
+          },
+          "options": [
+            { "ru": "Нормализовать всё, потом разделить на train и test", "uz": "Hammasini normalizatsiya qilib, keyin train va test ga bo'lish", "en": "Normalize everything, then split into train and test" },
+            { "ru": "Разделить, посчитать масштаб по train, применить его и к train, и к test", "uz": "Bo'lish, masshtabni train bo'yicha hisoblash, uni ham train, ham testga qo'llash", "en": "Split, compute the scale on train, apply it to both train and test" },
+            { "ru": "Нормализовать train и test каждый по своему масштабу", "uz": "Train va testni har birini o'z masshtabi bo'yicha normalizatsiya qilish", "en": "Normalize train and test each by its own scale" },
+            { "ru": "Нормализация не нужна деревьям, значит и порядок не важен", "uz": "Daraxtlarga normalizatsiya kerak emas, demak tartib ham muhim emas", "en": "Trees don't need normalization, so the order doesn't matter" }
+          ],
+          "a": 1
+        },
+        {
+          "q": {
+            "ru": "Кросс-валидация даёт 0.88, а на новых данных модель показывает 0.61. Наиболее вероятная причина?",
+            "uz": "Kross-validatsiya 0.88 beradi, yangi ma'lumotda esa model 0.61 ko'rsatadi. Eng ehtimolli sabab?",
+            "en": "Cross-validation gives 0.88, but on new data the model shows 0.61. The most likely cause?"
+          },
+          "options": [
+            { "ru": "Мало фолдов, надо взять 10", "uz": "Foldlar kam, 10 ta olish kerak", "en": "Too few folds, use 10" },
+            { "ru": "Утечка данных: в обучении была информация, которой в проде нет", "uz": "Ma'lumot oqishi: o'qitishda proddа yo'q ma'lumot bor edi", "en": "Data leakage: training held information that production does not have" },
+            { "ru": "Слишком простая модель", "uz": "Model juda sodda", "en": "The model is too simple" },
+            { "ru": "Так и должно быть, это нормально", "uz": "Shunday bo'lishi kerak, bu normal", "en": "That's expected and normal" }
+          ],
+          "a": 1
+        },
+        {
+          "q": {
+            "ru": "Что такое гиперпараметр?",
+            "uz": "Giperparametr nima?",
+            "en": "What is a hyperparameter?"
+          },
+          "options": [
+            { "ru": "Настройка, которую задают до обучения и модель не подбирает сама", "uz": "O'qitishdan oldin beriladigan va model o'zi tanlamaydigan sozlama", "en": "A setting fixed before training that the model does not learn itself" },
+            { "ru": "Коэффициент, который модель находит в процессе обучения", "uz": "Model o'qish jarayonida topadigan koeffitsiyent", "en": "A coefficient the model finds during training" },
+            { "ru": "Метка класса в обучающей выборке", "uz": "O'qitish tanlanmasidagi sinf belgisi", "en": "A class label in the training sample" },
+            { "ru": "Ошибка модели на тесте", "uz": "Modelning testdagi xatosi", "en": "The model's error on the test set" }
+          ],
+          "a": 0
+        },
+        {
+          "q": {
+            "ru": "Фолды дали 0.80, 0.81, 0.79, 0.80, 0.80. Что говорит такой набор?",
+            "uz": "Foldlar 0.80, 0.81, 0.79, 0.80, 0.80 berdi. Bunday to'plam nima deydi?",
+            "en": "The folds gave 0.80, 0.81, 0.79, 0.80, 0.80. What does such a set tell you?"
+          },
+          "options": [
+            { "ru": "Оценка устойчива: разброс маленький, среднему 0.80 можно верить", "uz": "Baho barqaror: tarqoqlik kichik, 0.80 o'rtachaga ishonsa bo'ladi", "en": "The score is stable: the spread is small, the 0.80 mean is trustworthy" },
+            { "ru": "Модель переобучена", "uz": "Model qayta o'qitilgan", "en": "The model is overfitted" },
+            { "ru": "Данных слишком мало", "uz": "Ma'lumot juda kam", "en": "There is too little data" },
+            { "ru": "Есть утечка данных", "uz": "Ma'lumot oqishi bor", "en": "There is data leakage" }
+          ],
+          "a": 0
+        }
+      ],
+      "tasks": [
+        {
+          "id": "e1",
+          "kind": "python",
+          "title": {
+            "ru": "Отчёт по кросс-валидации",
+            "uz": "Kross-validatsiya bo'yicha hisobot",
+            "en": "Cross-validation report"
+          },
+          "desc": {
+            "ru": "Напиши функцию <code>pick_model(results, min_folds)</code>. <code>results</code> — словарь «значение гиперпараметра → список оценок по фолдам». Учитывай только те значения, у которых оценок <b>не меньше</b> <code>min_folds</code>: остальные измерены слишком грубо. Среди оставшихся найди лучшее по средней оценке (при равенстве — меньшее значение параметра) и верни кортеж <code>(параметр, среднее)</code>, где среднее округлено до трёх знаков функцией <code>round</code>. Если подходящих значений нет, верни <code>None</code>.",
+            "uz": "<code>pick_model(results, min_folds)</code> funksiyasini yozing. <code>results</code> — «giperparametr qiymati → foldlar bo'yicha baholar ro'yxati» lug'ati. Faqat bahalari <code>min_folds</code> dan <b>kam bo'lmagan</b> qiymatlarni hisobga oling: qolganlari juda qo'pol o'lchangan. Qolganlari ichidan o'rtacha baho bo'yicha eng yaxshisini toping (tenglikda — kichikroq parametr qiymatini) va <code>(parametr, o'rtacha)</code> kortejini qaytaring, bu yerda o'rtacha <code>round</code> bilan uch xonagacha yaxlitlangan. Mos qiymatlar bo'lmasa, <code>None</code> qaytaring.",
+            "en": "Write a function <code>pick_model(results, min_folds)</code>. <code>results</code> maps a hyperparameter value to a list of per-fold scores. Consider only values with <b>at least</b> <code>min_folds</code> scores: the rest were measured too crudely. Among those, find the best mean score (ties go to the smaller parameter) and return the tuple <code>(parameter, mean)</code>, with the mean rounded to three decimals using <code>round</code>. If nothing qualifies, return <code>None</code>."
+          },
+          "starter": "def pick_model(results, min_folds):\n    # отбрось параметры с недостаточным числом фолдов, потом выбери лучший\n    ...\n",
+          "tests": "res = {1: [0.6, 0.62, 0.58], 3: [0.9, 0.88], 5: [0.81, 0.83, 0.85]}\nassert pick_model(res, 3) == (5, 0.83)\nassert pick_model(res, 2) == (3, 0.89)\nassert pick_model(res, 4) is None\nassert pick_model({}, 1) is None\nassert pick_model({2: [1.0, 1.0], 4: [1.0, 1.0]}, 2) == (2, 1.0)\nassert pick_model({8: [0.5]}, 1) == (8, 0.5)\n",
+          "hint": {
+            "ru": "Сначала собери словарь только из подходящих: <code>{p: s for p, s in results.items() if len(s) &gt;= min_folds}</code>. Если он пуст — <code>None</code>. Дальше та же сортировка, что в t3, а в конце не забудь <code>round(mean, 3)</code>.",
+            "uz": "Avval faqat mos keladiganlaridan lug'at yig'ing: <code>{p: s for p, s in results.items() if len(s) &gt;= min_folds}</code>. Bo'sh bo'lsa — <code>None</code>. Keyin t3 dagi kabi tartiblash, oxirida esa <code>round(mean, 3)</code> ni unutmang.",
+            "en": "First collect only the qualifying entries: <code>{p: s for p, s in results.items() if len(s) &gt;= min_folds}</code>. If it is empty, return <code>None</code>. Then the same sort as in t3, and don't forget <code>round(mean, 3)</code> at the end."
+          }
+        }
+      ]
+    }
   }
  ]
 }

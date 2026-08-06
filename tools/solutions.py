@@ -1317,4 +1317,51 @@ print(report(e, 1, 1.0))""",
     'security-intro/se-03/exam0': """def sanitize(record, secret_fields):
     return {k: ('***' if k.lower() in secret_fields else v) for k, v in record.items()}
 """,
+
+    'ml-intro/ml-03/t1': """def gini(labels):
+    if not labels:
+        return 0.0
+    total = len(labels)
+    result = 1.0
+    for value in set(labels):
+        p = labels.count(value) / total
+        result -= p * p
+    return result
+""",
+
+    'ml-intro/ml-03/t2': """def kfold_indices(n, k):
+    base = n // k
+    rest = n % k
+    folds = []
+    start = 0
+    for i in range(k):
+        size = base + 1 if i < rest else base
+        folds.append(list(range(start, start + size)))
+        start += size
+    return folds
+""",
+
+    'ml-intro/ml-03/t3': """def best_param(results):
+    if not results:
+        return None
+
+    def mean(param):
+        scores = results[param]
+        return sum(scores) / len(scores)
+
+    return sorted(results, key=lambda p: (-mean(p), p))[0]
+""",
+
+    'ml-intro/ml-03/exam0': """def pick_model(results, min_folds):
+    good = {p: s for p, s in results.items() if len(s) >= min_folds}
+    if not good:
+        return None
+
+    def mean(param):
+        scores = good[param]
+        return sum(scores) / len(scores)
+
+    best = sorted(good, key=lambda p: (-mean(p), p))[0]
+    return (best, round(mean(best), 3))
+""",
 }
