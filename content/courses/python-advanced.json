@@ -1019,6 +1019,349 @@
      }
     ]
    }
+  },
+  {
+   "id": "pa-03",
+   "title": { "ru": "Генераторы, декораторы и контекст", "uz": "Generatorlar, dekoratorlar va kontekst", "en": "Generators, decorators and context" },
+   "tagline": { "ru": "Три инструмента, которые отличают питониста от человека, пишущего на Python", "uz": "Pythonistni Python da yozadigan odamdan ajratadigan uch asbob", "en": "Three tools that separate a Pythonista from someone merely writing Python" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "Генераторы: данные по одному", "uz": "Generatorlar: ma'lumot bittalab", "en": "Generators: data one at a time" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Функция со словом <code>yield</code> вместо <code>return</code> становится <b>генератором</b>. Она не считает всё сразу, а отдаёт значения по одному и <b>запоминает, где остановилась</b>.</p><p>Разница видна на памяти. Список на миллион чисел займёт десятки мегабайт. Генератор — несколько десятков байт, потому что в любой момент существует ровно одно значение.</p><p>Отсюда правило Data Engineer: <b>файл на 10 гигабайт нельзя читать в список</b>. Его читают построчно — и это тоже генератор.</p>",
+        "uz": "<p><code>return</code> o'rniga <code>yield</code> so'zi bo'lgan funksiya <b>generator</b> ga aylanadi. U hammasini birdan hisoblamaydi, qiymatlarni bittalab beradi va <b>qayerda to'xtaganini eslab qoladi</b>.</p><p>Farq xotirada ko'rinadi. Million sonli ro'yxat o'nlab megabayt egallaydi. Generator — bir necha o'nlab bayt, chunki istalgan paytda aynan bitta qiymat mavjud.</p><p>Shundan Data Engineer qoidasi: <b>10 gigabaytli faylni ro'yxatga o'qib bo'lmaydi</b>. U qatorma-qator o'qiladi — va bu ham generator.</p>",
+        "en": "<p>A function with <code>yield</code> instead of <code>return</code> becomes a <b>generator</b>. It does not compute everything at once but hands out values one by one and <b>remembers where it stopped</b>.</p><p>The difference shows in memory. A list of a million numbers takes tens of megabytes. A generator takes a few dozen bytes, because exactly one value exists at any moment.</p><p>Hence the Data Engineer's rule: <b>a 10-gigabyte file must never be read into a list</b>. You read it line by line — and that is a generator too.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "import sys\n\n# обычная функция считает всё и возвращает список\ndef squares_list(n):\n    result = []\n    for i in range(n):\n        result.append(i * i)\n    return result\n\n# генератор отдаёт по одному и помнит, где остановился\ndef squares_gen(n):\n    for i in range(n):\n        yield i * i\n\nlst = squares_list(100000)\ngen = squares_gen(100000)\n\nprint(\"список занимает:\", sys.getsizeof(lst), \"байт\")\nprint(\"генератор занимает:\", sys.getsizeof(gen), \"байт\")\n\n# читаются одинаково\nprint(\"первые пять из генератора:\", [next(gen) for _ in range(5)])\n\n# генераторное выражение: те же скобки, но круглые\nbig = sum(x * x for x in range(1000))\nprint(\"сумма квадратов:\", big)\n\n# бесконечный генератор — со списком такое невозможно в принципе\ndef counter(start=0):\n    n = start\n    while True:\n        yield n\n        n += 1\n\nc = counter(10)\nprint(\"из бесконечного:\", [next(c) for _ in range(4)])"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Обрати внимание на <code>counter</code>: внутри <code>while True</code>, но программа не зависает. Генератор выполняется только до следующего <code>yield</code> и замирает до следующего запроса.</p><p>И на разницу в скобках: <code>[x * x for x in ...]</code> строит список сразу, <code>(x * x for x in ...)</code> — генератор. Внутри <code>sum()</code> скобки можно не дублировать, поэтому <code>sum(x * x for x in range(1000))</code> не создаёт список вообще.</p><p>Главное ограничение честно: <b>генератор одноразовый</b>. Прошёл по нему — он пуст. Нужно дважды — либо создавай заново, либо сохраняй в список.</p>",
+        "uz": "<p><code>counter</code> ga e'tibor bering: ichida <code>while True</code>, lekin dastur osilib qolmaydi. Generator faqat keyingi <code>yield</code> gacha bajariladi va keyingi so'rovgacha qotib qoladi.</p><p>Va qavslar farqiga: <code>[x * x for x in ...]</code> darhol ro'yxat quradi, <code>(x * x for x in ...)</code> — generator. <code>sum()</code> ichida qavslarni takrorlamasa ham bo'ladi, shuning uchun <code>sum(x * x for x in range(1000))</code> ro'yxat umuman yaratmaydi.</p><p>Asosiy cheklov halol: <b>generator bir martalik</b>. Bo'ylab yurdingiz — u bo'sh. Ikki marta kerak bo'lsa — yo qaytadan yarating, yo ro'yxatga saqlang.</p>",
+        "en": "<p>Note <code>counter</code>: it contains <code>while True</code> yet the program does not hang. A generator runs only up to the next <code>yield</code> and then freezes until the next request.</p><p>And note the brackets: <code>[x * x for x in ...]</code> builds a list at once, while <code>(x * x for x in ...)</code> is a generator. Inside <code>sum()</code> the brackets need not be doubled, so <code>sum(x * x for x in range(1000))</code> never creates a list at all.</p><p>The main limitation, honestly: <b>a generator is single-use</b>. Walk it once and it is empty. If you need it twice, either recreate it or store it in a list.</p>"
+       }
+      },
+      {
+       "type": "predict",
+       "code": "def gen():\n    yield 1\n    yield 2\n\ng = gen()\nprint(sum(g))\nprint(sum(g))",
+       "options": [
+        { "ru": "3 и 3", "uz": "3 va 3", "en": "3 and 3" },
+        { "ru": "3 и 0 — генератор одноразовый", "uz": "3 va 0 — generator bir martalik", "en": "3 and 0 — a generator is single-use" },
+        { "ru": "3 и ошибка", "uz": "3 va xato", "en": "3 and an error" },
+        { "ru": "0 и 0", "uz": "0 va 0", "en": "0 and 0" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Первый <code>sum</code> дошёл до конца и исчерпал генератор. Второй получил пустую последовательность — сумма пустого равна нулю, без всякой ошибки. Это самый коварный вид такой ошибки: программа не падает, просто цифры не те.",
+        "uz": "Birinchi <code>sum</code> oxirigacha yetib, generatorni tugatdi. Ikkinchisi bo'sh ketma-ketlik oldi — bo'shning yig'indisi nolga teng, hech qanday xatosiz. Bu bunday xatoning eng ayyor turi: dastur yiqilmaydi, shunchaki raqamlar boshqa.",
+        "en": "The first <code>sum</code> ran to the end and exhausted the generator. The second got an empty sequence — the sum of nothing is zero, with no error at all. This is the sneakiest form of the bug: nothing crashes, the numbers are simply wrong."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "Декораторы: обёртка вокруг функции", "uz": "Dekoratorlar: funksiya atrofidagi o'ram", "en": "Decorators: a wrapper around a function" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>В Python функция — обычное значение: её можно передать в другую функцию, вернуть из неё, положить в список. На этом и стоят <b>декораторы</b>.</p><p>Декоратор — функция, которая принимает функцию и возвращает новую, обёрнутую. Запись <code>@log</code> над <code>def work()</code> — это просто короткая форма для <code>work = log(work)</code>.</p><p>Зачем: добавить поведение, не трогая саму функцию. Логирование, замер времени, кеш, проверка прав, повтор при сбое — всё это одинаково для сотни функций, и его выносят в декоратор.</p><p>Одну деталь забывают почти все: обёртка должна принимать <code>*args, **kwargs</code>, иначе декоратор сломает все функции с аргументами.</p>",
+        "uz": "<p>Python da funksiya — oddiy qiymat: uni boshqa funksiyaga uzatish, undan qaytarish, ro'yxatga solish mumkin. <b>Dekoratorlar</b> shunga tayanadi.</p><p>Dekorator — funksiyani qabul qilib, yangi, o'ralgan funksiyani qaytaradigan funksiya. <code>def work()</code> ustidagi <code>@log</code> yozuvi — bu shunchaki <code>work = log(work)</code> ning qisqa shakli.</p><p>Nima uchun: funksiyaning o'ziga tegmasdan xatti-harakat qo'shish. Loglash, vaqt o'lchash, kesh, huquq tekshirish, nosozlikda takrorlash — bularning hammasi yuzta funksiya uchun bir xil va dekoratorga chiqariladi.</p><p>Bitta tafsilotni deyarli hamma unutadi: o'ram <code>*args, **kwargs</code> ni qabul qilishi kerak, aks holda dekorator argumentli barcha funksiyalarni buzadi.</p>",
+        "en": "<p>In Python a function is an ordinary value: you can pass it to another function, return it, put it in a list. <b>Decorators</b> stand on that.</p><p>A decorator is a function that takes a function and returns a new, wrapped one. Writing <code>@log</code> above <code>def work()</code> is simply short for <code>work = log(work)</code>.</p><p>What for: adding behaviour without touching the function itself. Logging, timing, caching, permission checks, retry on failure — all identical across a hundred functions, so it moves into a decorator.</p><p>One detail nearly everybody forgets: the wrapper must accept <code>*args, **kwargs</code>, or the decorator breaks every function that takes arguments.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "import functools\n\ndef log(func):\n    # functools.wraps сохраняет имя и документацию обёрнутой функции\n    @functools.wraps(func)\n    def wrapper(*args, **kwargs):        # принимаем ЛЮБЫЕ аргументы\n        print(f\"-> вызов {func.__name__} с {args}\")\n        result = func(*args, **kwargs)\n        print(f\"<- {func.__name__} вернула {result}\")\n        return result\n    return wrapper\n\n@log\ndef add(a, b):\n    \"\"\"Складывает два числа.\"\"\"\n    return a + b\n\nprint(add(2, 3))\nprint()\n\n# @log — это ровно то же самое, что:\ndef mul(a, b):\n    return a * b\nmul = log(mul)\nprint(mul(4, 5))\nprint()\n\n# имя сохранилось благодаря functools.wraps\nprint(\"имя функции:\", add.__name__)\nprint(\"документация:\", add.__doc__)\n\n# кеш — готовый декоратор из стандартной библиотеки\n@functools.lru_cache(maxsize=None)\ndef fib(n):\n    return n if n < 2 else fib(n - 1) + fib(n - 2)\n\nprint(\"fib(30) =\", fib(30))          # без кеша это миллионы вызовов"
+      },
+      {
+       "type": "note",
+       "kind": "trap",
+       "html": {
+        "ru": "Без <code>functools.wraps</code> обёрнутая функция теряет своё имя: <code>add.__name__</code> станет <code>'wrapper'</code>, а документация исчезнет. Это ломает отладку, автодокументацию и некоторые фреймворки, которые ищут функции по имени. Одна строка <code>@functools.wraps(func)</code> решает проблему целиком — пиши её всегда.",
+        "uz": "<code>functools.wraps</code> siz o'ralgan funksiya o'z nomini yo'qotadi: <code>add.__name__</code> <code>'wrapper'</code> bo'ladi, hujjat esa yo'qoladi. Bu nosozlik izlashni, avtohujjatlashni va funksiyalarni nomi bo'yicha qidiradigan ba'zi freymvorklarni buzadi. Bitta <code>@functools.wraps(func)</code> qatori muammoni to'liq hal qiladi — uni doim yozing.",
+        "en": "Without <code>functools.wraps</code> the wrapped function loses its name: <code>add.__name__</code> becomes <code>'wrapper'</code> and the docstring vanishes. That breaks debugging, auto-generated documentation and some frameworks that look functions up by name. One line — <code>@functools.wraps(func)</code> — fixes it entirely, so always write it."
+       }
+      },
+      {
+       "type": "checkpoint",
+       "q": { "ru": "Во что превращается <code>@log</code> над <code>def work():</code>?", "uz": "<code>def work():</code> ustidagi <code>@log</code> nimaga aylanadi?", "en": "What does <code>@log</code> above <code>def work():</code> become?" },
+       "options": [
+        { "ru": "В комментарий, который читает интерпретатор", "uz": "Interpretator o'qiydigan izohga", "en": "A comment the interpreter reads" },
+        { "ru": "В <code>work = log(work)</code>", "uz": "<code>work = log(work)</code> ga", "en": "Into <code>work = log(work)</code>" },
+        { "ru": "В вызов <code>log()</code> перед каждым запуском", "uz": "Har ishga tushirishdan oldin <code>log()</code> chaqiruviga", "en": "A call to <code>log()</code> before every run" },
+        { "ru": "Ни во что, это подсказка редактору", "uz": "Hech nimaga, bu muharrirga maslahat", "en": "Nothing, it is a hint for the editor" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Синтаксис <code>@</code> — просто короткая запись. Понимая это, легко разбираться и в декораторах с аргументами: <code>@retry(3)</code> означает <code>work = retry(3)(work)</code>.",
+        "uz": "<code>@</code> sintaksisi — shunchaki qisqa yozuv. Buni tushunsangiz, argumentli dekoratorlarni ham oson tushunasiz: <code>@retry(3)</code> <code>work = retry(3)(work)</code> degani.",
+        "en": "The <code>@</code> syntax is just shorthand. Once you see that, decorators with arguments are easy too: <code>@retry(3)</code> means <code>work = retry(3)(work)</code>."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "Контекстные менеджеры и свои исключения", "uz": "Kontekst menejerlari va o'z istisnolaringiz", "en": "Context managers and your own exceptions" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><code>with</code> ты уже знаешь по файлам. Но это общий механизм: <b>любой объект</b> можно научить работать с <code>with</code>, если у него есть <code>__enter__</code> и <code>__exit__</code>.</p><p>Смысл один: гарантированно освободить ресурс. Файл закроется, соединение с базой вернётся в пул, замок снимется — даже если внутри случилось исключение.</p><p>Проще всего писать такое через <code>contextlib.contextmanager</code>: код до <code>yield</code> — это вход, после — выход, а <code>try/finally</code> гарантирует выход при любом исходе.</p><p>Рядом стоит вторая тема — <b>свои исключения</b>. Класс, унаследованный от <code>Exception</code>, позволяет ловить именно свою ошибку, а не всё подряд. <code>except ValueError</code> поймает и чужую библиотеку, а <code>except NotEnoughMoney</code> — только твой случай.</p>",
+        "uz": "<p><code>with</code> ni fayllardan bilasiz. Lekin bu umumiy mexanizm: <code>__enter__</code> va <code>__exit__</code> bo'lsa, <b>har qanday obyektni</b> <code>with</code> bilan ishlashga o'rgatish mumkin.</p><p>Ma'nosi bitta: resursni kafolatli bo'shatish. Fayl yopiladi, baza bilan ulanish hovuzga qaytadi, qulf yechiladi — ichida istisno yuz bergan bo'lsa ham.</p><p>Bunday narsani <code>contextlib.contextmanager</code> orqali yozish eng oson: <code>yield</code> gacha kod — kirish, keyin — chiqish, <code>try/finally</code> esa har qanday natijada chiqishni kafolatlaydi.</p><p>Yonida ikkinchi mavzu turadi — <b>o'z istisnolaringiz</b>. <code>Exception</code> dan meros olingan sinf hamma narsani emas, aynan o'z xatoingizni tutish imkonini beradi. <code>except ValueError</code> begona kutubxonanikini ham tutadi, <code>except NotEnoughMoney</code> esa — faqat sizning holatingizni.</p>",
+        "en": "<p>You already know <code>with</code> from files. But it is a general mechanism: <b>any object</b> can be taught to work with <code>with</code> if it has <code>__enter__</code> and <code>__exit__</code>.</p><p>The purpose is one: release a resource guaranteed. The file closes, the database connection returns to the pool, the lock is released — even if an exception happened inside.</p><p>The easiest way to write one is <code>contextlib.contextmanager</code>: the code before <code>yield</code> is the entry, after it the exit, and <code>try/finally</code> guarantees the exit whatever happens.</p><p>Alongside sits a second topic — <b>your own exceptions</b>. A class inheriting from <code>Exception</code> lets you catch precisely your error rather than everything. <code>except ValueError</code> also catches a third-party library's; <code>except NotEnoughMoney</code> catches only your case.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "from contextlib import contextmanager\n\n@contextmanager\ndef step(name):\n    print(f\"[{name}] начали\")\n    try:\n        yield name                    # сюда попадёт то, что после as\n    finally:\n        print(f\"[{name}] закончили\")   # выполнится даже при исключении\n\nwith step(\"загрузка\") as s:\n    print(f\"  работаем внутри {s}\")\n\nprint()\n\n# своё исключение: ловится точно, а не заодно с чужими\nclass NotEnoughMoney(Exception):\n    def __init__(self, need, have):\n        super().__init__(f\"нужно {need}, а есть {have}\")\n        self.need = need\n        self.have = have\n\ndef withdraw(balance, amount):\n    if amount > balance:\n        raise NotEnoughMoney(amount, balance)\n    return balance - amount\n\nprint(\"снимаем 30:\", withdraw(100, 30))\n\ntry:\n    withdraw(100, 500)\nexcept NotEnoughMoney as e:\n    print(\"поймали своё:\", e)\n    print(\"не хватает:\", e.need - e.have)\n\nprint()\n\n# finally срабатывает даже когда внутри всё сломалось\ntry:\n    with step(\"опасный шаг\"):\n        raise ValueError(\"что-то пошло не так\")\nexcept ValueError as e:\n    print(\"снаружи поймали:\", e)"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Последний пример — главный. Внутри <code>with</code> выброшено исключение, а строка «закончили» всё равно напечаталась: <code>finally</code> отработал до того, как ошибка ушла наверх. Именно поэтому файл, открытый через <code>with</code>, закрывается всегда.</p><p>Про своё исключение: оно не просто носит имя, а <b>несёт данные</b> — <code>e.need</code> и <code>e.have</code>. Вызывающий код может показать пользователю, сколько именно не хватает, вместо безликого «ошибка».</p><p>И правило, которое стоит запомнить: <b>лови узко</b>. <code>except Exception</code> проглотит и опечатку в твоём коде, и нехватку памяти, и прервёт отладку на месяцы вперёд.</p>",
+        "uz": "<p>Oxirgi misol — asosiysi. <code>with</code> ichida istisno tashlandi, «tugatdik» qatori esa baribir chop etildi: xato yuqoriga ketishidan oldin <code>finally</code> ishladi. Aynan shuning uchun <code>with</code> orqali ochilgan fayl doim yopiladi.</p><p>O'z istisnosi haqida: u shunchaki nom tashimaydi, balki <b>ma'lumot olib yuradi</b> — <code>e.need</code> va <code>e.have</code>. Chaqiruvchi kod foydalanuvchiga qanchasi yetmayotganini ko'rsata oladi, betayin «xato» o'rniga.</p><p>Va eslab qolishga arziydigan qoida: <b>tor tuting</b>. <code>except Exception</code> koddagi xatoni ham, xotira yetishmasligini ham yutadi va nosozlik izlashni oylar oldinga uzadi.</p>",
+        "en": "<p>The last example is the key one. An exception was raised inside <code>with</code>, yet the line “finished” still printed: <code>finally</code> ran before the error travelled upwards. That is exactly why a file opened with <code>with</code> always closes.</p><p>About the custom exception: it does not merely carry a name, it <b>carries data</b> — <code>e.need</code> and <code>e.have</code>. The calling code can tell the user exactly how much is missing instead of a faceless “error”.</p><p>And a rule worth remembering: <b>catch narrowly</b>. <code>except Exception</code> swallows a typo in your own code and an out-of-memory alike, and pushes debugging months into the future.</p>"
+       }
+      },
+      {
+       "type": "summary",
+       "items": [
+        { "ru": "yield делает функцию генератором: значения по одному, память постоянная", "uz": "yield funksiyani generator qiladi: qiymatlar bittalab, xotira doimiy", "en": "yield makes a function a generator: values one at a time, constant memory" },
+        { "ru": "Генератор одноразовый: второй проход даст пустоту без ошибки", "uz": "Generator bir martalik: ikkinchi o'tish xatosiz bo'shliq beradi", "en": "A generator is single-use: a second pass yields emptiness with no error" },
+        { "ru": "Круглые скобки дают генератор, квадратные — список сразу", "uz": "Doira qavslar generator, kvadrat qavslar darhol ro'yxat beradi", "en": "Round brackets give a generator, square ones build a list at once" },
+        { "ru": "@log — это короткая запись work = log(work)", "uz": "@log — bu work = log(work) ning qisqa yozuvi", "en": "@log is shorthand for work = log(work)" },
+        { "ru": "Обёртка обязана принимать *args, **kwargs", "uz": "O'ram *args, **kwargs ni qabul qilishi shart", "en": "The wrapper must accept *args, **kwargs" },
+        { "ru": "functools.wraps сохраняет имя и документацию функции", "uz": "functools.wraps funksiya nomi va hujjatini saqlaydi", "en": "functools.wraps preserves the function's name and docstring" },
+        { "ru": "with гарантирует освобождение ресурса даже при исключении", "uz": "with istisnoda ham resurs bo'shatilishini kafolatlaydi", "en": "with guarantees the resource is released even on an exception" },
+        { "ru": "Своё исключение ловится точно и может нести данные об ошибке", "uz": "O'z istisnosi aniq tutiladi va xato haqida ma'lumot olib yura oladi", "en": "A custom exception is caught precisely and can carry data about the failure" }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": { "ru": "Чем <code>yield</code> отличается от <code>return</code>?", "uz": "<code>yield</code> <code>return</code> dan nimasi bilan farq qiladi?", "en": "How does <code>yield</code> differ from <code>return</code>?" },
+     "options": [
+      { "ru": "Ничем, это синонимы", "uz": "Hech nimasi bilan, bu sinonimlar", "en": "Not at all, they are synonyms" },
+      { "ru": "yield отдаёт значение и запоминает место остановки, функция продолжится", "uz": "yield qiymat berib, to'xtash joyini eslab qoladi, funksiya davom etadi", "en": "yield hands out a value and remembers where it paused; the function continues" },
+      { "ru": "yield быстрее", "uz": "yield tezroq", "en": "yield is faster" },
+      { "ru": "yield работает только с числами", "uz": "yield faqat sonlar bilan ishlaydi", "en": "yield works only with numbers" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "<code>return</code> завершает функцию навсегда, <code>yield</code> — ставит её на паузу до следующего запроса значения.",
+      "uz": "<code>return</code> funksiyani abadiy tugatadi, <code>yield</code> — uni keyingi qiymat so'rovigacha pauzaga qo'yadi.",
+      "en": "<code>return</code> ends the function for good; <code>yield</code> pauses it until the next value is requested."
+     }
+    },
+    {
+     "q": { "ru": "Прошли по генератору дважды. Что вернёт второй проход?", "uz": "Generator bo'ylab ikki marta yurildi. Ikkinchi o'tish nima qaytaradi?", "en": "You walked a generator twice. What does the second pass return?" },
+     "options": [
+      { "ru": "Те же значения", "uz": "O'sha qiymatlarni", "en": "The same values" },
+      { "ru": "Ничего: генератор исчерпан, и ошибки при этом не будет", "uz": "Hech nima: generator tugagan va bunda xato bo'lmaydi", "en": "Nothing: the generator is exhausted, and no error is raised" },
+      { "ru": "Ошибку StopIteration наружу", "uz": "Tashqariga StopIteration xatosini", "en": "A StopIteration error to the outside" },
+      { "ru": "Значения в обратном порядке", "uz": "Qiymatlarni teskari tartibda", "en": "The values in reverse order" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Отсутствие ошибки и делает эту ловушку опасной: программа работает, а числа тихо становятся нулями.",
+      "uz": "Xato yo'qligi bu tuzoqni xavfli qiladi: dastur ishlaydi, raqamlar esa jimgina nolga aylanadi.",
+      "en": "The absence of an error is what makes this trap dangerous: the program runs while the numbers quietly become zeros."
+     }
+    },
+    {
+     "q": { "ru": "Что создаёт <code>(x * 2 for x in data)</code>?", "uz": "<code>(x * 2 for x in data)</code> nima yaratadi?", "en": "What does <code>(x * 2 for x in data)</code> create?" },
+     "options": [
+      { "ru": "Кортеж", "uz": "Kortej", "en": "A tuple" },
+      { "ru": "Генератор — список в памяти не строится", "uz": "Generator — xotirada ro'yxat qurilmaydi", "en": "A generator — no list is built in memory" },
+      { "ru": "Список", "uz": "Ro'yxat", "en": "A list" },
+      { "ru": "Множество", "uz": "To'plam", "en": "A set" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Кортеж создаётся через <code>tuple(...)</code>. Круглые скобки в этой записи означают именно генераторное выражение.",
+      "uz": "Kortej <code>tuple(...)</code> orqali yaratiladi. Bu yozuvdagi doira qavslar aynan generator ifodasini bildiradi.",
+      "en": "A tuple comes from <code>tuple(...)</code>. Round brackets in this form mean precisely a generator expression."
+     }
+    },
+    {
+     "q": { "ru": "Почему обёртка декоратора принимает <code>*args, **kwargs</code>?", "uz": "Nega dekorator o'rami <code>*args, **kwargs</code> ni qabul qiladi?", "en": "Why does a decorator's wrapper accept <code>*args, **kwargs</code>?" },
+     "options": [
+      { "ru": "Так короче писать", "uz": "Shunday yozish qisqaroq", "en": "It is shorter to write" },
+      { "ru": "Чтобы декоратор подходил функциям с любыми аргументами", "uz": "Dekorator har qanday argumentli funksiyalarga mos kelishi uchun", "en": "So the decorator fits functions with any arguments" },
+      { "ru": "Это требование Python", "uz": "Bu Python talabi", "en": "Python requires it" },
+      { "ru": "Для скорости", "uz": "Tezlik uchun", "en": "For speed" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Обёртка без параметров сломает всё, кроме функций без аргументов, — и сломает молча, только при вызове.",
+      "uz": "Parametrsiz o'ram argumentsiz funksiyalardan boshqa hammasini buzadi — va jimgina, faqat chaqiruvda buzadi.",
+      "en": "A parameterless wrapper breaks everything except zero-argument functions — and breaks it silently, only at call time."
+     }
+    },
+    {
+     "q": { "ru": "Что теряется без <code>functools.wraps</code>?", "uz": "<code>functools.wraps</code> siz nima yo'qoladi?", "en": "What is lost without <code>functools.wraps</code>?" },
+     "options": [
+      { "ru": "Скорость выполнения", "uz": "Bajarilish tezligi", "en": "Execution speed" },
+      { "ru": "Имя и документация обёрнутой функции", "uz": "O'ralgan funksiyaning nomi va hujjati", "en": "The wrapped function's name and docstring" },
+      { "ru": "Аргументы функции", "uz": "Funksiya argumentlari", "en": "The function's arguments" },
+      { "ru": "Возвращаемое значение", "uz": "Qaytariladigan qiymat", "en": "The return value" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "<code>add.__name__</code> станет <code>'wrapper'</code>. В трассировке ошибки это выглядит одинаково для всех декорированных функций — искать становится нечем.",
+      "uz": "<code>add.__name__</code> <code>'wrapper'</code> bo'ladi. Xato trassirovkasida bu barcha dekoratsiyalangan funksiyalar uchun bir xil ko'rinadi — qidirish uchun narsa qolmaydi.",
+      "en": "<code>add.__name__</code> becomes <code>'wrapper'</code>. In a stack trace that looks identical for every decorated function — leaving you nothing to search by."
+     }
+    },
+    {
+     "q": { "ru": "Внутри <code>with</code> вылетело исключение. Выполнится ли <code>finally</code>?", "uz": "<code>with</code> ichida istisno uchdi. <code>finally</code> bajariladimi?", "en": "An exception flew out inside <code>with</code>. Does <code>finally</code> run?" },
+     "options": [
+      { "ru": "Нет, выполнение прервётся сразу", "uz": "Yo'q, bajarilish darhol uziladi", "en": "No, execution stops at once" },
+      { "ru": "Да — именно поэтому with гарантирует освобождение ресурса", "uz": "Ha — aynan shuning uchun with resurs bo'shatilishini kafolatlaydi", "en": "Yes — that is exactly why with guarantees the resource is released" },
+      { "ru": "Только если исключение поймали внутри", "uz": "Faqat istisno ichida tutilgan bo'lsa", "en": "Only if the exception was caught inside" },
+      { "ru": "Зависит от типа исключения", "uz": "Istisno turiga bog'liq", "en": "It depends on the exception type" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Ошибка уходит наверх только после выхода из контекста. Поэтому файл закрывается, соединение возвращается в пул, а замок снимается в любом случае.",
+      "uz": "Xato kontekstdan chiqqandan keyingina yuqoriga ketadi. Shuning uchun fayl yopiladi, ulanish hovuzga qaytadi, qulf esa har holda yechiladi.",
+      "en": "The error travels upwards only after leaving the context. So the file closes, the connection returns to the pool and the lock is released regardless."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "python",
+     "title": { "ru": "Генератор чётных", "uz": "Juftlar generatori", "en": "A generator of evens" },
+     "brief": { "ru": "yield вместо списка", "uz": "Ro'yxat o'rniga yield", "en": "yield instead of a list" },
+     "desc": {
+      "ru": "<p>Напиши <b>генератор</b> <code>evens(limit)</code>, который выдаёт чётные числа от 0 до <code>limit</code> не включая его.</p><p>Внутри должен быть <code>yield</code>, а не собранный список. При <code>limit &lt;= 0</code> генератор не выдаёт ничего.</p>",
+      "uz": "<p><code>evens(limit)</code> <b>generatorini</b> yozing — u 0 dan <code>limit</code> gacha (uni qo'shmagan holda) juft sonlarni beradi.</p><p>Ichida yig'ilgan ro'yxat emas, <code>yield</code> bo'lishi kerak. <code>limit &lt;= 0</code> da generator hech nima bermaydi.</p>",
+      "en": "<p>Write a <b>generator</b> <code>evens(limit)</code> that yields the even numbers from 0 up to but not including <code>limit</code>.</p><p>It must contain a <code>yield</code>, not a collected list. With <code>limit &lt;= 0</code> the generator yields nothing.</p>"
+     },
+     "starter": "def evens(limit):\n    # твой код: используй yield\n    pass\n\nprint(list(evens(10)))\n",
+     "tests": "import types\nassert isinstance(evens(10), types.GeneratorType), 'Функция должна быть генератором (используй yield)'\nassert list(evens(10)) == [0, 2, 4, 6, 8], 'Чётные до 10, не включая 10'\nassert list(evens(1)) == [0], 'Только ноль'\nassert list(evens(0)) == [], 'Пустой генератор'\nassert list(evens(-5)) == [], 'Отрицательный предел'\ng = evens(6)\nassert next(g) == 0 and next(g) == 2, 'Значения выдаются по одному'",
+     "hint": {
+      "ru": "Цикл <code>for n in range(0, limit, 2)</code> и внутри <code>yield n</code>. Отрицательный <code>limit</code> обрабатывать отдельно не нужно: <code>range</code> сам вернёт пусто.",
+      "uz": "<code>for n in range(0, limit, 2)</code> sikli va ichida <code>yield n</code>. Manfiy <code>limit</code> ni alohida qayta ishlash shart emas: <code>range</code> o'zi bo'sh qaytaradi.",
+      "en": "A loop <code>for n in range(0, limit, 2)</code> with <code>yield n</code> inside. A negative <code>limit</code> needs no special handling: <code>range</code> returns nothing on its own."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "python",
+     "title": { "ru": "Декоратор-счётчик", "uz": "Hisoblagich-dekorator", "en": "A counting decorator" },
+     "brief": { "ru": "Обёртка с состоянием", "uz": "Holatli o'ram", "en": "A wrapper with state" },
+     "desc": {
+      "ru": "<p>Напиши декоратор <code>counted</code>, который считает, сколько раз вызвали функцию. Счётчик храни в атрибуте обёртки: <code>wrapper.calls</code>.</p><p>Обёртка должна работать с любыми аргументами и возвращать результат исходной функции. Имя функции обязано сохраниться — используй <code>functools.wraps</code>.</p>",
+      "uz": "<p><code>counted</code> dekoratorini yozing — u funksiya necha marta chaqirilganini sanaydi. Hisoblagichni o'ram atributida saqlang: <code>wrapper.calls</code>.</p><p>O'ram har qanday argument bilan ishlashi va asl funksiya natijasini qaytarishi kerak. Funksiya nomi saqlanishi shart — <code>functools.wraps</code> dan foydalaning.</p>",
+      "en": "<p>Write a decorator <code>counted</code> that counts how many times a function was called. Keep the counter on the wrapper: <code>wrapper.calls</code>.</p><p>The wrapper must work with any arguments and return the original function's result. The function name must survive — use <code>functools.wraps</code>.</p>"
+     },
+     "starter": "import functools\n\ndef counted(func):\n    # твой код\n    pass\n\n@counted\ndef greet(name):\n    return f'привет, {name}'\n\nprint(greet('Азиз'))\nprint(greet.calls)\n",
+     "tests": "import functools\n\n@counted\ndef add(a, b):\n    \"\"\"Складывает.\"\"\"\n    return a + b\n\nassert add.calls == 0, 'До вызовов счётчик равен нулю'\nassert add(2, 3) == 5, 'Результат должен вернуться без изменений'\nassert add.calls == 1, 'После одного вызова счётчик равен единице'\nadd(1, 1)\nadd(b=2, a=3)\nassert add.calls == 3, 'Именованные аргументы тоже считаются'\nassert add.__name__ == 'add', 'Имя функции должно сохраниться (functools.wraps)'\n\n@counted\ndef nothing():\n    return None\nassert nothing() is None and nothing.calls == 1, 'Функция без аргументов тоже работает'",
+     "hint": {
+      "ru": "Внутри <code>counted</code> объяви <code>wrapper(*args, **kwargs)</code>, увеличивай <code>wrapper.calls += 1</code> и возвращай <code>func(*args, **kwargs)</code>. До возврата поставь <code>wrapper.calls = 0</code>, а над обёрткой — <code>@functools.wraps(func)</code>.",
+      "uz": "<code>counted</code> ichida <code>wrapper(*args, **kwargs)</code> e'lon qiling, <code>wrapper.calls += 1</code> ni oshiring va <code>func(*args, **kwargs)</code> ni qaytaring. Qaytarishdan oldin <code>wrapper.calls = 0</code> qo'ying, o'ram ustiga esa — <code>@functools.wraps(func)</code>.",
+      "en": "Inside <code>counted</code> declare <code>wrapper(*args, **kwargs)</code>, do <code>wrapper.calls += 1</code> and return <code>func(*args, **kwargs)</code>. Before returning it set <code>wrapper.calls = 0</code>, and put <code>@functools.wraps(func)</code> above the wrapper."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "python",
+     "title": { "ru": "Своё исключение", "uz": "O'z istisnongiz", "en": "Your own exception" },
+     "brief": { "ru": "Ошибка, которая несёт данные", "uz": "Ma'lumot olib yuruvchi xato", "en": "An error that carries data" },
+     "desc": {
+      "ru": "<p>Объяви исключение <code>NotEnoughMoney(Exception)</code> с полями <code>need</code> и <code>have</code>.</p><p>Напиши <code>withdraw(balance, amount)</code>: возвращает новый баланс, а если денег не хватает — бросает <code>NotEnoughMoney</code> с этими значениями. Отрицательную или нулевую сумму считай ошибкой <code>ValueError</code>.</p>",
+      "uz": "<p><code>need</code> va <code>have</code> maydonli <code>NotEnoughMoney(Exception)</code> istisnosini e'lon qiling.</p><p><code>withdraw(balance, amount)</code> yozing: yangi balansni qaytaradi, pul yetmasa — shu qiymatlar bilan <code>NotEnoughMoney</code> tashlaydi. Manfiy yoki nol summani <code>ValueError</code> xatosi deb hisoblang.</p>",
+      "en": "<p>Declare an exception <code>NotEnoughMoney(Exception)</code> with the fields <code>need</code> and <code>have</code>.</p><p>Write <code>withdraw(balance, amount)</code>: it returns the new balance, and if there is not enough money it raises <code>NotEnoughMoney</code> with those values. Treat a negative or zero amount as a <code>ValueError</code>.</p>"
+     },
+     "starter": "class NotEnoughMoney(Exception):\n    # твой код\n    pass\n\ndef withdraw(balance, amount):\n    # твой код\n    pass\n\nprint(withdraw(100, 30))\n",
+     "tests": "assert issubclass(NotEnoughMoney, Exception), 'NotEnoughMoney должен наследовать Exception'\nassert withdraw(100, 30) == 70, 'Обычное снятие'\nassert withdraw(50, 50) == 0, 'Можно снять всё'\ntry:\n    withdraw(100, 500)\n    assert False, 'Должно было выбросить NotEnoughMoney'\nexcept NotEnoughMoney as e:\n    assert e.need == 500, 'Поле need'\n    assert e.have == 100, 'Поле have'\ntry:\n    withdraw(100, 0)\n    assert False, 'Нулевая сумма — это ValueError'\nexcept ValueError:\n    pass\ntry:\n    withdraw(100, -5)\n    assert False, 'Отрицательная сумма — это ValueError'\nexcept ValueError:\n    pass",
+     "hint": {
+      "ru": "В <code>__init__</code> исключения вызови <code>super().__init__(текст)</code> и сохрани <code>self.need</code> и <code>self.have</code>. В <code>withdraw</code> сначала проверь сумму на положительность, потом на нехватку.",
+      "uz": "Istisnoning <code>__init__</code> ida <code>super().__init__(matn)</code> ni chaqiring va <code>self.need</code> hamda <code>self.have</code> ni saqlang. <code>withdraw</code> da avval summani musbatlikka, keyin yetishmaslikka tekshiring.",
+      "en": "In the exception's <code>__init__</code> call <code>super().__init__(text)</code> and store <code>self.need</code> and <code>self.have</code>. In <code>withdraw</code> check the amount is positive first, then check for shortage."
+     }
+    }
+   ],
+   "exam": {
+    "time": 600,
+    "questions": [
+     {
+      "q": { "ru": "Файл на 10 ГБ надо посчитать построчно. Что делать?", "uz": "10 GB li faylni qatorma-qator sanash kerak. Nima qilish kerak?", "en": "A 10 GB file must be processed line by line. What do you do?" },
+      "options": [
+       { "ru": "Прочитать в список через readlines()", "uz": "readlines() orqali ro'yxatga o'qish", "en": "Read it into a list with readlines()" },
+       { "ru": "Идти циклом по файлу — он сам работает как генератор", "uz": "Fayl bo'ylab sikl bilan yurish — u o'zi generator kabi ishlaydi", "en": "Loop over the file — it already behaves as a generator" },
+       { "ru": "Загрузить в словарь", "uz": "Lug'atga yuklash", "en": "Load it into a dictionary" },
+       { "ru": "Разбить на файлы вручную", "uz": "Qo'lda fayllarga bo'lish", "en": "Split it into files by hand" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "<code>@timer</code> над функцией — это…", "uz": "Funksiya ustidagi <code>@timer</code> — bu…", "en": "<code>@timer</code> above a function is…" },
+      "options": [
+       { "ru": "аннотация типа", "uz": "tur annotatsiyasi", "en": "a type annotation" },
+       { "ru": "запись вида func = timer(func)", "uz": "func = timer(func) ko'rinishidagi yozuv", "en": "shorthand for func = timer(func)" },
+       { "ru": "вызов timer() перед каждым запуском", "uz": "har ishga tushirishdan oldin timer() chaqiruvi", "en": "a call to timer() before each run" },
+       { "ru": "комментарий", "uz": "izoh", "en": "a comment" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Зачем нужен <code>with</code>, если можно просто вызвать close()?", "uz": "Shunchaki close() chaqirish mumkin bo'lsa, <code>with</code> nima uchun kerak?", "en": "Why use <code>with</code> if you can just call close()?" },
+      "options": [
+       { "ru": "with короче", "uz": "with qisqaroq", "en": "with is shorter" },
+       { "ru": "Он закроет ресурс даже если внутри случилось исключение", "uz": "U ichida istisno yuz bersa ham resursni yopadi", "en": "It closes the resource even if an exception happens inside" },
+       { "ru": "close() устарел", "uz": "close() eskirgan", "en": "close() is deprecated" },
+       { "ru": "with быстрее", "uz": "with tezroq", "en": "with is faster" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Почему <code>except Exception</code> считается плохой практикой?", "uz": "Nega <code>except Exception</code> yomon amaliyot hisoblanadi?", "en": "Why is <code>except Exception</code> considered bad practice?" },
+      "options": [
+       { "ru": "Он медленный", "uz": "U sekin", "en": "It is slow" },
+       { "ru": "Он проглотит и опечатку в твоём коде, и настоящую поломку", "uz": "U koddagi xatoni ham, haqiqiy nosozlikni ham yutadi", "en": "It swallows a typo in your own code and a genuine failure alike" },
+       { "ru": "Он не ловит свои исключения", "uz": "U o'z istisnolarini tutmaydi", "en": "It does not catch custom exceptions" },
+       { "ru": "Он требует finally", "uz": "U finally talab qiladi", "en": "It requires a finally" }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "python",
+      "title": { "ru": "Конвейер обработки лога", "uz": "Log qayta ishlash konveyeri", "en": "A log processing pipeline" },
+      "desc": {
+       "ru": "<p>Собери всё вместе — так и выглядит настоящая обработка данных.</p><ol><li>Генератор <code>parse(lines)</code> получает список строк вида <code>УРОВЕНЬ сообщение</code> и выдаёт пары <code>(уровень, сообщение)</code>. Строки без пробела пропускай молча.</li><li>Генератор <code>only(pairs, level)</code> пропускает дальше только пары с нужным уровнем.</li><li>Функция <code>count_errors(lines)</code> собирает конвейер и возвращает, сколько строк уровня <code>ERROR</code>.</li></ol><p>Оба генератора должны использовать <code>yield</code>, а не собирать списки.</p>",
+       "uz": "<p>Hammasini birlashtiring — haqiqiy ma'lumot qayta ishlash shunday ko'rinadi.</p><ol><li><code>parse(lines)</code> generatori <code>DARAJA xabar</code> ko'rinishidagi satrlar ro'yxatini oladi va <code>(daraja, xabar)</code> juftliklarini beradi. Bo'shliqsiz satrlarni jimgina o'tkazib yuboring.</li><li><code>only(pairs, level)</code> generatori faqat kerakli darajali juftliklarni keyingiga o'tkazadi.</li><li><code>count_errors(lines)</code> funksiyasi konveyerni yig'adi va <code>ERROR</code> darajali qatorlar sonini qaytaradi.</li></ol><p>Ikkala generator ham ro'yxat yig'masdan <code>yield</code> ishlatishi kerak.</p>",
+       "en": "<p>Put it all together — this is what real data processing looks like.</p><ol><li>The generator <code>parse(lines)</code> takes a list of strings shaped <code>LEVEL message</code> and yields <code>(level, message)</code> pairs. Silently skip lines with no space.</li><li>The generator <code>only(pairs, level)</code> passes along only the pairs with the requested level.</li><li>The function <code>count_errors(lines)</code> assembles the pipeline and returns how many lines have level <code>ERROR</code>.</li></ol><p>Both generators must use <code>yield</code> rather than building lists.</p>"
+      },
+      "starter": "def parse(lines):\n    # генератор пар (уровень, сообщение)\n    pass\n\ndef only(pairs, level):\n    # генератор: пропускает только нужный уровень\n    pass\n\ndef count_errors(lines):\n    # собери конвейер и посчитай\n    pass\n\nlog = ['ERROR диск полон', 'INFO старт', 'ERROR сеть упала', 'мусор']\nprint(count_errors(log))\n",
+      "tests": "import types\nlog = ['ERROR диск полон', 'INFO старт', 'ERROR сеть упала', 'мусор']\nassert isinstance(parse(log), types.GeneratorType), 'parse должен быть генератором'\nassert isinstance(only(parse(log), 'ERROR'), types.GeneratorType), 'only должен быть генератором'\nassert list(parse(log)) == [('ERROR', 'диск полон'), ('INFO', 'старт'), ('ERROR', 'сеть упала')], 'Разбор строк, мусор пропущен'\nassert [m for _, m in only(parse(log), 'INFO')] == ['старт'], 'Фильтр по уровню'\nassert count_errors(log) == 2, 'Две строки ERROR'\nassert count_errors([]) == 0, 'Пустой лог'\nassert count_errors(['INFO всё хорошо']) == 0, 'Ошибок нет'\nassert count_errors(['ERROR a', 'ERROR b', 'ERROR c']) == 3, 'Все строки — ошибки'",
+      "hint": {
+       "ru": "В <code>parse</code>: <code>parts = line.split(' ', 1)</code>, и если частей меньше двух — просто <code>continue</code>. В <code>only</code> — <code>for level_name, msg in pairs: if level_name == level: yield (level_name, msg)</code>. В <code>count_errors</code> достаточно <code>sum(1 for _ in only(parse(lines), 'ERROR'))</code>.",
+       "uz": "<code>parse</code> da: <code>parts = line.split(' ', 1)</code>, qismlar ikkitadan kam bo'lsa — shunchaki <code>continue</code>. <code>only</code> da — <code>for level_name, msg in pairs: if level_name == level: yield (level_name, msg)</code>. <code>count_errors</code> da <code>sum(1 for _ in only(parse(lines), 'ERROR'))</code> yetarli.",
+       "en": "In <code>parse</code>: <code>parts = line.split(' ', 1)</code>, and if there are fewer than two parts just <code>continue</code>. In <code>only</code>: <code>for level_name, msg in pairs: if level_name == level: yield (level_name, msg)</code>. For <code>count_errors</code>, <code>sum(1 for _ in only(parse(lines), 'ERROR'))</code> is enough."
+      }
+     }
+    ]
+   }
   }
  ],
  "finalExam": {

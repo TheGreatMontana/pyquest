@@ -204,6 +204,59 @@ print(city_report(o, u))""",
 'python-advanced/final/task0': "for n in range(1, 16):\n    if n % 15 == 0:\n        print('FizzBuzz')\n    elif n % 3 == 0:\n        print('Fizz')\n    elif n % 5 == 0:\n        print('Buzz')\n    else:\n        print(n)",
 'python-advanced/final/task1': "class Player:\n    def __init__(self, name):\n        self.name = name\n        self.xp = 0\n\n    def train(self, points):\n        self.xp += points\n\n    def rank(self):\n        if self.xp >= 100:\n            return 'Мастер'\n        return 'Новичок'\n\np = Player('Азиз')\np.train(60)\np.train(60)\nprint(f'{p.name} - {p.rank()}')",
 
+'python-advanced/pa-03/t1': """def evens(limit):
+    for n in range(0, limit, 2):
+        yield n
+
+print(list(evens(10)))""",
+'python-advanced/pa-03/t2': """import functools
+
+def counted(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        wrapper.calls += 1
+        return func(*args, **kwargs)
+    wrapper.calls = 0
+    return wrapper
+
+@counted
+def greet(name):
+    return f'привет, {name}'
+
+print(greet('Азиз'))
+print(greet.calls)""",
+'python-advanced/pa-03/t3': """class NotEnoughMoney(Exception):
+    def __init__(self, need, have):
+        super().__init__(f'нужно {need}, а есть {have}')
+        self.need = need
+        self.have = have
+
+def withdraw(balance, amount):
+    if amount <= 0:
+        raise ValueError('сумма должна быть положительной')
+    if amount > balance:
+        raise NotEnoughMoney(amount, balance)
+    return balance - amount
+
+print(withdraw(100, 30))""",
+'python-advanced/pa-03/exam0': """def parse(lines):
+    for line in lines:
+        parts = line.split(' ', 1)
+        if len(parts) < 2:
+            continue
+        yield (parts[0], parts[1])
+
+def only(pairs, level):
+    for name, message in pairs:
+        if name == level:
+            yield (name, message)
+
+def count_errors(lines):
+    return sum(1 for _ in only(parse(lines), 'ERROR'))
+
+log = ['ERROR диск полон', 'INFO старт']
+print(count_errors(log))""",
+
 # ===== algorithms =====
 'algorithms/alg-01/t1': "def linear_search(items, target):\n    for i in range(len(items)):\n        if items[i] == target:\n            return i\n    return -1\n\nprint(linear_search([5, 3, 8, 3], 3))",
 'algorithms/alg-01/t2': "def binary_search(items, target):\n    low, high = 0, len(items) - 1\n    while low <= high:\n        mid = (low + high) // 2\n        if items[mid] == target:\n            return mid\n        if items[mid] < target:\n            low = mid + 1\n        else:\n            high = mid - 1\n    return -1\n\nprint(binary_search([1, 3, 5, 7, 9, 11], 9))",

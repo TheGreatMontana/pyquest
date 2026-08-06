@@ -448,7 +448,7 @@
    "color": "#38bdf8",
    "level": "intermediate",
    "status": "full",
-   "estimatedHours": 14,
+   "estimatedHours": 20,
    "requires": [
     "python-functions"
    ],
@@ -461,7 +461,7 @@
     "m10",
     "final"
    ],
-   "moduleCount": 2
+   "moduleCount": 3
   },
   {
    "id": "python-libraries",

@@ -29,22 +29,53 @@ if (courseObj.modules.some(m => m.id === modObj.id)) {
   process.exit(1);
 }
 
-/* Хвост файла: закрытие последнего модуля, массива modules и объекта курса.
-   Часть курсов лежит с CRLF, часть с LF — переводы строк в шаблоне гибкие,
-   а результат пишется тем же стилем, что был в файле. */
-const tail = /\r?\n\s*\}\r?\n\s*\]\r?\n\}\s*$/;
-if (!tail.test(src)) {
-  console.error('неожиданный конец файла ' + target + ' — вставка отменена');
+/**
+ * Ищет позицию закрывающей скобки массива modules.
+ * Регулярка тут не годится: внутри модулей полно вложенных массивов, и любой
+ * шаблон цепляется за первый попавшийся. Считаем скобки вручную, пропуская
+ * то, что лежит внутри строк.
+ */
+function findModulesArrayEnd(text) {
+  const key = text.indexOf('"modules"');
+  if (key < 0) return -1;
+  const open = text.indexOf('[', key);
+  if (open < 0) return -1;
+
+  let depth = 0, inString = false, escaped = false;
+  for (let i = open; i < text.length; i++) {
+    const ch = text[i];
+    if (inString) {
+      if (escaped) escaped = false;
+      else if (ch === '\\') escaped = true;
+      else if (ch === '"') inString = false;
+      continue;
+    }
+    if (ch === '"') { inString = true; continue; }
+    if (ch === '[' || ch === '{') depth++;
+    else if (ch === ']' || ch === '}') {
+      depth--;
+      if (depth === 0) return i;      // это и есть закрытие modules
+    }
+  }
+  return -1;
+}
+
+const closeAt = findModulesArrayEnd(src);
+if (closeAt < 0) {
+  console.error('не нашёл конец массива modules в ' + target + ' — вставка отменена');
   process.exit(1);
 }
 
 const eol = src.includes('\r\n') ? '\r\n' : '\n';
 const indented = mod.split('\n').map(l => (l ? '  ' + l : l)).join(eol);
 
-/* Замена только функцией: в строке замены $$ значит один доллар, и хелпер
-   $$ из тестов по вёрстке молча превратился бы в $ — то есть в querySelector
-   вместо querySelectorAll. Функция отдаёт текст как есть. */
-const out = src.replace(tail, () => eol + '  },' + eol + indented + eol + ' ]' + eol + '}' + eol);
+/* Всё до закрывающей скобки массива — это последний модуль и перевод строки
+   перед ней. Ставим запятую после него и вписываем новый модуль. Склейка
+   строками, а не replace: в строке замены $$ значит один доллар, и хелпер $$
+   из тестов по вёрстке молча превратился бы в $. */
+const before = src.slice(0, closeAt).replace(/\s*$/, '');
+const after = src.slice(closeAt);
+const out = before + ',' + eol + indented + eol + ' ' + after;
 
 const check = JSON.parse(out);
 if (check.modules.length !== courseObj.modules.length + 1) {
