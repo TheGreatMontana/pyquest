@@ -502,6 +502,516 @@
      }
     ]
    }
+  },
+  {
+    "id": "se-03",
+    "title": {
+      "ru": "Секреты, зависимости и защита от перебора",
+      "uz": "Sirlar, bog'liqliklar va brutforsdan himoya",
+      "en": "Secrets, dependencies and brute-force protection"
+    },
+    "tagline": {
+      "ru": "Ключи в коде, чужие библиотеки и бесконечные попытки входа — три дыры, которые открываются не через форму, а через процесс",
+      "uz": "Koddagi kalitlar, begona kutubxonalar va cheksiz kirish urinishlari — shakl orqali emas, jarayon orqali ochiladigan uchta teshik",
+      "en": "Keys in code, third-party libraries and endless login attempts — three holes that open through your process, not your form"
+    },
+    "lessons": [
+      {
+        "id": "l1",
+        "title": {
+          "ru": "Секреты: ключи, токены и .env",
+          "uz": "Sirlar: kalitlar, tokenlar va .env",
+          "en": "Secrets: keys, tokens and .env"
+        },
+        "blocks": [
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p><b>Секрет</b> — это любая строка, которая заменяет собой доверие: пароль от базы, ключ платёжного сервиса, токен бота, приватный ключ подписи. Кто знает секрет — тот и есть ты для чужого сервиса. Проверять личность больше нечем.</p><p>Поэтому у секрета одно правило: он живёт <b>отдельно от кода</b>. Код едет в Git, попадает на GitHub, копируется коллегам, показывается на созвоне. Секрет не должен ехать вместе с ним.</p><p>Практика такая: в коде — только <i>имя</i> переменной окружения, а значение подставляет сервер при запуске.</p><pre><code>import os\n\nDB_PASSWORD = os.environ[\"DB_PASSWORD\"]   # значение приходит снаружи\nAPI_KEY = os.environ[\"PAYMENT_API_KEY\"]</code></pre><p>Локально значения кладут в файл <code>.env</code>, а сам <code>.env</code> сразу вносят в <code>.gitignore</code>. Рядом держат <code>.env.example</code> — с теми же именами, но пустыми значениями: он и документация, и напоминание.</p>",
+              "uz": "<p><b>Sir</b> — bu ishonchni almashtiradigan har qanday satr: baza paroli, to'lov xizmati kaliti, bot tokeni, imzoning yopiq kaliti. Kim sirni bilsa — begona xizmat uchun u siz bo'ladi. Shaxsni tekshiradigan boshqa narsa yo'q.</p><p>Shuning uchun sirning bitta qoidasi bor: u <b>koddan alohida</b> yashaydi. Kod Git ga tushadi, GitHub ga chiqadi, hamkasblarga ko'chiriladi, uchrashuvda ekranda ko'rsatiladi. Sir u bilan birga yurmasligi kerak.</p><p>Amaliyot shunday: kodda — faqat muhit o'zgaruvchisining <i>nomi</i>, qiymatini esa server ishga tushganda qo'yadi.</p><pre><code>import os\n\nDB_PASSWORD = os.environ[\"DB_PASSWORD\"]   # qiymat tashqaridan keladi\nAPI_KEY = os.environ[\"PAYMENT_API_KEY\"]</code></pre><p>Lokal qiymatlar <code>.env</code> faylida saqlanadi, <code>.env</code> ning o'zi esa darrov <code>.gitignore</code> ga yoziladi. Yonida <code>.env.example</code> turadi — xuddi shu nomlar, lekin bo'sh qiymatlar bilan: u ham hujjat, ham eslatma.</p>",
+              "en": "<p>A <b>secret</b> is any string that stands in for trust: a database password, a payment service key, a bot token, a signing private key. Whoever knows the secret <i>is</i> you as far as the other service is concerned. There is nothing else to check.</p><p>So a secret has one rule: it lives <b>apart from the code</b>. Code goes into Git, lands on GitHub, gets copied to teammates, gets shown on a call. The secret must not travel with it.</p><p>The practice: the code holds only the <i>name</i> of an environment variable, and the server supplies the value at startup.</p><pre><code>import os\n\nDB_PASSWORD = os.environ[\"DB_PASSWORD\"]   # the value comes from outside\nAPI_KEY = os.environ[\"PAYMENT_API_KEY\"]</code></pre><p>Locally the values go into a <code>.env</code> file, and <code>.env</code> itself goes straight into <code>.gitignore</code>. Next to it lives <code>.env.example</code> — same names, empty values: both documentation and a reminder.</p>"
+            }
+          },
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>Второе правило: секрет не должен попадать <b>в логи</b>. Логи копятся годами, уезжают в системы мониторинга, их читают люди, у которых нет доступа к базе. Если печатаешь объект запроса целиком — рано или поздно напечатаешь и токен.</p><p>Поэтому перед выводом секрет <b>маскируют</b>: оставляют пару символов по краям, чтобы можно было отличить один ключ от другого, а середину закрывают звёздочками.</p>",
+              "uz": "<p>Ikkinchi qoida: sir <b>loglarga</b> tushmasligi kerak. Loglar yillar davomida to'planadi, monitoring tizimlariga ketadi, ularni bazaga kirish huquqi yo'q odamlar o'qiydi. So'rov obyektini butunlay chop etsang — ertami-kechmi tokenni ham chop etasan.</p><p>Shuning uchun chiqarishdan oldin sir <b>niqoblanadi</b>: bir kalitni ikkinchisidan ajratish uchun chetlarida bir necha belgi qoldiriladi, o'rtasi esa yulduzchalar bilan yopiladi.</p>",
+              "en": "<p>Second rule: a secret must not reach <b>the logs</b>. Logs pile up for years, ship off to monitoring systems, and get read by people who have no database access. If you print the whole request object, sooner or later you print the token too.</p><p>So before printing, a secret is <b>masked</b>: a couple of characters are kept at each end so you can still tell one key from another, and the middle is covered with asterisks.</p>"
+            }
+          },
+          {
+            "type": "run",
+            "code": "def mask(secret, keep=2):\n    if len(secret) <= keep * 2:\n        return \"*\" * len(secret)\n    return secret[:keep] + \"*\" * (len(secret) - keep * 2) + secret[-keep:]\n\napi_key = \"sk_live_9f3a1c77b2\"\nprint(\"в коде: \", api_key)\nprint(\"в логах:\", mask(api_key))\nprint(\"короткий:\", mask(\"1234\"))"
+          },
+          {
+            "type": "note",
+            "kind": "trap",
+            "html": {
+              "ru": "Убрать секрет из файла и сделать коммит — <b>не значит убрать его</b>. Git хранит всю историю: старый коммит по-прежнему содержит ключ, и его достанет любой, кто склонировал репозиторий. Если ключ уехал в публичный репозиторий, единственное настоящее лечение — <b>отозвать и перевыпустить ключ</b>. Чистка истории — второстепенно.",
+              "uz": "Sirni fayldan olib tashlab, kommit qilish — <b>uni olib tashlash degani emas</b>. Git butun tarixni saqlaydi: eski kommitda kalit hamon turadi va uni repozitoriyni klonlagan har kim oladi. Agar kalit ochiq repozitoriyga ketgan bo'lsa, yagona haqiqiy davo — <b>kalitni bekor qilib, qaytadan chiqarish</b>. Tarixni tozalash — ikkinchi darajali.",
+              "en": "Removing a secret from a file and committing does <b>not</b> remove it. Git keeps the whole history: the old commit still holds the key, and anyone who cloned the repo can read it. If the key reached a public repository, the only real cure is to <b>revoke and reissue the key</b>. Rewriting history is secondary."
+            }
+          },
+          {
+            "type": "checkpoint",
+            "q": {
+              "ru": "Ключ платёжного сервиса случайно попал в публичный репозиторий. Ты удалил строку и запушил исправление. Что дальше?",
+              "uz": "To'lov xizmati kaliti tasodifan ochiq repozitoriyga tushdi. Siz qatorni o'chirib, tuzatishni push qildingiz. Endi nima?",
+              "en": "A payment service key accidentally landed in a public repository. You deleted the line and pushed the fix. What next?"
+            },
+            "options": [
+              { "ru": "Ничего, ключа в коде больше нет", "uz": "Hech nima, kalit endi kodda yo'q", "en": "Nothing, the key is no longer in the code" },
+              { "ru": "Отозвать ключ и выпустить новый — старый уже считается скомпрометированным", "uz": "Kalitni bekor qilib, yangisini chiqarish — eskisi allaqachon buzilgan hisoblanadi", "en": "Revoke the key and issue a new one — the old one counts as compromised" },
+              { "ru": "Сделать репозиторий приватным, этого достаточно", "uz": "Repozitoriyni yopiq qilish, shu yetarli", "en": "Make the repository private, that is enough" },
+              { "ru": "Добавить .env в .gitignore и закрыть задачу", "uz": ".env ni .gitignore ga qo'shib, vazifani yopish", "en": "Add .env to .gitignore and close the task" }
+            ],
+            "a": 1,
+            "explain": {
+              "ru": "Секунды хватает, чтобы ключ утёк в чужой скрипт или в поисковый индекс. История коммитов остаётся у всех, кто успел склонировать. Единственный надёжный ход — считать ключ утёкшим и заменить его. Остальное — полезные, но недостаточные меры.",
+              "uz": "Kalit begona skriptga yoki qidiruv indeksiga tushishi uchun soniya yetarli. Kommitlar tarixi klonlab olganlarda qoladi. Yagona ishonchli yo'l — kalitni oqib ketgan deb hisoblab, almashtirish. Qolgani — foydali, lekin yetarli emas.",
+              "en": "A second is enough for the key to be scraped into someone's script or a search index. The commit history stays with everyone who cloned. The only reliable move is to treat the key as leaked and replace it. The rest are useful but insufficient."
+            }
+          }
+        ]
+      },
+      {
+        "id": "l2",
+        "title": {
+          "ru": "Зависимости: чужой код внутри твоего",
+          "uz": "Bog'liqliklar: sizning kodingiz ichidagi begona kod",
+          "en": "Dependencies: someone else's code inside yours"
+        },
+        "blocks": [
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>Ты пишешь двести строк, а запускаешь двести тысяч: почти всё в приложении — чужие библиотеки и библиотеки этих библиотек. Каждая из них выполняется с теми же правами, что и твой код. Значит, дыра в любой из них — это дыра в твоём приложении.</p><p>Отсюда три привычки:</p><ul><li><b>Фиксируй версии.</b> <code>requests</code> без версии сегодня и завтра — разные библиотеки. В <code>requirements.txt</code> пишут точную версию, а рядом держат lock-файл со всеми вложенными зависимостями.</li><li><b>Проверяй известные уязвимости.</b> Для каждой библиотеки публикуют номер версии, начиная с которой дыра закрыта. Сравнение «моя версия младше исправленной» — и есть аудит.</li><li><b>Смотри на имя.</b> <code>reqeusts</code> вместо <code>requests</code> — приём, который называют опечаточным сквоттингом: злоумышленник заранее публикует пакет с похожим именем и ждёт чужую опечатку.</li></ul>",
+              "uz": "<p>Siz ikki yuz qator yozasiz, lekin ikki yuz ming qator ishga tushiradi: ilovadagi deyarli hamma narsa — begona kutubxonalar va o'sha kutubxonalarning kutubxonalari. Ularning har biri sizning kodingiz bilan bir xil huquqlar ostida bajariladi. Demak, ulardan birortasidagi teshik — bu sizning ilovangizdagi teshik.</p><p>Shundan uchta odat kelib chiqadi:</p><ul><li><b>Versiyalarni qotiring.</b> Versiyasiz <code>requests</code> bugun va ertaga — turli kutubxonalar. <code>requirements.txt</code> da aniq versiya yoziladi, yonida esa barcha ichki bog'liqliklar bilan lock-fayl saqlanadi.</li><li><b>Ma'lum zaifliklarni tekshiring.</b> Har bir kutubxona uchun teshik yopilgan versiya raqami e'lon qilinadi. «Mening versiyam tuzatilganidan kichik» degan taqqoslash — bu audit.</li><li><b>Nomga qarang.</b> <code>requests</code> o'rniga <code>reqeusts</code> — buni xato-yozuv skvotting deyishadi: buzg'unchi o'xshash nomli paketni oldindan e'lon qilib, birovning xatosini kutadi.</li></ul>",
+              "en": "<p>You write two hundred lines and run two hundred thousand: almost everything in an app is third-party libraries, and libraries of those libraries. Each of them runs with exactly your code's privileges. So a hole in any of them is a hole in your application.</p><p>Hence three habits:</p><ul><li><b>Pin versions.</b> <code>requests</code> with no version today and tomorrow are different libraries. <code>requirements.txt</code> gets an exact version, and a lock file next to it records every transitive dependency.</li><li><b>Check known vulnerabilities.</b> For every library a fixed-in version number is published. Comparing \"my version is older than the fixed one\" <i>is</i> the audit.</li><li><b>Read the name.</b> <code>reqeusts</code> instead of <code>requests</code> is called typosquatting: an attacker publishes a look-alike package in advance and waits for someone's typo.</li></ul>"
+            }
+          },
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>Сравнивать версии как строки нельзя. По алфавиту <code>\"1.0.9\"</code> больше, чем <code>\"1.0.10\"</code>, потому что символ <code>9</code> идёт после <code>1</code>. Уязвимую версию так легко посчитать безопасной. Правильно — разбить строку по точкам и сравнивать кортежи чисел.</p>",
+              "uz": "<p>Versiyalarni satr sifatida taqqoslab bo'lmaydi. Alifbo bo'yicha <code>\"1.0.9\"</code> <code>\"1.0.10\"</code> dan katta, chunki <code>9</code> belgisi <code>1</code> dan keyin keladi. Shunday qilib zaif versiyani xavfsiz deb hisoblash oson. To'g'risi — satrni nuqtalar bo'yicha bo'lib, sonlar kortejlarini taqqoslash.</p>",
+              "en": "<p>Versions cannot be compared as strings. Alphabetically <code>\"1.0.9\"</code> is greater than <code>\"1.0.10\"</code>, because the character <code>9</code> sorts after <code>1</code>. That makes it easy to call a vulnerable version safe. The right way is to split on dots and compare tuples of numbers.</p>"
+            }
+          },
+          {
+            "type": "run",
+            "code": "def to_tuple(version):\n    return tuple(int(part) for part in version.split(\".\"))\n\ninstalled = \"1.0.9\"\nfixed_in = \"1.0.10\"\n\nprint(\"как строки:\", installed < fixed_in)\nprint(\"как числа: \", to_tuple(installed) < to_tuple(fixed_in))"
+          },
+          {
+            "type": "findbug",
+            "lines": [
+              "flask==3.0.2",
+              "requests",
+              "sqlalchemy==2.0.29",
+              "pydantic==2.7.1"
+            ],
+            "bugLine": 1,
+            "explain": {
+              "ru": "У <code>requests</code> не зафиксирована версия: сборка на твоей машине и сборка на сервере через месяц поставят разные библиотеки. Это и невоспроизводимо, и опасно — обновление может приехать вместе с новой уязвимостью. Правильно: <code>requests==2.32.3</code>.",
+              "uz": "<code>requests</code> da versiya qotirilmagan: sizning mashinangizdagi va bir oydan keyin serverdagi yig'ish turli kutubxonalarni o'rnatadi. Bu ham takrorlanmaydi, ham xavfli — yangilanish yangi zaiflik bilan birga kelishi mumkin. To'g'risi: <code>requests==2.32.3</code>.",
+              "en": "<code>requests</code> has no pinned version: a build on your machine and a build on the server a month later will install different libraries. That is both irreproducible and unsafe — an update can arrive together with a fresh vulnerability. Correct: <code>requests==2.32.3</code>."
+            }
+          },
+          {
+            "type": "checkpoint",
+            "q": {
+              "ru": "Установлена версия 2.4.9, уязвимость исправлена в 2.4.10. Что вернёт проверка <code>\"2.4.9\" &lt; \"2.4.10\"</code>?",
+              "uz": "2.4.9 versiyasi o'rnatilgan, zaiflik 2.4.10 da tuzatilgan. <code>\"2.4.9\" &lt; \"2.4.10\"</code> tekshiruvi nima qaytaradi?",
+              "en": "Version 2.4.9 is installed, the vulnerability was fixed in 2.4.10. What does the check <code>\"2.4.9\" &lt; \"2.4.10\"</code> return?"
+            },
+            "options": [
+              { "ru": "True — и уязвимость будет найдена", "uz": "True — va zaiflik topiladi", "en": "True — and the vulnerability will be found" },
+              { "ru": "False — сравнение посимвольное, и уязвимость останется незамеченной", "uz": "False — taqqoslash belgima-belgi, zaiflik e'tibordan chetda qoladi", "en": "False — the comparison is character by character, and the vulnerability goes unnoticed" },
+              { "ru": "Ошибку сравнения типов", "uz": "Turlarni taqqoslash xatosini", "en": "A type comparison error" },
+              { "ru": "None", "uz": "None", "en": "None" }
+            ],
+            "a": 1,
+            "explain": {
+              "ru": "Строки сравниваются посимвольно: <code>\"2.4.\"</code> совпадает, дальше <code>\"9\"</code> против <code>\"1\"</code>, и <code>9 &gt; 1</code>. Результат — <code>False</code>, то есть скрипт решит, что версия свежая. Разбор по точкам в кортеж чисел даёт <code>(2, 4, 9) &lt; (2, 4, 10)</code> → <code>True</code>.",
+              "uz": "Satrlar belgima-belgi taqqoslanadi: <code>\"2.4.\"</code> mos keladi, keyin <code>\"9\"</code> ga qarshi <code>\"1\"</code>, va <code>9 &gt; 1</code>. Natija — <code>False</code>, ya'ni skript versiyani yangi deb hisoblaydi. Nuqtalar bo'yicha sonlar kortejiga ajratish <code>(2, 4, 9) &lt; (2, 4, 10)</code> → <code>True</code> beradi.",
+              "en": "Strings compare character by character: <code>\"2.4.\"</code> matches, then <code>\"9\"</code> against <code>\"1\"</code>, and <code>9 &gt; 1</code>. The result is <code>False</code>, so the script decides the version is current. Splitting on dots into a tuple of numbers gives <code>(2, 4, 9) &lt; (2, 4, 10)</code> → <code>True</code>."
+            }
+          }
+        ]
+      },
+      {
+        "id": "l3",
+        "title": {
+          "ru": "Перебор паролей и логи без утечек",
+          "uz": "Parol brutforsi va oqmaydigan loglar",
+          "en": "Password guessing and logs that don't leak"
+        },
+        "blocks": [
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>Форма входа выдержит любой пароль, если пробовать бесконечно. Скрипт перебирает миллион вариантов за ночь и не устаёт. Хеширование пароля тут не помогает: оно защищает базу после кражи, а не саму форму.</p><p>Помогает <b>ограничение частоты</b> — rate limiting. Идея простая: считаем попытки в скользящем окне времени и, если их больше лимита, отказываем, не проверяя пароль вообще.</p><p>Считать нужно <b>по ключу</b>: по логину — чтобы не подбирали один аккаунт, и по IP-адресу — чтобы не подбирали много аккаунтов подряд. Хранят такие счётчики обычно в кеше вроде Redis, а не в памяти процесса: серверов несколько, и лимит должен быть общим.</p>",
+              "uz": "<p>Kirish shakli cheksiz urinsangiz, har qanday parolni beradi. Skript bir kechada million variantni ko'rib chiqadi va charchamaydi. Parolni xeshlash bu yerda yordam bermaydi: u o'g'irlikdan keyin bazani himoya qiladi, shaklning o'zini emas.</p><p>Yordam beradigan narsa — <b>chastotani cheklash</b>, rate limiting. G'oya oddiy: urinishlarni siljiydigan vaqt oynasida sanaymiz va agar ular limitdan ko'p bo'lsa, parolni umuman tekshirmasdan rad etamiz.</p><p>Sanash <b>kalit bo'yicha</b> bo'lishi kerak: login bo'yicha — bitta akkaunt tanlanmasligi uchun, IP-manzil bo'yicha — ketma-ket ko'p akkaunt tanlanmasligi uchun. Bunday hisoblagichlar odatda jarayon xotirasida emas, Redis kabi keshda saqlanadi: serverlar bir nechta, limit esa umumiy bo'lishi kerak.</p>",
+              "en": "<p>A login form will give up any password if you can try forever. A script goes through a million guesses overnight and never gets tired. Password hashing does not help here: it protects the database after a theft, not the form itself.</p><p>What helps is <b>rate limiting</b>. The idea is simple: count attempts inside a sliding time window and, once they exceed the limit, refuse without checking the password at all.</p><p>Count <b>per key</b>: per login, so one account can't be ground down, and per IP address, so many accounts can't be ground down in a row. Such counters normally live in a cache like Redis rather than process memory: there are several servers, and the limit must be shared.</p>"
+            }
+          },
+          {
+            "type": "run",
+            "code": "LIMIT = 3\nattempts = {}\n\ndef try_login(user, password):\n    if attempts.get(user, 0) >= LIMIT:\n        return \"заблокировано\"\n    if password == \"correct-horse\":\n        attempts[user] = 0\n        return \"вход выполнен\"\n    attempts[user] = attempts.get(user, 0) + 1\n    return \"неверный пароль\"\n\nfor guess in [\"1234\", \"qwerty\", \"admin\", \"correct-horse\"]:\n    print(guess, \"->\", try_login(\"aziz\", guess))"
+          },
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>Обрати внимание на последнюю строку вывода: <b>правильный</b> пароль тоже получил отказ, потому что лимит уже исчерпан. Это не баг, а суть защиты — но именно поэтому счётчик должен сбрасываться со временем, а не блокировать навсегда. Обычное решение — окно в несколько минут плюс растущая задержка.</p><p>И вторая половина темы — ответы и логи. Сообщение «такого пользователя нет» бесплатно рассказывает злоумышленнику, какие логины существуют. Поэтому на неудачный вход отвечают одинаково: «неверный логин или пароль».</p><p>В логи же пишут <i>событие</i>, а не <i>данные</i>: кто, когда, откуда, чем закончилось — но без пароля, токена и номера карты.</p>",
+              "uz": "<p>Chiqishning oxirgi qatoriga e'tibor bering: <b>to'g'ri</b> parol ham rad etildi, chunki limit allaqachon tugagan. Bu xato emas, himoyaning mohiyati — lekin aynan shu sababli hisoblagich vaqt o'tishi bilan nolga tushishi kerak, abadiy bloklamasligi. Odatiy yechim — bir necha daqiqalik oyna va o'sib boruvchi kechikish.</p><p>Mavzuning ikkinchi yarmi — javoblar va loglar. «Bunday foydalanuvchi yo'q» degan xabar buzg'unchiga qaysi loginlar mavjudligini bepul aytib beradi. Shuning uchun muvaffaqiyatsiz kirishga bir xil javob beriladi: «login yoki parol noto'g'ri».</p><p>Loglarga esa <i>ma'lumot</i> emas, <i>hodisa</i> yoziladi: kim, qachon, qayerdan, nima bilan tugadi — lekin parolsiz, tokensiz va karta raqamisiz.</p>",
+              "en": "<p>Look at the last line of output: the <b>correct</b> password was refused too, because the limit was already spent. That is not a bug, it is the point of the defence — but it is exactly why the counter must reset over time instead of blocking forever. The usual answer is a window of a few minutes plus a growing delay.</p><p>The other half of the topic is responses and logs. A message saying \"no such user\" tells an attacker for free which logins exist. So a failed login always gets the same answer: \"wrong username or password\".</p><p>And logs record an <i>event</i>, not <i>data</i>: who, when, from where, how it ended — but no password, no token, no card number.</p>"
+            }
+          },
+          {
+            "type": "run",
+            "code": "SECRET_FIELDS = {\"password\", \"token\", \"api_key\", \"card\"}\n\ndef sanitize(record):\n    return {k: (\"***\" if k.lower() in SECRET_FIELDS else v) for k, v in record.items()}\n\nevent = {\n    \"user\": \"aziz\",\n    \"ip\": \"37.27.15.73\",\n    \"password\": \"correct-horse\",\n    \"result\": \"ok\",\n}\nprint(\"как есть:\", event)\nprint(\"в лог:   \", sanitize(event))"
+          },
+          {
+            "type": "order",
+            "steps": [
+              { "ru": "Заметили: ключ платёжного сервиса лежит в публичном репозитории", "uz": "Sezdik: to'lov xizmati kaliti ochiq repozitoriyda yotibdi", "en": "Noticed: the payment service key is sitting in a public repository" },
+              { "ru": "Отозвали старый ключ в панели сервиса", "uz": "Xizmat panelida eski kalitni bekor qildik", "en": "Revoked the old key in the service dashboard" },
+              { "ru": "Выпустили новый ключ и положили его в переменные окружения сервера", "uz": "Yangi kalit chiqarib, uni server muhit o'zgaruvchilariga qo'ydik", "en": "Issued a new key and put it into the server's environment variables" },
+              { "ru": "Убрали ключ из кода и добавили .env в .gitignore", "uz": "Kalitni koddan olib tashlab, .env ni .gitignore ga qo'shdik", "en": "Removed the key from the code and added .env to .gitignore" },
+              { "ru": "Проверили журнал операций сервиса: не было ли чужих платежей", "uz": "Xizmat operatsiyalari jurnalini tekshirdik: begona to'lovlar bo'lmadimi", "en": "Checked the service's operation log for payments that were not ours" }
+            ]
+          },
+          {
+            "type": "note",
+            "kind": "trap",
+            "html": {
+              "ru": "Счётчик попыток в обычном словаре Python живёт <b>внутри одного процесса</b>. Запусти четыре воркера — и лимит на входе вырастет вчетверо, потому что у каждого свой словарь. Общий лимит требует общего хранилища: Redis, база или сам балансировщик.",
+              "uz": "Oddiy Python lug'atidagi urinishlar hisoblagichi <b>bitta jarayon ichida</b> yashaydi. To'rtta vorker ishga tushiring — kirishdagi limit to'rt barobar oshadi, chunki har birida o'z lug'ati bor. Umumiy limit umumiy saqlagichni talab qiladi: Redis, baza yoki balansirovchining o'zi.",
+              "en": "An attempt counter in a plain Python dict lives <b>inside one process</b>. Start four workers and the effective limit quadruples, because each has its own dict. A shared limit needs shared storage: Redis, a database, or the load balancer itself."
+            }
+          },
+          {
+            "type": "summary",
+            "items": [
+              { "ru": "Секрет живёт в переменных окружения, а не в коде; .env — в .gitignore", "uz": "Sir kodda emas, muhit o'zgaruvchilarida yashaydi; .env — .gitignore da", "en": "A secret lives in environment variables, not in code; .env goes into .gitignore" },
+              { "ru": "Утёкший ключ отзывают и перевыпускают — удаления строки недостаточно", "uz": "Oqib ketgan kalit bekor qilinib, qaytadan chiqariladi — qatorni o'chirish yetarli emas", "en": "A leaked key is revoked and reissued — deleting the line is not enough" },
+              { "ru": "Версии зависимостей фиксируют и сравнивают числами, а не строками", "uz": "Bog'liqlik versiyalari qotiriladi va satr emas, sonlar bilan taqqoslanadi", "en": "Dependency versions are pinned and compared as numbers, not strings" },
+              { "ru": "Ограничение частоты по логину и IP закрывает перебор паролей", "uz": "Login va IP bo'yicha chastotani cheklash parol brutforsini yopadi", "en": "Rate limiting per login and per IP shuts down password guessing" },
+              { "ru": "Ответ на неудачный вход одинаковый, а в логах — событие без секретов", "uz": "Muvaffaqiyatsiz kirishga javob bir xil, loglarda esa sirsiz hodisa", "en": "Failed logins get one identical answer, and logs record an event without secrets" }
+            ]
+          }
+        ]
+      }
+    ],
+    "quiz": [
+      {
+        "q": {
+          "ru": "Где должен храниться пароль от базы данных в приложении?",
+          "uz": "Ilovada ma'lumotlar bazasi paroli qayerda saqlanishi kerak?",
+          "en": "Where should an application's database password be stored?"
+        },
+        "options": [
+          { "ru": "В константе в исходном коде", "uz": "Manba koddagi konstantada", "en": "In a constant in the source code" },
+          { "ru": "В переменной окружения, которую сервер подставляет при запуске", "uz": "Server ishga tushirishda qo'yadigan muhit o'zgaruvchisida", "en": "In an environment variable supplied by the server at startup" },
+          { "ru": "В комментарии рядом с подключением", "uz": "Ulanish yonidagi izohda", "en": "In a comment next to the connection" },
+          { "ru": "В README, чтобы команда не искала", "uz": "README da, jamoa qidirmasligi uchun", "en": "In the README so the team doesn't have to search" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Код уезжает в Git и копируется дальше — секрет не должен ехать вместе с ним. В коде остаётся только имя переменной, значение приходит из окружения.",
+          "uz": "Kod Git ga ketadi va keyinroq ko'chiriladi — sir u bilan birga yurmasligi kerak. Kodda faqat o'zgaruvchi nomi qoladi, qiymat muhitdan keladi.",
+          "en": "Code goes into Git and gets copied onward — the secret must not travel with it. Only the variable name stays in code; the value comes from the environment."
+        }
+      },
+      {
+        "q": {
+          "ru": "Зачем рядом с .env держат файл .env.example?",
+          "uz": ".env yonida nima uchun .env.example fayli saqlanadi?",
+          "en": "Why keep a .env.example file next to .env?"
+        },
+        "options": [
+          { "ru": "Это резервная копия секретов", "uz": "Bu sirlarning zaxira nusxasi", "en": "It is a backup of the secrets" },
+          { "ru": "Он перечисляет нужные имена переменных с пустыми значениями — как документация", "uz": "U kerakli o'zgaruvchi nomlarini bo'sh qiymatlar bilan sanaydi — hujjat sifatida", "en": "It lists the required variable names with empty values — as documentation" },
+          { "ru": "Он ускоряет запуск приложения", "uz": "U ilovaning ishga tushishini tezlashtiradi", "en": "It speeds up application startup" },
+          { "ru": "Git требует такой файл", "uz": "Git shunday faylni talab qiladi", "en": "Git requires such a file" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "<code>.env</code> лежит в <code>.gitignore</code> и до коллег не доедет. <code>.env.example</code> едет в репозиторий и показывает, какие переменные нужно задать — но без значений.",
+          "uz": "<code>.env</code> <code>.gitignore</code> da yotadi va hamkasblarga yetib bormaydi. <code>.env.example</code> repozitoriyga ketadi va qanday o'zgaruvchilar kerakligini ko'rsatadi — lekin qiymatlarsiz.",
+          "en": "<code>.env</code> sits in <code>.gitignore</code> and never reaches teammates. <code>.env.example</code> does go into the repo and shows which variables are needed — without the values."
+        }
+      },
+      {
+        "q": {
+          "ru": "Почему версии зависимостей нельзя сравнивать как строки?",
+          "uz": "Nega bog'liqlik versiyalarini satr sifatida taqqoslab bo'lmaydi?",
+          "en": "Why can't dependency versions be compared as strings?"
+        },
+        "options": [
+          { "ru": "Строки в Python нельзя сравнивать оператором <code>&lt;</code>", "uz": "Python da satrlarni <code>&lt;</code> operatori bilan taqqoslab bo'lmaydi", "en": "Strings in Python cannot be compared with <code>&lt;</code>" },
+          { "ru": "Сравнение идёт посимвольно, поэтому <code>\"1.0.9\"</code> оказывается больше <code>\"1.0.10\"</code>", "uz": "Taqqoslash belgima-belgi ketadi, shuning uchun <code>\"1.0.9\"</code> <code>\"1.0.10\"</code> dan katta chiqadi", "en": "The comparison is character by character, so <code>\"1.0.9\"</code> comes out greater than <code>\"1.0.10\"</code>" },
+          { "ru": "Версии всегда одинаковой длины, разницы нет", "uz": "Versiyalar doim bir xil uzunlikda, farqi yo'q", "en": "Versions are always the same length, so it makes no difference" },
+          { "ru": "Потому что версии хранятся в кортежах", "uz": "Chunki versiyalar kortejlarda saqlanadi", "en": "Because versions are stored in tuples" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Символ <code>9</code> идёт после <code>1</code>, поэтому строковое сравнение ошибается на двузначных номерах. Разбор по точкам в кортеж чисел решает проблему.",
+          "uz": "<code>9</code> belgisi <code>1</code> dan keyin keladi, shuning uchun satrli taqqoslash ikki xonali raqamlarda xato qiladi. Nuqtalar bo'yicha sonlar kortejiga ajratish muammoni hal qiladi.",
+          "en": "The character <code>9</code> sorts after <code>1</code>, so string comparison breaks on two-digit numbers. Splitting on dots into a tuple of numbers fixes it."
+        }
+      },
+      {
+        "q": {
+          "ru": "Что такое опечаточный сквоттинг (typosquatting) в мире пакетов?",
+          "uz": "Paketlar dunyosida xato-yozuv skvotting (typosquatting) nima?",
+          "en": "What is typosquatting in the world of packages?"
+        },
+        "options": [
+          { "ru": "Пакет с именем, похожим на популярный, в расчёте на опечатку при установке", "uz": "O'rnatishdagi xatoga umid qilib, mashhur nomga o'xshash nomli paket", "en": "A package named to look like a popular one, banking on a typo at install time" },
+          { "ru": "Слишком длинное имя пакета", "uz": "Paketning haddan tashqari uzun nomi", "en": "An overly long package name" },
+          { "ru": "Ошибка в файле requirements.txt", "uz": "requirements.txt faylidagi xato", "en": "A mistake in requirements.txt" },
+          { "ru": "Пакет без указанной версии", "uz": "Versiyasi ko'rsatilmagan paket", "en": "A package with no version specified" }
+        ],
+        "a": 0,
+        "explain": {
+          "ru": "Злоумышленник заранее публикует <code>reqeusts</code>, <code>python-dateutils</code> и подобное. Одна опечатка при установке — и его код выполняется с правами твоего приложения.",
+          "uz": "Buzg'unchi oldindan <code>reqeusts</code>, <code>python-dateutils</code> va shunga o'xshashlarni e'lon qiladi. O'rnatishdagi bitta xato — va uning kodi sizning ilovangiz huquqlari bilan bajariladi.",
+          "en": "The attacker publishes <code>reqeusts</code>, <code>python-dateutils</code> and the like in advance. One typo at install time and their code runs with your application's privileges."
+        }
+      },
+      {
+        "q": {
+          "ru": "Форму входа перебирают скриптом. Что остановит перебор?",
+          "uz": "Kirish shakli skript bilan tanlanmoqda. Brutforsni nima to'xtatadi?",
+          "en": "A script is hammering the login form. What stops the guessing?"
+        },
+        "options": [
+          { "ru": "Более длинный хеш пароля", "uz": "Uzunroq parol xeshi", "en": "A longer password hash" },
+          { "ru": "Ограничение числа попыток в окне времени по логину и по IP", "uz": "Login va IP bo'yicha vaqt oynasidagi urinishlar sonini cheklash", "en": "Limiting the number of attempts per time window, per login and per IP" },
+          { "ru": "Экранирование HTML в форме", "uz": "Shakldagi HTML ni ekranlash", "en": "Escaping HTML in the form" },
+          { "ru": "Хранение пароля в переменной окружения", "uz": "Parolni muhit o'zgaruvchisida saqlash", "en": "Storing the password in an environment variable" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Хеш защищает базу после кражи, но не мешает пробовать пароли через форму. Помогает только ограничение частоты — и обязательно по двум ключам сразу.",
+          "uz": "Xesh o'g'irlikdan keyin bazani himoya qiladi, lekin shakl orqali parol sinashga xalaqit bermaydi. Faqat chastotani cheklash yordam beradi — va albatta ikkita kalit bo'yicha birdan.",
+          "en": "A hash protects the database after a theft but does nothing about guesses through the form. Only rate limiting helps — and it must key on both login and IP."
+        }
+      },
+      {
+        "q": {
+          "ru": "Почему на неудачный вход отвечают «неверный логин или пароль», а не «такого пользователя нет»?",
+          "uz": "Nega muvaffaqiyatsiz kirishga «bunday foydalanuvchi yo'q» emas, «login yoki parol noto'g'ri» deb javob beriladi?",
+          "en": "Why does a failed login say \"wrong username or password\" instead of \"no such user\"?"
+        },
+        "options": [
+          { "ru": "Так короче текст", "uz": "Bunday matn qisqaroq", "en": "The text is shorter that way" },
+          { "ru": "Точный ответ подсказал бы, какие логины существуют", "uz": "Aniq javob qaysi loginlar borligini aytib berardi", "en": "A precise answer would reveal which logins exist" },
+          { "ru": "Так требует HTTP", "uz": "HTTP shuni talab qiladi", "en": "HTTP requires it" },
+          { "ru": "Чтобы не переводить сообщение на другие языки", "uz": "Xabarni boshqa tillarga tarjima qilmaslik uchun", "en": "To avoid translating the message" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Разные ответы превращают форму входа в справочник существующих аккаунтов: злоумышленник сначала собирает список логинов, потом подбирает пароли только к ним.",
+          "uz": "Turli javoblar kirish shaklini mavjud akkauntlar ma'lumotnomasiga aylantiradi: buzg'unchi avval loginlar ro'yxatini yig'adi, keyin faqat ularga parol tanlaydi.",
+          "en": "Different answers turn the login form into a directory of existing accounts: the attacker first collects logins, then guesses passwords only for those."
+        }
+      }
+    ],
+    "tasks": [
+      {
+        "id": "t1",
+        "kind": "python",
+        "title": {
+          "ru": "Маскировка секрета",
+          "uz": "Sirni niqoblash",
+          "en": "Mask a secret"
+        },
+        "brief": {
+          "ru": "Спрячь середину ключа перед выводом в лог",
+          "uz": "Logga chiqarishdan oldin kalitning o'rtasini yashiring",
+          "en": "Hide the middle of a key before it goes to the log"
+        },
+        "desc": {
+          "ru": "Напиши функцию <code>mask_secret(value, keep=2)</code>. Она оставляет первые <code>keep</code> и последние <code>keep</code> символов, а всё между ними заменяет на звёздочки <code>*</code> — по одной на каждый скрытый символ, чтобы длина не менялась. Если строка короче или равна <code>keep * 2</code> символам, скрывай её целиком: возвращай строку из звёздочек той же длины.",
+          "uz": "<code>mask_secret(value, keep=2)</code> funksiyasini yozing. U birinchi <code>keep</code> va oxirgi <code>keep</code> belgini qoldiradi, ular orasidagi hamma narsani esa <code>*</code> yulduzchalariga almashtiradi — har bir yashirilgan belgi uchun bittadan, uzunlik o'zgarmasligi uchun. Agar satr <code>keep * 2</code> belgidan qisqa yoki teng bo'lsa, uni butunlay yashiring: xuddi shu uzunlikdagi yulduzchalar satrini qaytaring.",
+          "en": "Write a function <code>mask_secret(value, keep=2)</code>. It keeps the first <code>keep</code> and the last <code>keep</code> characters and replaces everything between them with asterisks <code>*</code> — one per hidden character, so the length stays the same. If the string is shorter than or equal to <code>keep * 2</code> characters, hide it entirely: return a string of asterisks of the same length."
+        },
+        "starter": "def mask_secret(value, keep=2):\n    # верни строку той же длины со скрытой серединой\n    ...\n",
+        "tests": "assert mask_secret(\"sk_live_9f3a1c77b2\") == \"sk\" + \"*\" * 14 + \"b2\"\nassert mask_secret(\"abcd\") == \"****\"\nassert mask_secret(\"abc\") == \"***\"\nassert mask_secret(\"\") == \"\"\nassert mask_secret(\"token12345\", 3) == \"tok\" + \"*\" * 4 + \"345\"\nassert mask_secret(\"token12345\", 0) == \"*\" * 10\nassert len(mask_secret(\"1234567890\")) == 10\n",
+        "hint": {
+          "ru": "Срезы: <code>value[:keep]</code> — начало, <code>value[-keep:]</code> — конец. Скрытых символов ровно <code>len(value) - keep * 2</code>. Случай <code>keep = 0</code> проверь первым: срез <code>value[-0:]</code> вернёт всю строку, а не пустую.",
+          "uz": "Kesmalar: <code>value[:keep]</code> — bosh, <code>value[-keep:]</code> — oxir. Yashirilgan belgilar aynan <code>len(value) - keep * 2</code> ta. <code>keep = 0</code> holatini birinchi tekshiring: <code>value[-0:]</code> kesmasi bo'sh emas, butun satrni qaytaradi.",
+          "en": "Slices: <code>value[:keep]</code> is the head, <code>value[-keep:]</code> the tail. There are exactly <code>len(value) - keep * 2</code> hidden characters. Check <code>keep = 0</code> first: the slice <code>value[-0:]</code> returns the whole string, not an empty one."
+        }
+      },
+      {
+        "id": "t2",
+        "kind": "python",
+        "title": {
+          "ru": "Аудит зависимостей",
+          "uz": "Bog'liqliklar auditi",
+          "en": "Dependency audit"
+        },
+        "brief": {
+          "ru": "Найди библиотеки, которые нужно обновить",
+          "uz": "Yangilash kerak bo'lgan kutubxonalarni toping",
+          "en": "Find the libraries that need updating"
+        },
+        "desc": {
+          "ru": "Напиши функцию <code>risky_packages(installed, fixed)</code>. <code>installed</code> — словарь «имя пакета → установленная версия», <code>fixed</code> — словарь «имя пакета → версия, в которой уязвимость исправлена». Верни отсортированный по алфавиту список имён пакетов, которые установлены и версия которых <b>младше</b> исправленной. Версии — строки вида <code>\"2.4.10\"</code>; сравнивай их как кортежи чисел, а не как строки.",
+          "uz": "<code>risky_packages(installed, fixed)</code> funksiyasini yozing. <code>installed</code> — «paket nomi → o'rnatilgan versiya» lug'ati, <code>fixed</code> — «paket nomi → zaiflik tuzatilgan versiya» lug'ati. O'rnatilgan va versiyasi tuzatilganidan <b>kichik</b> bo'lgan paketlar nomlarining alifbo bo'yicha tartiblangan ro'yxatini qaytaring. Versiyalar — <code>\"2.4.10\"</code> ko'rinishidagi satrlar; ularni satr sifatida emas, sonlar korteji sifatida taqqoslang.",
+          "en": "Write a function <code>risky_packages(installed, fixed)</code>. <code>installed</code> maps a package name to the installed version, <code>fixed</code> maps a package name to the version in which the vulnerability was fixed. Return an alphabetically sorted list of names that are installed and whose version is <b>older</b> than the fixed one. Versions are strings like <code>\"2.4.10\"</code>; compare them as tuples of numbers, not as strings."
+        },
+        "starter": "def risky_packages(installed, fixed):\n    # верни отсортированный список имён, требующих обновления\n    ...\n",
+        "tests": "inst = {\"requests\": \"2.4.1\", \"flask\": \"3.0.0\", \"pillow\": \"10.2.0\"}\nfix = {\"requests\": \"2.4.7\", \"flask\": \"2.9.0\", \"django\": \"4.2.1\"}\nassert risky_packages(inst, fix) == [\"requests\"]\nassert risky_packages({}, fix) == []\nassert risky_packages(inst, {}) == []\nassert risky_packages({\"a\": \"1.0.0\"}, {\"a\": \"1.0.0\"}) == []\nassert risky_packages({\"a\": \"1.0.9\"}, {\"a\": \"1.0.10\"}) == [\"a\"]\nassert risky_packages({\"b\": \"0.9.1\", \"a\": \"1.2.3\"}, {\"a\": \"1.9.0\", \"b\": \"1.0.0\"}) == [\"a\", \"b\"]\n",
+        "hint": {
+          "ru": "Сделай вспомогательную функцию <code>to_tuple(v)</code>: <code>tuple(int(p) for p in v.split(\".\"))</code>. Потом пройдись по <code>installed.items()</code>, пропусти имена, которых нет в <code>fixed</code>, и собери те, где кортеж установленной версии меньше кортежа исправленной. В конце — <code>sorted(...)</code>.",
+          "uz": "<code>to_tuple(v)</code> yordamchi funksiyasini tuzing: <code>tuple(int(p) for p in v.split(\".\"))</code>. Keyin <code>installed.items()</code> bo'ylab yuring, <code>fixed</code> da yo'q nomlarni o'tkazib yuboring va o'rnatilgan versiya korteji tuzatilgan versiya kortejidan kichik bo'lganlarini yig'ing. Oxirida — <code>sorted(...)</code>.",
+          "en": "Write a helper <code>to_tuple(v)</code>: <code>tuple(int(p) for p in v.split(\".\"))</code>. Then walk <code>installed.items()</code>, skip names missing from <code>fixed</code>, and collect those whose installed tuple is less than the fixed tuple. Finish with <code>sorted(...)</code>."
+        }
+      },
+      {
+        "id": "t3",
+        "kind": "python",
+        "title": {
+          "ru": "Ограничение частоты запросов",
+          "uz": "So'rovlar chastotasini cheklash",
+          "en": "Request rate limiting"
+        },
+        "brief": {
+          "ru": "Пропускай не больше N попыток в окне времени",
+          "uz": "Vaqt oynasida N tadan ko'p urinishni o'tkazmang",
+          "en": "Allow no more than N attempts per time window"
+        },
+        "desc": {
+          "ru": "Напиши функцию <code>allow_request(log, user, now, limit, window)</code>. <code>log</code> — словарь «пользователь → список секунд, когда его запросы были разрешены». Порядок работы: сначала выброси из списка пользователя все отметки старше окна — оставь только те, для которых <code>now - t &lt; window</code>. Если разрешённых отметок осталось меньше <code>limit</code>, добавь <code>now</code> в список и верни <code>True</code>. Иначе верни <code>False</code>, ничего не добавляя. Обновлённый список должен остаться в <code>log</code> в обоих случаях.",
+          "uz": "<code>allow_request(log, user, now, limit, window)</code> funksiyasini yozing. <code>log</code> — «foydalanuvchi → so'rovlari ruxsat etilgan soniyalar ro'yxati» lug'ati. Ish tartibi: avval foydalanuvchi ro'yxatidan oynadan eski barcha belgilarni chiqarib tashlang — faqat <code>now - t &lt; window</code> bo'lganlarini qoldiring. Agar ruxsat etilgan belgilar <code>limit</code> dan kam qolgan bo'lsa, ro'yxatga <code>now</code> ni qo'shing va <code>True</code> qaytaring. Aks holda hech nima qo'shmasdan <code>False</code> qaytaring. Yangilangan ro'yxat ikkala holatda ham <code>log</code> da qolishi kerak.",
+          "en": "Write a function <code>allow_request(log, user, now, limit, window)</code>. <code>log</code> maps a user to the list of seconds at which their requests were allowed. The order of work: first drop every timestamp older than the window from that user's list — keep only those where <code>now - t &lt; window</code>. If fewer than <code>limit</code> timestamps remain, append <code>now</code> and return <code>True</code>. Otherwise return <code>False</code> without appending. The trimmed list must stay in <code>log</code> either way."
+        },
+        "starter": "def allow_request(log, user, now, limit, window):\n    # почисти старые отметки, потом реши: пропустить или отказать\n    ...\n",
+        "tests": "log = {}\nassert allow_request(log, \"aziz\", 0, 3, 10) is True\nassert allow_request(log, \"aziz\", 1, 3, 10) is True\nassert allow_request(log, \"aziz\", 2, 3, 10) is True\nassert allow_request(log, \"aziz\", 3, 3, 10) is False\nassert log[\"aziz\"] == [0, 1, 2]\nassert allow_request(log, \"bob\", 3, 3, 10) is True\nassert allow_request(log, \"aziz\", 11, 3, 10) is True\nassert log[\"aziz\"] == [2, 11]\nassert allow_request(log, \"aziz\", 100, 1, 10) is True\nassert log[\"aziz\"] == [100]\n",
+        "hint": {
+          "ru": "Возьми текущий список так: <code>marks = [t for t in log.get(user, []) if now - t &lt; window]</code>. Сразу положи его обратно: <code>log[user] = marks</code>. Дальше — обычная проверка <code>len(marks) &lt; limit</code>; при успехе <code>marks.append(now)</code> изменит и список внутри словаря, потому что это один и тот же объект.",
+          "uz": "Joriy ro'yxatni shunday oling: <code>marks = [t for t in log.get(user, []) if now - t &lt; window]</code>. Uni darrov qaytarib qo'ying: <code>log[user] = marks</code>. Keyin oddiy <code>len(marks) &lt; limit</code> tekshiruvi; muvaffaqiyatda <code>marks.append(now)</code> lug'at ichidagi ro'yxatni ham o'zgartiradi, chunki bu bitta obyekt.",
+          "en": "Take the current list like this: <code>marks = [t for t in log.get(user, []) if now - t &lt; window]</code>. Put it back right away: <code>log[user] = marks</code>. Then the usual <code>len(marks) &lt; limit</code> check; on success <code>marks.append(now)</code> also updates the list inside the dict, because it is the same object."
+        }
+      }
+    ],
+    "exam": {
+      "time": 600,
+      "questions": [
+        {
+          "q": {
+            "ru": "Токен бота лежит прямо в коде и уже запушен на GitHub. Минимальный правильный набор действий?",
+            "uz": "Bot tokeni to'g'ridan-to'g'ri kodda yotibdi va allaqachon GitHub ga push qilingan. Minimal to'g'ri harakatlar to'plami?",
+            "en": "A bot token sits right in the code and has already been pushed to GitHub. The minimum correct set of actions?"
+          },
+          "options": [
+            { "ru": "Удалить строку и запушить", "uz": "Qatorni o'chirib, push qilish", "en": "Delete the line and push" },
+            { "ru": "Отозвать токен, выпустить новый, вынести его в переменную окружения", "uz": "Tokenni bekor qilish, yangisini chiqarish, uni muhit o'zgaruvchisiga chiqarish", "en": "Revoke the token, issue a new one, move it to an environment variable" },
+            { "ru": "Переименовать переменную в коде", "uz": "Koddagi o'zgaruvchi nomini almashtirish", "en": "Rename the variable in the code" },
+            { "ru": "Закрыть репозиторий от индексации в robots.txt", "uz": "Repozitoriyni robots.txt orqali indekslashdan yopish", "en": "Block the repository from indexing via robots.txt" }
+          ],
+          "a": 1
+        },
+        {
+          "q": {
+            "ru": "Что записывают в лог при неудачной попытке входа?",
+            "uz": "Muvaffaqiyatsiz kirish urinishida logga nima yoziladi?",
+            "en": "What goes into the log on a failed login attempt?"
+          },
+          "options": [
+            { "ru": "Логин, время, IP и результат — без введённого пароля", "uz": "Login, vaqt, IP va natija — kiritilgan parolsiz", "en": "Login, time, IP and result — without the entered password" },
+            { "ru": "Весь объект запроса целиком, чтобы ничего не потерять", "uz": "So'rov obyektini butunlay, hech narsa yo'qolmasligi uchun", "en": "The entire request object, so nothing is lost" },
+            { "ru": "Введённый пароль — вдруг пригодится при разборе", "uz": "Kiritilgan parolni — tahlilda kerak bo'lib qolar", "en": "The entered password — it might help during an investigation" },
+            { "ru": "Ничего, логи только для успешных действий", "uz": "Hech nima, loglar faqat muvaffaqiyatli harakatlar uchun", "en": "Nothing, logs are only for successful actions" }
+          ],
+          "a": 0
+        },
+        {
+          "q": {
+            "ru": "Приложение запущено в четырёх процессах, счётчик попыток входа хранится в словаре Python. Что получится?",
+            "uz": "Ilova to'rtta jarayonda ishga tushirilgan, kirish urinishlari hisoblagichi Python lug'atida saqlanadi. Nima bo'ladi?",
+            "en": "The app runs in four processes and the login attempt counter lives in a Python dict. What happens?"
+          },
+          "options": [
+            { "ru": "Ничего, лимит соблюдается", "uz": "Hech nima, limit saqlanadi", "en": "Nothing, the limit holds" },
+            { "ru": "Фактический лимит вырастет вчетверо — у каждого процесса свой счётчик", "uz": "Amaldagi limit to'rt barobar oshadi — har bir jarayonda o'z hisoblagichi bor", "en": "The effective limit quadruples — each process has its own counter" },
+            { "ru": "Приложение перестанет запускаться", "uz": "Ilova ishga tushmay qoladi", "en": "The app will fail to start" },
+            { "ru": "Счётчик станет общим автоматически", "uz": "Hisoblagich avtomatik ravishda umumiy bo'ladi", "en": "The counter becomes shared automatically" }
+          ],
+          "a": 1
+        },
+        {
+          "q": {
+            "ru": "Установлено <code>pillow==10.0.1</code>, уязвимость исправлена в <code>10.0.10</code>. Пакет уязвим?",
+            "uz": "<code>pillow==10.0.1</code> o'rnatilgan, zaiflik <code>10.0.10</code> da tuzatilgan. Paket zaifmi?",
+            "en": "<code>pillow==10.0.1</code> is installed, the vulnerability was fixed in <code>10.0.10</code>. Is the package vulnerable?"
+          },
+          "options": [
+            { "ru": "Да: <code>(10, 0, 1) &lt; (10, 0, 10)</code>", "uz": "Ha: <code>(10, 0, 1) &lt; (10, 0, 10)</code>", "en": "Yes: <code>(10, 0, 1) &lt; (10, 0, 10)</code>" },
+            { "ru": "Нет, версии одинаковые", "uz": "Yo'q, versiyalar bir xil", "en": "No, the versions are the same" },
+            { "ru": "Нет: строка <code>\"10.0.1\"</code> длиннее по номеру", "uz": "Yo'q: <code>\"10.0.1\"</code> satri raqam bo'yicha uzunroq", "en": "No: the string <code>\"10.0.1\"</code> has a bigger number" },
+            { "ru": "Определить нельзя", "uz": "Aniqlab bo'lmaydi", "en": "Impossible to tell" }
+          ],
+          "a": 0
+        },
+        {
+          "q": {
+            "ru": "Зачем ограничивать частоту не только по логину, но и по IP-адресу?",
+            "uz": "Nega chastotani faqat login bo'yicha emas, IP-manzil bo'yicha ham cheklash kerak?",
+            "en": "Why rate-limit by IP address as well as by login?"
+          },
+          "options": [
+            { "ru": "Чтобы лог был короче", "uz": "Log qisqaroq bo'lishi uchun", "en": "To keep the log shorter" },
+            { "ru": "Иначе один источник переберёт по одному паролю к тысяче разных логинов", "uz": "Aks holda bitta manba mingta turli loginga bittadan parol sinaydi", "en": "Otherwise one source tries one password against a thousand different logins" },
+            { "ru": "IP нужен для хеширования пароля", "uz": "IP parolni xeshlash uchun kerak", "en": "The IP is needed to hash the password" },
+            { "ru": "Так требует протокол HTTPS", "uz": "HTTPS protokoli shuni talab qiladi", "en": "The HTTPS protocol requires it" }
+          ],
+          "a": 1
+        },
+        {
+          "q": {
+            "ru": "Что даёт lock-файл зависимостей?",
+            "uz": "Bog'liqliklarning lock-fayli nima beradi?",
+            "en": "What does a dependency lock file give you?"
+          },
+          "options": [
+            { "ru": "Шифрует список пакетов", "uz": "Paketlar ro'yxatini shifrlaydi", "en": "It encrypts the package list" },
+            { "ru": "Фиксирует точные версии всех зависимостей, включая вложенные", "uz": "Barcha bog'liqliklarning, jumladan ichkilarining aniq versiyalarini qotiradi", "en": "It pins exact versions of every dependency, including transitive ones" },
+            { "ru": "Запрещает устанавливать новые пакеты", "uz": "Yangi paketlar o'rnatishni taqiqlaydi", "en": "It forbids installing new packages" },
+            { "ru": "Ускоряет работу приложения", "uz": "Ilova ishini tezlashtiradi", "en": "It speeds the application up" }
+          ],
+          "a": 1
+        }
+      ],
+      "tasks": [
+        {
+          "id": "t1",
+          "kind": "python",
+          "title": {
+            "ru": "Чистая запись в лог",
+            "uz": "Logga toza yozuv",
+            "en": "A clean log record"
+          },
+          "desc": {
+            "ru": "Напиши функцию <code>sanitize(record, secret_fields)</code>. <code>record</code> — словарь события, <code>secret_fields</code> — множество имён полей, которые нельзя писать в лог. Верни <b>новый</b> словарь с теми же ключами в том же порядке, где значения секретных полей заменены на строку <code>\"***\"</code>. Имя поля сравнивай без учёта регистра: <code>\"API_KEY\"</code> тоже секретное. Исходный словарь менять нельзя.",
+            "uz": "<code>sanitize(record, secret_fields)</code> funksiyasini yozing. <code>record</code> — hodisa lug'ati, <code>secret_fields</code> — logga yozib bo'lmaydigan maydon nomlari to'plami. Xuddi shu kalitlar bilan xuddi shu tartibda <b>yangi</b> lug'at qaytaring, unda sirli maydonlar qiymatlari <code>\"***\"</code> satriga almashtirilgan bo'lsin. Maydon nomini registrni hisobga olmay taqqoslang: <code>\"API_KEY\"</code> ham sirli. Asl lug'atni o'zgartirib bo'lmaydi.",
+            "en": "Write a function <code>sanitize(record, secret_fields)</code>. <code>record</code> is an event dict, <code>secret_fields</code> a set of field names that must not reach the log. Return a <b>new</b> dict with the same keys in the same order, where the values of secret fields are replaced by the string <code>\"***\"</code>. Compare field names case-insensitively: <code>\"API_KEY\"</code> is secret too. The original dict must not be modified."
+          },
+          "starter": "def sanitize(record, secret_fields):\n    # верни новый словарь: секретные значения заменены на \"***\"\n    ...\n",
+          "tests": "SECRET = {\"password\", \"token\", \"api_key\", \"card\"}\nevent = {\"user\": \"aziz\", \"password\": \"12345\", \"token\": \"abc\", \"result\": \"ok\"}\nout = sanitize(event, SECRET)\nassert out == {\"user\": \"aziz\", \"password\": \"***\", \"token\": \"***\", \"result\": \"ok\"}\nassert list(out) == [\"user\", \"password\", \"token\", \"result\"]\nassert event[\"password\"] == \"12345\"\nassert sanitize({}, SECRET) == {}\nassert sanitize({\"API_KEY\": \"x\"}, SECRET) == {\"API_KEY\": \"***\"}\nassert sanitize({\"user_id\": 7}, SECRET) == {\"user_id\": 7}\nassert sanitize({\"card\": 4111}, SECRET) == {\"card\": \"***\"}\n",
+          "hint": {
+            "ru": "Словарное включение делает всё в одну строку: <code>{k: (\"***\" if k.lower() in secret_fields else v) for k, v in record.items()}</code>. Оно же само создаёт новый словарь и сохраняет порядок ключей.",
+            "uz": "Lug'at ichkilashi hammasini bir qatorda bajaradi: <code>{k: (\"***\" if k.lower() in secret_fields else v) for k, v in record.items()}</code>. U o'zi yangi lug'at yaratadi va kalitlar tartibini saqlaydi.",
+            "en": "A dict comprehension does it in one line: <code>{k: (\"***\" if k.lower() in secret_fields else v) for k, v in record.items()}</code>. It creates a new dict by itself and preserves key order."
+          }
+        }
+      ]
+    }
   }
  ]
 }

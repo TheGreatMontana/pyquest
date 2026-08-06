@@ -1285,4 +1285,36 @@ print(decide(100, 1000, 130, 1000, 500, 1.0))""",
 
 e = [{'group': 'A', 'ordered': True}, {'group': 'B', 'ordered': False}]
 print(report(e, 1, 1.0))""",
+
+    'security-intro/se-03/t1': """def mask_secret(value, keep=2):
+    if keep <= 0 or len(value) <= keep * 2:
+        return '*' * len(value)
+    return value[:keep] + '*' * (len(value) - keep * 2) + value[-keep:]
+""",
+
+    'security-intro/se-03/t2': """def risky_packages(installed, fixed):
+    def to_tuple(version):
+        return tuple(int(part) for part in version.split('.'))
+
+    names = []
+    for name, version in installed.items():
+        if name not in fixed:
+            continue
+        if to_tuple(version) < to_tuple(fixed[name]):
+            names.append(name)
+    return sorted(names)
+""",
+
+    'security-intro/se-03/t3': """def allow_request(log, user, now, limit, window):
+    marks = [t for t in log.get(user, []) if now - t < window]
+    log[user] = marks
+    if len(marks) < limit:
+        marks.append(now)
+        return True
+    return False
+""",
+
+    'security-intro/se-03/exam0': """def sanitize(record, secret_fields):
+    return {k: ('***' if k.lower() in secret_fields else v) for k, v in record.items()}
+""",
 }

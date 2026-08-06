@@ -651,13 +651,13 @@
    "color": "#f87171",
    "level": "beginner",
    "status": "starter",
-   "estimatedHours": 12,
+   "estimatedHours": 18,
    "requires": [],
    "grants": [
     "security-basics"
    ],
    "legacyIds": [],
-   "moduleCount": 2
+   "moduleCount": 3
   },
   {
    "id": "de-tools",
