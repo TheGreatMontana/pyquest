@@ -947,7 +947,7 @@
    "color": "#c084fc",
    "level": "intermediate",
    "status": "full",
-   "estimatedHours": 16,
+   "estimatedHours": 22,
    "requires": [
     "ml-basics"
    ],
@@ -955,7 +955,7 @@
     "dl-basics"
    ],
    "legacyIds": [],
-   "moduleCount": 2,
+   "moduleCount": 3,
    "runner": "python"
   },
   {

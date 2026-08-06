@@ -644,6 +644,489 @@
      }
     ]
    }
+  },
+  {
+    "id": "dl-03",
+    "title": {
+      "ru": "Нелинейность, активации и обратное распространение",
+      "uz": "Chiziqsizlik, aktivatsiyalar va teskari tarqalish",
+      "en": "Non-linearity, activations and backpropagation"
+    },
+    "tagline": {
+      "ru": "Почему без активации сеть остаётся одной прямой и как ошибка возвращается назад по слоям",
+      "uz": "Nega aktivatsiyasiz tarmoq bitta to'g'ri chiziqligicha qoladi va xato qatlamlar bo'ylab qanday orqaga qaytadi",
+      "en": "Why a network without activations stays a single straight line, and how the error travels back through the layers"
+    },
+    "lessons": [
+      {
+        "id": "l1",
+        "title": {
+          "ru": "Зачем сети нелинейность",
+          "uz": "Tarmoqqa chiziqsizlik nega kerak",
+          "en": "Why a network needs non-linearity"
+        },
+        "blocks": [
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>В dl-01 мы собрали слой, в dl-02 научили веса подстраиваться. Осталось объяснить деталь, без которой всё это не работает: <b>функцию активации</b>.</p><p>Слой без активации — это <code>w · x + b</code>, то есть прямая. Поставь два таких слоя подряд, и получится… снова прямая. Композиция двух линейных функций линейна: сколько слоёв ни ставь, вся сеть схлопывается в одно умножение и одно сложение.</p>",
+              "uz": "<p>dl-01 da biz qatlam yig'dik, dl-02 da vaznlarni moslashishga o'rgatdik. Bularsiz hech nima ishlamaydigan bitta tafsilot qoldi: <b>aktivatsiya funksiyasi</b>.</p><p>Aktivatsiyasiz qatlam — bu <code>w · x + b</code>, ya'ni to'g'ri chiziq. Ketma-ket ikkita shunday qatlam qo'ying va yana… to'g'ri chiziq chiqadi. Ikki chiziqli funksiyaning kompozitsiyasi chiziqli: nechta qatlam qo'ymang, butun tarmoq bitta ko'paytirish va bitta qo'shishga siqiladi.</p>",
+              "en": "<p>In dl-01 we assembled a layer, in dl-02 we taught the weights to adjust. One detail is left, and without it none of that works: the <b>activation function</b>.</p><p>A layer without an activation is <code>w · x + b</code> — a straight line. Stack two such layers and you get… a straight line again. The composition of two linear functions is linear: however many layers you stack, the whole network collapses into one multiplication and one addition.</p>"
+            }
+          },
+          {
+            "type": "run",
+            "code": "def layer(x, w, b):\n    return w * x + b\n\nx = 3.0\n\n# два линейных слоя подряд\nh = layer(x, 2.0, 1.0)\nout = layer(h, -0.5, 4.0)\nprint(\"два слоя подряд:\", out)\n\n# ровно та же функция, записанная одним слоем\nw_total = 2.0 * -0.5\nb_total = 1.0 * -0.5 + 4.0\nprint(\"один слой:      \", layer(x, w_total, b_total))\nprint(\"эквивалентные веса:\", w_total, b_total)"
+          },
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>Раз глубина без активации ничего не добавляет, посмотрим, чего прямая не умеет в принципе. Классический пример — <b>XOR</b>: «ровно один из двух входов равен единице».</p><table><tr><th>x₁</th><th>x₂</th><th>XOR</th></tr><tr><td>0</td><td>0</td><td>0</td></tr><tr><td>0</td><td>1</td><td>1</td></tr><tr><td>1</td><td>0</td><td>1</td></tr><tr><td>1</td><td>1</td><td>0</td></tr></table><p>Единицы стоят по одной диагонали, нули — по другой. Одной прямой такие точки не разделить: как ни клади линию, хотя бы одна точка окажется не на своей стороне. Проверим перебором нескольких вариантов весов.</p>",
+              "uz": "<p>Aktivatsiyasiz chuqurlik hech nima qo'shmasa, endi to'g'ri chiziq umuman nima qila olmasligiga qaraymiz. Klassik misol — <b>XOR</b>: «ikki kirishdan aynan bittasi birga teng».</p><table><tr><th>x₁</th><th>x₂</th><th>XOR</th></tr><tr><td>0</td><td>0</td><td>0</td></tr><tr><td>0</td><td>1</td><td>1</td></tr><tr><td>1</td><td>0</td><td>1</td></tr><tr><td>1</td><td>1</td><td>0</td></tr></table><p>Birlar bitta diagonalda, nollar boshqasida turibdi. Bunday nuqtalarni bitta to'g'ri chiziq bilan ajratib bo'lmaydi: chiziqni qanday qo'ymang, kamida bitta nuqta o'z tomonida bo'lmaydi. Bir nechta vazn variantini saralab tekshiramiz.</p>",
+              "en": "<p>Since depth without activation adds nothing, let's look at what a straight line simply cannot do. The classic example is <b>XOR</b>: \"exactly one of the two inputs is one\".</p><table><tr><th>x₁</th><th>x₂</th><th>XOR</th></tr><tr><td>0</td><td>0</td><td>0</td></tr><tr><td>0</td><td>1</td><td>1</td></tr><tr><td>1</td><td>0</td><td>1</td></tr><tr><td>1</td><td>1</td><td>0</td></tr></table><p>The ones sit on one diagonal, the zeros on the other. No single line separates such points: place the line however you like and at least one point ends up on the wrong side. Let's check by trying a few sets of weights.</p>"
+            }
+          },
+          {
+            "type": "run",
+            "code": "def linear(x1, x2, w1, w2, bias):\n    return w1 * x1 + w2 * x2 + bias\n\ntable = [(0, 0, 0), (0, 1, 1), (1, 0, 1), (1, 1, 0)]   # x1, x2, XOR\n\nfor w1, w2, bias in [(1, 1, -0.5), (1, -1, 0.5), (-1, -1, 1.5)]:\n    answers = [1 if linear(x1, x2, w1, w2, bias) > 0 else 0 for x1, x2, _ in table]\n    hits = sum(1 for (_, _, y), a in zip(table, answers) if a == y)\n    print(\"веса\", (w1, w2, bias), \"-> ответы\", answers, \"| угадано\", hits, \"из 4\")"
+          },
+          {
+            "type": "checkpoint",
+            "q": {
+              "ru": "Сеть из десяти слоёв, ни одной функции активации. Что она умеет?",
+              "uz": "O'nta qatlamli tarmoq, birorta ham aktivatsiya funksiyasi yo'q. U nima qila oladi?",
+              "en": "A ten-layer network with no activation functions at all. What can it do?"
+            },
+            "options": [
+              { "ru": "Всё то же, что один линейный слой", "uz": "Bitta chiziqli qatlam qila oladigan hamma narsani", "en": "Exactly what a single linear layer can do" },
+              { "ru": "В десять раз больше, чем один слой", "uz": "Bitta qatlamdan o'n barobar ko'p", "en": "Ten times more than one layer" },
+              { "ru": "Решать XOR, если слоёв достаточно", "uz": "Qatlam yetarli bo'lsa, XOR ni yechishi mumkin", "en": "Solve XOR, given enough layers" },
+              { "ru": "Ничего, такая сеть не запустится", "uz": "Hech nima, bunday tarmoq ishga tushmaydi", "en": "Nothing, such a network won't even run" }
+            ],
+            "a": 0,
+            "explain": {
+              "ru": "Композиция линейных функций линейна на любой глубине: десять слоёв сворачиваются в одну пару «вес и сдвиг». Глубина начинает что-то значить только тогда, когда между слоями стоит нелинейность.",
+              "uz": "Chiziqli funksiyalar kompozitsiyasi istalgan chuqurlikda chiziqli: o'nta qatlam bitta «vazn va siljish» juftligiga siqiladi. Chuqurlik faqat qatlamlar orasida chiziqsizlik turgandagina ma'no kasb etadi.",
+              "en": "A composition of linear functions is linear at any depth: ten layers collapse into a single weight-and-shift pair. Depth starts to mean something only when a non-linearity sits between the layers."
+            }
+          }
+        ]
+      },
+      {
+        "id": "l2",
+        "title": {
+          "ru": "Функции активации: step, sigmoid, tanh, ReLU",
+          "uz": "Aktivatsiya funksiyalari: step, sigmoid, tanh, ReLU",
+          "en": "Activation functions: step, sigmoid, tanh, ReLU"
+        },
+        "blocks": [
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>Активация — это функция, которую применяют к выходу нейрона перед тем, как передать его дальше. Ей достаточно быть <b>нелинейной</b>, и вся сеть перестаёт быть прямой.</p><ul><li><b>step</b> — ступенька: <code>1</code>, если вход неотрицателен, иначе <code>0</code>. Исторически первая, но у неё нулевая производная везде, кроме одной точки, поэтому градиентный спуск с ней не работает.</li><li><b>sigmoid</b> — <code>1 / (1 + e⁻ˣ)</code>, плавно сжимает любое число в диапазон от 0 до 1. Удобна на выходе, когда нужен «шанс».</li><li><b>tanh</b> — то же самое, но диапазон от −1 до 1 и центр в нуле.</li><li><b>ReLU</b> — <code>max(0, x)</code>. Отрицательное обнуляет, положительное пропускает как есть. Дешёвая и почти всегда стоит по умолчанию в скрытых слоях.</li></ul>",
+              "uz": "<p>Aktivatsiya — bu neyron chiqishiga uni keyingi qatlamga uzatishdan oldin qo'llanadigan funksiya. Uning <b>chiziqsiz</b> bo'lishi yetarli va butun tarmoq to'g'ri chiziq bo'lishdan to'xtaydi.</p><ul><li><b>step</b> — zinapoya: kirish manfiy bo'lmasa <code>1</code>, aks holda <code>0</code>. Tarixan birinchisi, lekin uning hosilasi bitta nuqtadan boshqa hamma joyda nol, shuning uchun u bilan gradient tushishi ishlamaydi.</li><li><b>sigmoid</b> — <code>1 / (1 + e⁻ˣ)</code>, har qanday sonni 0 dan 1 gacha oraliqqa silliq siqadi. «Ehtimol» kerak bo'lganda chiqishda qulay.</li><li><b>tanh</b> — xuddi shu, lekin oraliq −1 dan 1 gacha va markazi nolda.</li><li><b>ReLU</b> — <code>max(0, x)</code>. Manfiyni nolga aylantiradi, musbatni o'z holicha o'tkazadi. Arzon va yashirin qatlamlarda deyarli har doim standart.</li></ul>",
+              "en": "<p>An activation is a function applied to a neuron's output before passing it on. It only has to be <b>non-linear</b>, and the whole network stops being a straight line.</p><ul><li><b>step</b> — a staircase: <code>1</code> if the input is non-negative, otherwise <code>0</code>. Historically the first one, but its derivative is zero everywhere except a single point, so gradient descent cannot work with it.</li><li><b>sigmoid</b> — <code>1 / (1 + e⁻ˣ)</code>, smoothly squeezes any number into the range 0 to 1. Handy at the output when you need a \"chance\".</li><li><b>tanh</b> — the same, but ranging from −1 to 1 and centred at zero.</li><li><b>ReLU</b> — <code>max(0, x)</code>. Zeroes out negatives, passes positives through unchanged. Cheap, and almost always the default in hidden layers.</li></ul>"
+            }
+          },
+          {
+            "type": "run",
+            "code": "import math\n\ndef step(x):\n    return 1.0 if x >= 0 else 0.0\n\ndef sigmoid(x):\n    return 1 / (1 + math.exp(-x))\n\ndef relu(x):\n    return max(0.0, x)\n\nprint(f\"{'x':>6} {'step':>6} {'sigmoid':>9} {'tanh':>8} {'relu':>6}\")\nfor x in [-3.0, -1.0, 0.0, 1.0, 3.0]:\n    print(f\"{x:>6} {step(x):>6} {sigmoid(x):>9.3f} {math.tanh(x):>8.3f} {relu(x):>6}\")"
+          },
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>Почему ReLU вытеснила сигмоиду в скрытых слоях? Из-за производной. Обучение двигает веса на величину, пропорциональную производной активации. У сигмоиды производная равна <code>s · (1 − s)</code> и максимальна в нуле — всего <code>0.25</code>. А при входе <code>8</code> сигмоида почти упёрлась в единицу, и производная становится микроскопической.</p><p>Теперь представь десять слоёв подряд: градиент умножается на такое число десять раз и превращается в ноль. Первые слои перестают учиться вовсе. Это и называют <b>затухающим градиентом</b>.</p><p>У ReLU на положительной стороне производная ровно <code>1</code> — градиент проходит насквозь без потерь. Цена — на отрицательной стороне производная <code>0</code>: нейрон, который всегда выдаёт отрицательное значение, замолкает навсегда. Такие называют «мёртвыми», и лечат их вариантами вроде Leaky ReLU, где отрицательная часть не ноль, а <code>0.01 · x</code>.</p>",
+              "uz": "<p>Nega ReLU yashirin qatlamlarda sigmoidni siqib chiqardi? Hosila tufayli. O'qitish vaznlarni aktivatsiya hosilasiga proporsional miqdorga suradi. Sigmoidning hosilasi <code>s · (1 − s)</code> ga teng va nolda maksimal — atigi <code>0.25</code>. Kirish <code>8</code> bo'lganda esa sigmoid deyarli birga yetgan va hosila juda mayda bo'lib qoladi.</p><p>Endi ketma-ket o'nta qatlamni tasavvur qiling: gradient shunday songa o'n marta ko'paytiriladi va nolga aylanadi. Birinchi qatlamlar umuman o'qishdan to'xtaydi. Buni <b>so'nuvchi gradient</b> deyishadi.</p><p>ReLU da musbat tomonda hosila aynan <code>1</code> — gradient yo'qotishsiz o'tadi. Narxi — manfiy tomonda hosila <code>0</code>: doim manfiy qiymat beradigan neyron abadiy jim bo'ladi. Ularni «o'lik» deyishadi va manfiy qismi nol emas, <code>0.01 · x</code> bo'lgan Leaky ReLU kabi variantlar bilan davolashadi.</p>",
+              "en": "<p>Why did ReLU push sigmoid out of hidden layers? Because of the derivative. Training moves weights by an amount proportional to the activation's derivative. Sigmoid's derivative is <code>s · (1 − s)</code> and peaks at zero — a mere <code>0.25</code>. At an input of <code>8</code> the sigmoid has nearly hit one, and the derivative becomes microscopic.</p><p>Now picture ten layers in a row: the gradient gets multiplied by such a number ten times and turns into zero. The early layers stop learning entirely. This is the <b>vanishing gradient</b>.</p><p>On its positive side ReLU has a derivative of exactly <code>1</code> — the gradient passes straight through without loss. The price: on the negative side the derivative is <code>0</code>, so a neuron that always outputs a negative value goes silent forever. Those are called \"dead\", and the cure is variants like Leaky ReLU, where the negative part is <code>0.01 · x</code> instead of zero.</p>"
+            }
+          },
+          {
+            "type": "predict",
+            "lang": "python",
+            "code": "import math\n\ndef sigmoid(x):\n    return 1 / (1 + math.exp(-x))\n\n# производная сигмоиды равна s * (1 - s)\ns = sigmoid(8)\nprint(round(s * (1 - s), 5))",
+            "options": [
+              { "ru": "0.25", "uz": "0.25", "en": "0.25" },
+              { "ru": "0.00034", "uz": "0.00034", "en": "0.00034" },
+              { "ru": "0.5", "uz": "0.5", "en": "0.5" },
+              { "ru": "1.0", "uz": "1.0", "en": "1.0" }
+            ],
+            "a": 1,
+            "explain": {
+              "ru": "<code>sigmoid(8) ≈ 0.99966</code>, значит <code>s · (1 − s) ≈ 0.99966 · 0.00034 ≈ 0.00034</code>. Максимум <code>0.25</code> сигмоида даёт только в нуле; чем дальше от нуля, тем ближе производная к нулю — и тем меньше сдвинутся веса на этом шаге.",
+              "uz": "<code>sigmoid(8) ≈ 0.99966</code>, demak <code>s · (1 − s) ≈ 0.99966 · 0.00034 ≈ 0.00034</code>. Sigmoid <code>0.25</code> maksimumni faqat nolda beradi; noldan qanchalik uzoq bo'lsa, hosila shunchalik nolga yaqin — va bu qadamda vaznlar shunchalik kam suriladi.",
+              "en": "<code>sigmoid(8) ≈ 0.99966</code>, so <code>s · (1 − s) ≈ 0.99966 · 0.00034 ≈ 0.00034</code>. Sigmoid reaches its <code>0.25</code> maximum only at zero; the further from zero, the closer the derivative is to zero — and the less the weights move on this step."
+            }
+          },
+          {
+            "type": "note",
+            "kind": "trap",
+            "html": {
+              "ru": "Ступенчатая функция кажется самой логичной активацией — «сработал / не сработал». Но её производная равна нулю везде, кроме точки разрыва. Градиентный спуск умножает поправку на производную, значит с такой активацией <b>ни один вес никогда не сдвинется</b>. Именно поэтому сети учат с гладкими функциями, а ступеньку оставляют для объяснений на доске.",
+              "uz": "Zinapoyasimon funksiya eng mantiqiy aktivatsiyaday tuyuladi — «ishladi / ishlamadi». Lekin uning hosilasi uzilish nuqtasidan boshqa hamma joyda nol. Gradient tushishi tuzatishni hosilaga ko'paytiradi, demak bunday aktivatsiya bilan <b>birorta vazn hech qachon surilmaydi</b>. Aynan shuning uchun tarmoqlar silliq funksiyalar bilan o'qitiladi, zinapoya esa doskadagi tushuntirishlar uchun qoldiriladi.",
+              "en": "A step function looks like the most logical activation — \"fired / didn't fire\". But its derivative is zero everywhere except the point of discontinuity. Gradient descent multiplies the correction by the derivative, so with such an activation <b>no weight will ever move</b>. That is exactly why networks are trained with smooth functions, and the step is kept for whiteboard explanations."
+            }
+          }
+        ]
+      },
+      {
+        "id": "l3",
+        "title": {
+          "ru": "Обратное распространение ошибки",
+          "uz": "Xatoning teskari tarqalishi",
+          "en": "Backpropagation of the error"
+        },
+        "blocks": [
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>В dl-02 мы двигали один вес и считали производную численно — подставляли <code>w + ε</code> и смотрели, как изменилась ошибка. Для одного веса это нормально. Для миллиона — нет: каждый вес потребовал бы отдельного прогона всей сети.</p><p><b>Обратное распространение</b> (backpropagation) считает производные по всем весам сразу, за один проход назад. В основе — школьное цепное правило: если <code>out</code> зависит от <code>h</code>, а <code>h</code> зависит от <code>w</code>, то влияние <code>w</code> на <code>out</code> есть произведение двух влияний.</p><p>Разберём на цепочке из двух весов. Прямой проход: <code>h = w₁ · x</code>, затем <code>out = w₂ · h</code>. Ошибка — <code>(out − y)²</code>. Обратный проход даёт:</p><pre><code>∂ошибка/∂w₂ = 2 · (out − y) · h\n∂ошибка/∂w₁ = 2 · (out − y) · w₂ · x</code></pre><p>Смотри на структуру: множитель <code>2 · (out − y)</code> общий, он посчитан один раз у выхода и передан назад. Каждый следующий слой лишь домножает его на своё локальное влияние. Отсюда и название — ошибка идёт назад.</p>",
+              "uz": "<p>dl-02 da biz bitta vaznni surib, hosilani sonli hisobladik — <code>w + ε</code> ni qo'yib, xato qanday o'zgarganiga qaradik. Bitta vazn uchun bu normal. Million uchun — yo'q: har bir vazn butun tarmoqning alohida o'tishini talab qilardi.</p><p><b>Teskari tarqalish</b> (backpropagation) barcha vaznlar bo'yicha hosilalarni birdaniga, bitta orqaga o'tishda hisoblaydi. Asosida maktab zanjir qoidasi: agar <code>out</code> <code>h</code> ga, <code>h</code> esa <code>w</code> ga bog'liq bo'lsa, <code>w</code> ning <code>out</code> ga ta'siri ikki ta'sirning ko'paytmasidir.</p><p>Ikki vaznli zanjirda ko'rib chiqamiz. To'g'ri o'tish: <code>h = w₁ · x</code>, so'ng <code>out = w₂ · h</code>. Xato — <code>(out − y)²</code>. Teskari o'tish beradi:</p><pre><code>∂xato/∂w₂ = 2 · (out − y) · h\n∂xato/∂w₁ = 2 · (out − y) · w₂ · x</code></pre><p>Tuzilishga qarang: <code>2 · (out − y)</code> ko'paytuvchisi umumiy, u chiqishda bir marta hisoblanib, orqaga uzatiladi. Har bir keyingi qatlam uni faqat o'zining lokal ta'siriga ko'paytiradi. Nomi ham shundan — xato orqaga ketadi.</p>",
+              "en": "<p>In dl-02 we moved a single weight and computed the derivative numerically — plugging in <code>w + ε</code> and watching how the error changed. For one weight that's fine. For a million it isn't: each weight would need its own full pass through the network.</p><p><b>Backpropagation</b> computes the derivatives with respect to every weight at once, in a single backward pass. It rests on the school chain rule: if <code>out</code> depends on <code>h</code> and <code>h</code> depends on <code>w</code>, then the influence of <code>w</code> on <code>out</code> is the product of the two influences.</p><p>Let's work through a chain of two weights. Forward pass: <code>h = w₁ · x</code>, then <code>out = w₂ · h</code>. The error is <code>(out − y)²</code>. The backward pass gives:</p><pre><code>∂error/∂w₂ = 2 · (out − y) · h\n∂error/∂w₁ = 2 · (out − y) · w₂ · x</code></pre><p>Look at the structure: the factor <code>2 · (out − y)</code> is shared — computed once at the output and handed backwards. Each subsequent layer merely multiplies it by its own local influence. Hence the name — the error travels back.</p>"
+            }
+          },
+          {
+            "type": "run",
+            "code": "x, y = 2.0, 6.0        # один пример: вход 2, правильный ответ 6\nw1, w2 = 0.5, 1.5      # начальные веса\nlr = 0.01\n\nfor step_no in range(1, 7):\n    h = w1 * x                    # прямой проход: скрытое значение\n    out = w2 * h                  # выход сети\n    err = out - y                 # насколько промахнулись\n\n    grad_w2 = 2 * err * h         # цепное правило: до второго веса\n    grad_w1 = 2 * err * w2 * x    # и дальше назад, до первого\n\n    w1 -= lr * grad_w1            # оба веса двигаем от старых значений\n    w2 -= lr * grad_w2\n\n    print(\"шаг\", step_no,\n          \"| out =\", round(out, 3),\n          \"| ошибка =\", round(err ** 2, 3),\n          \"| w1 =\", round(w1, 3),\n          \"| w2 =\", round(w2, 3))"
+          },
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>Один такой проход — это <b>один шаг</b>. Полный проход по всем обучающим примерам называется <b>эпохой</b>, и обучение состоит из десятков или сотен эпох.</p><p>Обрати внимание на порядок в коде: оба градиента посчитаны от <b>старых</b> весов, и только потом оба веса обновляются. Если обновить <code>w₂</code> раньше, чем посчитан градиент для <code>w₁</code>, второй градиент окажется взят от смеси старого и нового состояния — сеть будет учиться, но неправильно и нестабильно.</p><p>На практике веса обновляют не после каждого примера, а после <b>батча</b> — пачки из 32, 64 или 128 примеров: градиенты по ним усредняют. Так шаг получается менее шумным, а видеокарта считает пачку почти за то же время, что один пример.</p>",
+              "uz": "<p>Bunday bitta o'tish — bu <b>bitta qadam</b>. Barcha o'qitish misollari bo'yicha to'liq o'tish <b>epoxa</b> deyiladi va o'qitish o'nlab yoki yuzlab epoxalardan iborat.</p><p>Koddagi tartibga e'tibor bering: ikkala gradient ham <b>eski</b> vaznlardan hisoblangan va faqat keyin ikkala vazn yangilanadi. Agar <code>w₂</code> ni <code>w₁</code> uchun gradient hisoblanmasdan oldin yangilasangiz, ikkinchi gradient eski va yangi holat aralashmasidan olinadi — tarmoq o'qiydi, lekin noto'g'ri va beqaror.</p><p>Amalda vaznlar har bir misoldan keyin emas, <b>batch</b> dan — 32, 64 yoki 128 misoldan iborat to'plamdan keyin yangilanadi: ular bo'yicha gradientlar o'rtachalanadi. Shunda qadam kamroq shovqinli bo'ladi, videokarta esa to'plamni deyarli bitta misol vaqtida hisoblaydi.</p>",
+              "en": "<p>One such pass is <b>one step</b>. A full pass over all training examples is called an <b>epoch</b>, and training consists of tens or hundreds of epochs.</p><p>Note the order in the code: both gradients are computed from the <b>old</b> weights, and only then are both weights updated. If you update <code>w₂</code> before the gradient for <code>w₁</code> is computed, that second gradient is taken from a mixture of old and new state — the network will still learn, but incorrectly and unstably.</p><p>In practice weights are updated not after every example but after a <b>batch</b> — a bundle of 32, 64 or 128 examples whose gradients get averaged. That makes the step less noisy, and a GPU computes the whole bundle in nearly the time of a single example.</p>"
+            }
+          },
+          {
+            "type": "note",
+            "kind": "trap",
+            "html": {
+              "ru": "Обратное распространение — это <b>не</b> метод обучения, а всего лишь способ быстро посчитать производные. Шаг делает градиентный спуск из dl-02. Их часто путают: «сеть обучается методом обратного распространения» — привычная, но неточная фраза. Backprop считает, куда наклон; спуск решает, насколько шагнуть.",
+              "uz": "Teskari tarqalish — bu o'qitish usuli <b>emas</b>, faqat hosilalarni tez hisoblash yo'li. Qadamni dl-02 dagi gradient tushishi qiladi. Ularni ko'pincha adashtirishadi: «tarmoq teskari tarqalish usuli bilan o'qiydi» — odatiy, lekin noaniq ibora. Backprop qiyalik qayerda ekanini hisoblaydi; tushish qancha qadam tashlashni hal qiladi.",
+              "en": "Backpropagation is <b>not</b> a training method — it is merely a fast way to compute derivatives. The step itself is taken by gradient descent from dl-02. The two get confused often: \"the network is trained by backpropagation\" is a familiar but inaccurate phrase. Backprop computes which way the slope goes; descent decides how far to step."
+            }
+          },
+          {
+            "type": "summary",
+            "items": [
+              { "ru": "Без активации любая глубина сворачивается в один линейный слой", "uz": "Aktivatsiyasiz istalgan chuqurlik bitta chiziqli qatlamga siqiladi", "en": "Without an activation any depth collapses into one linear layer" },
+              { "ru": "XOR — пример задачи, которую одна прямая не решает никогда", "uz": "XOR — bitta to'g'ri chiziq hech qachon yecha olmaydigan masala misoli", "en": "XOR is an example of a task a single line can never solve" },
+              { "ru": "ReLU держит градиент на положительной стороне, сигмоида его гасит", "uz": "ReLU gradientni musbat tomonda saqlaydi, sigmoid uni so'ndiradi", "en": "ReLU keeps the gradient alive on the positive side; sigmoid damps it" },
+              { "ru": "Затухающий градиент — причина, по которой глубокие сети со сигмоидой не учились", "uz": "So'nuvchi gradient — sigmoidli chuqur tarmoqlar o'qimaganining sababi", "en": "The vanishing gradient is why deep sigmoid networks refused to learn" },
+              { "ru": "Backprop — это цепное правило: общий множитель ошибки идёт назад по слоям", "uz": "Backprop — bu zanjir qoidasi: xatoning umumiy ko'paytuvchisi qatlamlar bo'ylab orqaga ketadi", "en": "Backprop is the chain rule: the shared error factor travels back through the layers" },
+              { "ru": "Все градиенты считают от старых весов, обновляют — после", "uz": "Barcha gradientlar eski vaznlardan hisoblanadi, yangilash — keyin", "en": "All gradients are computed from the old weights; the update comes after" }
+            ]
+          }
+        ]
+      }
+    ],
+    "quiz": [
+      {
+        "q": {
+          "ru": "Два линейных слоя без активации подряд эквивалентны...",
+          "uz": "Aktivatsiyasiz ketma-ket ikki chiziqli qatlam nimaga ekvivalent?",
+          "en": "Two linear layers in a row without an activation are equivalent to..."
+        },
+        "options": [
+          { "ru": "Одному линейному слою", "uz": "Bitta chiziqli qatlamga", "en": "One linear layer" },
+          { "ru": "Двум разным моделям", "uz": "Ikki xil modelga", "en": "Two different models" },
+          { "ru": "Дереву решений", "uz": "Qaror daraxtiga", "en": "A decision tree" },
+          { "ru": "Сети с активацией ReLU", "uz": "ReLU aktivatsiyali tarmoqqa", "en": "A network with ReLU activation" }
+        ],
+        "a": 0,
+        "explain": {
+          "ru": "<code>w₂ · (w₁ · x + b₁) + b₂</code> раскрывается в <code>(w₂ · w₁) · x + (w₂ · b₁ + b₂)</code> — снова вес и сдвиг. Глубина без нелинейности бесплатна и бесполезна.",
+          "uz": "<code>w₂ · (w₁ · x + b₁) + b₂</code> <code>(w₂ · w₁) · x + (w₂ · b₁ + b₂)</code> ga ochiladi — yana vazn va siljish. Chiziqsizliksiz chuqurlik bepul va foydasiz.",
+          "en": "<code>w₂ · (w₁ · x + b₁) + b₂</code> expands to <code>(w₂ · w₁) · x + (w₂ · b₁ + b₂)</code> — a weight and a shift again. Depth without non-linearity is free and useless."
+        }
+      },
+      {
+        "q": {
+          "ru": "Почему ступенчатую функцию не используют как активацию в обучаемых сетях?",
+          "uz": "Nega zinapoyasimon funksiya o'qitiladigan tarmoqlarda aktivatsiya sifatida ishlatilmaydi?",
+          "en": "Why isn't a step function used as an activation in trainable networks?"
+        },
+        "options": [
+          { "ru": "Она слишком медленно считается", "uz": "U juda sekin hisoblanadi", "en": "It is too slow to compute" },
+          { "ru": "Её производная равна нулю, и веса не сдвигаются", "uz": "Uning hosilasi nolga teng va vaznlar surilmaydi", "en": "Its derivative is zero, so the weights never move" },
+          { "ru": "Она линейна", "uz": "U chiziqli", "en": "It is linear" },
+          { "ru": "Она даёт отрицательные значения", "uz": "U manfiy qiymatlar beradi", "en": "It produces negative values" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Градиентный спуск двигает вес пропорционально производной. У ступеньки она нулевая везде, кроме точки разрыва, — сеть просто не получает сигнала, в какую сторону меняться.",
+          "uz": "Gradient tushishi vaznni hosilaga proporsional suradi. Zinapoyada u uzilish nuqtasidan boshqa hamma joyda nol — tarmoq qaysi tomonga o'zgarish haqida signal olmaydi.",
+          "en": "Gradient descent moves a weight in proportion to the derivative. For a step it is zero everywhere except the break point — the network simply gets no signal about which way to change."
+        }
+      },
+      {
+        "q": {
+          "ru": "Чему равна производная ReLU при <code>x = 5</code>?",
+          "uz": "<code>x = 5</code> da ReLU hosilasi nechaga teng?",
+          "en": "What is the derivative of ReLU at <code>x = 5</code>?"
+        },
+        "options": [
+          { "ru": "0", "uz": "0", "en": "0" },
+          { "ru": "1", "uz": "1", "en": "1" },
+          { "ru": "5", "uz": "5", "en": "5" },
+          { "ru": "0.25", "uz": "0.25", "en": "0.25" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "На положительной стороне <code>ReLU(x) = x</code>, значит производная равна <code>1</code> — градиент проходит без ослабления. На отрицательной стороне функция равна нулю, и производная тоже ноль.",
+          "uz": "Musbat tomonda <code>ReLU(x) = x</code>, demak hosila <code>1</code> ga teng — gradient susaymasdan o'tadi. Manfiy tomonda funksiya nolga teng va hosila ham nol.",
+          "en": "On the positive side <code>ReLU(x) = x</code>, so the derivative is <code>1</code> — the gradient passes through undiminished. On the negative side the function is zero, and so is the derivative."
+        }
+      },
+      {
+        "q": {
+          "ru": "Что такое затухающий градиент?",
+          "uz": "So'nuvchi gradient nima?",
+          "en": "What is the vanishing gradient?"
+        },
+        "options": [
+          { "ru": "Ошибка растёт с каждой эпохой", "uz": "Xato har epoxada o'sib boradi", "en": "The error grows with every epoch" },
+          { "ru": "Градиент, умножаясь на маленькие производные в каждом слое, доходит до первых слоёв почти нулевым", "uz": "Har qatlamda kichik hosilalarga ko'payib, gradient birinchi qatlamlarga deyarli nol bo'lib yetadi", "en": "Multiplied by small derivatives in every layer, the gradient reaches the first layers as almost zero" },
+          { "ru": "Слишком большая скорость обучения", "uz": "Juda katta o'qitish tezligi", "en": "Too large a learning rate" },
+          { "ru": "Переобучение на маленькой выборке", "uz": "Kichik tanlanmada qayta o'qitish", "en": "Overfitting on a small sample" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Производная сигмоиды не больше <code>0.25</code>, а вдали от нуля — тысячные доли. Десять слоёв перемножат такие числа, и до начала сети сигнал не дойдёт: ранние слои останутся необученными.",
+          "uz": "Sigmoid hosilasi <code>0.25</code> dan katta emas, noldan uzoqda esa mingdan bir ulushlar. O'nta qatlam bunday sonlarni ko'paytiradi va tarmoq boshiga signal yetmaydi: dastlabki qatlamlar o'qimay qoladi.",
+          "en": "Sigmoid's derivative never exceeds <code>0.25</code>, and far from zero it's thousandths. Ten layers multiply such numbers together and the signal never reaches the front of the network: the early layers stay untrained."
+        }
+      },
+      {
+        "q": {
+          "ru": "Что делает обратное распространение?",
+          "uz": "Teskari tarqalish nima qiladi?",
+          "en": "What does backpropagation do?"
+        },
+        "options": [
+          { "ru": "Обновляет веса по правилу градиентного спуска", "uz": "Vaznlarni gradient tushishi qoidasi bo'yicha yangilaydi", "en": "Updates the weights by the gradient descent rule" },
+          { "ru": "Быстро считает производные ошибки по всем весам за один проход назад", "uz": "Xatoning barcha vaznlar bo'yicha hosilalarini bitta orqaga o'tishda tez hisoblaydi", "en": "Quickly computes the error's derivatives for all weights in one backward pass" },
+          { "ru": "Перемешивает обучающую выборку", "uz": "O'qitish tanlanmasini aralashtiradi", "en": "Shuffles the training sample" },
+          { "ru": "Выбирает функцию активации", "uz": "Aktivatsiya funksiyasini tanlaydi", "en": "Chooses the activation function" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Backprop отвечает на вопрос «куда наклон», а шаг по этому наклону делает уже градиентный спуск. Разделение ролей важно: это два разных механизма, которые работают в паре.",
+          "uz": "Backprop «qiyalik qayerda» degan savolga javob beradi, bu qiyalik bo'yicha qadamni esa gradient tushishi qiladi. Rollarni ajratish muhim: bu juftlikda ishlaydigan ikki xil mexanizm.",
+          "en": "Backprop answers \"which way is downhill\", while gradient descent takes the step along that slope. The split matters: they are two distinct mechanisms working as a pair."
+        }
+      },
+      {
+        "q": {
+          "ru": "Что называют эпохой обучения?",
+          "uz": "O'qitish epoxasi deb nimaga aytiladi?",
+          "en": "What is called a training epoch?"
+        },
+        "options": [
+          { "ru": "Один шаг градиентного спуска", "uz": "Gradient tushishining bitta qadami", "en": "One step of gradient descent" },
+          { "ru": "Полный проход по всей обучающей выборке", "uz": "Butun o'qitish tanlanmasi bo'yicha to'liq o'tish", "en": "A full pass over the entire training sample" },
+          { "ru": "Обработку одного батча", "uz": "Bitta batchni qayta ishlash", "en": "Processing a single batch" },
+          { "ru": "Проверку на тестовой выборке", "uz": "Test tanlanmasida tekshirish", "en": "Evaluation on the test set" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Эпоха — это когда сеть увидела каждый обучающий пример по одному разу. Внутри эпохи шагов столько, сколько батчей помещается в выборку.",
+          "uz": "Epoxa — bu tarmoq har bir o'qitish misolini bir martadan ko'rgani. Epoxa ichida tanlanmaga nechta batch sig'sa, shuncha qadam bo'ladi.",
+          "en": "An epoch is when the network has seen every training example once. Inside an epoch there are as many steps as there are batches in the sample."
+        }
+      }
+    ],
+    "tasks": [
+      {
+        "id": "t1",
+        "kind": "python",
+        "title": {
+          "ru": "Функции активации",
+          "uz": "Aktivatsiya funksiyalari",
+          "en": "Activation functions"
+        },
+        "brief": {
+          "ru": "Примени выбранную активацию ко всему слою",
+          "uz": "Tanlangan aktivatsiyani butun qatlamga qo'llang",
+          "en": "Apply the chosen activation to a whole layer"
+        },
+        "desc": {
+          "ru": "Напиши функцию <code>activate(values, kind)</code>. Она принимает список чисел — выходы слоя — и название активации, а возвращает новый список той же длины. Поддержи три варианта: <code>\"relu\"</code> → <code>max(0, x)</code>, <code>\"step\"</code> → <code>1</code> при <code>x &gt;= 0</code> и <code>0</code> иначе, <code>\"sigmoid\"</code> → <code>1 / (1 + e⁻ˣ)</code>. Если <code>kind</code> другой, брось <code>ValueError</code>. Пустой список даёт пустой список. Модуль <code>math</code> уже импортирован.",
+          "uz": "<code>activate(values, kind)</code> funksiyasini yozing. U sonlar ro'yxatini — qatlam chiqishlarini — va aktivatsiya nomini oladi, xuddi shu uzunlikdagi yangi ro'yxat qaytaradi. Uchta variantni qo'llab-quvvatlang: <code>\"relu\"</code> → <code>max(0, x)</code>, <code>\"step\"</code> → <code>x &gt;= 0</code> da <code>1</code>, aks holda <code>0</code>, <code>\"sigmoid\"</code> → <code>1 / (1 + e⁻ˣ)</code>. Agar <code>kind</code> boshqa bo'lsa, <code>ValueError</code> tashlang. Bo'sh ro'yxat bo'sh ro'yxat beradi. <code>math</code> moduli allaqachon import qilingan.",
+          "en": "Write a function <code>activate(values, kind)</code>. It takes a list of numbers — a layer's outputs — plus an activation name, and returns a new list of the same length. Support three options: <code>\"relu\"</code> → <code>max(0, x)</code>, <code>\"step\"</code> → <code>1</code> when <code>x &gt;= 0</code> and <code>0</code> otherwise, <code>\"sigmoid\"</code> → <code>1 / (1 + e⁻ˣ)</code>. If <code>kind</code> is anything else, raise <code>ValueError</code>. An empty list gives an empty list. The <code>math</code> module is already imported."
+        },
+        "starter": "import math\n\n\ndef activate(values, kind):\n    # relu / step / sigmoid, иначе ValueError\n    ...\n",
+        "tests": "import math\nassert activate([], \"relu\") == []\nassert activate([-2, 0, 3], \"relu\") == [0, 0, 3]\nassert activate([-1, 0, 1], \"step\") == [0, 1, 1]\nout = activate([0], \"sigmoid\")\nassert abs(out[0] - 0.5) < 1e-9\nout = activate([2, -2], \"sigmoid\")\nassert abs(out[0] - 1 / (1 + math.exp(-2))) < 1e-9\nassert abs(out[0] + out[1] - 1) < 1e-9\ntry:\n    activate([1], \"banana\")\n    raised = False\nexcept ValueError:\n    raised = True\nassert raised\n",
+        "hint": {
+          "ru": "Проверь <code>kind</code> до цикла и брось <code>ValueError</code> сразу, если он неизвестен. Дальше — списочное включение с нужной формулой: <code>[max(0, x) for x in values]</code> для relu, <code>[1 / (1 + math.exp(-x)) for x in values]</code> для сигмоиды.",
+          "uz": "<code>kind</code> ni sikldan oldin tekshiring va noma'lum bo'lsa darrov <code>ValueError</code> tashlang. Keyin — kerakli formulali ro'yxat ichkilashi: relu uchun <code>[max(0, x) for x in values]</code>, sigmoid uchun <code>[1 / (1 + math.exp(-x)) for x in values]</code>.",
+          "en": "Check <code>kind</code> before the loop and raise <code>ValueError</code> right away if it is unknown. Then a list comprehension with the right formula: <code>[max(0, x) for x in values]</code> for relu, <code>[1 / (1 + math.exp(-x)) for x in values]</code> for sigmoid."
+        }
+      },
+      {
+        "id": "t2",
+        "kind": "python",
+        "title": {
+          "ru": "Сеть со скрытым слоем",
+          "uz": "Yashirin qatlamli tarmoq",
+          "en": "A network with a hidden layer"
+        },
+        "brief": {
+          "ru": "Прямой проход через скрытый слой с ReLU",
+          "uz": "ReLU li yashirin qatlam orqali to'g'ri o'tish",
+          "en": "A forward pass through a ReLU hidden layer"
+        },
+        "desc": {
+          "ru": "Напиши функцию <code>forward(x, w1, b1, w2, b2)</code> — прямой проход двухслойной сети.<br><br><code>x</code> — список входов. <code>w1</code> — список весов скрытых нейронов: для каждого нейрона свой список весов длиной как <code>x</code>. <code>b1</code> — список сдвигов скрытых нейронов. К каждому скрытому нейрону примени <b>ReLU</b>. Затем выход: скалярное произведение скрытых значений на <code>w2</code> плюс <code>b2</code>, <b>без</b> активации. Верни это число.",
+          "uz": "<code>forward(x, w1, b1, w2, b2)</code> funksiyasini yozing — ikki qatlamli tarmoqning to'g'ri o'tishi.<br><br><code>x</code> — kirishlar ro'yxati. <code>w1</code> — yashirin neyronlar vaznlari ro'yxati: har bir neyron uchun <code>x</code> uzunligidagi o'z ro'yxati. <code>b1</code> — yashirin neyronlar siljishlari ro'yxati. Har bir yashirin neyronga <b>ReLU</b> qo'llang. So'ng chiqish: yashirin qiymatlarning <code>w2</code> ga skalyar ko'paytmasi plyus <code>b2</code>, aktivatsiya <b>siz</b>. Shu sonni qaytaring.",
+          "en": "Write a function <code>forward(x, w1, b1, w2, b2)</code> — the forward pass of a two-layer network.<br><br><code>x</code> is the list of inputs. <code>w1</code> is the list of hidden-neuron weights: each neuron gets its own list as long as <code>x</code>. <code>b1</code> is the list of hidden-neuron biases. Apply <b>ReLU</b> to each hidden neuron. Then the output: the dot product of the hidden values with <code>w2</code> plus <code>b2</code>, with <b>no</b> activation. Return that number."
+        },
+        "starter": "def forward(x, w1, b1, w2, b2):\n    # скрытый слой с ReLU, затем линейный выход\n    ...\n",
+        "tests": "W1 = [[1.0, 1.0], [1.0, 1.0]]\nB1 = [0.0, -1.0]\nW2 = [1.0, -2.0]\nB2 = 0.0\nassert abs(forward([0, 0], W1, B1, W2, B2) - 0.0) < 1e-9\nassert abs(forward([0, 1], W1, B1, W2, B2) - 1.0) < 1e-9\nassert abs(forward([1, 0], W1, B1, W2, B2) - 1.0) < 1e-9\nassert abs(forward([1, 1], W1, B1, W2, B2) - 0.0) < 1e-9\nassert abs(forward([-5, -5], W1, B1, W2, B2) - 0.0) < 1e-9\nassert abs(forward([2, 3], [[0.5, -0.5]], [1.0], [2.0], -1.0) - 0.0) < 1e-9\nassert abs(forward([1.0], [[2.0], [-2.0]], [0.0, 0.0], [1.0, 1.0], 0.5) - 2.5) < 1e-9\n",
+        "hint": {
+          "ru": "Сначала скрытый слой: <code>hidden = [max(0.0, sum(wi * xi for wi, xi in zip(w, x)) + b) for w, b in zip(w1, b1)]</code>. Потом выход: <code>sum(wo * h for wo, h in zip(w2, hidden)) + b2</code>. Проверь на XOR-весах из тестов — сеть должна выдавать 0, 1, 1, 0.",
+          "uz": "Avval yashirin qatlam: <code>hidden = [max(0.0, sum(wi * xi for wi, xi in zip(w, x)) + b) for w, b in zip(w1, b1)]</code>. Keyin chiqish: <code>sum(wo * h for wo, h in zip(w2, hidden)) + b2</code>. Testlardagi XOR vaznlarida tekshiring — tarmoq 0, 1, 1, 0 berishi kerak.",
+          "en": "Hidden layer first: <code>hidden = [max(0.0, sum(wi * xi for wi, xi in zip(w, x)) + b) for w, b in zip(w1, b1)]</code>. Then the output: <code>sum(wo * h for wo, h in zip(w2, hidden)) + b2</code>. Check with the XOR weights from the tests — the network should give 0, 1, 1, 0."
+        }
+      },
+      {
+        "id": "t3",
+        "kind": "python",
+        "title": {
+          "ru": "Шаг обратного распространения",
+          "uz": "Teskari tarqalish qadami",
+          "en": "One backpropagation step"
+        },
+        "brief": {
+          "ru": "Посчитай оба градиента и обнови веса",
+          "uz": "Ikkala gradientni hisoblab, vaznlarni yangilang",
+          "en": "Compute both gradients and update the weights"
+        },
+        "desc": {
+          "ru": "Сеть из двух весов: <code>h = w1 · x</code>, затем <code>out = w2 · h</code>. Ошибка — <code>(out − y)²</code>.<br><br>Напиши функцию <code>grad_step(x, y, w1, w2, lr)</code>, которая делает один шаг обучения и возвращает кортеж новых весов <code>(w1, w2)</code>. Градиенты: <code>∂/∂w2 = 2 · (out − y) · h</code> и <code>∂/∂w1 = 2 · (out − y) · w2 · x</code>. Оба считай от <b>старых</b> весов, и только потом вычитай <code>lr · градиент</code>.",
+          "uz": "Ikki vaznli tarmoq: <code>h = w1 · x</code>, so'ng <code>out = w2 · h</code>. Xato — <code>(out − y)²</code>.<br><br><code>grad_step(x, y, w1, w2, lr)</code> funksiyasini yozing: u bitta o'qitish qadamini bajaradi va yangi vaznlar kortejini <code>(w1, w2)</code> qaytaradi. Gradientlar: <code>∂/∂w2 = 2 · (out − y) · h</code> va <code>∂/∂w1 = 2 · (out − y) · w2 · x</code>. Ikkalasini ham <b>eski</b> vaznlardan hisoblang va faqat keyin <code>lr · gradient</code> ni ayiring.",
+          "en": "A two-weight network: <code>h = w1 · x</code>, then <code>out = w2 · h</code>. The error is <code>(out − y)²</code>.<br><br>Write a function <code>grad_step(x, y, w1, w2, lr)</code> that performs one training step and returns the tuple of new weights <code>(w1, w2)</code>. The gradients: <code>∂/∂w2 = 2 · (out − y) · h</code> and <code>∂/∂w1 = 2 · (out − y) · w2 · x</code>. Compute both from the <b>old</b> weights, and only then subtract <code>lr · gradient</code>."
+        },
+        "starter": "def grad_step(x, y, w1, w2, lr):\n    # прямой проход, оба градиента от старых весов, затем обновление\n    ...\n",
+        "tests": "assert grad_step(1, 1, 2, 3, 0.1) == (-1.0, 1.0)\nassert grad_step(2, 6, 1, 3, 0.5) == (1.0, 3.0)\nassert grad_step(1, 1, 2, 3, 0) == (2.0, 3.0)\n\nw1, w2 = 0.5, 0.5\nbefore = (w1 * w2 * 2.0 - 4.0) ** 2\nfor _ in range(30):\n    w1, w2 = grad_step(2.0, 4.0, w1, w2, 0.01)\nafter = (w1 * w2 * 2.0 - 4.0) ** 2\nassert after < before\nassert after < 1e-4\n",
+        "hint": {
+          "ru": "Считай по шагам: <code>h = w1 * x</code>, <code>out = w2 * h</code>, <code>err = out - y</code>. Затем <code>grad2 = 2 * err * h</code> и <code>grad1 = 2 * err * w2 * x</code> — и только после этого <code>return (w1 - lr * grad1, w2 - lr * grad2)</code>. Если обновить <code>w2</code> раньше, второй градиент получится неверным.",
+          "uz": "Qadamma-qadam hisoblang: <code>h = w1 * x</code>, <code>out = w2 * h</code>, <code>err = out - y</code>. Keyin <code>grad2 = 2 * err * h</code> va <code>grad1 = 2 * err * w2 * x</code> — va faqat shundan keyin <code>return (w1 - lr * grad1, w2 - lr * grad2)</code>. Agar <code>w2</code> ni oldin yangilasangiz, ikkinchi gradient noto'g'ri chiqadi.",
+          "en": "Compute step by step: <code>h = w1 * x</code>, <code>out = w2 * h</code>, <code>err = out - y</code>. Then <code>grad2 = 2 * err * h</code> and <code>grad1 = 2 * err * w2 * x</code> — and only after that <code>return (w1 - lr * grad1, w2 - lr * grad2)</code>. Update <code>w2</code> earlier and the second gradient comes out wrong."
+        }
+      }
+    ],
+    "exam": {
+      "time": 660,
+      "questions": [
+        {
+          "q": {
+            "ru": "Зачем между слоями ставят функцию активации?",
+            "uz": "Qatlamlar orasiga aktivatsiya funksiyasi nega qo'yiladi?",
+            "en": "Why is an activation function placed between layers?"
+          },
+          "options": [
+            { "ru": "Чтобы сеть считалась быстрее", "uz": "Tarmoq tezroq hisoblansin uchun", "en": "To make the network compute faster" },
+            { "ru": "Чтобы сеть не сворачивалась в один линейный слой", "uz": "Tarmoq bitta chiziqli qatlamga siqilmasligi uchun", "en": "So the network doesn't collapse into a single linear layer" },
+            { "ru": "Чтобы уменьшить число весов", "uz": "Vaznlar sonini kamaytirish uchun", "en": "To reduce the number of weights" },
+            { "ru": "Чтобы данные не нужно было нормализовать", "uz": "Ma'lumotlarni normalizatsiya qilish shart bo'lmasligi uchun", "en": "So the data doesn't need normalizing" }
+          ],
+          "a": 1
+        },
+        {
+          "q": {
+            "ru": "Что произойдёт с ReLU-нейроном, у которого вход всегда отрицательный?",
+            "uz": "Kirishi doim manfiy bo'lgan ReLU-neyronga nima bo'ladi?",
+            "en": "What happens to a ReLU neuron whose input is always negative?"
+          },
+          "options": [
+            { "ru": "Он выдаёт ноль и его градиент тоже ноль — нейрон перестаёт учиться", "uz": "U nol beradi va gradienti ham nol — neyron o'qishdan to'xtaydi", "en": "It outputs zero and its gradient is zero too — the neuron stops learning" },
+            { "ru": "Он выдаёт отрицательное значение", "uz": "U manfiy qiymat beradi", "en": "It outputs a negative value" },
+            { "ru": "Он автоматически переключится на сигмоиду", "uz": "U avtomatik ravishda sigmoidga o'tadi", "en": "It automatically switches to sigmoid" },
+            { "ru": "Ничего, ReLU симметрична", "uz": "Hech nima, ReLU simmetrik", "en": "Nothing, ReLU is symmetric" }
+          ],
+          "a": 0
+        },
+        {
+          "q": {
+            "ru": "Где производная сигмоиды максимальна?",
+            "uz": "Sigmoid hosilasi qayerda maksimal?",
+            "en": "Where is the sigmoid derivative at its maximum?"
+          },
+          "options": [
+            { "ru": "В нуле, и равна 0.25", "uz": "Nolda, va 0.25 ga teng", "en": "At zero, and equals 0.25" },
+            { "ru": "При больших положительных x", "uz": "Katta musbat x larda", "en": "At large positive x" },
+            { "ru": "При больших отрицательных x", "uz": "Katta manfiy x larda", "en": "At large negative x" },
+            { "ru": "Она постоянна и равна 1", "uz": "U doimiy va 1 ga teng", "en": "It is constant and equals 1" }
+          ],
+          "a": 0
+        },
+        {
+          "q": {
+            "ru": "В коде обучения <code>w2</code> обновили до того, как посчитали градиент для <code>w1</code>. Что не так?",
+            "uz": "O'qitish kodida <code>w2</code> <code>w1</code> uchun gradient hisoblanmasdan oldin yangilandi. Nimasi noto'g'ri?",
+            "en": "In the training code <code>w2</code> was updated before the gradient for <code>w1</code> was computed. What's wrong?"
+          },
+          "options": [
+            { "ru": "Ничего, порядок не важен", "uz": "Hech nima, tartib muhim emas", "en": "Nothing, the order doesn't matter" },
+            { "ru": "Градиент для <code>w1</code> посчитан от смеси старого и нового состояния — шаг неверный", "uz": "<code>w1</code> uchun gradient eski va yangi holat aralashmasidan hisoblangan — qadam noto'g'ri", "en": "The gradient for <code>w1</code> came from a mix of old and new state — the step is wrong" },
+            { "ru": "Программа упадёт с ошибкой", "uz": "Dastur xato bilan yiqiladi", "en": "The program will crash" },
+            { "ru": "Обучение станет быстрее", "uz": "O'qitish tezlashadi", "en": "Training will get faster" }
+          ],
+          "a": 1
+        },
+        {
+          "q": {
+            "ru": "Обучающая выборка — 1000 примеров, размер батча 100. Сколько шагов обновления весов в одной эпохе?",
+            "uz": "O'qitish tanlanmasi — 1000 misol, batch o'lchami 100. Bitta epoxada nechta vazn yangilash qadami bo'ladi?",
+            "en": "The training sample has 1000 examples and the batch size is 100. How many weight updates in one epoch?"
+          },
+          "options": [
+            { "ru": "1", "uz": "1", "en": "1" },
+            { "ru": "10", "uz": "10", "en": "10" },
+            { "ru": "100", "uz": "100", "en": "100" },
+            { "ru": "1000", "uz": "1000", "en": "1000" }
+          ],
+          "a": 1
+        },
+        {
+          "q": {
+            "ru": "Одна прямая не может решить XOR. Что это меняет на практике?",
+            "uz": "Bitta to'g'ri chiziq XOR ni yecha olmaydi. Bu amalda nimani o'zgartiradi?",
+            "en": "A single line cannot solve XOR. What does that change in practice?"
+          },
+          "options": [
+            { "ru": "Ничего, XOR — искусственный пример", "uz": "Hech nima, XOR — sun'iy misol", "en": "Nothing, XOR is an artificial example" },
+            { "ru": "Нужен скрытый слой с нелинейностью — иначе целые классы задач недоступны", "uz": "Chiziqsizlikli yashirin qatlam kerak — aks holda butun boshli masalalar sinflari yopiq", "en": "You need a hidden layer with non-linearity — otherwise whole classes of tasks stay out of reach" },
+            { "ru": "Нужно больше данных", "uz": "Ko'proq ma'lumot kerak", "en": "You need more data" },
+            { "ru": "Нужно увеличить скорость обучения", "uz": "O'qitish tezligini oshirish kerak", "en": "You need a larger learning rate" }
+          ],
+          "a": 1
+        }
+      ],
+      "tasks": [
+        {
+          "id": "e1",
+          "kind": "python",
+          "title": {
+            "ru": "Обучение до сходимости",
+            "uz": "Yaqinlashguncha o'qitish",
+            "en": "Train until convergence"
+          },
+          "desc": {
+            "ru": "Возьми сеть из задачи t3: <code>h = w1 · x</code>, <code>out = w2 · h</code>, ошибка <code>(out − y)²</code>.<br><br>Напиши функцию <code>train(samples, w1, w2, lr, epochs)</code>. <code>samples</code> — список пар <code>(x, y)</code>. За одну эпоху пройди по всем парам <b>по порядку</b> и на каждой сделай один шаг обучения (градиенты от старых весов, потом обновление). Повтори <code>epochs</code> раз.<br><br>Верни кортеж <code>(w1, w2, loss)</code>, где веса округлены до 4 знаков, а <code>loss</code> — средняя квадратичная ошибка по всем парам после обучения, округлённая до 6 знаков.",
+            "uz": "t3 masalasidagi tarmoqni oling: <code>h = w1 · x</code>, <code>out = w2 · h</code>, xato <code>(out − y)²</code>.<br><br><code>train(samples, w1, w2, lr, epochs)</code> funksiyasini yozing. <code>samples</code> — <code>(x, y)</code> juftliklari ro'yxati. Bir epoxada barcha juftlar bo'ylab <b>tartib bilan</b> yuring va har birida bitta o'qitish qadamini bajaring (gradientlar eski vaznlardan, keyin yangilash). <code>epochs</code> marta takrorlang.<br><br><code>(w1, w2, loss)</code> kortejini qaytaring: vaznlar 4 xonagacha yaxlitlangan, <code>loss</code> esa o'qitishdan keyin barcha juftlar bo'yicha o'rtacha kvadratik xato, 6 xonagacha yaxlitlangan.",
+            "en": "Take the network from task t3: <code>h = w1 · x</code>, <code>out = w2 · h</code>, error <code>(out − y)²</code>.<br><br>Write a function <code>train(samples, w1, w2, lr, epochs)</code>. <code>samples</code> is a list of <code>(x, y)</code> pairs. In one epoch, walk all pairs <b>in order</b> and take one training step on each (gradients from the old weights, then the update). Repeat <code>epochs</code> times.<br><br>Return the tuple <code>(w1, w2, loss)</code>, where the weights are rounded to 4 decimals and <code>loss</code> is the mean squared error over all pairs after training, rounded to 6 decimals."
+          },
+          "starter": "def train(samples, w1, w2, lr, epochs):\n    # epochs раз пройди по samples, потом посчитай средний квадрат ошибки\n    ...\n",
+          "tests": "w1, w2, loss = train([(1.0, 2.0), (2.0, 4.0), (3.0, 6.0)], 0.5, 0.5, 0.01, 200)\nassert abs(w1 - 1.4142) < 1e-4 and abs(w2 - 1.4142) < 1e-4\nassert w1 == round(w1, 4) and w2 == round(w2, 4)\nassert loss < 1e-5\n\nw1, w2, loss = train([(1.0, 3.0)], 1.0, 1.0, 0.05, 100)\nassert abs(w1 - 1.7321) < 1e-4 and abs(w2 - 1.7321) < 1e-4\nassert loss < 1e-5\n\nw1, w2, loss = train([(1.0, 2.0)], 0.5, 0.5, 0.0, 10)\nassert (w1, w2) == (0.5, 0.5)\nassert abs(loss - 3.0625) < 1e-6\n\nassert train([(1.0, 2.0)], 0.5, 0.5, 0.01, 0)[:2] == (0.5, 0.5)\n",
+          "hint": {
+            "ru": "Внутри двойного цикла повтори тело <code>grad_step</code> из t3, присваивая новые значения <code>w1</code> и <code>w2</code>. После циклов посчитай ошибку заново: <code>sum((w1 * w2 * x - y) ** 2 for x, y in samples) / len(samples)</code>. Округляй только в самом конце, в <code>return</code>.",
+            "uz": "Ikki qavatli sikl ichida t3 dagi <code>grad_step</code> tanasini takrorlang, <code>w1</code> va <code>w2</code> ga yangi qiymatlarni berib. Sikllardan keyin xatoni qaytadan hisoblang: <code>sum((w1 * w2 * x - y) ** 2 for x, y in samples) / len(samples)</code>. Yaxlitlashni faqat oxirida, <code>return</code> da qiling.",
+            "en": "Inside the double loop repeat the body of <code>grad_step</code> from t3, assigning the new values to <code>w1</code> and <code>w2</code>. After the loops recompute the error: <code>sum((w1 * w2 * x - y) ** 2 for x, y in samples) / len(samples)</code>. Round only at the very end, in the <code>return</code>."
+          }
+        }
+      ]
+    }
   }
  ]
 }

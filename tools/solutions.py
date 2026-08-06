@@ -1364,4 +1364,48 @@ print(report(e, 1, 1.0))""",
     best = sorted(good, key=lambda p: (-mean(p), p))[0]
     return (best, round(mean(best), 3))
 """,
+
+    'dl-intro/dl-03/t1': """import math
+
+
+def activate(values, kind):
+    if kind == 'relu':
+        return [max(0, x) for x in values]
+    if kind == 'step':
+        return [1 if x >= 0 else 0 for x in values]
+    if kind == 'sigmoid':
+        return [1 / (1 + math.exp(-x)) for x in values]
+    raise ValueError('unknown activation: ' + str(kind))
+""",
+
+    'dl-intro/dl-03/t2': """def forward(x, w1, b1, w2, b2):
+    hidden = []
+    for weights, bias in zip(w1, b1):
+        total = sum(wi * xi for wi, xi in zip(weights, x)) + bias
+        hidden.append(max(0.0, total))
+    return sum(wo * h for wo, h in zip(w2, hidden)) + b2
+""",
+
+    'dl-intro/dl-03/t3': """def grad_step(x, y, w1, w2, lr):
+    h = w1 * x
+    out = w2 * h
+    err = out - y
+    grad2 = 2 * err * h
+    grad1 = 2 * err * w2 * x
+    return (w1 - lr * grad1, w2 - lr * grad2)
+""",
+
+    'dl-intro/dl-03/exam0': """def train(samples, w1, w2, lr, epochs):
+    for _ in range(epochs):
+        for x, y in samples:
+            h = w1 * x
+            out = w2 * h
+            err = out - y
+            grad2 = 2 * err * h
+            grad1 = 2 * err * w2 * x
+            w1 -= lr * grad1
+            w2 -= lr * grad2
+    loss = sum((w1 * w2 * x - y) ** 2 for x, y in samples) / len(samples)
+    return (round(w1, 4), round(w2, 4), round(loss, 6))
+""",
 }
