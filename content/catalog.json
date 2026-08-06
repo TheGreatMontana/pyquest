@@ -1001,7 +1001,7 @@
    "color": "#22d3ee",
    "level": "intermediate",
    "status": "full",
-   "estimatedHours": 15,
+   "estimatedHours": 21,
    "requires": [
     "python-collections"
    ],
@@ -1009,7 +1009,7 @@
     "cv-basics"
    ],
    "legacyIds": [],
-   "moduleCount": 2,
+   "moduleCount": 3,
    "runner": "python"
   },
   {

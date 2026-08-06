@@ -1463,4 +1463,71 @@ def attention(query, keys, values):
         return None
     return sorted(counts, key=lambda w: (-counts[w], w))[0]
 """,
+
+    'cv-intro/cv-03/t1': """def pad(image, size, value=0):
+    if not image:
+        return []
+    width = len(image[0]) + 2 * size
+    blank = [value] * width
+    result = [list(blank) for _ in range(size)]
+    for row in image:
+        result.append([value] * size + list(row) + [value] * size)
+    result.extend(list(blank) for _ in range(size))
+    return result
+""",
+
+    'cv-intro/cv-03/t2': """def conv(image, kernel, stride=1):
+    if not image or not kernel:
+        return []
+    kh, kw = len(kernel), len(kernel[0])
+    if kh > len(image) or kw > len(image[0]):
+        return []
+    out = []
+    for i in range(0, len(image) - kh + 1, stride):
+        row = []
+        for j in range(0, len(image[0]) - kw + 1, stride):
+            row.append(sum(kernel[a][b] * image[i + a][j + b]
+                           for a in range(kh) for b in range(kw)))
+        out.append(row)
+    return out
+""",
+
+    'cv-intro/cv-03/t3': """def iou(a, b):
+    ix1, iy1 = max(a[0], b[0]), max(a[1], b[1])
+    ix2, iy2 = min(a[2], b[2]), min(a[3], b[3])
+    inter = max(0, ix2 - ix1) * max(0, iy2 - iy1)
+    area_a = (a[2] - a[0]) * (a[3] - a[1])
+    area_b = (b[2] - b[0]) * (b[3] - b[1])
+    union = area_a + area_b - inter
+    if union == 0:
+        return 0.0
+    return inter / union
+""",
+
+    'cv-intro/cv-03/exam0': """def filter_boxes(boxes, scores, min_score, iou_limit):
+    def iou(a, b):
+        ix1, iy1 = max(a[0], b[0]), max(a[1], b[1])
+        ix2, iy2 = min(a[2], b[2]), min(a[3], b[3])
+        inter = max(0, ix2 - ix1) * max(0, iy2 - iy1)
+        area_a = (a[2] - a[0]) * (a[3] - a[1])
+        area_b = (b[2] - b[0]) * (b[3] - b[1])
+        union = area_a + area_b - inter
+        if union == 0:
+            return 0.0
+        return inter / union
+
+    candidates = [i for i in range(len(boxes)) if scores[i] >= min_score]
+    candidates.sort(key=lambda i: (-scores[i], i))
+
+    kept = []
+    dropped = set()
+    for i in candidates:
+        if i in dropped:
+            continue
+        kept.append(i)
+        for j in candidates:
+            if j != i and j not in dropped and iou(boxes[i], boxes[j]) > iou_limit:
+                dropped.add(j)
+    return kept
+""",
 }

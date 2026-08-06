@@ -643,6 +643,494 @@
      }
     ]
    }
+  },
+  {
+    "id": "cv-03",
+    "title": {
+      "ru": "Свёрточная сеть, аугментация и оценка детектора",
+      "uz": "Konvolyutsion tarmoq, augmentatsiya va detektor bahosi",
+      "en": "Convolutional networks, augmentation and detector scoring"
+    },
+    "tagline": {
+      "ru": "Как из свёртки вырастает сеть, что делать, когда картинок мало, и чем измеряют качество рамки",
+      "uz": "Konvolyutsiyadan tarmoq qanday o'sadi, rasm kam bo'lsa nima qilish kerak va ramka sifati nima bilan o'lchanadi",
+      "en": "How a convolution grows into a network, what to do when you have few images, and how a box's quality is measured"
+    },
+    "lessons": [
+      {
+        "id": "l1",
+        "title": {
+          "ru": "Свёрточный слой: много фильтров сразу",
+          "uz": "Konvolyutsion qatlam: birdaniga ko'p filtr",
+          "en": "A convolutional layer: many filters at once"
+        },
+        "blocks": [
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>В cv-01 мы прогоняли по картинке одно ядро и получали одну новую матрицу. <b>Свёрточный слой</b> делает ровно то же, только ядер у него несколько — обычно десятки. Каждое ядро даёт свою матрицу, и эти матрицы называют <b>картами признаков</b>.</p><p>Смысл простой: одно ядро умеет отвечать на один вопрос — «есть ли здесь вертикальный край?». Чтобы описать картинку, вопросов нужно много: края разных направлений, пятна, переходы яркости. Поэтому слой держит пачку ядер и прикладывает их все.</p>",
+              "uz": "<p>cv-01 da biz rasm bo'ylab bitta yadroni yurgizib, bitta yangi matritsa oldik. <b>Konvolyutsion qatlam</b> aynan shuni qiladi, faqat uning yadrolari bir nechta — odatda o'nlab. Har bir yadro o'z matritsasini beradi va bu matritsalarni <b>belgilar xaritasi</b> deyishadi.</p><p>Ma'nosi oddiy: bitta yadro bitta savolga javob bera oladi — «bu yerda vertikal qirra bormi?». Rasmni tasvirlash uchun savollar ko'p kerak: turli yo'nalishdagi qirralar, dog'lar, yorqinlik o'tishlari. Shuning uchun qatlam bir dasta yadro saqlaydi va ularning hammasini qo'llaydi.</p>",
+              "en": "<p>In cv-01 we ran a single kernel over an image and got one new matrix. A <b>convolutional layer</b> does exactly the same, except it holds several kernels — usually dozens. Each kernel produces its own matrix, and those matrices are called <b>feature maps</b>.</p><p>The point is simple: one kernel can answer one question — \"is there a vertical edge here?\". Describing an image takes many questions: edges in various directions, blobs, brightness transitions. So the layer keeps a stack of kernels and applies them all.</p>"
+            }
+          },
+          {
+            "type": "run",
+            "code": "image = [\n    [0, 0, 9, 9],\n    [0, 0, 9, 9],\n    [0, 0, 9, 9],\n    [0, 0, 9, 9],\n]\n\ndef conv(image, kernel):\n    kh, kw = len(kernel), len(kernel[0])\n    out = []\n    for i in range(len(image) - kh + 1):\n        row = []\n        for j in range(len(image[0]) - kw + 1):\n            row.append(sum(kernel[a][b] * image[i + a][j + b]\n                           for a in range(kh) for b in range(kw)))\n        out.append(row)\n    return out\n\nkernels = {\n    \"вертикальный край\": [[-1, 1]],\n    \"горизонтальный край\": [[-1], [1]],\n    \"размытие\": [[1, 1], [1, 1]],\n}\n\nfor name, kernel in kernels.items():\n    print(name)\n    for row in conv(image, kernel):\n        print(\"  \", row)"
+          },
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>Одно ядро нашло границу между тёмной и светлой половиной, второе не нашло ничего — в этой картинке нет горизонтальных переходов. Так и работает слой: каждая карта признаков светится там, где встретился «её» узор.</p><p>У свёртки есть две настройки, которые надо знать.</p><p><b>Шаг (stride)</b> — на сколько пикселей ядро сдвигается за раз. Шаг <code>1</code> проходит все позиции, шаг <code>2</code> — через одну, и картинка сразу уменьшается вдвое.</p><p><b>Паддинг (padding)</b> — рамка из нулей вокруг картинки. Без неё выход всегда меньше входа, и после десятка слоёв от картинки ничего не остаётся. Паддинг <code>1</code> с ядром <code>3×3</code> даёт выход того же размера, что вход.</p><p>Размер выхода считается по формуле:</p><pre><code>выход = (вход + 2 · паддинг − ядро) // шаг + 1</code></pre>",
+              "uz": "<p>Bitta yadro qorong'i va yorug' yarim orasidagi chegarani topdi, ikkinchisi hech nima topmadi — bu rasmda gorizontal o'tishlar yo'q. Qatlam ham shunday ishlaydi: har bir belgilar xaritasi «o'zining» naqshi uchragan joyda yonadi.</p><p>Konvolyutsiyaning bilish kerak bo'lgan ikkita sozlamasi bor.</p><p><b>Qadam (stride)</b> — yadro bir martada necha piksel suriladi. <code>1</code> qadam barcha pozitsiyalardan o'tadi, <code>2</code> qadam — bittasidan oshirib, va rasm darrov ikki barobar kichrayadi.</p><p><b>Padding</b> — rasm atrofidagi nollar ramkasi. Usiz chiqish doim kirishdan kichik bo'ladi va o'nta qatlamdan keyin rasmdan hech nima qolmaydi. <code>3×3</code> yadro bilan <code>1</code> padding kirish bilan bir xil o'lchamdagi chiqish beradi.</p><p>Chiqish o'lchami formula bo'yicha hisoblanadi:</p><pre><code>chiqish = (kirish + 2 · padding − yadro) // qadam + 1</code></pre>",
+              "en": "<p>One kernel found the boundary between the dark and light halves; the other found nothing — this image has no horizontal transitions. That is how a layer works: each feature map lights up wherever \"its\" pattern occurred.</p><p>A convolution has two settings you need to know.</p><p><b>Stride</b> — how many pixels the kernel shifts at a time. A stride of <code>1</code> visits every position, a stride of <code>2</code> skips every other one and immediately halves the image.</p><p><b>Padding</b> — a border of zeros around the image. Without it the output is always smaller than the input, and after a dozen layers nothing is left of the picture. Padding <code>1</code> with a <code>3×3</code> kernel yields an output the same size as the input.</p><p>The output size follows the formula:</p><pre><code>output = (input + 2 · padding − kernel) // stride + 1</code></pre>"
+            }
+          },
+          {
+            "type": "run",
+            "code": "def out_size(n, k, stride, padding):\n    return (n + 2 * padding - k) // stride + 1\n\nprint(f\"{'вход':>6} {'ядро':>6} {'шаг':>5} {'паддинг':>9} {'выход':>7}\")\nfor n, k, s, p in [(6, 3, 1, 0), (6, 3, 1, 1), (6, 3, 2, 0), (6, 3, 2, 1), (28, 5, 1, 2)]:\n    print(f\"{n:>6} {k:>6} {s:>5} {p:>9} {out_size(n, k, s, p):>7}\")"
+          },
+          {
+            "type": "checkpoint",
+            "q": {
+              "ru": "Картинка 32×32, ядро 3×3, шаг 1, паддинг 1. Какого размера будет выход?",
+              "uz": "Rasm 32×32, yadro 3×3, qadam 1, padding 1. Chiqish qanday o'lchamda bo'ladi?",
+              "en": "A 32×32 image, a 3×3 kernel, stride 1, padding 1. What size is the output?"
+            },
+            "options": [
+              { "ru": "30×30", "uz": "30×30", "en": "30×30" },
+              { "ru": "32×32", "uz": "32×32", "en": "32×32" },
+              { "ru": "16×16", "uz": "16×16", "en": "16×16" },
+              { "ru": "34×34", "uz": "34×34", "en": "34×34" }
+            ],
+            "a": 1,
+            "explain": {
+              "ru": "<code>(32 + 2 · 1 − 3) // 1 + 1 = 32</code>. Такое сочетание называют «same padding»: размер сохраняется, и слои можно ставить друг на друга без потери краёв. Без паддинга вышло бы 30×30.",
+              "uz": "<code>(32 + 2 · 1 − 3) // 1 + 1 = 32</code>. Bunday birikmani «same padding» deyishadi: o'lcham saqlanadi va qatlamlarni chetlarni yo'qotmasdan ustma-ust qo'yish mumkin. Paddingsiz 30×30 chiqardi.",
+              "en": "<code>(32 + 2 · 1 − 3) // 1 + 1 = 32</code>. That combination is called \"same padding\": the size is preserved and layers can be stacked without eating away the borders. Without padding you'd get 30×30."
+            }
+          }
+        ]
+      },
+      {
+        "id": "l2",
+        "title": {
+          "ru": "Архитектура свёрточной сети",
+          "uz": "Konvolyutsion tarmoq arxitekturasi",
+          "en": "The architecture of a convolutional network"
+        },
+        "blocks": [
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>Свёрточная сеть (CNN) собирается из одинаковых блоков. Один блок — это три шага подряд:</p><pre><code>свёртка → ReLU → пулинг</code></pre><p>Свёртка ищет узоры, ReLU из dl-03 отсекает отрицательные отклики (узор либо есть, либо его нет — «минус края» не бывает), пулинг из cv-02 уменьшает карту вдвое, оставляя самое сильное.</p><p>Таких блоков ставят несколько подряд. Дальше карты признаков вытягивают в один вектор и подают в обычные полносвязные слои — их называют «головой» сети. Голова и выдаёт итог: класс, вероятность, координаты рамки.</p>",
+              "uz": "<p>Konvolyutsion tarmoq (CNN) bir xil bloklardan yig'iladi. Bitta blok — ketma-ket uch qadam:</p><pre><code>konvolyutsiya → ReLU → puling</code></pre><p>Konvolyutsiya naqshlarni qidiradi, dl-03 dagi ReLU manfiy javoblarni kesadi (naqsh yo bor, yo yo'q — «minus qirra» bo'lmaydi), cv-02 dagi puling xaritani eng kuchlisini qoldirib, ikki barobar kichraytiradi.</p><p>Bunday bloklardan bir nechtasi ketma-ket qo'yiladi. Keyin belgilar xaritalari bitta vektorga cho'ziladi va oddiy to'liq bog'langan qatlamlarga beriladi — ularni tarmoqning «boshi» deyishadi. Bosh natijani beradi: sinf, ehtimollik, ramka koordinatalari.</p>",
+              "en": "<p>A convolutional network (CNN) is assembled from identical blocks. One block is three steps in a row:</p><pre><code>convolution → ReLU → pooling</code></pre><p>The convolution looks for patterns, the ReLU from dl-03 cuts off negative responses (a pattern is either there or not — there is no \"minus edge\"), and the pooling from cv-02 halves the map while keeping the strongest response.</p><p>Several such blocks are stacked. Then the feature maps are stretched into a single vector and fed into ordinary fully connected layers — the network's \"head\". The head produces the result: a class, a probability, box coordinates.</p>"
+            }
+          },
+          {
+            "type": "run",
+            "code": "image = [\n    [1, 1, 8, 8, 1, 1],\n    [1, 1, 8, 8, 1, 1],\n    [1, 1, 8, 8, 1, 1],\n    [1, 1, 8, 8, 1, 1],\n    [1, 1, 8, 8, 1, 1],\n    [1, 1, 8, 8, 1, 1],\n]\n\ndef conv(image, kernel):\n    kh, kw = len(kernel), len(kernel[0])\n    return [[sum(kernel[a][b] * image[i + a][j + b]\n                 for a in range(kh) for b in range(kw))\n             for j in range(len(image[0]) - kw + 1)]\n            for i in range(len(image) - kh + 1)]\n\ndef relu(matrix):\n    return [[max(0, v) for v in row] for row in matrix]\n\ndef maxpool(matrix, size=2):\n    return [[max(matrix[i + a][j + b] for a in range(size) for b in range(size))\n             for j in range(0, len(matrix[0]) - size + 1, size)]\n            for i in range(0, len(matrix) - size + 1, size)]\n\nstep1 = conv(image, [[-1, 1]])\nstep2 = relu(step1)\nstep3 = maxpool(step2)\n\nfor name, matrix in [(\"после свёртки\", step1), (\"после ReLU\", step2), (\"после пулинга\", step3)]:\n    print(f\"{name} ({len(matrix)}x{len(matrix[0])})\")\n    for row in matrix:\n        print(\"  \", row)"
+          },
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>Матрица ужалась с 6×6 до 3×2, но осталось главное: столбец с сильным откликом там, где в картинке была граница.</p><p>Теперь самое важное. Ядра в настоящей сети <b>никто не пишет руками</b>. Это обычные веса, и находит их градиентный спуск из dl-02 — ровно так же, как веса полносвязного слоя. Мы задаём только форму: сколько ядер и какого размера.</p><p>И когда сеть обучается, происходит любопытная вещь. Первые слои сами приходят к тем самым фильтрам краёв, которые мы писали руками в cv-01. Следующие слои складывают края в углы и дуги, ещё дальше — в глаза, колёса, буквы, а последние собирают из них целые объекты. Иерархия возникает сама, потому что она — самый экономный способ описать реальные изображения.</p>",
+              "uz": "<p>Matritsa 6×6 dan 3×2 gacha siqildi, lekin asosiysi qoldi: rasmda chegara bo'lgan joyda kuchli javobli ustun.</p><p>Endi eng muhimi. Haqiqiy tarmoqdagi yadrolarni <b>hech kim qo'lda yozmaydi</b>. Bular oddiy vaznlar va ularni dl-02 dagi gradient tushishi topadi — xuddi to'liq bog'langan qatlam vaznlaridek. Biz faqat shaklni beramiz: nechta yadro va qanday o'lchamda.</p><p>Tarmoq o'qiyotganda qiziq narsa sodir bo'ladi. Birinchi qatlamlar biz cv-01 da qo'lda yozgan o'sha qirra filtrlariga o'zi keladi. Keyingi qatlamlar qirralarni burchak va yoylarga qo'shadi, undan keyin — ko'z, g'ildirak, harflarga, oxirgilari esa ulardan butun obyektlarni yig'adi. Ierarxiya o'zi paydo bo'ladi, chunki u haqiqiy tasvirlarni tavsiflashning eng tejamkor yo'li.</p>",
+              "en": "<p>The matrix shrank from 6×6 to 3×2, but the essential part survived: a column of strong response exactly where the image had its boundary.</p><p>Now the important part. In a real network <b>nobody writes the kernels by hand</b>. They are ordinary weights, found by the gradient descent from dl-02 — exactly like the weights of a fully connected layer. We only specify the shape: how many kernels and of what size.</p><p>And when the network trains, something curious happens. The first layers arrive on their own at the very edge filters we wrote by hand in cv-01. The next layers assemble edges into corners and arcs, further on into eyes, wheels, letters, and the last ones build whole objects out of those. The hierarchy emerges by itself, because it is the most economical way to describe real images.</p>"
+            }
+          },
+          {
+            "type": "predict",
+            "lang": "python",
+            "code": "# картинка 100x100 в оттенках серого,\n# первый полносвязный слой на 128 нейронов\npixels = 100 * 100\nhidden = 128\nprint(pixels * hidden)",
+            "options": [
+              { "ru": "12800", "uz": "12800", "en": "12800" },
+              { "ru": "1280000", "uz": "1280000", "en": "1280000" },
+              { "ru": "10000", "uz": "10000", "en": "10000" },
+              { "ru": "128", "uz": "128", "en": "128" }
+            ],
+            "a": 1,
+            "explain": {
+              "ru": "1 280 000 весов — и это только первый слой одной маленькой картинки. У свёрточного ядра <code>3×3</code> весов девять, и они переиспользуются для всей картинки. Отсюда и главная экономия CNN: одно ядро работает во всех точках сразу.",
+              "uz": "1 280 000 vazn — va bu bitta kichkina rasmning faqat birinchi qatlami. <code>3×3</code> konvolyutsion yadroda to'qqizta vazn bor va ular butun rasm uchun qayta ishlatiladi. CNN ning asosiy tejamkorligi shundan: bitta yadro barcha nuqtalarda birdaniga ishlaydi.",
+              "en": "1,280,000 weights — and that is just the first layer for one small picture. A <code>3×3</code> convolutional kernel has nine weights, and they are reused across the whole image. Hence the CNN's main saving: one kernel works at every position at once."
+            }
+          },
+          {
+            "type": "note",
+            "kind": "trap",
+            "html": {
+              "ru": "Разложить картинку в один длинный вектор и подать в полносвязную сеть технически можно — и это плохо работает по двум причинам. Первая: число весов взрывается, как в примере выше. Вторая, важнее: полносвязный слой не знает, что пиксель 45 и пиксель 46 были соседями. Сдвинь объект на два пикселя вправо — и для такой сети это совершенно другая картинка. Свёртка знает про соседство по построению и находит узор где угодно на изображении.",
+              "uz": "Rasmni bitta uzun vektorga yoyib, to'liq bog'langan tarmoqqa berish texnik jihatdan mumkin — va bu ikki sababga ko'ra yomon ishlaydi. Birinchisi: vaznlar soni yuqoridagi misoldagidek portlaydi. Ikkinchisi, muhimrog'i: to'liq bog'langan qatlam 45-piksel va 46-piksel qo'shni bo'lganini bilmaydi. Obyektni ikki piksel o'ngga suring — bunday tarmoq uchun bu mutlaqo boshqa rasm. Konvolyutsiya qo'shnilik haqida tuzilishi bo'yicha biladi va naqshni tasvirning istalgan joyidan topadi.",
+              "en": "Flattening an image into one long vector and feeding it to a fully connected network is technically possible — and works badly for two reasons. First: the weight count explodes, as in the example above. Second, and more important: a fully connected layer has no idea that pixel 45 and pixel 46 were neighbours. Shift the object two pixels to the right and to such a network it is a completely different picture. A convolution knows about adjacency by construction and finds the pattern anywhere in the image."
+            }
+          }
+        ]
+      },
+      {
+        "id": "l3",
+        "title": {
+          "ru": "Аугментация и оценка детектора",
+          "uz": "Augmentatsiya va detektor bahosi",
+          "en": "Augmentation and scoring a detector"
+        },
+        "blocks": [
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>Свёрточным сетям нужно много картинок, а размеченных картинок всегда мало. Самый дешёвый выход — <b>аугментация</b>: из одного изображения делают десяток, применяя преобразования, которые не меняют ответ.</p><p>Отражение, поворот на несколько градусов, сдвиг, случайная обрезка, изменение яркости и контраста — кот остаётся котом при любом из них. Модель видит больше вариантов одного объекта и перестаёт цепляться за случайные детали конкретного снимка.</p><p>Но преобразование должно быть <b>безопасным для задачи</b>. Отразить фотографию кота можно. Отразить цифру <code>2</code> нельзя — получится не цифра. Повернуть рентгеновский снимок на 180° тоже нельзя: врач различает верх и низ, и модель должна тоже.</p>",
+              "uz": "<p>Konvolyutsion tarmoqlarga ko'p rasm kerak, belgilangan rasmlar esa doim kam. Eng arzon chiqish yo'li — <b>augmentatsiya</b>: bitta tasvirdan javobni o'zgartirmaydigan o'zgartirishlarni qo'llab, o'nta rasm yasaladi.</p><p>Aks ettirish, bir necha gradusga burish, surish, tasodifiy kesish, yorqinlik va kontrastni o'zgartirish — mushuk ularning har birida ham mushukligicha qoladi. Model bitta obyektning ko'proq variantini ko'radi va aniq bir suratning tasodifiy tafsilotlariga yopishishdan to'xtaydi.</p><p>Lekin o'zgartirish <b>vazifa uchun xavfsiz</b> bo'lishi kerak. Mushuk suratini aks ettirsa bo'ladi. <code>2</code> raqamini aks ettirib bo'lmaydi — raqam chiqmaydi. Rentgen suratini 180° burish ham mumkin emas: shifokor tepa va pastni ajratadi, model ham ajratishi kerak.</p>",
+              "en": "<p>Convolutional networks need lots of images, and labelled images are always in short supply. The cheapest way out is <b>augmentation</b>: one image becomes a dozen by applying transformations that do not change the answer.</p><p>A mirror flip, a rotation by a few degrees, a shift, a random crop, a change of brightness and contrast — a cat stays a cat under any of them. The model sees more variants of the same object and stops clinging to accidental details of one particular shot.</p><p>But the transformation must be <b>safe for the task</b>. Mirroring a photo of a cat is fine. Mirroring the digit <code>2</code> is not — it stops being a digit. Rotating an X-ray by 180° is also out: the radiologist distinguishes top from bottom, and the model must too.</p>"
+            }
+          },
+          {
+            "type": "run",
+            "code": "image = [\n    [1, 2, 3],\n    [4, 5, 6],\n    [7, 8, 9],\n]\n\ndef flip_horizontal(img):\n    return [list(reversed(row)) for row in img]\n\ndef rotate90(img):\n    return [list(row) for row in zip(*reversed(img))]\n\ndef brighter(img, delta):\n    return [[min(9, v + delta) for v in row] for row in img]\n\nvariants = [\n    (\"оригинал\", image),\n    (\"отражение\", flip_horizontal(image)),\n    (\"поворот 90\", rotate90(image)),\n    (\"ярче на 2\", brighter(image, 2)),\n]\n\nfor name, result in variants:\n    print(name)\n    for row in result:\n        print(\"  \", row)"
+          },
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>Осталась вторая половина урока — как вообще понять, хорошо ли работает детектор. С классификацией просто: ответ либо верный, либо нет. А детектор рисует рамку, и она почти никогда не совпадает с правильной пиксель в пиксель.</p><p>Меряют совпадение метрикой <b>IoU</b> — Intersection over Union, «пересечение делить на объединение»:</p><pre><code>IoU = площадь пересечения / площадь объединения</code></pre><p>Полное совпадение даёт <code>1</code>, полное непопадание — <code>0</code>. Порог договорной: в большинстве соревнований рамку считают верной при <code>IoU ≥ 0.5</code>.</p><p>Дальше всё сводится к знакомому: рамки с IoU выше порога — правильные срабатывания, лишние рамки — ложные, пропущенные объекты — пропуски. По ним считают precision и recall из ml-02.</p>",
+              "uz": "<p>Darsning ikkinchi yarmi qoldi — detektor yaxshi ishlayotganini umuman qanday bilish mumkin. Klassifikatsiyada oddiy: javob yo to'g'ri, yo yo'q. Detektor esa ramka chizadi va u to'g'risi bilan deyarli hech qachon pikselma-piksel mos kelmaydi.</p><p>Moslik <b>IoU</b> — Intersection over Union, «kesishmani birlashmaga bo'lish» metrikasi bilan o'lchanadi:</p><pre><code>IoU = kesishma yuzasi / birlashma yuzasi</code></pre><p>To'liq moslik <code>1</code>, umuman tegmaslik <code>0</code> beradi. Chegara kelishuvli: ko'pchilik musobaqalarda ramka <code>IoU ≥ 0.5</code> da to'g'ri hisoblanadi.</p><p>Keyin hammasi tanishga keladi: IoU si chegaradan yuqori ramkalar — to'g'ri ishlashlar, ortiqcha ramkalar — yolg'onlar, o'tkazib yuborilgan obyektlar — yo'qotishlar. Ular bo'yicha ml-02 dagi precision va recall hisoblanadi.</p>",
+              "en": "<p>The other half of the lesson: how do you tell whether a detector works well at all. With classification it's easy — the answer is either right or wrong. But a detector draws a box, and it almost never matches the correct one pixel for pixel.</p><p>The overlap is measured with <b>IoU</b> — Intersection over Union:</p><pre><code>IoU = area of intersection / area of union</code></pre><p>A perfect match gives <code>1</code>, a complete miss <code>0</code>. The threshold is a convention: most competitions count a box as correct at <code>IoU ≥ 0.5</code>.</p><p>From there it reduces to the familiar: boxes above the threshold are true positives, extra boxes are false positives, missed objects are false negatives. From those you compute the precision and recall from ml-02.</p>"
+            }
+          },
+          {
+            "type": "run",
+            "code": "def iou(a, b):\n    ix1, iy1 = max(a[0], b[0]), max(a[1], b[1])\n    ix2, iy2 = min(a[2], b[2]), min(a[3], b[3])\n    inter = max(0, ix2 - ix1) * max(0, iy2 - iy1)\n    area_a = (a[2] - a[0]) * (a[3] - a[1])\n    area_b = (b[2] - b[0]) * (b[3] - b[1])\n    union = area_a + area_b - inter\n    return inter / union if union else 0.0\n\ntruth = (10, 10, 50, 50)\nfor guess in [(10, 10, 50, 50), (12, 12, 52, 52), (30, 30, 70, 70), (60, 60, 90, 90)]:\n    print(guess, \"-> IoU =\", round(iou(truth, guess), 3))"
+          },
+          {
+            "type": "note",
+            "kind": "trap",
+            "html": {
+              "ru": "Аугментацию применяют <b>только к обучающей выборке</b>. Если добавить повороты и отражения в тест, окажется, что модель видела почти те же самые картинки на обучении — это утечка данных из ml-03 в чистом виде. И ещё: перевёрнутого кота в тесте не будет, а значит оценка перестанет отражать реальность.",
+              "uz": "Augmentatsiya <b>faqat o'qitish tanlanmasiga</b> qo'llanadi. Agar testga burishlar va aks ettirishlarni qo'shsangiz, model o'qitishda deyarli o'sha rasmlarni ko'rgan bo'lib chiqadi — bu ml-03 dagi ma'lumot oqishining sof ko'rinishi. Yana: testda ag'darilgan mushuk bo'lmaydi, demak baho haqiqatni aks ettirishdan to'xtaydi.",
+              "en": "Augmentation is applied <b>to the training set only</b>. Add rotations and flips to the test set and it turns out the model already saw nearly the same images during training — that is data leakage from ml-03 in its purest form. Besides, there will be no upside-down cats in reality, so the score stops reflecting it."
+            }
+          },
+          {
+            "type": "summary",
+            "items": [
+              { "ru": "Свёрточный слой держит пачку ядер и даёт по карте признаков на каждое", "uz": "Konvolyutsion qatlam bir dasta yadro saqlaydi va har biriga belgilar xaritasini beradi", "en": "A convolutional layer holds a stack of kernels and yields a feature map per kernel" },
+              { "ru": "Размер выхода: <code>(вход + 2 · паддинг − ядро) // шаг + 1</code>", "uz": "Chiqish o'lchami: <code>(kirish + 2 · padding − yadro) // qadam + 1</code>", "en": "Output size: <code>(input + 2 · padding − kernel) // stride + 1</code>" },
+              { "ru": "Блок CNN — это свёртка, ReLU и пулинг; блоки ставят стопкой", "uz": "CNN bloki — konvolyutsiya, ReLU va puling; bloklar ustma-ust qo'yiladi", "en": "A CNN block is convolution, ReLU and pooling; blocks are stacked" },
+              { "ru": "Ядра не пишут руками — их находит градиентный спуск", "uz": "Yadrolar qo'lda yozilmaydi — ularni gradient tushishi topadi", "en": "Kernels are not hand-written — gradient descent finds them" },
+              { "ru": "Свёртка экономит веса и знает про соседство пикселей", "uz": "Konvolyutsiya vaznlarni tejaydi va piksellar qo'shniligini biladi", "en": "Convolution saves weights and knows about pixel adjacency" },
+              { "ru": "Аугментация даёт больше данных — но только на обучении и только безопасная для задачи", "uz": "Augmentatsiya ko'proq ma'lumot beradi — lekin faqat o'qitishda va faqat vazifa uchun xavfsizi", "en": "Augmentation gives more data — but on training only, and only if safe for the task" },
+              { "ru": "Качество рамки меряют IoU; порог обычно 0.5", "uz": "Ramka sifati IoU bilan o'lchanadi; chegara odatda 0.5", "en": "Box quality is measured with IoU; the threshold is usually 0.5" }
+            ]
+          }
+        ]
+      }
+    ],
+    "quiz": [
+      {
+        "q": {
+          "ru": "Что такое карта признаков?",
+          "uz": "Belgilar xaritasi nima?",
+          "en": "What is a feature map?"
+        },
+        "options": [
+          { "ru": "Исходная картинка в оттенках серого", "uz": "Kulrang tuslardagi asl rasm", "en": "The original image in greyscale" },
+          { "ru": "Результат применения одного ядра ко всей картинке", "uz": "Bitta yadroni butun rasmga qo'llash natijasi", "en": "The result of applying one kernel across the whole image" },
+          { "ru": "Список координат объектов", "uz": "Obyektlar koordinatalari ro'yxati", "en": "A list of object coordinates" },
+          { "ru": "Таблица весов полносвязного слоя", "uz": "To'liq bog'langan qatlam vaznlari jadvali", "en": "The weight table of a fully connected layer" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Сколько ядер в слое — столько и карт признаков на выходе. Каждая показывает, в каких местах картинки встретился узор её ядра.",
+          "uz": "Qatlamda nechta yadro bo'lsa, chiqishda shuncha belgilar xaritasi bo'ladi. Har biri o'z yadrosining naqshi rasmning qaysi joylarida uchraganini ko'rsatadi.",
+          "en": "As many kernels in the layer as feature maps at the output. Each one shows where in the image its kernel's pattern occurred."
+        }
+      },
+      {
+        "q": {
+          "ru": "Зачем нужен паддинг?",
+          "uz": "Padding nimaga kerak?",
+          "en": "What is padding for?"
+        },
+        "options": [
+          { "ru": "Чтобы выход не уменьшался с каждым слоем и края не терялись", "uz": "Chiqish har qatlamda kichraymasligi va chetlar yo'qolmasligi uchun", "en": "So the output doesn't shrink with every layer and the borders aren't lost" },
+          { "ru": "Чтобы ускорить свёртку", "uz": "Konvolyutsiyani tezlashtirish uchun", "en": "To speed up the convolution" },
+          { "ru": "Чтобы уменьшить число ядер", "uz": "Yadrolar sonini kamaytirish uchun", "en": "To reduce the number of kernels" },
+          { "ru": "Чтобы повысить яркость картинки", "uz": "Rasm yorqinligini oshirish uchun", "en": "To raise the image brightness" }
+        ],
+        "a": 0,
+        "explain": {
+          "ru": "Без паддинга ядро <code>3×3</code> отъедает по пикселю с каждой стороны за слой. Десять слоёв — двадцать пикселей, и от небольшой картинки не остаётся ничего. Рамка нулей это компенсирует.",
+          "uz": "Paddingsiz <code>3×3</code> yadro har qatlamda har tomondan bir pikseldan yeydi. O'nta qatlam — yigirma piksel va kichik rasmdan hech nima qolmaydi. Nollar ramkasi buni qoplaydi.",
+          "en": "Without padding a <code>3×3</code> kernel eats one pixel off each side per layer. Ten layers means twenty pixels, and nothing is left of a small image. A border of zeros compensates."
+        }
+      },
+      {
+        "q": {
+          "ru": "Картинка 10×10, ядро 3×3, шаг 1, паддинг 0. Размер выхода?",
+          "uz": "Rasm 10×10, yadro 3×3, qadam 1, padding 0. Chiqish o'lchami?",
+          "en": "A 10×10 image, a 3×3 kernel, stride 1, padding 0. Output size?"
+        },
+        "options": [
+          { "ru": "10×10", "uz": "10×10", "en": "10×10" },
+          { "ru": "8×8", "uz": "8×8", "en": "8×8" },
+          { "ru": "7×7", "uz": "7×7", "en": "7×7" },
+          { "ru": "5×5", "uz": "5×5", "en": "5×5" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "<code>(10 + 0 − 3) // 1 + 1 = 8</code>. Ядро успевает встать в 8 позиций по каждой оси — крайние пиксели не могут оказаться в центре окна.",
+          "uz": "<code>(10 + 0 − 3) // 1 + 1 = 8</code>. Yadro har o'q bo'yicha 8 pozitsiyaga tura oladi — chekka piksellar oyna markazida bo'la olmaydi.",
+          "en": "<code>(10 + 0 − 3) // 1 + 1 = 8</code>. The kernel fits into 8 positions along each axis — the edge pixels can never sit at the window's centre."
+        }
+      },
+      {
+        "q": {
+          "ru": "Откуда берутся ядра в обученной свёрточной сети?",
+          "uz": "O'qitilgan konvolyutsion tarmoqdagi yadrolar qayerdan olinadi?",
+          "en": "Where do the kernels in a trained convolutional network come from?"
+        },
+        "options": [
+          { "ru": "Их пишет разработчик, как в cv-01", "uz": "Ularni cv-01 dagidek ishlab chiquvchi yozadi", "en": "The developer writes them, as in cv-01" },
+          { "ru": "Это обычные веса, их находит градиентный спуск", "uz": "Bular oddiy vaznlar, ularni gradient tushishi topadi", "en": "They are ordinary weights, found by gradient descent" },
+          { "ru": "Они берутся из стандартной библиотеки фильтров", "uz": "Ular standart filtrlar kutubxonasidan olinadi", "en": "They are taken from a standard library of filters" },
+          { "ru": "Они случайны и не меняются при обучении", "uz": "Ular tasodifiy va o'qitishda o'zgarmaydi", "en": "They are random and never change during training" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Разработчик задаёт только форму слоя — сколько ядер и какого размера. Сами числа внутри ядер обучаются так же, как любые веса, и первые слои сами приходят к детекторам краёв.",
+          "uz": "Ishlab chiquvchi faqat qatlam shaklini beradi — nechta yadro va qanday o'lchamda. Yadro ichidagi sonlarning o'zi har qanday vazn kabi o'qitiladi va birinchi qatlamlar qirra detektorlariga o'zi keladi.",
+          "en": "The developer only specifies the layer's shape — how many kernels and what size. The numbers inside the kernels are trained like any weights, and the first layers arrive at edge detectors on their own."
+        }
+      },
+      {
+        "q": {
+          "ru": "Какая аугментация опасна при распознавании рукописных цифр?",
+          "uz": "Qo'lda yozilgan raqamlarni tanishda qaysi augmentatsiya xavfli?",
+          "en": "Which augmentation is dangerous for handwritten digit recognition?"
+        },
+        "options": [
+          { "ru": "Небольшой поворот на 5°", "uz": "5° ga kichik burish", "en": "A small 5° rotation" },
+          { "ru": "Зеркальное отражение", "uz": "Ko'zgu aks ettirish", "en": "A mirror flip" },
+          { "ru": "Изменение яркости", "uz": "Yorqinlikni o'zgartirish", "en": "A brightness change" },
+          { "ru": "Сдвиг на пару пикселей", "uz": "Bir necha pikselga surish", "en": "A shift by a couple of pixels" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Отражённая <code>2</code> — это уже не двойка, а отражённые <code>6</code> и <code>9</code> вообще превращаются друг в друга. Аугментация обязана сохранять правильный ответ, иначе она просто портит разметку.",
+          "uz": "Aks ettirilgan <code>2</code> — bu endi ikki emas, aks ettirilgan <code>6</code> va <code>9</code> esa umuman bir-biriga aylanadi. Augmentatsiya to'g'ri javobni saqlashi shart, aks holda u shunchaki belgilashni buzadi.",
+          "en": "A mirrored <code>2</code> is no longer a two, and mirrored <code>6</code> and <code>9</code> turn into each other outright. Augmentation must preserve the correct answer, otherwise it simply corrupts the labels."
+        }
+      },
+      {
+        "q": {
+          "ru": "Предсказанная рамка совпала с правильной ровно наполовину по площади пересечения при равных размерах. Что покажет IoU?",
+          "uz": "Bashorat qilingan ramka to'g'risi bilan teng o'lchamda kesishma yuzasi bo'yicha aynan yarmiga mos keldi. IoU nima ko'rsatadi?",
+          "en": "A predicted box overlaps the correct one by exactly half its area, both boxes being the same size. What does IoU show?"
+        },
+        "options": [
+          { "ru": "0.5 — как доля пересечения", "uz": "0.5 — kesishma ulushidek", "en": "0.5 — the share of the intersection" },
+          { "ru": "Около 0.33 — знаменатель включает объединение, а не одну рамку", "uz": "Taxminan 0.33 — maxrajda bitta ramka emas, birlashma turadi", "en": "About 0.33 — the denominator is the union, not one box" },
+          { "ru": "1.0", "uz": "1.0", "en": "1.0" },
+          { "ru": "0", "uz": "0", "en": "0" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Пусть площадь каждой рамки — 100, пересечение — 50. Объединение равно <code>100 + 100 − 50 = 150</code>, значит <code>IoU = 50 / 150 ≈ 0.33</code>. Именно поэтому IoU строже, чем «доля перекрытия»: он штрафует и за лишнее, и за недостающее.",
+          "uz": "Har bir ramka yuzasi 100, kesishma 50 bo'lsin. Birlashma <code>100 + 100 − 50 = 150</code> ga teng, demak <code>IoU = 50 / 150 ≈ 0.33</code>. Aynan shuning uchun IoU «qoplanish ulushi» dan qattiqroq: u ortiqcha uchun ham, yetishmagani uchun ham jarima soladi.",
+          "en": "Let each box have area 100 and the intersection 50. The union is <code>100 + 100 − 50 = 150</code>, so <code>IoU = 50 / 150 ≈ 0.33</code>. That is exactly why IoU is stricter than \"share of overlap\": it penalizes both excess and shortfall."
+        }
+      }
+    ],
+    "tasks": [
+      {
+        "id": "t1",
+        "kind": "python",
+        "title": {
+          "ru": "Паддинг картинки",
+          "uz": "Rasmga padding",
+          "en": "Padding an image"
+        },
+        "brief": {
+          "ru": "Обведи матрицу рамкой заданной толщины",
+          "uz": "Matritsani berilgan qalinlikdagi ramka bilan o'rang",
+          "en": "Surround a matrix with a border of given thickness"
+        },
+        "desc": {
+          "ru": "Напиши функцию <code>pad(image, size, value=0)</code>. <code>image</code> — список строк-списков одинаковой длины. Верни <b>новую</b> матрицу, вокруг которой добавлено <code>size</code> строк сверху и снизу и <code>size</code> столбцов слева и справа, заполненных числом <code>value</code>.<br><br>При <code>size = 0</code> верни копию исходной матрицы. Для пустого списка верни пустой список. Исходную матрицу менять нельзя.",
+          "uz": "<code>pad(image, size, value=0)</code> funksiyasini yozing. <code>image</code> — bir xil uzunlikdagi qator-ro'yxatlar ro'yxati. Atrofiga tepa va pastdan <code>size</code> ta qator, chap va o'ngdan <code>size</code> ta ustun qo'shilgan, <code>value</code> soni bilan to'ldirilgan <b>yangi</b> matritsani qaytaring.<br><br><code>size = 0</code> da asl matritsaning nusxasini qaytaring. Bo'sh ro'yxat uchun bo'sh ro'yxat qaytaring. Asl matritsani o'zgartirib bo'lmaydi.",
+          "en": "Write a function <code>pad(image, size, value=0)</code>. <code>image</code> is a list of equal-length row lists. Return a <b>new</b> matrix with <code>size</code> rows added on top and bottom and <code>size</code> columns on the left and right, all filled with <code>value</code>.<br><br>With <code>size = 0</code> return a copy of the original matrix. For an empty list return an empty list. The original must not be modified."
+        },
+        "starter": "def pad(image, size, value=0):\n    # рамка толщиной size из значения value вокруг матрицы\n    ...\n",
+        "tests": "img = [[1, 2], [3, 4]]\nassert pad(img, 0) == [[1, 2], [3, 4]]\nassert pad(img, 1) == [\n    [0, 0, 0, 0],\n    [0, 1, 2, 0],\n    [0, 3, 4, 0],\n    [0, 0, 0, 0],\n]\nassert pad(img, 1, 9)[0] == [9, 9, 9, 9]\nassert pad(img, 1, 9)[1] == [9, 1, 2, 9]\nwide = pad(img, 2)\nassert len(wide) == 6 and len(wide[0]) == 6\nassert img == [[1, 2], [3, 4]]\nassert pad([], 1) == []\nassert pad([[7]], 1) == [[0, 0, 0], [0, 7, 0], [0, 0, 0]]\n",
+        "hint": {
+          "ru": "Новая ширина — <code>len(image[0]) + 2 * size</code>. Собери результат из трёх частей: <code>size</code> строк <code>[value] * ширина</code>, затем каждая исходная строка как <code>[value] * size + row + [value] * size</code>, затем снова <code>size</code> пустых строк. Не забудь про пустой <code>image</code> — до <code>image[0]</code> в этом случае доходить нельзя.",
+          "uz": "Yangi kenglik — <code>len(image[0]) + 2 * size</code>. Natijani uch qismdan yig'ing: <code>size</code> ta <code>[value] * kenglik</code> qator, keyin har bir asl qator <code>[value] * size + row + [value] * size</code> ko'rinishida, keyin yana <code>size</code> ta bo'sh qator. Bo'sh <code>image</code> ni unutmang — bu holda <code>image[0]</code> ga borib bo'lmaydi.",
+          "en": "The new width is <code>len(image[0]) + 2 * size</code>. Build the result from three parts: <code>size</code> rows of <code>[value] * width</code>, then each original row as <code>[value] * size + row + [value] * size</code>, then <code>size</code> filler rows again. Don't forget the empty <code>image</code> — you must not reach <code>image[0]</code> in that case."
+        }
+      },
+      {
+        "id": "t2",
+        "kind": "python",
+        "title": {
+          "ru": "Свёртка с шагом",
+          "uz": "Qadamli konvolyutsiya",
+          "en": "Strided convolution"
+        },
+        "brief": {
+          "ru": "Прогони ядро по картинке с заданным шагом",
+          "uz": "Yadroni rasm bo'ylab berilgan qadam bilan yurgizing",
+          "en": "Run a kernel over the image with a given stride"
+        },
+        "desc": {
+          "ru": "Напиши функцию <code>conv(image, kernel, stride=1)</code>. Прикладывай <code>kernel</code> ко всем позициям <code>image</code>, сдвигаясь на <code>stride</code> пикселей по обеим осям. В каждой позиции перемножь совпавшие числа и сложи результаты.<br><br>Размер выхода — <code>(len(image) - len(kernel)) // stride + 1</code> строк и столько же столбцов по ширине. Если ядро не помещается в картинку, верни пустой список. Паддинг здесь не нужен.<br><br>Пример: ядро <code>[[1]]</code> с шагом 1 возвращает копию картинки.",
+          "uz": "<code>conv(image, kernel, stride=1)</code> funksiyasini yozing. <code>kernel</code> ni <code>image</code> ning barcha pozitsiyalariga qo'ying, ikkala o'q bo'yicha <code>stride</code> pikselga surilib. Har bir pozitsiyada mos kelgan sonlarni ko'paytirib, natijalarni qo'shing.<br><br>Chiqish o'lchami — <code>(len(image) - len(kernel)) // stride + 1</code> qator va kenglik bo'yicha shuncha ustun. Agar yadro rasmga sig'masa, bo'sh ro'yxat qaytaring. Bu yerda padding kerak emas.<br><br>Misol: <code>[[1]]</code> yadrosi 1 qadam bilan rasm nusxasini qaytaradi.",
+          "en": "Write a function <code>conv(image, kernel, stride=1)</code>. Apply <code>kernel</code> at every position of <code>image</code>, moving <code>stride</code> pixels along both axes. At each position multiply the aligned numbers and add up the results.<br><br>The output has <code>(len(image) - len(kernel)) // stride + 1</code> rows and the same count of columns along the width. If the kernel does not fit into the image, return an empty list. No padding here.<br><br>Example: the kernel <code>[[1]]</code> with stride 1 returns a copy of the image."
+        },
+        "starter": "def conv(image, kernel, stride=1):\n    # скользящее окно: перемножить и сложить\n    ...\n",
+        "tests": "img = [\n    [1, 2, 3],\n    [4, 5, 6],\n    [7, 8, 9],\n]\nassert conv(img, [[1]]) == img\nassert conv(img, [[1]], 2) == [[1, 3], [7, 9]]\nbox = [[1, 1], [1, 1]]\nassert conv(img, box) == [[12, 16], [24, 28]]\nassert conv(img, box, 2) == [[12]]\nassert conv(img, [[1, 1, 1], [1, 1, 1], [1, 1, 1]]) == [[45]]\nassert conv(img, [[1], [1], [1], [1]]) == []\nassert conv([[10, 10, 30]], [[-1, 1]]) == [[0, 20]]\n",
+        "hint": {
+          "ru": "Сначала проверь, помещается ли ядро: если <code>len(kernel) &gt; len(image)</code> или ядро шире картинки — верни <code>[]</code>. Дальше два внешних цикла по <code>range(0, len(image) - kh + 1, stride)</code> и то же по ширине, а внутри — сумма <code>kernel[a][b] * image[i + a][j + b]</code> по всем <code>a</code> и <code>b</code>.",
+          "uz": "Avval yadro sig'ishini tekshiring: agar <code>len(kernel) &gt; len(image)</code> yoki yadro rasmdan keng bo'lsa — <code>[]</code> qaytaring. Keyin <code>range(0, len(image) - kh + 1, stride)</code> bo'yicha ikkita tashqi sikl va kenglik bo'yicha xuddi shunday, ichida esa barcha <code>a</code> va <code>b</code> bo'yicha <code>kernel[a][b] * image[i + a][j + b]</code> yig'indisi.",
+          "en": "First check whether the kernel fits: if <code>len(kernel) &gt; len(image)</code> or the kernel is wider than the image, return <code>[]</code>. Then two outer loops over <code>range(0, len(image) - kh + 1, stride)</code> and the same along the width, with the sum of <code>kernel[a][b] * image[i + a][j + b]</code> over all <code>a</code> and <code>b</code> inside."
+        }
+      },
+      {
+        "id": "t3",
+        "kind": "python",
+        "title": {
+          "ru": "IoU двух рамок",
+          "uz": "Ikki ramkaning IoU si",
+          "en": "IoU of two boxes"
+        },
+        "brief": {
+          "ru": "Пересечение делить на объединение",
+          "uz": "Kesishmani birlashmaga bo'lish",
+          "en": "Intersection over union"
+        },
+        "desc": {
+          "ru": "Напиши функцию <code>iou(a, b)</code>. Рамка задаётся кортежем <code>(x1, y1, x2, y2)</code> — левый верхний и правый нижний углы.<br><br>Найди прямоугольник пересечения: его левый край — больший из левых, правый — меньший из правых, и так же по вертикали. Если стороны получились отрицательными, пересечения нет и его площадь равна нулю. Верни <code>площадь пересечения / площадь объединения</code>, где объединение — сумма площадей минус пересечение. Если объединение равно нулю, верни <code>0.0</code>.",
+          "uz": "<code>iou(a, b)</code> funksiyasini yozing. Ramka <code>(x1, y1, x2, y2)</code> korteji bilan beriladi — chap yuqori va o'ng pastki burchaklar.<br><br>Kesishma to'rtburchagini toping: uning chap cheti — chaplarning kattasi, o'ng cheti — o'nglarning kichigi, vertikal bo'yicha ham shunday. Agar tomonlar manfiy chiqsa, kesishma yo'q va uning yuzasi nolga teng. <code>kesishma yuzasi / birlashma yuzasi</code> ni qaytaring, birlashma — yuzalar yig'indisidan kesishmani ayirgan. Agar birlashma nolga teng bo'lsa, <code>0.0</code> qaytaring.",
+          "en": "Write a function <code>iou(a, b)</code>. A box is a tuple <code>(x1, y1, x2, y2)</code> — top-left and bottom-right corners.<br><br>Find the intersection rectangle: its left edge is the larger of the two lefts, its right edge the smaller of the two rights, and likewise vertically. If the sides come out negative there is no intersection and its area is zero. Return <code>intersection area / union area</code>, where the union is the sum of areas minus the intersection. If the union is zero, return <code>0.0</code>."
+        },
+        "starter": "def iou(a, b):\n    # площадь пересечения делить на площадь объединения\n    ...\n",
+        "tests": "assert iou((0, 0, 2, 2), (0, 0, 2, 2)) == 1.0\nassert iou((0, 0, 2, 2), (2, 2, 4, 4)) == 0.0\nassert iou((0, 0, 2, 2), (5, 5, 6, 6)) == 0.0\nassert abs(iou((0, 0, 4, 4), (0, 0, 2, 2)) - 0.25) < 1e-9\nassert abs(iou((0, 0, 4, 4), (2, 2, 6, 6)) - 4 / 28) < 1e-9\nassert abs(iou((10, 10, 50, 50), (30, 30, 70, 70)) - 400 / 2800) < 1e-9\nassert iou((0, 0, 0, 0), (0, 0, 0, 0)) == 0.0\nassert abs(iou((0, 0, 4, 2), (0, 0, 2, 2)) - 0.5) < 1e-9\n",
+        "hint": {
+          "ru": "Левый край пересечения — <code>max(a[0], b[0])</code>, правый — <code>min(a[2], b[2])</code>. Ширину бери как <code>max(0, ix2 - ix1)</code>, чтобы отрицательная сторона превратилась в ноль. Объединение — <code>area_a + area_b - inter</code>: площадь пересечения иначе посчиталась бы дважды.",
+          "uz": "Kesishmaning chap cheti — <code>max(a[0], b[0])</code>, o'ng cheti — <code>min(a[2], b[2])</code>. Kenglikni <code>max(0, ix2 - ix1)</code> qilib oling, manfiy tomon nolga aylansin. Birlashma — <code>area_a + area_b - inter</code>: aks holda kesishma yuzasi ikki marta hisoblanardi.",
+          "en": "The intersection's left edge is <code>max(a[0], b[0])</code>, its right edge <code>min(a[2], b[2])</code>. Take the width as <code>max(0, ix2 - ix1)</code> so a negative side becomes zero. The union is <code>area_a + area_b - inter</code>: otherwise the intersection area would be counted twice."
+        }
+      }
+    ],
+    "exam": {
+      "time": 660,
+      "questions": [
+        {
+          "q": {
+            "ru": "Сколько карт признаков даст свёрточный слой с 16 ядрами?",
+            "uz": "16 yadroli konvolyutsion qatlam nechta belgilar xaritasini beradi?",
+            "en": "How many feature maps does a convolutional layer with 16 kernels produce?"
+          },
+          "options": [
+            { "ru": "1", "uz": "1", "en": "1" },
+            { "ru": "16", "uz": "16", "en": "16" },
+            { "ru": "Зависит от размера картинки", "uz": "Rasm o'lchamiga bog'liq", "en": "It depends on the image size" },
+            { "ru": "256", "uz": "256", "en": "256" }
+          ],
+          "a": 1
+        },
+        {
+          "q": {
+            "ru": "Что делает шаг (stride), равный 2?",
+            "uz": "2 ga teng qadam (stride) nima qiladi?",
+            "en": "What does a stride of 2 do?"
+          },
+          "options": [
+            { "ru": "Уменьшает выход примерно вдвое по каждой оси", "uz": "Chiqishni har o'q bo'yicha taxminan ikki barobar kichraytiradi", "en": "Roughly halves the output along each axis" },
+            { "ru": "Удваивает число ядер", "uz": "Yadrolar sonini ikki barobar oshiradi", "en": "Doubles the number of kernels" },
+            { "ru": "Добавляет рамку из нулей", "uz": "Nollardan ramka qo'shadi", "en": "Adds a border of zeros" },
+            { "ru": "Ничего не меняет, кроме скорости", "uz": "Tezlikdan boshqa hech nimani o'zgartirmaydi", "en": "Changes nothing but speed" }
+          ],
+          "a": 0
+        },
+        {
+          "q": {
+            "ru": "Почему свёртка лучше полносвязного слоя для картинок?",
+            "uz": "Nega rasmlar uchun konvolyutsiya to'liq bog'langan qatlamdan yaxshi?",
+            "en": "Why is a convolution better than a fully connected layer for images?"
+          },
+          "options": [
+            { "ru": "Она использует меньше весов и учитывает соседство пикселей", "uz": "U kamroq vazn ishlatadi va piksellar qo'shniligini hisobga oladi", "en": "It uses fewer weights and accounts for pixel adjacency" },
+            { "ru": "Она не требует обучения", "uz": "U o'qitishni talab qilmaydi", "en": "It requires no training" },
+            { "ru": "Она работает только с цветными картинками", "uz": "U faqat rangli rasmlar bilan ishlaydi", "en": "It only works with colour images" },
+            { "ru": "Она заменяет функцию активации", "uz": "U aktivatsiya funksiyasini almashtiradi", "en": "It replaces the activation function" }
+          ],
+          "a": 0
+        },
+        {
+          "q": {
+            "ru": "Из чего состоит типовой блок свёрточной сети?",
+            "uz": "Konvolyutsion tarmoqning odatiy bloki nimalardan iborat?",
+            "en": "What makes up a typical convolutional network block?"
+          },
+          "options": [
+            { "ru": "Свёртка, ReLU, пулинг", "uz": "Konvolyutsiya, ReLU, puling", "en": "Convolution, ReLU, pooling" },
+            { "ru": "Пулинг, нормализация, softmax", "uz": "Puling, normalizatsiya, softmax", "en": "Pooling, normalization, softmax" },
+            { "ru": "Только свёртка", "uz": "Faqat konvolyutsiya", "en": "Convolution alone" },
+            { "ru": "Полносвязный слой и дропаут", "uz": "To'liq bog'langan qatlam va dropout", "en": "A fully connected layer and dropout" }
+          ],
+          "a": 0
+        },
+        {
+          "q": {
+            "ru": "К какой выборке применяют аугментацию?",
+            "uz": "Augmentatsiya qaysi tanlanmaga qo'llanadi?",
+            "en": "Which sample is augmentation applied to?"
+          },
+          "options": [
+            { "ru": "Только к обучающей", "uz": "Faqat o'qitish tanlanmasiga", "en": "The training set only" },
+            { "ru": "К обучающей и тестовой одинаково", "uz": "O'qitish va test tanlanmasiga bir xil", "en": "Training and test equally" },
+            { "ru": "Только к тестовой", "uz": "Faqat test tanlanmasiga", "en": "The test set only" },
+            { "ru": "К той, где меньше объектов", "uz": "Obyektlari kamrog'iga", "en": "Whichever has fewer objects" }
+          ],
+          "a": 0
+        },
+        {
+          "q": {
+            "ru": "IoU предсказанной рамки равен 0.3, порог — 0.5. Как считается такое срабатывание?",
+            "uz": "Bashorat qilingan ramkaning IoU si 0.3, chegara — 0.5. Bunday ishlash qanday hisoblanadi?",
+            "en": "A predicted box has IoU 0.3 and the threshold is 0.5. How does that detection count?"
+          },
+          "options": [
+            { "ru": "Как ложное срабатывание, а объект — как пропущенный", "uz": "Yolg'on ishlash sifatida, obyekt esa — o'tkazib yuborilgan", "en": "As a false positive, and the object as a miss" },
+            { "ru": "Как верное — рамка ведь пересекается", "uz": "To'g'ri sifatida — ramka kesishyapti-ku", "en": "As correct — the box does overlap" },
+            { "ru": "Как половина верного срабатывания", "uz": "To'g'ri ishlashning yarmi sifatida", "en": "As half a correct detection" },
+            { "ru": "Такие рамки не учитываются вообще", "uz": "Bunday ramkalar umuman hisobga olinmaydi", "en": "Such boxes are not counted at all" }
+          ],
+          "a": 0
+        }
+      ],
+      "tasks": [
+        {
+          "id": "e1",
+          "kind": "python",
+          "title": {
+            "ru": "Фильтрация рамок детектора",
+            "uz": "Detektor ramkalarini filtrlash",
+            "en": "Filtering detector boxes"
+          },
+          "desc": {
+            "ru": "Детектор возвращает много рамок вокруг одного объекта. Лишние убирают алгоритмом «подавления немаксимумов»: берут самую уверенную рамку, выбрасывают всё, что с ней сильно пересекается, и повторяют.<br><br>Напиши функцию <code>filter_boxes(boxes, scores, min_score, iou_limit)</code>. <code>boxes</code> — список кортежей <code>(x1, y1, x2, y2)</code>, <code>scores</code> — уверенность каждой рамки.<br><br>Порядок: отбрось рамки, у которых уверенность <b>меньше</b> <code>min_score</code>; оставшиеся перебирай по убыванию уверенности (при равной — сначала та, что раньше в списке); каждую взятую рамку добавляй в результат и выбрасывай все ещё не рассмотренные рамки, у которых IoU с ней <b>больше</b> <code>iou_limit</code>. Верни список исходных индексов оставленных рамок в том порядке, в котором они были взяты.",
+            "uz": "Detektor bitta obyekt atrofida ko'p ramka qaytaradi. Ortiqchalari «maksimal bo'lmaganlarni bostirish» algoritmi bilan olib tashlanadi: eng ishonchli ramka olinadi, u bilan kuchli kesishadigan hamma narsa tashlanadi va takrorlanadi.<br><br><code>filter_boxes(boxes, scores, min_score, iou_limit)</code> funksiyasini yozing. <code>boxes</code> — <code>(x1, y1, x2, y2)</code> kortejlari ro'yxati, <code>scores</code> — har bir ramkaning ishonchliligi.<br><br>Tartib: ishonchliligi <code>min_score</code> dan <b>kichik</b> ramkalarni tashlang; qolganlarini ishonchlilik kamayishi bo'yicha ko'rib chiqing (teng bo'lsa — ro'yxatda oldinrog'i birinchi); olingan har bir ramkani natijaga qo'shing va u bilan IoU si <code>iou_limit</code> dan <b>katta</b> bo'lgan hali ko'rilmagan ramkalarni tashlang. Qoldirilgan ramkalarning asl indekslarini olingan tartibda ro'yxat qilib qaytaring.",
+            "en": "A detector returns many boxes around one object. The extras are removed by non-maximum suppression: take the most confident box, drop everything that overlaps it heavily, repeat.<br><br>Write a function <code>filter_boxes(boxes, scores, min_score, iou_limit)</code>. <code>boxes</code> is a list of <code>(x1, y1, x2, y2)</code> tuples, <code>scores</code> the confidence of each box.<br><br>The order: drop boxes whose confidence is <b>below</b> <code>min_score</code>; walk the rest by descending confidence (ties go to the one earlier in the list); add each taken box to the result and drop every not-yet-considered box whose IoU with it is <b>above</b> <code>iou_limit</code>. Return the list of original indices of the kept boxes, in the order they were taken."
+          },
+          "starter": "def filter_boxes(boxes, scores, min_score, iou_limit):\n    # подавление немаксимумов: оставить лучшие непересекающиеся рамки\n    ...\n",
+          "tests": "boxes = [(0, 0, 4, 4), (1, 1, 5, 5), (10, 10, 14, 14)]\nscores = [0.9, 0.8, 0.7]\nassert filter_boxes(boxes, scores, 0.5, 0.3) == [0, 2]\nassert filter_boxes(boxes, scores, 0.5, 0.5) == [0, 1, 2]\nassert filter_boxes(boxes, scores, 0.85, 0.3) == [0]\nassert filter_boxes(boxes, scores, 0.95, 0.3) == []\nassert filter_boxes([], [], 0.5, 0.5) == []\nsame = [(0, 0, 2, 2), (0, 0, 2, 2)]\nassert filter_boxes(same, [0.5, 0.5], 0.5, 0.9) == [0]\nassert filter_boxes(boxes, [0.7, 0.9, 0.8], 0.5, 0.3) == [1, 2]\n",
+          "hint": {
+            "ru": "Функция <code>iou</code> из задачи t3 понадобится целиком — просто напиши её рядом. Дальше собери список подходящих индексов и отсортируй его по ключу <code>(-scores[i], i)</code>. Иди по этому списку: если индекс ещё не выброшен — добавь в результат и помечай выброшенными все следующие, у которых IoU с ним больше предела. Удобно держать множество <code>dropped</code>.",
+            "uz": "t3 masalasidagi <code>iou</code> funksiyasi butunlay kerak bo'ladi — uni shunchaki yoniga yozing. Keyin mos indekslar ro'yxatini yig'ing va uni <code>(-scores[i], i)</code> kaliti bo'yicha tartiblang. Shu ro'yxat bo'ylab yuring: agar indeks hali tashlanmagan bo'lsa — natijaga qo'shing va u bilan IoU si chegaradan katta bo'lgan keyingilarini tashlangan deb belgilang. <code>dropped</code> to'plamini saqlash qulay.",
+            "en": "The <code>iou</code> function from task t3 is needed in full — just write it alongside. Then collect the qualifying indices and sort them by the key <code>(-scores[i], i)</code>. Walk that list: if an index has not been dropped yet, add it to the result and mark as dropped every later one whose IoU with it exceeds the limit. A <code>dropped</code> set is handy."
+          }
+        }
+      ]
+    }
   }
  ]
 }
