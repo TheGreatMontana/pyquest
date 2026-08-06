@@ -524,6 +524,353 @@
      }
     ]
    }
+  },
+  {
+   "id": "be-03",
+   "title": { "ru": "База, кеш и фоновые задачи", "uz": "Baza, kesh va fon vazifalari", "en": "Database, cache and background jobs" },
+   "tagline": { "ru": "Транзакции, N+1, TTL и очередь — что превращает медленный сервис в быстрый", "uz": "Tranzaksiyalar, N+1, TTL va navbat — sekin xizmatni tez qiladigan narsalar", "en": "Transactions, N+1, TTL and a queue — what turns a slow service into a fast one" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "Транзакции и запрос в цикле", "uz": "Tranzaksiyalar va sikldagi so'rov", "en": "Transactions and the query in a loop" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Перевод денег — это две операции: списать у одного и зачислить другому. Если сервис упадёт между ними, деньги исчезнут. Поэтому база умеет объединять операции в <b>транзакцию</b>: либо применяются все, либо ни одной.</p><p>В коде это выглядит так: начали, сделали изменения, зафиксировали (<code>COMMIT</code>). Если по дороге ошибка — <code>ROLLBACK</code>, и база возвращается в состояние до начала.</p><p>Важно, что <b>проверка и изменение должны быть внутри одной транзакции</b>. Классическая ошибка: сначала проверили баланс, потом отдельным запросом списали. Между этими двумя моментами успевает пройти второй запрос того же пользователя — и оба видят достаточный баланс, а списывают дважды.</p>",
+        "uz": "<p>Pul o'tkazmasi — ikki amal: birovdan yechish va boshqasiga o'tkazish. Xizmat ular orasida yiqilsa, pul yo'qoladi. Shuning uchun baza amallarni <b>tranzaksiyaga</b> birlashtira oladi: yo hammasi qo'llanadi, yo hech biri.</p><p>Kodda bu shunday: boshladik, o'zgarishlar qildik, qayd etdik (<code>COMMIT</code>). Yo'lda xato bo'lsa — <code>ROLLBACK</code>, va baza boshlanishdan oldingi holatga qaytadi.</p><p>Muhimi, <b>tekshirish va o'zgartirish bitta tranzaksiya ichida bo'lishi kerak</b>. Klassik xato: avval balans tekshirildi, keyin alohida so'rov bilan yechildi. Bu ikki lahza orasida o'sha foydalanuvchining ikkinchi so'rovi o'tib ulguradi — va ikkalasi yetarli balansni ko'radi, yechish esa ikki marta bo'ladi.</p>",
+        "en": "<p>A money transfer is two operations: debit one account and credit another. If the service dies between them, the money vanishes. So a database can join operations into a <b>transaction</b>: either all of them apply or none.</p><p>In code: begin, make the changes, commit. If an error happens on the way — roll back, and the database returns to its state before the start.</p><p>Crucially, <b>the check and the change must be inside one transaction</b>. The classic bug: first check the balance, then debit with a separate query. Between those two moments a second request from the same user slips through — both see a sufficient balance and both debit.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "accounts = {\"aziz\": 500, \"bek\": 100}\n\ndef transfer_bad(frm, to, amount):\n    accounts[frm] -= amount\n    raise RuntimeError(\"сеть отвалилась\")   # сервис упал здесь\n    accounts[to] += amount\n\ntry:\n    transfer_bad(\"aziz\", \"bek\", 200)\nexcept RuntimeError as e:\n    print(\"ошибка:\", e)\nprint(\"после сбоя:\", accounts, \"<- 200 исчезли\")\n\nprint()\n\n# транзакция: работаем с копией, применяем только целиком\naccounts = {\"aziz\": 500, \"bek\": 100}\n\ndef transfer(frm, to, amount):\n    draft = dict(accounts)                  # BEGIN\n    if draft.get(frm, 0) < amount:\n        return False                        # ROLLBACK: копию просто выбрасываем\n    draft[frm] -= amount\n    draft[to] = draft.get(to, 0) + amount\n    accounts.clear()\n    accounts.update(draft)                  # COMMIT\n    return True\n\nprint(\"перевод 200:\", transfer(\"aziz\", \"bek\", 200), accounts)\nprint(\"перевод 10000:\", transfer(\"aziz\", \"bek\", 10000), accounts)\nprint(\"сумма денег в системе:\", sum(accounts.values()), \"- не изменилась\")"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Вторая типичная беда бэкенда — <b>запрос в цикле</b>, её называют проблемой <b>N+1</b>. Взяли список из 100 заказов одним запросом, а потом для каждого заказа отдельным запросом достали имя клиента. Итого 101 поход в базу вместо двух.</p><p>Локально это незаметно: база рядом, каждый запрос миллисекунда. На проде база в другом дата-центре, круговая задержка 20 мс — и страница открывается две секунды вместо сорока миллисекунд.</p><p>Лечится одинаково во всех языках: собрать нужные идентификаторы и сделать <b>один запрос со списком</b> (<code>WHERE id IN (...)</code>), а потом соединить в памяти.</p>",
+        "uz": "<p>Bekendning ikkinchi tipik balosi — <b>sikldagi so'rov</b>, uni <b>N+1</b> muammosi deyishadi. 100 ta buyurtma ro'yxatini bitta so'rov bilan oldik, keyin har buyurtma uchun alohida so'rov bilan mijoz ismini oldik. Jami ikkita o'rniga bazaga 101 marta borish.</p><p>Lokalda bu sezilmaydi: baza yonginada, har so'rov bir millisekund. Prodda baza boshqa ma'lumot markazida, aylanma kechikish 20 ms — va sahifa qirq millisekund o'rniga ikki soniyada ochiladi.</p><p>Barcha tillarda bir xil davolanadi: kerakli identifikatorlarni yig'ib, <b>ro'yxat bilan bitta so'rov</b> qilish (<code>WHERE id IN (...)</code>), keyin xotirada birlashtirish.</p>",
+        "en": "<p>The second typical backend trouble is the <b>query in a loop</b>, known as the <b>N+1</b> problem. You fetch a list of 100 orders with one query, then for each order you fetch the customer's name with a separate query. That is 101 round trips instead of two.</p><p>Locally it is invisible: the database is next door, each query takes a millisecond. In production the database sits in another data centre, the round trip is 20 ms — and the page opens in two seconds instead of forty milliseconds.</p><p>The cure is the same in every language: collect the identifiers you need and issue <b>one query with a list</b> (<code>WHERE id IN (...)</code>), then join in memory.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "users_db = {1: \"Азиз\", 2: \"Бек\", 3: \"Дилноза\"}\ncalls = 0\n\ndef fetch_users(ids):\n    global calls\n    calls += 1\n    return {i: users_db[i] for i in ids if i in users_db}\n\norders = [{\"id\": 10, \"user_id\": 1}, {\"id\": 11, \"user_id\": 2},\n          {\"id\": 12, \"user_id\": 1}, {\"id\": 13, \"user_id\": 3}]\n\n# N+1: запрос внутри цикла\ncalls = 0\nfor o in orders:\n    o[\"user\"] = fetch_users([o[\"user_id\"]])[o[\"user_id\"]]\nprint(\"запросов в базу:\", calls)\n\n# один запрос списком\ncalls = 0\nids = {o[\"user_id\"] for o in orders}\nnames = fetch_users(ids)\nfor o in orders:\n    o[\"user\"] = names[o[\"user_id\"]]\nprint(\"запросов в базу:\", calls)\nprint([(o[\"id\"], o[\"user\"]) for o in orders])"
+      },
+      {
+       "type": "checkpoint",
+       "q": { "ru": "Сервис упал между списанием и зачислением. Что спасает деньги?", "uz": "Xizmat yechish va o'tkazish orasida yiqildi. Pulni nima qutqaradi?", "en": "The service died between the debit and the credit. What saves the money?" },
+       "options": [
+        { "ru": "Логи — по ним потом восстановят вручную", "uz": "Loglar — ular bo'yicha keyin qo'lda tiklashadi", "en": "Logs — someone restores it by hand later" },
+        { "ru": "Транзакция: применяются либо обе операции, либо ни одной", "uz": "Tranzaksiya: yo ikkala amal qo'llanadi, yo hech biri", "en": "A transaction: either both operations apply or neither" },
+        { "ru": "Повторный запрос от клиента", "uz": "Mijozdan qayta so'rov", "en": "A repeat request from the client" },
+        { "ru": "Увеличенный таймаут", "uz": "Oshirilgan taymaut", "en": "A longer timeout" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Ручное восстановление по логам работает ровно до первой сотни таких случаев в день. Транзакция решает это на уровне базы.",
+        "uz": "Loglar bo'yicha qo'lda tiklash kuniga birinchi yuzta shunday holatgacha ishlaydi. Tranzaksiya buni baza darajasida hal qiladi.",
+        "en": "Manual recovery from logs works right up to the first hundred such cases a day. A transaction solves it at the database level."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "Кеш: быстро, но опасно", "uz": "Kesh: tez, lekin xavfli", "en": "Cache: fast, but dangerous" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Кеш — это ответ, который сервис запомнил, чтобы не считать заново. Список категорий магазина меняется раз в месяц, а запрашивают его тысячу раз в минуту: считать каждый раз бессмысленно.</p><p>Первое решение — <b>TTL</b> (time to live): запись живёт заданное число секунд, потом протухает и считается заново. Просто и надёжно, но данные всегда отстают на длину TTL.</p><p>Второе — <b>инвалидация</b>: при изменении данных запись из кеша удаляют. Данные свежие, но легко забыть удалить кеш в одном из десяти мест, где данные меняются, — и пользователь будет видеть старую цену.</p><p>На практике их комбинируют: инвалидация как основной механизм, TTL как страховка от забытого места.</p>",
+        "uz": "<p>Kesh — bu xizmat qayta hisoblamaslik uchun eslab qolgan javob. Do'kon kategoriyalari ro'yxati oyiga bir marta o'zgaradi, so'ralishi esa daqiqada ming marta: har safar hisoblash ma'nosiz.</p><p>Birinchi yechim — <b>TTL</b> (time to live): yozuv berilgan soniyalar yashaydi, keyin aynib, qayta hisoblanadi. Oddiy va ishonchli, lekin ma'lumot doim TTL uzunligicha orqada qoladi.</p><p>Ikkinchisi — <b>invalidatsiya</b>: ma'lumot o'zgarganda yozuv keshdan o'chiriladi. Ma'lumot yangi, lekin ma'lumot o'zgaradigan o'nta joydan birida keshni o'chirishni unutish oson — va foydalanuvchi eski narxni ko'radi.</p><p>Amalda ularni birlashtiradilar: invalidatsiya asosiy mexanizm, TTL esa unutilgan joydan sug'urta.</p>",
+        "en": "<p>A cache is an answer the service remembered so it need not compute it again. A shop's category list changes once a month but is requested a thousand times a minute: recomputing it every time is pointless.</p><p>The first solution is a <b>TTL</b> (time to live): an entry lives for a given number of seconds, then goes stale and is recomputed. Simple and reliable, but the data always lags by the length of the TTL.</p><p>The second is <b>invalidation</b>: when the data changes, the entry is removed from the cache. The data is fresh, but it is easy to forget the removal in one of the ten places where the data changes — and a user will see the old price.</p><p>In practice the two are combined: invalidation as the main mechanism, the TTL as insurance against the forgotten place.</p>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "cache = {}\ncomputed = 0\n\ndef expensive(key):\n    global computed\n    computed += 1\n    return f\"результат для {key}\"\n\ndef get(key, now, ttl=10):\n    item = cache.get(key)\n    if item and now - item[\"at\"] < ttl:\n        return item[\"value\"], \"из кеша\"\n    value = expensive(key)\n    cache[key] = {\"value\": value, \"at\": now}\n    return value, \"посчитано\"\n\nprint(get(\"categories\", now=0))\nprint(get(\"categories\", now=3))\nprint(get(\"categories\", now=9))\nprint(get(\"categories\", now=11))     # TTL истёк\nprint(\"тяжёлых вычислений:\", computed, \"на 4 запроса\")\n\nprint()\n\n# инвалидация при изменении данных\ndef update_categories():\n    cache.pop(\"categories\", None)     # данные изменились - кеш больше не верен\n    print(\"кеш сброшен\")\n\nprint(get(\"categories\", now=12))\nupdate_categories()\nprint(get(\"categories\", now=12))\nprint(\"тяжёлых вычислений:\", computed)"
+      },
+      {
+       "type": "note",
+       "kind": "trap",
+       "html": {
+        "ru": "Кешировать <b>персональные</b> ответы по общему ключу — способ показать одному пользователю данные другого. Если в ответе есть что-то, зависящее от того, кто спрашивает (корзина, баланс, права), идентификатор пользователя обязан быть частью ключа кеша. Это не теоретический риск: именно так утекают чужие заказы, и обнаруживается это обычно от жалобы клиента, а не от мониторинга.",
+        "uz": "<b>Shaxsiy</b> javoblarni umumiy kalit bo'yicha keshlash — bir foydalanuvchiga boshqasining ma'lumotini ko'rsatish usuli. Javobda kim so'rayotganiga bog'liq narsa bo'lsa (savat, balans, huquqlar), foydalanuvchi identifikatori kesh kalitining qismi bo'lishi shart. Bu nazariy xavf emas: birovning buyurtmalari aynan shunday sizib chiqadi va bu odatda monitoringdan emas, mijoz shikoyatidan aniqlanadi.",
+        "en": "Caching <b>personal</b> responses under a shared key is a way to show one user another user's data. If the response depends on who is asking (a basket, a balance, permissions), the user identifier must be part of the cache key. This is not a theoretical risk: it is exactly how other people's orders leak, and it is usually discovered from a customer complaint rather than from monitoring."
+       }
+      },
+      {
+       "type": "checkpoint",
+       "q": { "ru": "Цену товара поменяли, а пользователи ещё десять минут видят старую. Почему?", "uz": "Mahsulot narxi o'zgardi, foydalanuvchilar esa yana o'n daqiqa eskisini ko'radi. Nega?", "en": "The price changed but users see the old one for another ten minutes. Why?" },
+       "options": [
+        { "ru": "База работает медленно", "uz": "Baza sekin ishlaydi", "en": "The database is slow" },
+        { "ru": "Кеш не сбросили при изменении, ждём истечения TTL", "uz": "O'zgarishda kesh tozalanmadi, TTL tugashini kutyapmiz", "en": "The cache was not invalidated on change; we are waiting for the TTL" },
+        { "ru": "У пользователей старый браузер", "uz": "Foydalanuvchilarda eski brauzer", "en": "The users have an old browser" },
+        { "ru": "Так и должно быть всегда", "uz": "Doim shunday bo'lishi kerak", "en": "That is always how it should be" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "TTL здесь работает как страховка и рано или поздно всё починит. Но правильное место для сброса — там, где цена меняется.",
+        "uz": "TTL bu yerda sug'urta sifatida ishlaydi va ertami-kechmi hammasini tuzatadi. Lekin tozalash uchun to'g'ri joy — narx o'zgaradigan joy.",
+        "en": "The TTL acts as insurance here and will fix things sooner or later. But the right place to invalidate is where the price changes."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "Фоновые задачи", "uz": "Fon vazifalari", "en": "Background jobs" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Пользователь оформил заказ. Нужно отправить письмо, уведомить склад, пересчитать статистику. Если делать это прямо в обработчике запроса, кнопка «Оформить» будет думать восемь секунд — а если почтовый сервис недоступен, заказ вообще не создастся.</p><p>Поэтому обработчик делает только то, без чего ответ невозможен: сохраняет заказ и <b>кладёт задачу в очередь</b>. Ответ уходит клиенту за 50 мс, а письмо отправит отдельный процесс — <b>воркер</b>.</p><p>У воркера свои правила, и они те же, что у пайплайна данных:</p><ul><li><b>Ретраи с задержкой.</b> Почта не ответила — повторить через минуту, потом через пять, потом через час.</li><li><b>Ограничение попыток.</b> После N неудач задача уходит в «мёртвую» очередь, а не крутится вечно.</li><li><b>Идемпотентность.</b> Воркер может получить задачу дважды, и письмо не должно уйти два раза.</li></ul>",
+        "uz": "<p>Foydalanuvchi buyurtma berdi. Xat yuborish, omborni xabardor qilish, statistikani qayta hisoblash kerak. Buni to'g'ridan-to'g'ri so'rov ishlovchisida qilinsa, «Rasmiylashtirish» tugmasi sakkiz soniya o'ylaydi — pochta xizmati ishlamasa esa buyurtma umuman yaratilmaydi.</p><p>Shuning uchun ishlovchi faqat javob uchun zarur ishni qiladi: buyurtmani saqlaydi va <b>vazifani navbatga qo'yadi</b>. Javob mijozga 50 ms da ketadi, xatni esa alohida jarayon — <b>vorker</b> yuboradi.</p><p>Vorkerning o'z qoidalari bor va ular ma'lumot payplaynidagidek:</p><ul><li><b>Kechikish bilan qayta urinishlar.</b> Pochta javob bermadi — bir daqiqadan keyin, keyin beshtadan, keyin bir soatdan keyin takrorlash.</li><li><b>Urinishlar cheklovi.</b> N marta muvaffaqiyatsizlikdan keyin vazifa abadiy aylanmasdan «o'lik» navbatga ketadi.</li><li><b>Idempotentlik.</b> Vorker vazifani ikki marta olishi mumkin va xat ikki marta ketmasligi kerak.</li></ul>",
+        "en": "<p>A user placed an order. An email must be sent, the warehouse notified, statistics recomputed. Doing that inside the request handler makes the “Place order” button think for eight seconds — and if the mail service is down, the order is not created at all.</p><p>So the handler does only what the response cannot exist without: it saves the order and <b>puts a job on a queue</b>. The response reaches the client in 50 ms, and a separate process — a <b>worker</b> — sends the email.</p><p>The worker has its own rules, and they are the same as a data pipeline's:</p><ul><li><b>Retries with a delay.</b> Mail did not answer — retry in a minute, then in five, then in an hour.</li><li><b>An attempt limit.</b> After N failures the job goes to a dead-letter queue instead of spinning forever.</li><li><b>Idempotency.</b> The worker may receive a job twice, and the email must not go out twice.</li></ul>"
+       }
+      },
+      {
+       "type": "run",
+       "code": "queue = []\nsent = set()\ndead = []\n\ndef create_order(order_id):\n    queue.append({\"type\": \"email\", \"order\": order_id, \"tries\": 0})\n    return {\"status\": 201, \"order\": order_id}   # ответ уходит сразу\n\nattempts = {\"count\": 0}\n\ndef send_email(order_id):\n    attempts[\"count\"] += 1\n    if attempts[\"count\"] < 3:                    # почта временно недоступна\n        raise RuntimeError(\"SMTP недоступен\")\n    if order_id in sent:\n        return \"уже отправлено\"                  # идемпотентность\n    sent.add(order_id)\n    return \"письмо отправлено\"\n\ndef worker(max_tries=5):\n    while queue:\n        job = queue.pop(0)\n        try:\n            print(f\"заказ {job['order']}:\", send_email(job[\"order\"]))\n        except RuntimeError as e:\n            job[\"tries\"] += 1\n            if job[\"tries\"] >= max_tries:\n                dead.append(job)\n                print(f\"заказ {job['order']}: сдаёмся после {job['tries']} попыток\")\n            else:\n                queue.append(job)\n                print(f\"заказ {job['order']}: {e}, попытка {job['tries']}\")\n\nprint(create_order(777))\nworker()\nprint(\"отправлено:\", sent, \"| в мёртвой очереди:\", len(dead))"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Обрати внимание на две детали. Первая: задача вернулась в конец очереди, а не повторилась немедленно — иначе воркер зациклится на одной сломанной задаче и не тронет остальные.</p><p>Вторая: <code>if order_id in sent</code> внутри отправки. Очередь почти всегда даёт гарантию «доставим <b>хотя бы</b> один раз», а не «ровно один раз» — воркер может умереть после отправки письма, но до подтверждения задачи, и задача вернётся. Защита от повторной отправки должна быть в самом обработчике.</p>",
+        "uz": "<p>Ikki tafsilotga e'tibor bering. Birinchisi: vazifa darhol takrorlanmasdan navbat oxiriga qaytdi — aks holda vorker bitta buzuq vazifada aylanib qoladi va qolganlariga tegmaydi.</p><p>Ikkinchisi: yuborish ichidagi <code>if order_id in sent</code>. Navbat deyarli doim «<b>hech bo'lmasa</b> bir marta yetkazamiz» kafolatini beradi, «aynan bir marta» emas — vorker xat yuborgandan keyin, vazifani tasdiqlashdan oldin o'lishi mumkin va vazifa qaytadi. Qayta yuborishdan himoya ishlovchining o'zida bo'lishi kerak.</p>",
+        "en": "<p>Note two details. First: the job went back to the end of the queue rather than retrying immediately — otherwise the worker spins on one broken job and never touches the rest.</p><p>Second: <code>if order_id in sent</code> inside the send. A queue almost always guarantees “delivered <b>at least</b> once”, not “exactly once” — the worker can die after sending the email but before acknowledging the job, and the job comes back. The protection against a double send must live in the handler itself.</p>"
+       }
+      },
+      {
+       "type": "summary",
+       "items": [
+        { "ru": "Транзакция применяет либо все операции, либо ни одной", "uz": "Tranzaksiya yo barcha amallarni, yo hech birini qo'llaydi", "en": "A transaction applies either all operations or none" },
+        { "ru": "Проверка и изменение должны быть в одной транзакции", "uz": "Tekshirish va o'zgartirish bitta tranzaksiyada bo'lishi kerak", "en": "The check and the change must sit in one transaction" },
+        { "ru": "Запрос в цикле (N+1) незаметен локально и убивает прод", "uz": "Sikldagi so'rov (N+1) lokalda sezilmaydi va prodni o'ldiradi", "en": "A query in a loop (N+1) is invisible locally and kills production" },
+        { "ru": "Один запрос со списком идентификаторов вместо ста", "uz": "Yuzta o'rniga identifikatorlar ro'yxati bilan bitta so'rov", "en": "One query with a list of identifiers instead of a hundred" },
+        { "ru": "TTL — простая страховка, инвалидация — точный сброс", "uz": "TTL — oddiy sug'urta, invalidatsiya — aniq tozalash", "en": "A TTL is simple insurance, invalidation is a precise reset" },
+        { "ru": "Персональные ответы кешируются только с id пользователя в ключе", "uz": "Shaxsiy javoblar faqat kalitda foydalanuvchi id si bilan keshlanadi", "en": "Personal responses are cached only with the user id in the key" },
+        { "ru": "Медленное и ненадёжное выносится в фоновую очередь", "uz": "Sekin va ishonchsiz narsa fon navbatiga chiqariladi", "en": "Slow and unreliable work moves to a background queue" },
+        { "ru": "Очередь доставляет хотя бы раз — обработчик обязан быть идемпотентным", "uz": "Navbat hech bo'lmasa bir marta yetkazadi — ishlovchi idempotent bo'lishi shart", "en": "A queue delivers at least once — the handler must be idempotent" }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": { "ru": "Что гарантирует транзакция?", "uz": "Tranzaksiya nimani kafolatlaydi?", "en": "What does a transaction guarantee?" },
+     "options": [
+      { "ru": "Что запрос выполнится быстро", "uz": "So'rov tez bajarilishini", "en": "That the query runs fast" },
+      { "ru": "Что применятся либо все операции, либо ни одной", "uz": "Yo barcha amallar, yo hech biri qo'llanishini", "en": "That either all operations apply or none" },
+      { "ru": "Что данные не устареют", "uz": "Ma'lumot eskirmasligini", "en": "That the data will not go stale" },
+      { "ru": "Что база не упадёт", "uz": "Baza yiqilmasligini", "en": "That the database will not crash" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Именно поэтому перевод денег делают транзакцией: промежуточное состояние, где деньги списаны, но не зачислены, снаружи не видно никогда.",
+      "uz": "Aynan shuning uchun pul o'tkazmasi tranzaksiya bilan qilinadi: pul yechilgan, lekin o'tkazilmagan oraliq holat tashqaridan hech qachon ko'rinmaydi.",
+      "en": "That is exactly why a money transfer is a transaction: the intermediate state where money is debited but not credited is never visible from outside."
+     }
+    },
+    {
+     "q": { "ru": "Страница со ста заказами открывается две секунды. Что проверить первым?", "uz": "Yuzta buyurtmali sahifa ikki soniyada ochiladi. Birinchi nimani tekshirish kerak?", "en": "A page with a hundred orders takes two seconds. What do you check first?" },
+     "options": [
+      { "ru": "Скорость интернета у пользователя", "uz": "Foydalanuvchining internet tezligini", "en": "The user's internet speed" },
+      { "ru": "Нет ли запроса в базу внутри цикла по заказам", "uz": "Buyurtmalar sikli ichida bazaga so'rov yo'qmi", "en": "Whether there is a database query inside the loop over orders" },
+      { "ru": "Версию Python", "uz": "Python versiyasini", "en": "The Python version" },
+      { "ru": "Размер картинок", "uz": "Rasmlar hajmini", "en": "The image sizes" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "N+1 — самая частая причина «непонятно медленной» страницы. Сто запросов по 20 мс это ровно две секунды.",
+      "uz": "N+1 — «tushunarsiz sekin» sahifaning eng tez-tez sababi. 20 ms dan yuzta so'rov aynan ikki soniya.",
+      "en": "N+1 is the most common cause of a mysteriously slow page. A hundred queries at 20 ms each is exactly two seconds."
+     }
+    },
+    {
+     "q": { "ru": "Что делает TTL у записи в кеше?", "uz": "Keshdagi yozuvning TTL si nima qiladi?", "en": "What does a cache entry's TTL do?" },
+     "options": [
+      { "ru": "Ограничивает размер записи", "uz": "Yozuv hajmini cheklaydi", "en": "Limits the entry's size" },
+      { "ru": "Задаёт, сколько секунд запись считается свежей", "uz": "Yozuv necha soniya yangi hisoblanishini belgilaydi", "en": "Sets how many seconds the entry counts as fresh" },
+      { "ru": "Шифрует значение", "uz": "Qiymatni shifrlaydi", "en": "Encrypts the value" },
+      { "ru": "Сбрасывает кеш при изменении данных", "uz": "Ma'lumot o'zgarganda keshni tozalaydi", "en": "Clears the cache when the data changes" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Сброс при изменении — это инвалидация, отдельный механизм. TTL про время, инвалидация про событие.",
+      "uz": "O'zgarishda tozalash — bu invalidatsiya, alohida mexanizm. TTL vaqt haqida, invalidatsiya hodisa haqida.",
+      "en": "Clearing on change is invalidation, a separate mechanism. A TTL is about time, invalidation about an event."
+     }
+    },
+    {
+     "q": { "ru": "Что обязательно должно входить в ключ кеша персонального ответа?", "uz": "Shaxsiy javob kesh kalitiga nima albatta kirishi kerak?", "en": "What must be part of the cache key for a personal response?" },
+     "options": [
+      { "ru": "Время запроса", "uz": "So'rov vaqti", "en": "The request time" },
+      { "ru": "Идентификатор пользователя", "uz": "Foydalanuvchi identifikatori", "en": "The user identifier" },
+      { "ru": "Версия сервиса", "uz": "Xizmat versiyasi", "en": "The service version" },
+      { "ru": "Адрес сервера", "uz": "Server manzili", "en": "The server address" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Без него один пользователь получит закешированный ответ другого — это утечка данных, а не ошибка производительности.",
+      "uz": "Usiz bir foydalanuvchi boshqasining keshlangan javobini oladi — bu unumdorlik xatosi emas, ma'lumot sizishi.",
+      "en": "Without it one user receives another's cached response — that is a data leak, not a performance bug."
+     }
+    },
+    {
+     "q": { "ru": "Зачем отправку письма выносят в фоновую очередь?", "uz": "Xat yuborishni nega fon navbatiga chiqarishadi?", "en": "Why is sending an email moved to a background queue?" },
+     "options": [
+      { "ru": "Так письма красивее", "uz": "Shunda xatlar chiroyliroq", "en": "The emails look nicer that way" },
+      { "ru": "Чтобы ответ клиенту не ждал медленный и ненадёжный внешний сервис", "uz": "Mijozga javob sekin va ishonchsiz tashqi xizmatni kutmasligi uchun", "en": "So the client's response does not wait for a slow, unreliable external service" },
+      { "ru": "Чтобы сэкономить место в базе", "uz": "Bazada joy tejash uchun", "en": "To save space in the database" },
+      { "ru": "Этого требует HTTP", "uz": "HTTP shuni talab qiladi", "en": "HTTP requires it" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Заодно недоступность почты перестаёт мешать созданию заказа: заказ сохранён, письмо уйдёт позже.",
+      "uz": "Ayni paytda pochta ishlamasligi buyurtma yaratishga xalaqit bermay qo'yadi: buyurtma saqlangan, xat keyinroq ketadi.",
+      "en": "As a bonus, mail being down stops blocking order creation: the order is saved, the email goes out later."
+     }
+    },
+    {
+     "q": { "ru": "Очередь гарантирует доставку «хотя бы раз». Что из этого следует?", "uz": "Navbat «hech bo'lmasa bir marta» yetkazishni kafolatlaydi. Bundan nima kelib chiqadi?", "en": "A queue guarantees “at least once” delivery. What follows from that?" },
+     "options": [
+      { "ru": "Ничего, задача придёт ровно один раз", "uz": "Hech nima, vazifa aynan bir marta keladi", "en": "Nothing, the job arrives exactly once" },
+      { "ru": "Обработчик обязан быть идемпотентным: повтор не должен слать письмо дважды", "uz": "Ishlovchi idempotent bo'lishi shart: takror xatni ikki marta yubormasligi kerak", "en": "The handler must be idempotent: a repeat must not send the email twice" },
+      { "ru": "Очередь нужно заменить на базу", "uz": "Navbatni bazaga almashtirish kerak", "en": "The queue should be replaced with a database" },
+      { "ru": "Ретраи не нужны", "uz": "Qayta urinishlar kerak emas", "en": "Retries are unnecessary" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Воркер может умереть после отправки, но до подтверждения задачи — тогда задача вернётся в очередь и придёт снова.",
+      "uz": "Vorker yuborgandan keyin, vazifani tasdiqlashdan oldin o'lishi mumkin — u holda vazifa navbatga qaytadi va yana keladi.",
+      "en": "The worker can die after sending but before acknowledging the job — then the job returns to the queue and arrives again."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "python",
+     "title": { "ru": "Перевод как транзакция", "uz": "O'tkazma tranzaksiya sifatida", "en": "A transfer as a transaction" },
+     "brief": { "ru": "Всё или ничего", "uz": "Hammasi yoki hech nima", "en": "All or nothing" },
+     "desc": {
+      "ru": "<p><code>transfer(accounts, frm, to, amount)</code> переводит деньги между счетами в словаре <code>accounts</code>.</p><p>Верни <code>True</code>, если перевод прошёл. Верни <code>False</code> и <b>не меняй ни одного счёта</b>, если: сумма не положительная, отправителя нет в словаре, получателя нет в словаре, или денег не хватает.</p>",
+      "uz": "<p><code>transfer(accounts, frm, to, amount)</code> <code>accounts</code> lug'atidagi hisoblar orasida pul o'tkazadi.</p><p>O'tkazma o'tsa <code>True</code> qaytaring. Agar summa musbat bo'lmasa, yuboruvchi lug'atda bo'lmasa, qabul qiluvchi lug'atda bo'lmasa yoki pul yetmasa — <code>False</code> qaytaring va <b>birorta hisobni o'zgartirmang</b>.</p>",
+      "en": "<p><code>transfer(accounts, frm, to, amount)</code> moves money between accounts in the <code>accounts</code> dictionary.</p><p>Return <code>True</code> if the transfer went through. Return <code>False</code> and <b>change no account</b> if: the amount is not positive, the sender is missing, the recipient is missing, or there is not enough money.</p>"
+     },
+     "starter": "def transfer(accounts, frm, to, amount):\n    # твой код\n    pass\n\nacc = {'aziz': 500, 'bek': 100}\nprint(transfer(acc, 'aziz', 'bek', 200), acc)\n",
+     "tests": "acc = {'aziz': 500, 'bek': 100}\nassert transfer(acc, 'aziz', 'bek', 200) is True, 'Обычный перевод'\nassert acc == {'aziz': 300, 'bek': 300}, 'Списали и зачислили'\nassert transfer(acc, 'aziz', 'bek', 10000) is False, 'Не хватает денег'\nassert acc == {'aziz': 300, 'bek': 300}, 'При отказе счета не меняются'\nassert transfer(acc, 'aziz', 'nikto', 10) is False, 'Нет получателя'\nassert transfer(acc, 'nikto', 'bek', 10) is False, 'Нет отправителя'\nassert transfer(acc, 'aziz', 'bek', 0) is False, 'Ноль не переводим'\nassert transfer(acc, 'aziz', 'bek', -50) is False, 'Отрицательную сумму не переводим'\nassert acc == {'aziz': 300, 'bek': 300}, 'Ни одна проверка не тронула счета'\nassert sum(acc.values()) == 600, 'Деньги не исчезают и не появляются'",
+     "hint": {
+      "ru": "Сначала все проверки подряд с ранним <code>return False</code>, и только потом два изменения. Так «половинчатое» состояние невозможно в принципе.",
+      "uz": "Avval barcha tekshiruvlar ketma-ket erta <code>return False</code> bilan, va faqat keyin ikki o'zgarish. Shunda «yarim» holat printsipial imkonsiz.",
+      "en": "All the checks first, each with an early <code>return False</code>, and only then the two changes. That makes a half-done state impossible in principle."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "python",
+     "title": { "ru": "Кеш с TTL", "uz": "TTL li kesh", "en": "A cache with a TTL" },
+     "brief": { "ru": "Свежее отдаём, протухшее считаем", "uz": "Yangisini beramiz, aynaganini hisoblaymiz", "en": "Serve the fresh, recompute the stale" },
+     "desc": {
+      "ru": "<p><code>cached(store, key, now, ttl, compute)</code> — обёртка над кешем. <code>store</code> — словарь, <code>compute</code> — функция без аргументов, считающая значение.</p><p>Если в <code>store</code> есть свежая запись по ключу (с момента её сохранения прошло <b>меньше</b> <code>ttl</code>), верни <code>(значение, True)</code> и не вызывай <code>compute</code>. Иначе посчитай, сохрани с меткой <code>now</code> и верни <code>(значение, False)</code>.</p><p>Храни записи в виде <code>store[key] = (значение, время_сохранения)</code>.</p>",
+      "uz": "<p><code>cached(store, key, now, ttl, compute)</code> — kesh ustidagi o'ram. <code>store</code> — lug'at, <code>compute</code> — qiymatni hisoblaydigan argumentsiz funksiya.</p><p><code>store</code> da kalit bo'yicha yangi yozuv bo'lsa (saqlanganidan beri <code>ttl</code> dan <b>kam</b> o'tgan), <code>(qiymat, True)</code> qaytaring va <code>compute</code> ni chaqirmang. Aks holda hisoblang, <code>now</code> belgisi bilan saqlang va <code>(qiymat, False)</code> qaytaring.</p><p>Yozuvlarni <code>store[key] = (qiymat, saqlangan_vaqt)</code> ko'rinishida saqlang.</p>",
+      "en": "<p><code>cached(store, key, now, ttl, compute)</code> is a wrapper over a cache. <code>store</code> is a dictionary, <code>compute</code> is a zero-argument function producing the value.</p><p>If <code>store</code> holds a fresh entry for the key (<b>less</b> than <code>ttl</code> has passed since it was saved), return <code>(value, True)</code> and do not call <code>compute</code>. Otherwise compute, save it with the timestamp <code>now</code> and return <code>(value, False)</code>.</p><p>Store entries as <code>store[key] = (value, saved_at)</code>.</p>"
+     },
+     "starter": "def cached(store, key, now, ttl, compute):\n    # твой код\n    pass\n\ns = {}\nprint(cached(s, 'cats', 0, 10, lambda: 'мяу'))\nprint(cached(s, 'cats', 5, 10, lambda: 'мяу'))\n",
+     "tests": "calls = []\ndef compute():\n    calls.append(1)\n    return 'значение'\n\ns = {}\nval, hit = cached(s, 'k', 0, 10, compute)\nassert val == 'значение' and hit is False, 'Первый раз считаем'\nassert len(calls) == 1, 'compute вызван один раз'\nval, hit = cached(s, 'k', 5, 10, compute)\nassert val == 'значение' and hit is True, 'Свежая запись берётся из кеша'\nassert len(calls) == 1, 'compute не должен вызываться повторно'\nval, hit = cached(s, 'k', 10, 10, compute)\nassert hit is False, 'Ровно ttl - запись уже протухла'\nassert len(calls) == 2, 'После протухания считаем заново'\nval, hit = cached(s, 'other', 10, 10, compute)\nassert hit is False and len(calls) == 3, 'Другой ключ - свой расчёт'\nassert s['k'][1] == 10, 'В store лежит время сохранения'",
+     "hint": {
+      "ru": "Достань запись через <code>store.get(key)</code>. Она есть и <code>now - saved &lt; ttl</code> — попадание. Иначе <code>value = compute()</code>, <code>store[key] = (value, now)</code>.",
+      "uz": "Yozuvni <code>store.get(key)</code> orqali oling. U bor va <code>now - saved &lt; ttl</code> bo'lsa — tushish. Aks holda <code>value = compute()</code>, <code>store[key] = (value, now)</code>.",
+      "en": "Fetch the entry with <code>store.get(key)</code>. If it exists and <code>now - saved &lt; ttl</code>, that is a hit. Otherwise <code>value = compute()</code>, <code>store[key] = (value, now)</code>."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "python",
+     "title": { "ru": "Воркер с ретраями", "uz": "Qayta urinishli vorker", "en": "A worker with retries" },
+     "brief": { "ru": "Повторяй, но не вечно", "uz": "Takrorlang, lekin abadiy emas", "en": "Retry, but not forever" },
+     "desc": {
+      "ru": "<p><code>work(queue, handler, max_tries)</code> разбирает очередь задач. <code>queue</code> — список словарей вида <code>{'id': ..., 'tries': 0}</code>, <code>handler</code> — функция от задачи, которая либо отрабатывает, либо бросает исключение.</p><p>Бери задачи с начала. Если <code>handler</code> отработал — задача выполнена. Если бросил исключение — увеличь <code>tries</code> и верни задачу <b>в конец</b> очереди; когда <code>tries</code> достигло <code>max_tries</code>, задача отправляется в «мёртвую» очередь.</p><p>Верни кортеж <code>(список_id_выполненных, список_id_мёртвых)</code>.</p>",
+      "uz": "<p><code>work(queue, handler, max_tries)</code> vazifalar navbatini tahlil qiladi. <code>queue</code> — <code>{'id': ..., 'tries': 0}</code> ko'rinishidagi lug'atlar ro'yxati, <code>handler</code> — vazifadan funksiya, u yo bajaradi, yo istisno tashlaydi.</p><p>Vazifalarni boshidan oling. <code>handler</code> ishlagan bo'lsa — vazifa bajarildi. Istisno tashlasa — <code>tries</code> ni oshiring va vazifani navbat <b>oxiriga</b> qaytaring; <code>tries</code> <code>max_tries</code> ga yetganda vazifa «o'lik» navbatga ketadi.</p><p><code>(bajarilganlar_id_ro'yxati, o'liklar_id_ro'yxati)</code> kortejini qaytaring.</p>",
+      "en": "<p><code>work(queue, handler, max_tries)</code> drains a job queue. <code>queue</code> is a list of dictionaries like <code>{'id': ..., 'tries': 0}</code>, and <code>handler</code> is a function of a job that either succeeds or raises.</p><p>Take jobs from the front. If <code>handler</code> succeeded, the job is done. If it raised, increment <code>tries</code> and put the job back at the <b>end</b> of the queue; once <code>tries</code> reaches <code>max_tries</code> the job goes to the dead-letter queue.</p><p>Return the tuple <code>(done_ids, dead_ids)</code>.</p>"
+     },
+     "starter": "def work(queue, handler, max_tries):\n    # твой код\n    pass\n\nq = [{'id': 1, 'tries': 0}]\nprint(work(q, lambda job: None, 3))\n",
+     "tests": "q = [{'id': 1, 'tries': 0}, {'id': 2, 'tries': 0}]\ndone, dead = work(q, lambda job: None, 3)\nassert done == [1, 2] and dead == [], 'Всё выполнилось с первого раза'\nassert q == [], 'Очередь разобрана'\n\ndef always_fail(job):\n    raise RuntimeError('нет связи')\n\nq = [{'id': 7, 'tries': 0}]\ndone, dead = work(q, always_fail, 3)\nassert done == [] and dead == [7], 'После max_tries задача мёртвая'\nassert q == [], 'Мёртвая задача не остаётся в очереди'\n\ncalls = []\ndef flaky(job):\n    calls.append(job['id'])\n    if len(calls) < 3:\n        raise RuntimeError('временно')\nq = [{'id': 5, 'tries': 0}]\ndone, dead = work(q, flaky, 5)\nassert done == [5] and dead == [], 'Третья попытка удалась'\nassert len(calls) == 3, 'Ровно три попытки'\n\nq = [{'id': 1, 'tries': 0}, {'id': 2, 'tries': 0}]\nseen = []\ndef order(job):\n    seen.append(job['id'])\n    if job['id'] == 1 and job['tries'] == 0:\n        raise RuntimeError('первый раз мимо')\ndone, dead = work(q, order, 3)\nassert seen == [1, 2, 1], 'Неудачная задача уходит в конец, а не повторяется сразу'\nassert done == [2, 1], 'Порядок выполнения'",
+     "hint": {
+      "ru": "<code>while queue:</code> и <code>job = queue.pop(0)</code>. Вокруг <code>handler(job)</code> — <code>try/except Exception</code>. В <code>except</code>: <code>job['tries'] += 1</code>, потом либо в мёртвые, либо <code>queue.append(job)</code>.",
+      "uz": "<code>while queue:</code> va <code>job = queue.pop(0)</code>. <code>handler(job)</code> atrofida — <code>try/except Exception</code>. <code>except</code> da: <code>job['tries'] += 1</code>, keyin yo o'liklarga, yo <code>queue.append(job)</code>.",
+      "en": "<code>while queue:</code> with <code>job = queue.pop(0)</code>. Wrap <code>handler(job)</code> in <code>try/except Exception</code>. Inside <code>except</code>: <code>job['tries'] += 1</code>, then either dead-letter it or <code>queue.append(job)</code>."
+     }
+    }
+   ],
+   "exam": {
+    "time": 600,
+    "questions": [
+     {
+      "q": { "ru": "Проверили баланс одним запросом, списали вторым. Что может пойти не так?", "uz": "Balansni bitta so'rov bilan tekshirdik, ikkinchisi bilan yechdik. Nima noto'g'ri ketishi mumkin?", "en": "You checked the balance with one query and debited with another. What can go wrong?" },
+      "options": [
+       { "ru": "Ничего, это правильный способ", "uz": "Hech nima, bu to'g'ri usul", "en": "Nothing, that is the right way" },
+       { "ru": "Второй одновременный запрос увидит тот же баланс — спишут дважды", "uz": "Ikkinchi bir vaqtdagi so'rov o'sha balansni ko'radi — ikki marta yechiladi", "en": "A second concurrent request sees the same balance — it debits twice" },
+       { "ru": "База откажет в записи", "uz": "Baza yozishdan bosh tortadi", "en": "The database refuses the write" },
+       { "ru": "Запрос выполнится медленнее", "uz": "So'rov sekinroq bajariladi", "en": "The query runs slower" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Как убрать N+1 при выводе заказов с именами клиентов?", "uz": "Mijoz ismlari bilan buyurtmalarni chiqarishda N+1 ni qanday olib tashlash mumkin?", "en": "How do you remove N+1 when listing orders with customer names?" },
+      "options": [
+       { "ru": "Добавить кеш на каждый отдельный запрос", "uz": "Har alohida so'rovga kesh qo'shish", "en": "Add a cache to each separate query" },
+       { "ru": "Собрать id клиентов и сделать один запрос со списком", "uz": "Mijoz id larini yig'ib, ro'yxat bilan bitta so'rov qilish", "en": "Collect the customer ids and issue one query with the list" },
+       { "ru": "Увеличить размер страницы", "uz": "Sahifa hajmini oshirish", "en": "Increase the page size" },
+       { "ru": "Перейти на другую базу", "uz": "Boshqa bazaga o'tish", "en": "Switch to another database" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Когда правильнее всего сбросить кеш товара?", "uz": "Mahsulot keshini qachon tozalash to'g'riroq?", "en": "When is the right moment to invalidate a product's cache?" },
+      "options": [
+       { "ru": "Раз в сутки по расписанию", "uz": "Kuniga bir marta jadval bo'yicha", "en": "Once a day on a schedule" },
+       { "ru": "В момент изменения товара, а TTL оставить страховкой", "uz": "Mahsulot o'zgargan lahzada, TTL ni esa sug'urta qilib qoldirish", "en": "At the moment the product changes, keeping the TTL as insurance" },
+       { "ru": "Никогда, кеш сам разберётся", "uz": "Hech qachon, kesh o'zi hal qiladi", "en": "Never, the cache sorts itself out" },
+       { "ru": "При каждом чтении", "uz": "Har o'qishda", "en": "On every read" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Воркер упал после отправки письма, но до подтверждения задачи. Что будет?", "uz": "Vorker xat yuborgandan keyin, vazifani tasdiqlashdan oldin yiqildi. Nima bo'ladi?", "en": "The worker died after sending the email but before acknowledging the job. What happens?" },
+      "options": [
+       { "ru": "Задача потеряется", "uz": "Vazifa yo'qoladi", "en": "The job is lost" },
+       { "ru": "Задача вернётся в очередь — поэтому обработчик должен быть идемпотентным", "uz": "Vazifa navbatga qaytadi — shuning uchun ishlovchi idempotent bo'lishi kerak", "en": "The job returns to the queue — hence the handler must be idempotent" },
+       { "ru": "Очередь сама поймёт, что письмо отправлено", "uz": "Navbat xat yuborilganini o'zi tushunadi", "en": "The queue works out on its own that the email was sent" },
+       { "ru": "Письмо отменится", "uz": "Xat bekor qilinadi", "en": "The email is cancelled" }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "python",
+      "title": { "ru": "Обработчик заказа целиком", "uz": "Buyurtma ishlovchisi to'liq", "en": "The whole order handler" },
+      "desc": {
+       "ru": "<p>Собери обработчик <code>create_order(state, user_id, amount, order_id)</code>. В <code>state</code> лежат ключи <code>'accounts'</code> (словарь баланса), <code>'orders'</code> (словарь заказов), <code>'queue'</code> (список задач), <code>'cache'</code> (словарь).</p><ol><li>Если <code>order_id</code> уже есть в <code>state['orders']</code> — верни <code>{'status': 200, 'order': order_id}</code> и больше ничего не делай (повторный запрос).</li><li>Если <code>amount</code> не положительный — верни <code>{'status': 400, 'error': 'сумма'}</code>.</li><li>Если у пользователя не хватает денег или его нет — верни <code>{'status': 402, 'error': 'баланс'}</code>, не меняя состояния.</li><li>Иначе: спиши сумму, запиши заказ <code>state['orders'][order_id] = {'user': user_id, 'amount': amount}</code>, добавь в очередь <code>{'type': 'email', 'order': order_id}</code>, удали из кеша ключ <code>('orders', user_id)</code>, если он там есть, и верни <code>{'status': 201, 'order': order_id}</code>.</li></ol>",
+       "uz": "<p><code>create_order(state, user_id, amount, order_id)</code> ishlovchisini yig'ing. <code>state</code> da <code>'accounts'</code> (balans lug'ati), <code>'orders'</code> (buyurtmalar lug'ati), <code>'queue'</code> (vazifalar ro'yxati), <code>'cache'</code> (lug'at) kalitlari bor.</p><ol><li><code>order_id</code> allaqachon <code>state['orders']</code> da bo'lsa — <code>{'status': 200, 'order': order_id}</code> qaytaring va boshqa hech nima qilmang (takroriy so'rov).</li><li><code>amount</code> musbat bo'lmasa — <code>{'status': 400, 'error': 'сумма'}</code> qaytaring.</li><li>Foydalanuvchida pul yetmasa yoki u bo'lmasa — holatni o'zgartirmasdan <code>{'status': 402, 'error': 'баланс'}</code> qaytaring.</li><li>Aks holda: summani yeching, buyurtmani <code>state['orders'][order_id] = {'user': user_id, 'amount': amount}</code> qilib yozing, navbatga <code>{'type': 'email', 'order': order_id}</code> qo'shing, keshdan <code>('orders', user_id)</code> kalitini bo'lsa o'chiring va <code>{'status': 201, 'order': order_id}</code> qaytaring.</li></ol>",
+       "en": "<p>Assemble the handler <code>create_order(state, user_id, amount, order_id)</code>. <code>state</code> holds the keys <code>'accounts'</code> (a balance dictionary), <code>'orders'</code> (an order dictionary), <code>'queue'</code> (a job list) and <code>'cache'</code> (a dictionary).</p><ol><li>If <code>order_id</code> is already in <code>state['orders']</code>, return <code>{'status': 200, 'order': order_id}</code> and do nothing else (a repeat request).</li><li>If <code>amount</code> is not positive, return <code>{'status': 400, 'error': 'сумма'}</code>.</li><li>If the user lacks the funds or does not exist, return <code>{'status': 402, 'error': 'баланс'}</code> without changing any state.</li><li>Otherwise: debit the amount, record the order as <code>state['orders'][order_id] = {'user': user_id, 'amount': amount}</code>, push <code>{'type': 'email', 'order': order_id}</code> onto the queue, drop the key <code>('orders', user_id)</code> from the cache if present, and return <code>{'status': 201, 'order': order_id}</code>.</li></ol>"
+      },
+      "starter": "def create_order(state, user_id, amount, order_id):\n    # повтор -> проверки -> изменение состояния\n    pass\n\nstate = {'accounts': {'aziz': 500}, 'orders': {}, 'queue': [], 'cache': {}}\nprint(create_order(state, 'aziz', 200, 'ord-1'))\nprint(state)\n",
+      "tests": "def fresh():\n    return {'accounts': {'aziz': 500}, 'orders': {}, 'queue': [],\n            'cache': {('orders', 'aziz'): ['старый список']}}\n\ns = fresh()\nres = create_order(s, 'aziz', 200, 'ord-1')\nassert res == {'status': 201, 'order': 'ord-1'}, 'Заказ создан'\nassert s['accounts']['aziz'] == 300, 'Деньги списаны'\nassert s['orders']['ord-1'] == {'user': 'aziz', 'amount': 200}, 'Заказ записан'\nassert s['queue'] == [{'type': 'email', 'order': 'ord-1'}], 'Письмо ушло в очередь'\nassert ('orders', 'aziz') not in s['cache'], 'Кеш списка заказов сброшен'\n\nres = create_order(s, 'aziz', 200, 'ord-1')\nassert res == {'status': 200, 'order': 'ord-1'}, 'Повтор не создаёт заказ заново'\nassert s['accounts']['aziz'] == 300, 'Повтор не списывает деньги второй раз'\nassert len(s['queue']) == 1, 'Повтор не шлёт второе письмо'\n\ns = fresh()\nres = create_order(s, 'aziz', 0, 'ord-2')\nassert res == {'status': 400, 'error': 'сумма'}, 'Нулевая сумма'\nassert s['orders'] == {} and s['queue'] == [], 'Состояние не тронуто'\n\ns = fresh()\nres = create_order(s, 'aziz', 100000, 'ord-3')\nassert res == {'status': 402, 'error': 'баланс'}, 'Не хватает денег'\nassert s['accounts']['aziz'] == 500, 'Баланс не изменился'\nassert ('orders', 'aziz') in s['cache'], 'Кеш при отказе не сбрасываем'\n\ns = fresh()\nres = create_order(s, 'nikto', 10, 'ord-4')\nassert res == {'status': 402, 'error': 'баланс'}, 'Неизвестный пользователь'",
+      "hint": {
+       "ru": "Порядок ровно как в условии: сначала повтор, потом валидация, потом деньги, и только в самом конце — изменения состояния подряд. Отсутствующего пользователя удобно поймать через <code>state['accounts'].get(user_id, 0)</code>.",
+       "uz": "Tartib aynan shartdagidek: avval takror, keyin validatsiya, keyin pul, va faqat oxirida — holat o'zgarishlari ketma-ket. Yo'q foydalanuvchini <code>state['accounts'].get(user_id, 0)</code> orqali tutish qulay.",
+       "en": "Exactly the order in the statement: repeat first, then validation, then funds, and only at the very end the state changes in a row. A missing user is conveniently caught with <code>state['accounts'].get(user_id, 0)</code>."
+      }
+     }
+    ]
+   }
   }
  ]
 }

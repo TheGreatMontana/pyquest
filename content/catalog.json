@@ -599,7 +599,7 @@
    "color": "#34d399",
    "level": "beginner",
    "status": "starter",
-   "estimatedHours": 12,
+   "estimatedHours": 18,
    "requires": [
     "python-syntax"
    ],
@@ -607,7 +607,7 @@
     "http-basics"
    ],
    "legacyIds": [],
-   "moduleCount": 2
+   "moduleCount": 3
   },
   {
    "id": "analytics-intro",

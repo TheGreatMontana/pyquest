@@ -1158,4 +1158,65 @@ rows = [{'day': '2026-08-01', 'id': 1, 'amount': 100},
 print(run_step(mart, '2026-08-01', rows, ['orders'], {'orders': True}, 2))
 print(mart)""",
 
+
+# ===== backend-intro be-03 =====
+'backend-intro/be-03/t1': """def transfer(accounts, frm, to, amount):
+    if amount <= 0:
+        return False
+    if frm not in accounts or to not in accounts:
+        return False
+    if accounts[frm] < amount:
+        return False
+    accounts[frm] -= amount
+    accounts[to] += amount
+    return True
+
+acc = {'aziz': 500, 'bek': 100}
+print(transfer(acc, 'aziz', 'bek', 200), acc)""",
+'backend-intro/be-03/t2': """def cached(store, key, now, ttl, compute):
+    item = store.get(key)
+    if item is not None and now - item[1] < ttl:
+        return item[0], True
+    value = compute()
+    store[key] = (value, now)
+    return value, False
+
+s = {}
+print(cached(s, 'cats', 0, 10, lambda: 'meow'))
+print(cached(s, 'cats', 5, 10, lambda: 'meow'))""",
+'backend-intro/be-03/t3': """def work(queue, handler, max_tries):
+    done, dead = [], []
+    while queue:
+        job = queue.pop(0)
+        try:
+            handler(job)
+        except Exception:
+            job['tries'] += 1
+            if job['tries'] >= max_tries:
+                dead.append(job['id'])
+            else:
+                queue.append(job)
+        else:
+            done.append(job['id'])
+    return done, dead
+
+q = [{'id': 1, 'tries': 0}]
+print(work(q, lambda job: None, 3))""",
+'backend-intro/be-03/exam0': """def create_order(state, user_id, amount, order_id):
+    if order_id in state['orders']:
+        return {'status': 200, 'order': order_id}
+    if amount <= 0:
+        return {'status': 400, 'error': '\u0441\u0443\u043c\u043c\u0430'}
+    if state['accounts'].get(user_id, 0) < amount:
+        return {'status': 402, 'error': '\u0431\u0430\u043b\u0430\u043d\u0441'}
+
+    state['accounts'][user_id] -= amount
+    state['orders'][order_id] = {'user': user_id, 'amount': amount}
+    state['queue'].append({'type': 'email', 'order': order_id})
+    state['cache'].pop(('orders', user_id), None)
+    return {'status': 201, 'order': order_id}
+
+state = {'accounts': {'aziz': 500}, 'orders': {}, 'queue': [], 'cache': {}}
+print(create_order(state, 'aziz', 200, 'ord-1'))
+print(state)""",
 }
