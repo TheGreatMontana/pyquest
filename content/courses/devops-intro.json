@@ -628,6 +628,488 @@
      }
     ]
    }
+  },
+  {
+    "id": "do-03",
+    "title": {
+      "ru": "Инфраструктура как код, конфигурация и масштабирование",
+      "uz": "Infratuzilma kod sifatida, konfiguratsiya va masshtablash",
+      "en": "Infrastructure as code, configuration and scaling"
+    },
+    "tagline": {
+      "ru": "Сервер, описанный файлом, один артефакт на все окружения и реплики, которые появляются сами",
+      "uz": "Fayl bilan tasvirlangan server, barcha muhitlar uchun bitta artefakt va o'zi paydo bo'ladigan replikalar",
+      "en": "A server described by a file, one artifact for every environment, and replicas that appear on their own"
+    },
+    "lessons": [
+      {
+        "id": "l1",
+        "title": {
+          "ru": "Инфраструктура как код",
+          "uz": "Infratuzilma kod sifatida",
+          "en": "Infrastructure as code"
+        },
+        "blocks": [
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>Сервер, настроенный руками по SSH, живёт ровно до первой аварии. Никто не помнит, какие пакеты ставили полгода назад, какой файл правили и почему. Такие серверы называют <b>снежинками</b>: каждый уникален, и повторить его нельзя.</p><p><b>Инфраструктура как код</b> (IaC) убирает эту проблему целиком. Нужное состояние описывают в файле — какие сервисы, какие версии, сколько памяти, — файл кладут в Git, а специальная программа приводит реальность в соответствие с описанием.</p><p>Что это даёт сразу:</p><ul><li>Второй такой же сервер поднимается одной командой.</li><li>Любое изменение видно в истории Git: кто, когда и зачем.</li><li>Откат — это откат коммита.</li></ul>",
+              "uz": "<p>SSH orqali qo'lda sozlangan server birinchi avariyagacha yashaydi. Yarim yil oldin qanday paketlar o'rnatilgani, qaysi fayl tuzatilgani va nega — hech kim eslamaydi. Bunday serverlarni <b>qorparchalar</b> deyishadi: har biri noyob va uni takrorlab bo'lmaydi.</p><p><b>Infratuzilma kod sifatida</b> (IaC) bu muammoni butunlay olib tashlaydi. Kerakli holat faylda tasvirlanadi — qanday xizmatlar, qanday versiyalar, qancha xotira — fayl Git ga qo'yiladi, maxsus dastur esa haqiqatni tasvirga moslaydi.</p><p>Bu darrov nima beradi:</p><ul><li>Xuddi shunday ikkinchi server bitta buyruq bilan ko'tariladi.</li><li>Har qanday o'zgarish Git tarixida ko'rinadi: kim, qachon va nega.</li><li>Orqaga qaytarish — bu kommitni qaytarish.</li></ul>",
+              "en": "<p>A server configured by hand over SSH lives exactly until the first outage. Nobody remembers which packages were installed six months ago, which file was edited, or why. Such servers are called <b>snowflakes</b>: each is unique and cannot be reproduced.</p><p><b>Infrastructure as code</b> (IaC) removes the problem entirely. The desired state is described in a file — which services, which versions, how much memory — the file goes into Git, and a dedicated program brings reality in line with the description.</p><p>What that buys you immediately:</p><ul><li>A second identical server comes up with one command.</li><li>Every change is visible in Git history: who, when and why.</li><li>A rollback is a revert of a commit.</li></ul>"
+            }
+          },
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>Ключевое слово здесь — <b>декларативно</b>. Ты пишешь не «установи пакет, потом создай папку, потом перезапусти сервис», а «должно быть вот так». Дальше инструмент сам сравнивает желаемое с текущим и делает только разницу.</p><p>Отсюда важнейшее свойство — <b>идемпотентность</b> из dt-03: применить описание один раз или пять раз подряд — результат одинаковый. Если всё уже совпадает, инструмент честно скажет «изменений нет» и не тронет ничего.</p><p>Разницу между текущим и желаемым состоянием называют <b>планом</b>, и её всегда показывают до применения. Посмотрим, как такой план считается.</p>",
+              "uz": "<p>Bu yerdagi kalit so'z — <b>deklarativ</b>. Siz «paketni o'rnat, keyin papka yarat, keyin xizmatni qayta ishga tushir» deb emas, «shunday bo'lishi kerak» deb yozasiz. Keyin vosita o'zi kerakni joriysi bilan solishtirib, faqat farqni bajaradi.</p><p>Shundan eng muhim xususiyat kelib chiqadi — dt-03 dagi <b>idempotentlik</b>: tasvirni bir marta yoki ketma-ket besh marta qo'llash — natija bir xil. Agar hammasi allaqachon mos bo'lsa, vosita halol «o'zgarish yo'q» deydi va hech nimaga tegmaydi.</p><p>Joriy va kerakli holat orasidagi farqni <b>reja</b> deyishadi va uni qo'llashdan oldin doim ko'rsatishadi. Bunday reja qanday hisoblanishini ko'ramiz.</p>",
+              "en": "<p>The key word here is <b>declarative</b>. You do not write \"install the package, then create the folder, then restart the service\" — you write \"this is how it should look\". The tool then compares desired with current and applies only the difference.</p><p>From that follows the crucial property — <b>idempotency</b> from dt-03: apply the description once or five times in a row and the result is the same. If everything already matches, the tool honestly reports \"no changes\" and touches nothing.</p><p>The difference between current and desired state is called the <b>plan</b>, and it is always shown before it is applied. Let's see how such a plan is computed.</p>"
+            }
+          },
+          {
+            "type": "run",
+            "code": "current = {\"web\": \"app:1.1\", \"db\": \"pg:16\"}\ndesired = {\"web\": \"app:1.2\", \"db\": \"pg:16\", \"cache\": \"redis:7\"}\n\ncreate = sorted(name for name in desired if name not in current)\ndelete = sorted(name for name in current if name not in desired)\nupdate = sorted(name for name in desired\n                if name in current and current[name] != desired[name])\nsame = sorted(name for name in desired\n              if name in current and current[name] == desired[name])\n\nprint(\"создать: \", create)\nprint(\"обновить:\", update)\nprint(\"удалить: \", delete)\nprint(\"без изменений:\", same)"
+          },
+          {
+            "type": "note",
+            "kind": "trap",
+            "html": {
+              "ru": "Самая частая беда IaC — <b>дрейф конфигурации</b>. Кто-то зашёл на сервер по SSH и «просто поправил одну строчку», не тронув описание. Реальность и файл разошлись; при следующем применении инструмент молча вернёт всё как в файле, и правка исчезнет. Правило простое: если инфраструктура описана кодом, менять её руками нельзя вообще — только через изменение описания.",
+              "uz": "IaC ning eng ko'p uchraydigan balosi — <b>konfiguratsiya dreyfi</b>. Kimdir SSH orqali serverga kirib, tasvirga tegmasdan «shunchaki bitta qatorni tuzatdi». Haqiqat va fayl ajralib ketdi; keyingi qo'llashda vosita jimgina hammasini fayldagidek qaytaradi va tuzatish yo'qoladi. Qoida oddiy: agar infratuzilma kod bilan tasvirlangan bo'lsa, uni qo'lda umuman o'zgartirib bo'lmaydi — faqat tasvirni o'zgartirish orqali.",
+              "en": "The most common IaC trouble is <b>configuration drift</b>. Someone SSH'd into the server and \"just fixed one line\" without touching the description. Reality and the file diverged; on the next apply the tool silently restores everything to match the file, and the fix disappears. The rule is simple: if infrastructure is described by code, it must never be changed by hand — only by changing the description."
+            }
+          },
+          {
+            "type": "checkpoint",
+            "q": {
+              "ru": "Ты применил описание инфраструктуры, ничего не изменив в файле, второй раз подряд. Что должно произойти?",
+              "uz": "Faylda hech nimani o'zgartirmasdan, infratuzilma tasvirini ketma-ket ikkinchi marta qo'lladingiz. Nima bo'lishi kerak?",
+              "en": "You applied the infrastructure description a second time in a row, changing nothing in the file. What should happen?"
+            },
+            "options": [
+              { "ru": "Всё пересоздастся заново", "uz": "Hammasi qaytadan yaratiladi", "en": "Everything gets recreated from scratch" },
+              { "ru": "Инструмент сообщит, что изменений нет, и ничего не тронет", "uz": "Vosita o'zgarish yo'qligini aytadi va hech nimaga tegmaydi", "en": "The tool reports no changes and touches nothing" },
+              { "ru": "Появятся дубликаты сервисов", "uz": "Xizmatlar dublikatlari paydo bo'ladi", "en": "Duplicate services appear" },
+              { "ru": "Инструмент выдаст ошибку", "uz": "Vosita xato beradi", "en": "The tool raises an error" }
+            ],
+            "a": 1,
+            "explain": {
+              "ru": "Это и есть идемпотентность: инструмент смотрит на разницу между желаемым и текущим, а разницы нет. Если повторное применение что-то меняет — значит описание неполное или кто-то правил инфраструктуру руками.",
+              "uz": "Bu idempotentlikning o'zi: vosita kerakli va joriy holat orasidagi farqqa qaraydi, farq esa yo'q. Agar takroriy qo'llash biror narsani o'zgartirsa — demak tasvir to'liq emas yoki kimdir infratuzilmani qo'lda tuzatgan.",
+              "en": "That is idempotency: the tool looks at the difference between desired and current, and there is none. If a repeat apply changes something, either the description is incomplete or someone edited the infrastructure by hand."
+            }
+          }
+        ]
+      },
+      {
+        "id": "l2",
+        "title": {
+          "ru": "Конфигурация: один артефакт, много окружений",
+          "uz": "Konfiguratsiya: bitta artefakt, ko'p muhit",
+          "en": "Configuration: one artifact, many environments"
+        },
+        "blocks": [
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>Окружений обычно три: <b>dev</b> для разработки, <b>staging</b> для проверки перед выкладкой, <b>prod</b> для пользователей. Отличаются они не кодом, а настройками: адрес базы, размер пула, уровень логирования, ключи внешних сервисов.</p><p>Отсюда главное правило: <b>собираем один раз, конфигурируем при запуске</b>. Один и тот же образ едет в staging, а потом ровно он же — в prod. Если пересобирать образ под каждое окружение, теряется весь смысл проверки: в prod поедет то, что никто не тестировал.</p><p>Значения берут из нескольких источников, и у них есть приоритет: значения по умолчанию в коде → конфигурационный файл → переменные окружения. Чем ближе источник к конкретному запуску, тем он важнее.</p>",
+              "uz": "<p>Muhitlar odatda uchta: ishlab chiqish uchun <b>dev</b>, chiqarishdan oldin tekshirish uchun <b>staging</b>, foydalanuvchilar uchun <b>prod</b>. Ular kod bilan emas, sozlamalar bilan farq qiladi: baza manzili, pul o'lchami, loglash darajasi, tashqi xizmatlar kalitlari.</p><p>Shundan asosiy qoida: <b>bir marta yig'amiz, ishga tushirishda sozlaymiz</b>. Xuddi shu obraz staging ga ketadi, keyin aynan o'sha — prod ga. Agar har bir muhit uchun obrazni qayta yig'sangiz, tekshiruvning butun ma'nosi yo'qoladi: prod ga hech kim sinamagan narsa ketadi.</p><p>Qiymatlar bir necha manbadan olinadi va ularning ustunligi bor: koddagi standart qiymatlar → konfiguratsiya fayli → muhit o'zgaruvchilari. Manba aniq ishga tushirishga qanchalik yaqin bo'lsa, shunchalik muhim.</p>",
+              "en": "<p>There are usually three environments: <b>dev</b> for development, <b>staging</b> for checks before release, <b>prod</b> for users. They differ not in code but in settings: the database address, the pool size, the log level, external service keys.</p><p>Hence the main rule: <b>build once, configure at startup</b>. The very same image goes to staging and then exactly that image goes to prod. Rebuild the image per environment and the whole point of the check is lost: prod receives something nobody tested.</p><p>Values come from several sources with a priority order: defaults in code → configuration file → environment variables. The closer a source is to the specific run, the more it counts.</p>"
+            }
+          },
+          {
+            "type": "run",
+            "code": "defaults = {\"port\": 8000, \"debug\": False, \"name\": \"app\"}\nfile_cfg = {\"port\": 9000, \"debug\": True}\nenv = {\"APP_PORT\": \"8080\", \"PATH\": \"/usr/bin\", \"HOME\": \"/root\"}\n\nconfig = dict(defaults)          # самый низкий приоритет\nconfig.update(file_cfg)          # файл важнее умолчаний\n\nfor key, value in env.items():   # окружение важнее всего\n    if key.startswith(\"APP_\"):\n        config[key[len(\"APP_\"):].lower()] = value\n\nfor key in sorted(config):\n    print(f\"{key:>6} = {config[key]!r}\")"
+          },
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>Обрати внимание на вывод: порт стал строкой <code>'8080'</code>, а не числом. Это не опечатка — <b>переменные окружения всегда приходят строками</b>, других типов у них не бывает. Значение нужно приводить к нужному типу руками, иначе <code>port + 1</code> упадёт, а сравнение с числом всегда будет ложным.</p><p>Отдельно — префикс <code>APP_</code>. Переменных окружения в системе десятки, и большинство к твоему приложению не относится. Префикс отделяет свои от чужих и заодно защищает от случайных совпадений имён.</p>",
+              "uz": "<p>Chiqishga e'tibor bering: port son emas, <code>'8080'</code> satri bo'ldi. Bu xato emas — <b>muhit o'zgaruvchilari doim satr bo'lib keladi</b>, ularda boshqa tur bo'lmaydi. Qiymatni kerakli turga qo'lda keltirish kerak, aks holda <code>port + 1</code> yiqiladi, son bilan taqqoslash esa doim yolg'on bo'ladi.</p><p>Alohida — <code>APP_</code> prefiksi. Tizimda o'nlab muhit o'zgaruvchisi bor va ko'pchiligi sizning ilovangizga aloqador emas. Prefiks o'zinikini begonadan ajratadi va bir vaqtda tasodifiy nom mos kelishidan himoya qiladi.</p>",
+              "en": "<p>Note the output: the port became the string <code>'8080'</code>, not a number. That is not a typo — <b>environment variables always arrive as strings</b>, they have no other type. You must convert the value to the right type yourself, otherwise <code>port + 1</code> crashes and a comparison with a number is always false.</p><p>Separately, the <code>APP_</code> prefix. A system has dozens of environment variables and most have nothing to do with your app. The prefix separates yours from the rest and guards against accidental name collisions.</p>"
+            }
+          },
+          {
+            "type": "predict",
+            "lang": "python",
+            "code": "debug = \"false\"      # так значение приходит из переменной окружения\n\nif debug:\n    print(\"включено\")\nelse:\n    print(\"выключено\")",
+            "options": [
+              { "ru": "включено", "uz": "включено", "en": "включено" },
+              { "ru": "выключено", "uz": "выключено", "en": "выключено" },
+              { "ru": "Ошибка", "uz": "Xato", "en": "Error" },
+              { "ru": "Ничего не выведется", "uz": "Hech nima chiqmaydi", "en": "Nothing is printed" }
+            ],
+            "a": 0,
+            "explain": {
+              "ru": "Непустая строка в Python истинна — и <code>\"false\"</code> тоже. Отладочный режим включится в проде, и никто этого не заметит, пока в логи не польются пароли. Значение из окружения нужно разбирать явно, например <code>value.lower() in (\"1\", \"true\", \"yes\")</code>.",
+              "uz": "Python da bo'sh bo'lmagan satr rost — <code>\"false\"</code> ham. Debug rejimi proddа yoqiladi va loglarga parollar quyilmaguncha buni hech kim sezmaydi. Muhitdan kelgan qiymatni aniq tahlil qilish kerak, masalan <code>value.lower() in (\"1\", \"true\", \"yes\")</code>.",
+              "en": "A non-empty string is truthy in Python — and <code>\"false\"</code> is one. Debug mode switches on in production and nobody notices until passwords start pouring into the logs. A value from the environment must be parsed explicitly, e.g. <code>value.lower() in (\"1\", \"true\", \"yes\")</code>."
+            }
+          }
+        ]
+      },
+      {
+        "id": "l3",
+        "title": {
+          "ru": "Масштабирование и проверки здоровья",
+          "uz": "Masshtablash va sog'liq tekshiruvlari",
+          "en": "Scaling and health checks"
+        },
+        "blocks": [
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>Нагрузка выросла. Есть два ответа.</p><p><b>Вертикальное масштабирование</b> — дать той же машине больше ядер и памяти. Просто, ничего не надо менять в коде, но упирается в потолок железа и требует перезапуска.</p><p><b>Горизонтальное</b> — запустить несколько копий приложения и раскидать запросы между ними балансировщиком. Потолка почти нет, и падение одной копии не роняет сервис.</p><p>У горизонтального есть одно условие: приложение должно быть <b>stateless</b> — не хранить состояние внутри себя. Если сессия пользователя лежит в памяти процесса, второй запрос попадёт на другую копию и пользователя разлогинит. Состояние выносят в общее хранилище: базу, Redis, объектное хранилище.</p><p>Число копий не задают вручную — его считает автомасштабирование по метрике: нагрузка выше верхнего порога, значит добавить реплику; ниже нижнего — убрать.</p>",
+              "uz": "<p>Yuklama oshdi. Ikkita javob bor.</p><p><b>Vertikal masshtablash</b> — xuddi shu mashinaga ko'proq yadro va xotira berish. Oddiy, kodda hech nimani o'zgartirish shart emas, lekin temir shiftiga tiraladi va qayta ishga tushirishni talab qiladi.</p><p><b>Gorizontal</b> — ilovaning bir necha nusxasini ishga tushirib, so'rovlarni balansirovchi bilan ular orasida taqsimlash. Shift deyarli yo'q va bitta nusxaning qulashi xizmatni yiqitmaydi.</p><p>Gorizontalning bitta sharti bor: ilova <b>stateless</b> bo'lishi kerak — holatni o'z ichida saqlamasligi. Agar foydalanuvchi sessiyasi jarayon xotirasida yotsa, ikkinchi so'rov boshqa nusxaga tushadi va foydalanuvchini tizimdan chiqaradi. Holat umumiy saqlagichga chiqariladi: baza, Redis, obyekt saqlagichi.</p><p>Nusxalar soni qo'lda berilmaydi — uni avtomasshtablash metrika bo'yicha hisoblaydi: yuklama yuqori chegaradan baland bo'lsa, replika qo'shish; pastidan past bo'lsa — olib tashlash.</p>",
+              "en": "<p>Load has grown. There are two answers.</p><p><b>Vertical scaling</b> — give the same machine more cores and memory. Simple, no code changes, but it hits a hardware ceiling and requires a restart.</p><p><b>Horizontal</b> — run several copies of the application and spread requests across them with a load balancer. There is almost no ceiling, and one copy dying does not take the service down.</p><p>Horizontal scaling has one condition: the application must be <b>stateless</b> — it must not keep state inside itself. If a user session lives in process memory, the second request lands on a different copy and logs the user out. State is moved to shared storage: a database, Redis, an object store.</p><p>The number of copies is not set by hand — autoscaling computes it from a metric: load above the upper threshold means add a replica, below the lower one means remove one.</p>"
+            }
+          },
+          {
+            "type": "run",
+            "code": "def desired_replicas(current, load, low, high, min_r, max_r):\n    target = current\n    if load > high:\n        target = current + 1\n    elif load < low:\n        target = current - 1\n    return max(min_r, min(max_r, target))\n\nreplicas = 2\nfor minute, load in enumerate([20, 45, 80, 95, 90, 60, 25, 10], start=1):\n    new = desired_replicas(replicas, load, 30, 70, 2, 6)\n    mark = \"=\" if new == replicas else (\"+\" if new > replicas else \"-\")\n    print(f\"минута {minute}: нагрузка {load:>3}%  реплик {replicas} -> {new}  {mark}\")\n    replicas = new"
+          },
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>Заметь: на первой минуте нагрузка была ниже нижнего порога, но реплик осталось две — сработал минимум. Минимум и максимум обязательны: без нижней границы автоскейлер уведёт сервис в ноль, без верхней — съест весь бюджет за час.</p><p>Чтобы балансировщик знал, кому отдавать запросы, приложение отвечает на <b>проверки здоровья</b>. Их две, и путать их дорого.</p><ul><li><b>Liveness</b> — «процесс жив?». Если проба не отвечает, контейнер убивают и запускают заново.</li><li><b>Readiness</b> — «готов принимать запросы?». Если проба отвечает «нет», трафик просто не шлют, но контейнер не трогают.</li></ul><p>Разница важна при старте: приложение поднялось, но ещё прогревает кеш и открывает соединения с базой. Оно <i>живое</i>, но <i>не готовое</i>. Если проверять только liveness, балансировщик отправит запросы слишком рано и пользователи получат ошибки. Если вместо readiness поставить liveness, контейнер будут перезапускать по кругу, так и не дав ему прогреться.</p>",
+              "uz": "<p>E'tibor bering: birinchi daqiqada yuklama pastki chegaradan past edi, lekin replikalar ikkita qoldi — minimum ishladi. Minimum va maksimum majburiy: pastki chegarasiz avtoskeyler xizmatni nolga tushiradi, yuqorisiz — bir soatda butun byudjetni yeydi.</p><p>Balansirovchi so'rovlarni kimga berishni bilishi uchun ilova <b>sog'liq tekshiruvlariga</b> javob beradi. Ular ikkita va ularni adashtirish qimmatga tushadi.</p><ul><li><b>Liveness</b> — «jarayon tirikmi?». Agar proba javob bermasa, konteyner o'ldiriladi va qaytadan ishga tushiriladi.</li><li><b>Readiness</b> — «so'rov qabul qilishga tayyormi?». Agar proba «yo'q» desa, trafik shunchaki yuborilmaydi, lekin konteynerga tegilmaydi.</li></ul><p>Farq ishga tushishda muhim: ilova ko'tarildi, lekin hali keshni isityapti va baza bilan ulanish ochyapti. U <i>tirik</i>, lekin <i>tayyor emas</i>. Faqat liveness ni tekshirsangiz, balansirovchi so'rovlarni juda erta yuboradi va foydalanuvchilar xato oladi. Readiness o'rniga liveness qo'ysangiz, konteyner isishga ulgurmasdan aylanma bo'yicha qayta ishga tushiriladi.</p>",
+              "en": "<p>Notice: in the first minute the load was below the lower threshold, yet two replicas remained — the minimum kicked in. A minimum and a maximum are mandatory: without a lower bound the autoscaler drives the service to zero, without an upper one it eats the entire budget in an hour.</p><p>So the load balancer knows whom to send requests to, the application answers <b>health checks</b>. There are two, and confusing them is expensive.</p><ul><li><b>Liveness</b> — \"is the process alive?\". If the probe stops answering, the container is killed and started again.</li><li><b>Readiness</b> — \"ready to accept requests?\". If the probe says no, traffic simply is not sent, but the container is left alone.</li></ul><p>The difference matters at startup: the app is up but still warming its cache and opening database connections. It is <i>alive</i> but <i>not ready</i>. Check only liveness and the balancer sends requests too early, so users get errors. Use liveness where readiness belongs and the container is restarted in a loop, never given time to warm up.</p>"
+            }
+          },
+          {
+            "type": "order",
+            "steps": [
+              { "ru": "Собрали образ новой версии и прогнали тесты", "uz": "Yangi versiya obrazini yig'ib, testlarni o'tkazdik", "en": "Built the new version's image and ran the tests" },
+              { "ru": "Запустили контейнер новой версии рядом со старой", "uz": "Yangi versiya konteynerini eskisi yonida ishga tushirdik", "en": "Started the new version's container alongside the old one" },
+              { "ru": "Дождались, пока readiness-проба ответит «готов»", "uz": "Readiness-proba «tayyor» deb javob berishini kutdik", "en": "Waited until the readiness probe answered \"ready\"" },
+              { "ru": "Перевели на новую версию часть трафика", "uz": "Trafikning bir qismini yangi versiyaga o'tkazdik", "en": "Routed part of the traffic to the new version" },
+              { "ru": "Посмотрели метрики ошибок и задержки", "uz": "Xatolar va kechikish metrikalariga qaradik", "en": "Checked the error and latency metrics" },
+              { "ru": "Перевели остальной трафик и погасили старую версию", "uz": "Qolgan trafikni o'tkazib, eski versiyani o'chirdik", "en": "Moved the remaining traffic and shut the old version down" }
+            ]
+          },
+          {
+            "type": "summary",
+            "items": [
+              { "ru": "Инфраструктура описывается кодом в Git, а не настраивается руками", "uz": "Infratuzilma qo'lda sozlanmaydi, Git dagi kod bilan tasvirlanadi", "en": "Infrastructure is described by code in Git, not configured by hand" },
+              { "ru": "Описание декларативно: инструмент сам считает и применяет разницу", "uz": "Tasvir deklarativ: vosita farqni o'zi hisoblab, qo'llaydi", "en": "The description is declarative: the tool computes and applies the difference itself" },
+              { "ru": "Правка руками создаёт дрейф конфигурации и теряется при следующем применении", "uz": "Qo'lda tuzatish konfiguratsiya dreyfini yaratadi va keyingi qo'llashda yo'qoladi", "en": "A manual edit creates configuration drift and is lost on the next apply" },
+              { "ru": "Собираем образ один раз, настраиваем при запуске", "uz": "Obrazni bir marta yig'amiz, ishga tushirishda sozlaymiz", "en": "Build the image once, configure it at startup" },
+              { "ru": "Переменные окружения всегда строки — приводи тип явно", "uz": "Muhit o'zgaruvchilari doim satr — turni aniq keltiring", "en": "Environment variables are always strings — convert the type explicitly" },
+              { "ru": "Горизонтальное масштабирование требует stateless-приложения", "uz": "Gorizontal masshtablash stateless ilovani talab qiladi", "en": "Horizontal scaling requires a stateless application" },
+              { "ru": "Liveness перезапускает контейнер, readiness управляет трафиком", "uz": "Liveness konteynerni qayta ishga tushiradi, readiness trafikni boshqaradi", "en": "Liveness restarts the container, readiness controls traffic" }
+            ]
+          }
+        ]
+      }
+    ],
+    "quiz": [
+      {
+        "q": {
+          "ru": "Что значит «декларативное» описание инфраструктуры?",
+          "uz": "Infratuzilmaning «deklarativ» tasviri nimani anglatadi?",
+          "en": "What does a \"declarative\" infrastructure description mean?"
+        },
+        "options": [
+          { "ru": "Пошаговый список команд для настройки", "uz": "Sozlash uchun bosqichma-bosqich buyruqlar ro'yxati", "en": "A step-by-step list of setup commands" },
+          { "ru": "Описание желаемого состояния; разницу считает и применяет инструмент", "uz": "Kerakli holat tasviri; farqni vosita hisoblab, qo'llaydi", "en": "A description of the desired state; the tool computes and applies the difference" },
+          { "ru": "Документация в README", "uz": "README dagi hujjat", "en": "Documentation in the README" },
+          { "ru": "Скрипт на bash, запускаемый по SSH", "uz": "SSH orqali ishga tushiriladigan bash skripti", "en": "A bash script run over SSH" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Императивный подход перечисляет шаги и ломается, если часть уже выполнена. Декларативный описывает результат, поэтому его можно применять сколько угодно раз — это и даёт идемпотентность.",
+          "uz": "Imperativ yondashuv qadamlarni sanaydi va bir qismi bajarilgan bo'lsa sinadi. Deklarativi natijani tasvirlaydi, shuning uchun uni istagancha marta qo'llash mumkin — idempotentlik shundan.",
+          "en": "The imperative approach lists steps and breaks when some are already done. The declarative one describes the result, so it can be applied any number of times — which is what gives idempotency."
+        }
+      },
+      {
+        "q": {
+          "ru": "Что такое дрейф конфигурации?",
+          "uz": "Konfiguratsiya dreyfi nima?",
+          "en": "What is configuration drift?"
+        },
+        "options": [
+          { "ru": "Медленная работа сервера под нагрузкой", "uz": "Yuklama ostida serverning sekin ishlashi", "en": "A server slowing down under load" },
+          { "ru": "Расхождение между описанием в коде и реальным состоянием сервера", "uz": "Koddagi tasvir va serverning haqiqiy holati orasidagi farq", "en": "A divergence between the description in code and the server's real state" },
+          { "ru": "Изменение конфигурации через Git", "uz": "Konfiguratsiyani Git orqali o'zgartirish", "en": "Changing configuration through Git" },
+          { "ru": "Переход между окружениями dev и prod", "uz": "dev va prod muhitlari orasida o'tish", "en": "Moving between the dev and prod environments" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Дрейф появляется, когда сервер правят руками, минуя описание. Он опасен вдвойне: правка потеряется при следующем применении, а до тех пор реальность не соответствует тому, что видит команда в репозитории.",
+          "uz": "Dreyf server tasvirni chetlab, qo'lda tuzatilganda paydo bo'ladi. U ikki barobar xavfli: tuzatish keyingi qo'llashda yo'qoladi, unga qadar esa haqiqat jamoa repozitoriyda ko'rayotganiga mos kelmaydi.",
+          "en": "Drift appears when a server is edited by hand, bypassing the description. It is doubly dangerous: the edit is lost on the next apply, and until then reality does not match what the team sees in the repository."
+        }
+      },
+      {
+        "q": {
+          "ru": "Почему один и тот же образ должен ехать в staging и в prod?",
+          "uz": "Nega xuddi shu obraz staging ga ham, prod ga ham ketishi kerak?",
+          "en": "Why must the same image go to both staging and prod?"
+        },
+        "options": [
+          { "ru": "Чтобы сэкономить место в реестре образов", "uz": "Obrazlar reyestrida joy tejash uchun", "en": "To save space in the image registry" },
+          { "ru": "Иначе в prod поедет сборка, которую никто не проверял", "uz": "Aks holda prod ga hech kim tekshirmagan yig'ma ketadi", "en": "Otherwise prod receives a build nobody verified" },
+          { "ru": "Так требует Docker", "uz": "Docker shuni talab qiladi", "en": "Docker requires it" },
+          { "ru": "Чтобы образ занимал меньше памяти", "uz": "Obraz kamroq xotira egallashi uchun", "en": "So the image uses less memory" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Смысл staging в том, чтобы проверить <i>именно тот</i> артефакт, который поедет к пользователям. Пересборка под prod ломает эту гарантию: собрали другую версию зависимостей — и проверка обесценилась.",
+          "uz": "Staging ning ma'nosi foydalanuvchilarga ketadigan <i>aynan o'sha</i> artefaktni tekshirishda. Prod uchun qayta yig'ish bu kafolatni buzadi: bog'liqliklarning boshqa versiyasi yig'ildi — va tekshiruv qadrsizlandi.",
+          "en": "The point of staging is to verify <i>exactly the artifact</i> that will reach users. Rebuilding for prod breaks that guarantee: a different set of dependency versions got built, and the verification is worthless."
+        }
+      },
+      {
+        "q": {
+          "ru": "Переменная окружения <code>DEBUG=\"false\"</code>. Что вернёт <code>bool(os.environ[\"DEBUG\"])</code>?",
+          "uz": "<code>DEBUG=\"false\"</code> muhit o'zgaruvchisi. <code>bool(os.environ[\"DEBUG\"])</code> nima qaytaradi?",
+          "en": "The environment variable <code>DEBUG=\"false\"</code>. What does <code>bool(os.environ[\"DEBUG\"])</code> return?"
+        },
+        "options": [
+          { "ru": "<code>False</code>", "uz": "<code>False</code>", "en": "<code>False</code>" },
+          { "ru": "<code>True</code> — непустая строка всегда истинна", "uz": "<code>True</code> — bo'sh bo'lmagan satr doim rost", "en": "<code>True</code> — a non-empty string is always truthy" },
+          { "ru": "<code>None</code>", "uz": "<code>None</code>", "en": "<code>None</code>" },
+          { "ru": "Ошибку преобразования типа", "uz": "Turni o'zgartirish xatosini", "en": "A type conversion error" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Переменные окружения — всегда строки. <code>\"false\"</code> непустая, значит истинна. Отладочный режим включится в проде вместе с подробными логами и трассировками стека.",
+          "uz": "Muhit o'zgaruvchilari — doim satr. <code>\"false\"</code> bo'sh emas, demak rost. Debug rejimi proddа batafsil loglar va stek izlari bilan birga yoqiladi.",
+          "en": "Environment variables are always strings. <code>\"false\"</code> is non-empty, hence truthy. Debug mode switches on in production together with verbose logs and stack traces."
+        }
+      },
+      {
+        "q": {
+          "ru": "Что мешает горизонтально масштабировать приложение, хранящее сессии в памяти процесса?",
+          "uz": "Sessiyalarni jarayon xotirasida saqlaydigan ilovani gorizontal masshtablashga nima xalaqit beradi?",
+          "en": "What prevents horizontally scaling an app that keeps sessions in process memory?"
+        },
+        "options": [
+          { "ru": "Нехватка памяти", "uz": "Xotira yetishmasligi", "en": "Not enough memory" },
+          { "ru": "Второй запрос попадёт на другую копию, которая про эту сессию не знает", "uz": "Ikkinchi so'rov bu sessiyani bilmaydigan boshqa nusxaga tushadi", "en": "The second request lands on another copy that knows nothing about that session" },
+          { "ru": "Балансировщик не поддерживает несколько копий", "uz": "Balansirovchi bir nechta nusxani qo'llab-quvvatlamaydi", "en": "The load balancer doesn't support multiple copies" },
+          { "ru": "Ничего не мешает", "uz": "Hech nima xalaqit bermaydi", "en": "Nothing prevents it" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Копии не видят память друг друга. Пользователь залогинился на первой, а следующий запрос ушёл на вторую — и его выкинуло. Состояние выносят в общее хранилище, и приложение становится stateless.",
+          "uz": "Nusxalar bir-birining xotirasini ko'rmaydi. Foydalanuvchi birinchisida kirdi, keyingi so'rov esa ikkinchisiga ketdi — va uni chiqarib yubordi. Holat umumiy saqlagichga chiqariladi va ilova stateless bo'ladi.",
+          "en": "The copies cannot see each other's memory. The user logged in on the first one, the next request went to the second — and they were thrown out. State is moved to shared storage and the app becomes stateless."
+        }
+      },
+      {
+        "q": {
+          "ru": "Приложение запустилось, но ещё прогревает кеш. Какая проба должна отвечать «нет»?",
+          "uz": "Ilova ishga tushdi, lekin hali keshni isityapti. Qaysi proba «yo'q» deb javob berishi kerak?",
+          "en": "The app has started but is still warming its cache. Which probe should answer \"no\"?"
+        },
+        "options": [
+          { "ru": "Liveness — контейнер нужно перезапустить", "uz": "Liveness — konteynerni qayta ishga tushirish kerak", "en": "Liveness — the container should be restarted" },
+          { "ru": "Readiness — трафик слать рано, но перезапускать не нужно", "uz": "Readiness — trafik yuborish erta, lekin qayta ishga tushirish shart emas", "en": "Readiness — too early for traffic, but no restart needed" },
+          { "ru": "Обе одновременно", "uz": "Ikkalasi birdaniga", "en": "Both at once" },
+          { "ru": "Ни одна, пробы нужны только при сбоях", "uz": "Birortasi ham, probalar faqat nosozlikda kerak", "en": "Neither, probes are only for failures" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Процесс жив, поэтому liveness должна отвечать «да» — иначе контейнер убьют и он никогда не прогреется. А readiness отвечает «нет», и балансировщик просто подождёт.",
+          "uz": "Jarayon tirik, shuning uchun liveness «ha» deyishi kerak — aks holda konteyner o'ldiriladi va u hech qachon isimaydi. Readiness esa «yo'q» deydi va balansirovchi shunchaki kutadi.",
+          "en": "The process is alive, so liveness must answer \"yes\" — otherwise the container is killed and never warms up. Readiness answers \"no\", and the balancer simply waits."
+        }
+      }
+    ],
+    "tasks": [
+      {
+        "id": "t1",
+        "kind": "python",
+        "title": {
+          "ru": "План изменений",
+          "uz": "O'zgarishlar rejasi",
+          "en": "The change plan"
+        },
+        "brief": {
+          "ru": "Посчитай разницу между текущим и желаемым состоянием",
+          "uz": "Joriy va kerakli holat orasidagi farqni hisoblang",
+          "en": "Compute the difference between current and desired state"
+        },
+        "desc": {
+          "ru": "Напиши функцию <code>plan(current, desired)</code>. Оба аргумента — словари «имя ресурса → версия». Верни словарь с тремя ключами:<br><br><code>\"create\"</code> — имена, которые есть в <code>desired</code>, но не в <code>current</code>;<br><code>\"update\"</code> — имена, которые есть в обоих, но с разными версиями;<br><code>\"delete\"</code> — имена, которые есть в <code>current</code>, но не в <code>desired</code>.<br><br>Все три списка отсортируй по алфавиту. Если состояния совпадают, все три списка пустые.",
+          "uz": "<code>plan(current, desired)</code> funksiyasini yozing. Ikkala argument ham «resurs nomi → versiya» lug'ati. Uchta kalitli lug'at qaytaring:<br><br><code>\"create\"</code> — <code>desired</code> da bor, <code>current</code> da yo'q nomlar;<br><code>\"update\"</code> — ikkalasida ham bor, lekin versiyasi turlicha nomlar;<br><code>\"delete\"</code> — <code>current</code> da bor, <code>desired</code> da yo'q nomlar.<br><br>Uchala ro'yxatni alifbo bo'yicha tartiblang. Holatlar mos kelsa, uchala ro'yxat ham bo'sh.",
+          "en": "Write a function <code>plan(current, desired)</code>. Both arguments map a resource name to a version. Return a dict with three keys:<br><br><code>\"create\"</code> — names present in <code>desired</code> but not in <code>current</code>;<br><code>\"update\"</code> — names present in both but with different versions;<br><code>\"delete\"</code> — names present in <code>current</code> but not in <code>desired</code>.<br><br>Sort all three lists alphabetically. If the states match, all three lists are empty."
+        },
+        "starter": "def plan(current, desired):\n    # что создать, что обновить, что удалить\n    ...\n",
+        "tests": "cur = {\"web\": \"app:1.1\", \"db\": \"pg:16\"}\ndes = {\"web\": \"app:1.2\", \"db\": \"pg:16\", \"cache\": \"redis:7\"}\nassert plan(cur, des) == {\"create\": [\"cache\"], \"update\": [\"web\"], \"delete\": []}\nassert plan(des, des) == {\"create\": [], \"update\": [], \"delete\": []}\nassert plan({}, {}) == {\"create\": [], \"update\": [], \"delete\": []}\nassert plan(cur, {}) == {\"create\": [], \"update\": [], \"delete\": [\"db\", \"web\"]}\nassert plan({}, cur) == {\"create\": [\"db\", \"web\"], \"update\": [], \"delete\": []}\nassert plan({\"a\": \"1\"}, {\"a\": \"2\"}) == {\"create\": [], \"update\": [\"a\"], \"delete\": []}\n",
+        "hint": {
+          "ru": "Каждый список — одно включение с условием: <code>sorted(n for n in desired if n not in current)</code> для создания, <code>sorted(n for n in current if n not in desired)</code> для удаления, и <code>sorted(n for n in desired if n in current and current[n] != desired[n])</code> для обновления.",
+          "uz": "Har bir ro'yxat — shartli bitta ichkilash: yaratish uchun <code>sorted(n for n in desired if n not in current)</code>, o'chirish uchun <code>sorted(n for n in current if n not in desired)</code> va yangilash uchun <code>sorted(n for n in desired if n in current and current[n] != desired[n])</code>.",
+          "en": "Each list is one comprehension with a condition: <code>sorted(n for n in desired if n not in current)</code> to create, <code>sorted(n for n in current if n not in desired)</code> to delete, and <code>sorted(n for n in desired if n in current and current[n] != desired[n])</code> to update."
+        }
+      },
+      {
+        "id": "t2",
+        "kind": "python",
+        "title": {
+          "ru": "Сборка конфигурации",
+          "uz": "Konfiguratsiyani yig'ish",
+          "en": "Assembling the configuration"
+        },
+        "brief": {
+          "ru": "Умолчания, файл и окружение — в порядке приоритета",
+          "uz": "Standartlar, fayl va muhit — ustunlik tartibida",
+          "en": "Defaults, file and environment — in priority order"
+        },
+        "desc": {
+          "ru": "Напиши функцию <code>resolve(defaults, file_cfg, env, prefix)</code>. Она собирает итоговую конфигурацию из трёх источников по возрастанию приоритета: <code>defaults</code>, затем <code>file_cfg</code>, затем <code>env</code>.<br><br>Из <code>env</code> берутся только те ключи, что начинаются с <code>prefix</code>. У такого ключа отрежь префикс и переведи остаток в нижний регистр — это и есть имя настройки. Остальные переменные окружения игнорируй.<br><br>Верни <b>новый</b> словарь; исходные менять нельзя. Значения из <code>env</code> оставляй строками как есть.",
+          "uz": "<code>resolve(defaults, file_cfg, env, prefix)</code> funksiyasini yozing. U yakuniy konfiguratsiyani uchta manbadan ustunlik o'sish tartibida yig'adi: <code>defaults</code>, keyin <code>file_cfg</code>, keyin <code>env</code>.<br><br><code>env</code> dan faqat <code>prefix</code> bilan boshlanadigan kalitlar olinadi. Bunday kalitning prefiksini kesib, qolganini quyi registrga o'tkazing — bu sozlama nomi bo'ladi. Qolgan muhit o'zgaruvchilarini e'tiborsiz qoldiring.<br><br><b>Yangi</b> lug'at qaytaring; asllarini o'zgartirib bo'lmaydi. <code>env</code> dan kelgan qiymatlarni satr holicha qoldiring.",
+          "en": "Write a function <code>resolve(defaults, file_cfg, env, prefix)</code>. It assembles the final configuration from three sources in ascending priority: <code>defaults</code>, then <code>file_cfg</code>, then <code>env</code>.<br><br>From <code>env</code>, take only the keys starting with <code>prefix</code>. Strip the prefix from such a key and lowercase the remainder — that is the setting's name. Ignore all other environment variables.<br><br>Return a <b>new</b> dict; the originals must not change. Leave values from <code>env</code> as the strings they are."
+        },
+        "starter": "def resolve(defaults, file_cfg, env, prefix):\n    # умолчания -> файл -> переменные окружения с префиксом\n    ...\n",
+        "tests": "defaults = {\"port\": 8000, \"debug\": False, \"name\": \"app\"}\nfile_cfg = {\"port\": 9000}\nenv = {\"APP_PORT\": \"8080\", \"PATH\": \"/usr/bin\", \"APP_NAME\": \"prod\"}\nassert resolve(defaults, file_cfg, env, \"APP_\") == {\"port\": \"8080\", \"debug\": False, \"name\": \"prod\"}\nassert resolve(defaults, file_cfg, {}, \"APP_\") == {\"port\": 9000, \"debug\": False, \"name\": \"app\"}\nassert resolve({}, {}, {\"APP_X\": \"1\"}, \"APP_\") == {\"x\": \"1\"}\nassert resolve(defaults, {}, {\"OTHER_PORT\": \"1\"}, \"APP_\") == defaults\nassert resolve(defaults, {}, {}, \"APP_\") is not defaults\nassert defaults == {\"port\": 8000, \"debug\": False, \"name\": \"app\"}\nassert resolve({}, {}, {\"APP_LOG_LEVEL\": \"debug\"}, \"APP_\") == {\"log_level\": \"debug\"}\n",
+        "hint": {
+          "ru": "Начни с копии: <code>config = dict(defaults)</code>, потом <code>config.update(file_cfg)</code>. Дальше цикл по <code>env.items()</code> с проверкой <code>key.startswith(prefix)</code>; имя настройки — <code>key[len(prefix):].lower()</code>. Копия в первой строке и решает требование «не менять исходные».",
+          "uz": "Nusxadan boshlang: <code>config = dict(defaults)</code>, keyin <code>config.update(file_cfg)</code>. Keyin <code>key.startswith(prefix)</code> tekshiruvi bilan <code>env.items()</code> bo'yicha sikl; sozlama nomi — <code>key[len(prefix):].lower()</code>. Birinchi qatordagi nusxa «asllarini o'zgartirmaslik» talabini hal qiladi.",
+          "en": "Start with a copy: <code>config = dict(defaults)</code>, then <code>config.update(file_cfg)</code>. Then loop over <code>env.items()</code> checking <code>key.startswith(prefix)</code>; the setting name is <code>key[len(prefix):].lower()</code>. The copy on the first line is what satisfies the \"don't modify the originals\" requirement."
+        }
+      },
+      {
+        "id": "t3",
+        "kind": "python",
+        "title": {
+          "ru": "Автомасштабирование",
+          "uz": "Avtomasshtablash",
+          "en": "Autoscaling"
+        },
+        "brief": {
+          "ru": "Реши, сколько реплик нужно при текущей нагрузке",
+          "uz": "Joriy yuklamada nechta replika kerakligini hal qiling",
+          "en": "Decide how many replicas the current load needs"
+        },
+        "desc": {
+          "ru": "Напиши функцию <code>desired_replicas(current, load, low, high, min_r, max_r)</code>.<br><br>Если <code>load</code> <b>строго больше</b> <code>high</code> — целевое число реплик на одну больше текущего. Если <code>load</code> <b>строго меньше</b> <code>low</code> — на одну меньше. В остальных случаях (в том числе ровно на пороге) остаётся текущее.<br><br>Результат обязательно зажми в границы: не меньше <code>min_r</code> и не больше <code>max_r</code>. Границы применяются всегда, даже если число реплик не менялось.",
+          "uz": "<code>desired_replicas(current, load, low, high, min_r, max_r)</code> funksiyasini yozing.<br><br>Agar <code>load</code> <code>high</code> dan <b>qat'iy katta</b> bo'lsa — maqsadli replikalar soni joriysidan bitta ko'p. Agar <code>load</code> <code>low</code> dan <b>qat'iy kichik</b> bo'lsa — bitta kam. Qolgan holatlarda (jumladan aynan chegarada) joriysi qoladi.<br><br>Natijani albatta chegaralarga siqing: <code>min_r</code> dan kam emas, <code>max_r</code> dan ko'p emas. Chegaralar doim qo'llanadi, hatto replikalar soni o'zgarmagan bo'lsa ham.",
+          "en": "Write a function <code>desired_replicas(current, load, low, high, min_r, max_r)</code>.<br><br>If <code>load</code> is <b>strictly above</b> <code>high</code>, the target is one more replica than current. If <code>load</code> is <b>strictly below</b> <code>low</code>, one less. In every other case (including exactly on a threshold) the current count stays.<br><br>Always clamp the result to the bounds: no less than <code>min_r</code> and no more than <code>max_r</code>. The bounds apply every time, even when the replica count did not change."
+        },
+        "starter": "def desired_replicas(current, load, low, high, min_r, max_r):\n    # выше верхнего порога — добавить, ниже нижнего — убрать, потом зажать в границы\n    ...\n",
+        "tests": "assert desired_replicas(3, 85, 30, 70, 2, 10) == 4\nassert desired_replicas(3, 10, 30, 70, 2, 10) == 2\nassert desired_replicas(3, 50, 30, 70, 2, 10) == 3\nassert desired_replicas(2, 10, 30, 70, 2, 10) == 2\nassert desired_replicas(10, 90, 30, 70, 2, 10) == 10\nassert desired_replicas(1, 50, 30, 70, 2, 10) == 2\nassert desired_replicas(3, 70, 30, 70, 2, 10) == 3\nassert desired_replicas(3, 30, 30, 70, 2, 10) == 3\nassert desired_replicas(12, 10, 30, 70, 2, 10) == 10\n",
+        "hint": {
+          "ru": "Сначала посчитай цель: <code>target = current + 1</code> при <code>load &gt; high</code>, <code>current - 1</code> при <code>load &lt; low</code>, иначе <code>current</code>. Потом одной строкой зажми: <code>max(min_r, min(max_r, target))</code>. Внутренний <code>min</code> держит верхнюю границу, внешний <code>max</code> — нижнюю.",
+          "uz": "Avval maqsadni hisoblang: <code>load &gt; high</code> da <code>target = current + 1</code>, <code>load &lt; low</code> da <code>current - 1</code>, aks holda <code>current</code>. Keyin bir qatorda siqing: <code>max(min_r, min(max_r, target))</code>. Ichki <code>min</code> yuqori chegarani, tashqi <code>max</code> pastkisini ushlaydi.",
+          "en": "First compute the target: <code>target = current + 1</code> when <code>load &gt; high</code>, <code>current - 1</code> when <code>load &lt; low</code>, otherwise <code>current</code>. Then clamp in one line: <code>max(min_r, min(max_r, target))</code>. The inner <code>min</code> holds the upper bound, the outer <code>max</code> the lower one."
+        }
+      }
+    ],
+    "exam": {
+      "time": 660,
+      "questions": [
+        {
+          "q": {
+            "ru": "Что кладут в Git при подходе «инфраструктура как код»?",
+            "uz": "«Infratuzilma kod sifatida» yondashuvida Git ga nima qo'yiladi?",
+            "en": "What goes into Git with the infrastructure-as-code approach?"
+          },
+          "options": [
+            { "ru": "Описание желаемого состояния инфраструктуры", "uz": "Infratuzilmaning kerakli holati tasviri", "en": "The description of the desired infrastructure state" },
+            { "ru": "Дампы баз данных", "uz": "Ma'lumotlar bazasi damplari", "en": "Database dumps" },
+            { "ru": "Пароли от серверов", "uz": "Server parollari", "en": "Server passwords" },
+            { "ru": "Логи приложения", "uz": "Ilova loglari", "en": "Application logs" }
+          ],
+          "a": 0
+        },
+        {
+          "q": {
+            "ru": "Коллега поправил конфиг на проде через SSH. Что произойдёт при следующем применении описания?",
+            "uz": "Hamkasb prodda konfigni SSH orqali tuzatdi. Tasvirni keyingi qo'llashda nima bo'ladi?",
+            "en": "A colleague edited a config on prod over SSH. What happens on the next apply of the description?"
+          },
+          "options": [
+            { "ru": "Правка сохранится, инструмент её увидит", "uz": "Tuzatish saqlanadi, vosita uni ko'radi", "en": "The edit survives, the tool will notice it" },
+            { "ru": "Правка исчезнет — состояние вернут к тому, что в файле", "uz": "Tuzatish yo'qoladi — holat fayldagiga qaytariladi", "en": "The edit disappears — the state is restored to what's in the file" },
+            { "ru": "Инструмент откажется работать", "uz": "Vosita ishlashdan bosh tortadi", "en": "The tool refuses to run" },
+            { "ru": "Описание в Git обновится автоматически", "uz": "Git dagi tasvir avtomatik yangilanadi", "en": "The description in Git updates automatically" }
+          ],
+          "a": 1
+        },
+        {
+          "q": {
+            "ru": "Какой источник конфигурации имеет наивысший приоритет?",
+            "uz": "Konfiguratsiyaning qaysi manbasi eng yuqori ustunlikka ega?",
+            "en": "Which configuration source has the highest priority?"
+          },
+          "options": [
+            { "ru": "Значения по умолчанию в коде", "uz": "Koddagi standart qiymatlar", "en": "Defaults in the code" },
+            { "ru": "Переменные окружения", "uz": "Muhit o'zgaruvchilari", "en": "Environment variables" },
+            { "ru": "Конфигурационный файл", "uz": "Konfiguratsiya fayli", "en": "The configuration file" },
+            { "ru": "README проекта", "uz": "Loyihaning README fayli", "en": "The project README" }
+          ],
+          "a": 1
+        },
+        {
+          "q": {
+            "ru": "Нагрузка 40%, нижний порог 30%, верхний 70%, реплик 5. Сколько реплик должно стать?",
+            "uz": "Yuklama 40%, pastki chegara 30%, yuqorisi 70%, replikalar 5 ta. Nechta replika bo'lishi kerak?",
+            "en": "Load is 40%, the lower threshold 30%, the upper 70%, with 5 replicas. How many replicas should there be?"
+          },
+          "options": [
+            { "ru": "4", "uz": "4", "en": "4" },
+            { "ru": "5 — нагрузка между порогами, менять нечего", "uz": "5 — yuklama chegaralar orasida, o'zgartiradigan narsa yo'q", "en": "5 — the load is between the thresholds, nothing to change" },
+            { "ru": "6", "uz": "6", "en": "6" },
+            { "ru": "2", "uz": "2", "en": "2" }
+          ],
+          "a": 1
+        },
+        {
+          "q": {
+            "ru": "Зачем автомасштабированию нижняя граница числа реплик?",
+            "uz": "Avtomasshtablashga replikalar sonining pastki chegarasi nimaga kerak?",
+            "en": "Why does autoscaling need a lower bound on replicas?"
+          },
+          "options": [
+            { "ru": "Чтобы при спаде нагрузки сервис не ушёл в ноль реплик", "uz": "Yuklama pasayganda xizmat nol replikaga tushmasligi uchun", "en": "So the service doesn't drop to zero replicas when load falls" },
+            { "ru": "Чтобы экономить деньги", "uz": "Pul tejash uchun", "en": "To save money" },
+            { "ru": "Этого требует балансировщик", "uz": "Balansirovchi shuni talab qiladi", "en": "The load balancer requires it" },
+            { "ru": "Чтобы ускорить выкладку", "uz": "Chiqarishni tezlashtirish uchun", "en": "To speed up deployment" }
+          ],
+          "a": 0
+        },
+        {
+          "q": {
+            "ru": "Чем liveness-проба отличается от readiness-пробы?",
+            "uz": "Liveness-proba readiness-probadan nimasi bilan farq qiladi?",
+            "en": "How does a liveness probe differ from a readiness probe?"
+          },
+          "options": [
+            { "ru": "Ничем, это два названия одного и того же", "uz": "Hech nimasi bilan, bu bir narsaning ikki nomi", "en": "In nothing, they are two names for the same thing" },
+            { "ru": "Провал liveness перезапускает контейнер, провал readiness лишь отключает трафик", "uz": "Liveness ning muvaffaqiyatsizligi konteynerni qayta ishga tushiradi, readiness niki faqat trafikni uzadi", "en": "A failed liveness restarts the container, a failed readiness only cuts off traffic" },
+            { "ru": "Liveness проверяет базу, readiness — сеть", "uz": "Liveness bazani, readiness tarmoqni tekshiradi", "en": "Liveness checks the database, readiness the network" },
+            { "ru": "Readiness работает только в prod", "uz": "Readiness faqat proddа ishlaydi", "en": "Readiness only works in prod" }
+          ],
+          "a": 1
+        }
+      ],
+      "tasks": [
+        {
+          "id": "e1",
+          "kind": "python",
+          "title": {
+            "ru": "Отчёт о дрейфе конфигурации",
+            "uz": "Konfiguratsiya dreyfi hisoboti",
+            "en": "Configuration drift report"
+          },
+          "desc": {
+            "ru": "Напиши функцию <code>drift(declared, actual)</code>. Оба аргумента — словари «имя ресурса → словарь настроек». Верни отчёт-словарь с тремя ключами:<br><br><code>\"missing\"</code> — отсортированный список ресурсов, которые объявлены, но отсутствуют в реальности;<br><code>\"extra\"</code> — отсортированный список ресурсов, которые есть в реальности, но не объявлены;<br><code>\"changed\"</code> — словарь для ресурсов, которые есть в обоих: имя ресурса → словарь «поле → кортеж <code>(объявлено, на самом деле)</code>».<br><br>В <code>\"changed\"</code> попадают только поля с разными значениями. Сравнивай объединение полей обеих сторон: если поля нет с одной стороны, вместо значения ставь <code>None</code>. Ресурсы без расхождений в <code>\"changed\"</code> не включай.",
+            "uz": "<code>drift(declared, actual)</code> funksiyasini yozing. Ikkala argument ham «resurs nomi → sozlamalar lug'ati» lug'ati. Uchta kalitli hisobot-lug'at qaytaring:<br><br><code>\"missing\"</code> — e'lon qilingan, lekin haqiqatda yo'q resurslarning tartiblangan ro'yxati;<br><code>\"extra\"</code> — haqiqatda bor, lekin e'lon qilinmagan resurslarning tartiblangan ro'yxati;<br><code>\"changed\"</code> — ikkalasida ham bor resurslar uchun lug'at: resurs nomi → «maydon → <code>(e'lon qilingan, haqiqatda)</code> korteji» lug'ati.<br><br><code>\"changed\"</code> ga faqat qiymatlari turlicha maydonlar tushadi. Ikkala tomon maydonlari birlashmasini solishtiring: agar maydon bir tomonda bo'lmasa, qiymat o'rniga <code>None</code> qo'ying. Farqi yo'q resurslarni <code>\"changed\"</code> ga qo'shmang.",
+            "en": "Write a function <code>drift(declared, actual)</code>. Both arguments map a resource name to a dict of settings. Return a report dict with three keys:<br><br><code>\"missing\"</code> — a sorted list of resources that are declared but absent in reality;<br><code>\"extra\"</code> — a sorted list of resources that exist in reality but were not declared;<br><code>\"changed\"</code> — a dict for resources present in both: resource name → dict of \"field → tuple <code>(declared, actual)</code>\".<br><br>Only fields with differing values go into <code>\"changed\"</code>. Compare the union of both sides' fields: if a field is absent on one side, use <code>None</code> in place of its value. Resources with no differences must not appear in <code>\"changed\"</code>."
+          },
+          "starter": "def drift(declared, actual):\n    # чего не хватает, что лишнее и что разошлось по полям\n    ...\n",
+          "tests": "declared = {\n    \"web\": {\"image\": \"app:1.2\", \"replicas\": 3},\n    \"db\": {\"image\": \"pg:16\", \"replicas\": 1},\n}\nactual = {\n    \"web\": {\"image\": \"app:1.1\", \"replicas\": 3},\n    \"cache\": {\"image\": \"redis:7\"},\n}\nreport = drift(declared, actual)\nassert report[\"missing\"] == [\"db\"]\nassert report[\"extra\"] == [\"cache\"]\nassert report[\"changed\"] == {\"web\": {\"image\": (\"app:1.2\", \"app:1.1\")}}\n\nassert drift({}, {}) == {\"missing\": [], \"extra\": [], \"changed\": {}}\nassert drift({\"a\": {\"x\": 1}}, {\"a\": {\"x\": 1}})[\"changed\"] == {}\nassert drift({\"a\": {\"x\": 1}}, {\"a\": {\"x\": 1, \"y\": 2}})[\"changed\"] == {\"a\": {\"y\": (None, 2)}}\nassert drift({\"a\": {\"x\": 1, \"y\": 2}}, {\"a\": {\"x\": 1}})[\"changed\"] == {\"a\": {\"y\": (2, None)}}\nassert drift({\"b\": {}, \"a\": {}}, {})[\"missing\"] == [\"a\", \"b\"]\n",
+          "hint": {
+            "ru": "Списки собираются так же, как в задаче t1. Для <code>\"changed\"</code> пройди по общим именам, возьми объединение полей — <code>set(d) | set(a)</code> — и для каждого поля сравни <code>d.get(field)</code> с <code>a.get(field)</code>: метод <code>get</code> сам вернёт <code>None</code>, если поля нет. Добавляй ресурс в отчёт, только если словарь расхождений непустой.",
+            "uz": "Ro'yxatlar t1 masalasidagidek yig'iladi. <code>\"changed\"</code> uchun umumiy nomlar bo'ylab yuring, maydonlar birlashmasini oling — <code>set(d) | set(a)</code> — va har bir maydon uchun <code>d.get(field)</code> ni <code>a.get(field)</code> bilan solishtiring: <code>get</code> metodi maydon bo'lmasa o'zi <code>None</code> qaytaradi. Resursni hisobotga faqat farqlar lug'ati bo'sh bo'lmaganda qo'shing.",
+            "en": "The lists are built just like in task t1. For <code>\"changed\"</code>, walk the shared names, take the union of fields — <code>set(d) | set(a)</code> — and compare <code>d.get(field)</code> with <code>a.get(field)</code> for each: <code>get</code> returns <code>None</code> by itself when the field is missing. Add the resource to the report only if its difference dict is non-empty."
+          }
+        }
+      ]
+    }
   }
  ]
 }

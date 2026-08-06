@@ -1028,7 +1028,7 @@
    "color": "#34d399",
    "level": "intermediate",
    "status": "full",
-   "estimatedHours": 15,
+   "estimatedHours": 21,
    "requires": [
     "python-collections"
    ],
@@ -1036,7 +1036,7 @@
     "devops-basics"
    ],
    "legacyIds": [],
-   "moduleCount": 2,
+   "moduleCount": 3,
    "runner": "python"
   },
   {

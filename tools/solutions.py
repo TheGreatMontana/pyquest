@@ -1530,4 +1530,51 @@ def attention(query, keys, values):
                 dropped.add(j)
     return kept
 """,
+
+    'devops-intro/do-03/t1': """def plan(current, desired):
+    return {
+        'create': sorted(n for n in desired if n not in current),
+        'update': sorted(n for n in desired
+                         if n in current and current[n] != desired[n]),
+        'delete': sorted(n for n in current if n not in desired),
+    }
+""",
+
+    'devops-intro/do-03/t2': """def resolve(defaults, file_cfg, env, prefix):
+    config = dict(defaults)
+    config.update(file_cfg)
+    for key, value in env.items():
+        if key.startswith(prefix):
+            config[key[len(prefix):].lower()] = value
+    return config
+""",
+
+    'devops-intro/do-03/t3': """def desired_replicas(current, load, low, high, min_r, max_r):
+    target = current
+    if load > high:
+        target = current + 1
+    elif load < low:
+        target = current - 1
+    return max(min_r, min(max_r, target))
+""",
+
+    'devops-intro/do-03/exam0': """def drift(declared, actual):
+    changed = {}
+    for name in declared:
+        if name not in actual:
+            continue
+        d = declared[name]
+        a = actual[name]
+        diff = {}
+        for field in set(d) | set(a):
+            if d.get(field) != a.get(field):
+                diff[field] = (d.get(field), a.get(field))
+        if diff:
+            changed[name] = diff
+    return {
+        'missing': sorted(n for n in declared if n not in actual),
+        'extra': sorted(n for n in actual if n not in declared),
+        'changed': changed,
+    }
+""",
 }
