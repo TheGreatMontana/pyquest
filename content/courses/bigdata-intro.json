@@ -631,6 +631,478 @@
      }
     ]
    }
+  },
+  {
+    "id": "bd-03",
+    "title": {
+      "ru": "Джойны, шаффл и потоковая обработка",
+      "uz": "Joinlar, shuffle va oqimli qayta ishlash",
+      "en": "Joins, shuffle and stream processing"
+    },
+    "tagline": {
+      "ru": "Почему соединение таблиц — самая дорогая операция кластера и чем поток отличается от пакета",
+      "uz": "Nega jadvallarni birlashtirish klasterning eng qimmat amali va oqim paketdan nimasi bilan farq qiladi",
+      "en": "Why joining tables is a cluster's most expensive operation, and how a stream differs from a batch"
+    },
+    "lessons": [
+      {
+        "id": "l1",
+        "title": {
+          "ru": "Джойн в распределённой системе",
+          "uz": "Taqsimlangan tizimda join",
+          "en": "Joining in a distributed system"
+        },
+        "blocks": [
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>На одной машине соединение двух таблиц — рутина: строим индекс по ключу и идём по второй таблице. В кластере всё сложнее, потому что строки лежат на разных узлах.</p><p>Чтобы соединить строку с ключом <code>u1</code> из левой таблицы со строкой <code>u1</code> из правой, обе они должны оказаться <b>на одной машине</b>. Никак иначе узел не сможет их сопоставить: он не видит память соседа.</p><p>Сначала посмотрим на сам алгоритм — <b>хеш-джойн</b>. Он в основе любой реализации, распределённой или нет: по меньшей таблице строится словарь «ключ → строки», потом по большей идёт проход с поиском в этом словаре.</p>",
+              "uz": "<p>Bitta mashinada ikki jadvalni birlashtirish — odatiy ish: kalit bo'yicha indeks quramiz va ikkinchi jadval bo'ylab yuramiz. Klasterda hammasi murakkabroq, chunki qatorlar turli tugunlarda yotadi.</p><p>Chap jadvaldagi <code>u1</code> kalitli qatorni o'ng jadvaldagi <code>u1</code> qatori bilan birlashtirish uchun ikkalasi ham <b>bitta mashinada</b> bo'lishi kerak. Boshqacha tugun ularni solishtira olmaydi: u qo'shnisining xotirasini ko'rmaydi.</p><p>Avval algoritmning o'ziga qaraymiz — <b>xesh-join</b>. U taqsimlangan yoki taqsimlanmagan har qanday amalga oshirishning asosida: kichikroq jadval bo'yicha «kalit → qatorlar» lug'ati quriladi, keyin kattarog'i bo'ylab shu lug'atda qidirib yuriladi.</p>",
+              "en": "<p>On a single machine joining two tables is routine: build an index by key and walk the second table. In a cluster it is harder, because the rows live on different nodes.</p><p>To join a row with key <code>u1</code> from the left table to the row <code>u1</code> from the right, both must end up <b>on the same machine</b>. There is no other way for a node to match them: it cannot see its neighbour's memory.</p><p>First look at the algorithm itself — the <b>hash join</b>. It underlies every implementation, distributed or not: a dictionary \"key → rows\" is built from the smaller table, then the larger one is walked, looking each key up in that dictionary.</p>"
+            }
+          },
+          {
+            "type": "run",
+            "code": "left = [(\"u1\", \"Азиз\"), (\"u2\", \"Дилноза\"), (\"u3\", \"Тимур\")]\nright = [(\"u1\", 250), (\"u1\", 400), (\"u3\", 120), (\"u9\", 50)]\n\nindex = {}\nfor key, value in right:\n    index.setdefault(key, []).append(value)\n\nprint(\"индекс правой таблицы:\", index)\nprint()\n\nfor key, name in left:\n    for amount in index.get(key, []):\n        print(key, name, \"->\", amount)"
+          },
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>Заметь: <code>u2</code> не попал в результат — у него нет пары справа, а <code>u9</code> не попал, потому что нет пары слева. Это обычный внутренний джойн.</p><p>Теперь про кластер. Есть два способа собрать пары на одной машине.</p><p><b>Shuffle join.</b> Обе таблицы перераспределяют по ключу: строка с ключом <code>u1</code> из любой таблицы едет на один и тот же узел. Работает всегда, но по сети едут обе таблицы целиком — это дорого.</p><p><b>Broadcast join.</b> Если одна таблица маленькая (справочник валют, список городов, таблица категорий), её копию рассылают на <b>каждый</b> узел. Большая таблица тогда вообще не двигается, и джойн делается локально. Разница в скорости — на порядок.</p><p>Правило простое: если меньшая сторона помещается в память узла, это broadcast; если нет — shuffle. Современные движки выбирают сами по статистике таблиц, но подсказать им размер иногда всё ещё приходится вручную.</p>",
+              "uz": "<p>E'tibor bering: <code>u2</code> natijaga tushmadi — o'ngda jufti yo'q, <code>u9</code> esa chapda jufti yo'qligi uchun tushmadi. Bu oddiy ichki join.</p><p>Endi klaster haqida. Juftlarni bitta mashinada yig'ishning ikki yo'li bor.</p><p><b>Shuffle join.</b> Ikkala jadval ham kalit bo'yicha qayta taqsimlanadi: istalgan jadvaldagi <code>u1</code> kalitli qator bitta va o'sha tugunga ketadi. Doim ishlaydi, lekin tarmoq orqali ikkala jadval to'liq ketadi — bu qimmat.</p><p><b>Broadcast join.</b> Agar bitta jadval kichik bo'lsa (valyutalar ma'lumotnomasi, shaharlar ro'yxati, kategoriyalar jadvali), uning nusxasi <b>har bir</b> tugunga tarqatiladi. Katta jadval unda umuman qimirlamaydi va join lokal bajariladi. Tezlikdagi farq — bir tartibga.</p><p>Qoida oddiy: agar kichikroq tomon tugun xotirasiga sig'sa, bu broadcast; sig'masa — shuffle. Zamonaviy dvigatellar jadval statistikasi bo'yicha o'zi tanlaydi, lekin ba'zan ularga hajmni qo'lda aytish hamon kerak bo'ladi.</p>",
+              "en": "<p>Note: <code>u2</code> is missing from the result — it has no match on the right — and <code>u9</code> is missing because it has no match on the left. That is an ordinary inner join.</p><p>Now about the cluster. There are two ways to bring pairs together on one machine.</p><p><b>Shuffle join.</b> Both tables are redistributed by key: a row with key <code>u1</code> from either table travels to the very same node. It always works, but both tables cross the network in full — which is expensive.</p><p><b>Broadcast join.</b> If one table is small (a currency reference, a list of cities, a category table), a copy of it is sent to <b>every</b> node. The large table then does not move at all and the join happens locally. The speed difference is an order of magnitude.</p><p>The rule is simple: if the smaller side fits in a node's memory it is a broadcast; if not, a shuffle. Modern engines choose on their own from table statistics, but sometimes you still have to hint the size by hand.</p>"
+            }
+          },
+          {
+            "type": "checkpoint",
+            "q": {
+              "ru": "Соединяем таблицу заказов на 500 ГБ со справочником городов на 2 МБ. Какой джойн выберет движок?",
+              "uz": "500 GB buyurtmalar jadvalini 2 MB shaharlar ma'lumotnomasi bilan birlashtiryapmiz. Dvigatel qaysi joinni tanlaydi?",
+              "en": "Joining a 500 GB orders table with a 2 MB city reference. Which join will the engine pick?"
+            },
+            "options": [
+              { "ru": "Shuffle join — обе таблицы перераспределит по ключу", "uz": "Shuffle join — ikkala jadvalni ham kalit bo'yicha qayta taqsimlaydi", "en": "A shuffle join — it will redistribute both tables by key" },
+              { "ru": "Broadcast join — разошлёт справочник на все узлы, большая таблица не сдвинется", "uz": "Broadcast join — ma'lumotnomani barcha tugunlarga tarqatadi, katta jadval qimirlamaydi", "en": "A broadcast join — it sends the reference to every node and the big table stays put" },
+              { "ru": "Соединение невозможно из-за разницы в размерах", "uz": "O'lchamlar farqi tufayli birlashtirish mumkin emas", "en": "The join is impossible because of the size difference" },
+              { "ru": "Сначала нужно уменьшить большую таблицу", "uz": "Avval katta jadvalni kichraytirish kerak", "en": "The big table must be shrunk first" }
+            ],
+            "a": 1,
+            "explain": {
+              "ru": "2 МБ спокойно помещаются в память любого узла. Разослать их дешевле, чем гонять по сети 500 ГБ. Именно поэтому маленькие справочники соединяют почти бесплатно, а два больших факта — очень дорого.",
+              "uz": "2 MB istalgan tugun xotirasiga bemalol sig'adi. Uni tarqatish 500 GB ni tarmoq orqali haydashdan arzonroq. Aynan shuning uchun kichik ma'lumotnomalar deyarli bepul birlashtiriladi, ikkita katta fakt esa juda qimmat.",
+              "en": "2 MB fits comfortably in any node's memory. Broadcasting it is cheaper than pushing 500 GB across the network. That is exactly why small references join almost for free while two large fact tables are very costly."
+            }
+          }
+        ]
+      },
+      {
+        "id": "l2",
+        "title": {
+          "ru": "Шаффл: самая дорогая операция",
+          "uz": "Shuffle: eng qimmat amal",
+          "en": "The shuffle: the most expensive operation"
+        },
+        "blocks": [
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p><b>Шаффл</b> — это пересылка данных между узлами кластера, чтобы строки с одинаковым ключом собрались вместе. Он не виден в коде: ты пишешь <code>GROUP BY</code>, а движок под капотом раскидывает миллиарды строк по сети.</p><p>Шаффл вызывают почти все интересные операции:</p><ul><li><code>GROUP BY</code> и любые агрегаты по ключу;</li><li><code>JOIN</code> без broadcast;</li><li><code>DISTINCT</code>;</li><li>сортировка по всему набору данных;</li><li>явное изменение числа партиций.</li></ul><p>А вот фильтрация, вычисление новой колонки и чтение файла шаффла не требуют — каждый узел справляется сам. Отсюда главное правило оптимизации: <b>фильтруй до шаффла, а не после</b>. Строка, отброшенная фильтром, по сети уже не поедет.</p><p>Куда именно поедет строка, решает хеш ключа: <code>номер партиции = hash(ключ) % число партиций</code>. Одинаковые ключи дают одинаковый хеш, значит гарантированно попадают в одну партицию — на этом всё и держится.</p>",
+              "uz": "<p><b>Shuffle</b> — bir xil kalitli qatorlar birga yig'ilishi uchun klaster tugunlari orasida ma'lumot uzatish. U kodda ko'rinmaydi: siz <code>GROUP BY</code> yozasiz, dvigatel esa ostida milliardlab qatorni tarmoq bo'ylab tarqatadi.</p><p>Shuffle ni deyarli barcha qiziqarli amallar chaqiradi:</p><ul><li><code>GROUP BY</code> va kalit bo'yicha har qanday agregat;</li><li>broadcast siz <code>JOIN</code>;</li><li><code>DISTINCT</code>;</li><li>butun ma'lumot to'plami bo'yicha saralash;</li><li>partitsiyalar sonini aniq o'zgartirish.</li></ul><p>Filtrlash, yangi ustun hisoblash va fayl o'qish esa shuffle ni talab qilmaydi — har bir tugun o'zi uddalaydi. Shundan optimallashtirishning asosiy qoidasi: <b>shuffle dan keyin emas, oldin filtrlang</b>. Filtr tashlab yuborgan qator tarmoq bo'ylab ketmaydi.</p><p>Qator qayerga ketishini kalit xeshi hal qiladi: <code>partitsiya raqami = hash(kalit) % partitsiyalar soni</code>. Bir xil kalitlar bir xil xesh beradi, demak kafolatli bitta partitsiyaga tushadi — hammasi shunga tayanadi.</p>",
+              "en": "<p>A <b>shuffle</b> is the transfer of data between cluster nodes so that rows with the same key gather together. It is invisible in the code: you write <code>GROUP BY</code>, and under the hood the engine scatters billions of rows across the network.</p><p>Almost every interesting operation triggers a shuffle:</p><ul><li><code>GROUP BY</code> and any aggregate by key;</li><li><code>JOIN</code> without a broadcast;</li><li><code>DISTINCT</code>;</li><li>sorting the whole dataset;</li><li>explicitly changing the number of partitions.</li></ul><p>Filtering, computing a new column and reading a file, on the other hand, need no shuffle — each node handles them alone. Hence the main optimization rule: <b>filter before the shuffle, not after</b>. A row dropped by a filter never crosses the network.</p><p>Where a row goes is decided by the key's hash: <code>partition number = hash(key) % number of partitions</code>. Equal keys give equal hashes and are therefore guaranteed to land in the same partition — that is what the whole thing rests on.</p>"
+            }
+          },
+          {
+            "type": "run",
+            "code": "rows = [(\"moscow\", 1), (\"tashkent\", 1), (\"moscow\", 1), (\"moscow\", 1),\n        (\"samarkand\", 1), (\"moscow\", 1), (\"tashkent\", 1), (\"moscow\", 1)]\n\nPARTITIONS = 3\n\ndef partition_of(key, partitions):\n    return sum(ord(c) for c in key) % partitions\n\nbuckets = [[] for _ in range(PARTITIONS)]\nfor key, value in rows:\n    buckets[partition_of(key, PARTITIONS)].append(key)\n\nfor i, bucket in enumerate(buckets):\n    print(f\"партиция {i}: {len(bucket):>2} строк  {sorted(set(bucket))}\")"
+          },
+          {
+            "type": "note",
+            "kind": "trap",
+            "html": {
+              "ru": "Смотри на результат: одна партиция пустая, другая получила почти всё. Это <b>перекос</b> из bd-01, но теперь понятно, откуда он берётся — из распределения самих ключей. Пока один узел молотит шесть строк, два других простаивают, и задача идёт со скоростью самого загруженного.<br><br>Худший случай — <code>NULL</code> в ключе джойна. Все <code>NULL</code> дают один хеш, и десятки миллионов строк съезжаются на один узел, который падает по памяти. Лечение: отфильтровать <code>NULL</code> до соединения либо подмешать в ключ случайное число (приём называют «солью»).",
+              "uz": "Natijaga qarang: bitta partitsiya bo'sh, boshqasi deyarli hammasini oldi. Bu bd-01 dagi <b>qiyshiqlik</b>, lekin endi u qayerdan kelishi tushunarli — kalitlarning o'z taqsimotidan. Bitta tugun olti qatorni ishlagunicha, ikkitasi bo'sh turadi va vazifa eng yuklangani tezligida ketadi.<br><br>Eng yomon holat — join kalitidagi <code>NULL</code>. Barcha <code>NULL</code> bitta xesh beradi va o'nlab million qator xotiradan qulaydigan bitta tugunga yig'iladi. Davosi: birlashtirishdan oldin <code>NULL</code> ni filtrlash yoki kalitga tasodifiy son qo'shish (bu usulni «tuz» deyishadi).",
+              "en": "Look at the result: one partition is empty, another got nearly everything. That is the <b>skew</b> from bd-01, but now its origin is clear — the distribution of the keys themselves. While one node grinds through six rows the other two sit idle, and the job runs at the speed of the busiest one.<br><br>The worst case is a <code>NULL</code> in the join key. All <code>NULL</code>s hash the same, and tens of millions of rows converge on one node, which then dies on memory. The cure: filter out <code>NULL</code>s before the join, or mix a random number into the key (the trick is called \"salting\")."
+            }
+          },
+          {
+            "type": "predict",
+            "lang": "python",
+            "code": "def partition_of(key, partitions):\n    return sum(ord(c) for c in key) % partitions\n\nprint(partition_of(\"ab\", 4), partition_of(\"ba\", 4))",
+            "options": [
+              { "ru": "3 3", "uz": "3 3", "en": "3 3" },
+              { "ru": "3 0", "uz": "3 0", "en": "3 0" },
+              { "ru": "1 2", "uz": "1 2", "en": "1 2" },
+              { "ru": "Ошибка", "uz": "Xato", "en": "Error" }
+            ],
+            "a": 0,
+            "explain": {
+              "ru": "Сумма кодов не зависит от порядка букв: <code>97 + 98 = 195</code> в обоих случаях, <code>195 % 4 = 3</code>. Разные ключи попали в одну партицию — это коллизия. Настоящие хеш-функции такое почти исключают, но главное свойство сохраняется в любом случае: <b>одинаковый ключ всегда даёт одинаковую партицию</b>.",
+              "uz": "Kodlar yig'indisi harflar tartibiga bog'liq emas: ikkala holatda ham <code>97 + 98 = 195</code>, <code>195 % 4 = 3</code>. Turli kalitlar bitta partitsiyaga tushdi — bu to'qnashuv. Haqiqiy xesh-funksiyalar buni deyarli istisno qiladi, lekin asosiy xususiyat baribir saqlanadi: <b>bir xil kalit doim bir xil partitsiya beradi</b>.",
+              "en": "The sum of character codes does not depend on letter order: <code>97 + 98 = 195</code> in both cases, and <code>195 % 4 = 3</code>. Two different keys landed in one partition — a collision. Real hash functions make that nearly impossible, but the essential property holds regardless: <b>the same key always yields the same partition</b>."
+            }
+          }
+        ]
+      },
+      {
+        "id": "l3",
+        "title": {
+          "ru": "Пакет и поток",
+          "uz": "Paket va oqim",
+          "en": "Batch and stream"
+        },
+        "blocks": [
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>Всё, что мы делали до сих пор, — <b>пакетная обработка</b>: есть готовый набор данных, мы его читаем целиком и считаем результат. Раз в час, раз в сутки.</p><p>Но данные часто приходят непрерывно: клики, платежи, показания датчиков, события приложения. Ждать полуночи, чтобы заметить всплеск ошибок, бессмысленно. Здесь работает <b>потоковая обработка</b>: события считают по мере поступления.</p><p>Главная сложность потока в том, что у него нет конца. «Посчитай сумму» — некорректный вопрос: сумму за какой период? Поэтому поток режут на <b>окна</b>.</p><ul><li><b>Тумблинговые</b> — подряд идущие непересекающиеся отрезки: 0–5, 5–10, 10–15. Каждое событие попадает ровно в одно окно.</li><li><b>Скользящие</b> — окна перекрываются: 0–5, 1–6, 2–7. Событие попадает в несколько окон, зато график получается гладким.</li></ul>",
+              "uz": "<p>Shu paytgacha qilganimizning hammasi — <b>paketli qayta ishlash</b>: tayyor ma'lumot to'plami bor, biz uni butunlay o'qib, natijani hisoblaymiz. Soatiga bir marta, kuniga bir marta.</p><p>Lekin ma'lumot ko'pincha uzluksiz keladi: bosishlar, to'lovlar, datchik ko'rsatkichlari, ilova hodisalari. Xatolar to'lqinini sezish uchun yarim tunni kutish ma'nosiz. Bu yerda <b>oqimli qayta ishlash</b> ishlaydi: hodisalar kelishi bilan hisoblanadi.</p><p>Oqimning asosiy qiyinligi shundaki, uning oxiri yo'q. «Yig'indini hisobla» — noto'g'ri savol: qaysi davr uchun yig'indi? Shuning uchun oqim <b>oynalarga</b> kesiladi.</p><ul><li><b>Tumbling</b> — ketma-ket kesishmaydigan kesmalar: 0–5, 5–10, 10–15. Har bir hodisa aynan bitta oynaga tushadi.</li><li><b>Sliding</b> — oynalar ustma-ust tushadi: 0–5, 1–6, 2–7. Hodisa bir necha oynaga tushadi, buning evaziga grafik silliq chiqadi.</li></ul>",
+              "en": "<p>Everything we have done so far is <b>batch processing</b>: there is a finished dataset, we read it whole and compute the result. Once an hour, once a day.</p><p>But data often arrives continuously: clicks, payments, sensor readings, application events. Waiting until midnight to notice a spike in errors is pointless. This is where <b>stream processing</b> comes in: events are counted as they arrive.</p><p>The main difficulty of a stream is that it has no end. \"Compute the sum\" is an ill-formed question: the sum over what period? So a stream is cut into <b>windows</b>.</p><ul><li><b>Tumbling</b> — consecutive non-overlapping intervals: 0–5, 5–10, 10–15. Each event falls into exactly one window.</li><li><b>Sliding</b> — the windows overlap: 0–5, 1–6, 2–7. An event lands in several windows, but the resulting chart is smooth.</li></ul>"
+            }
+          },
+          {
+            "type": "run",
+            "code": "events = [(0, 5), (2, 3), (6, 8), (7, 1), (12, 4)]   # (секунда, значение)\nSIZE = 5\n\nwindows = {}\nfor ts, value in events:\n    start = ts // SIZE * SIZE          # начало окна, куда попадает событие\n    windows[start] = windows.get(start, 0) + value\n\nfor start in sorted(windows):\n    print(f\"окно [{start}, {start + SIZE}) -> {windows[start]}\")"
+          },
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>Формула <code>ts // size * size</code> — весь секрет тумблингового окна: целочисленное деление отбрасывает остаток, а умножение возвращает начало отрезка.</p><p>Теперь главная головная боль потоков. Есть два времени: <b>время события</b> (когда клик реально произошёл) и <b>время обработки</b> (когда событие доехало до сервера). Между ними — сеть, буферы, ушедший в туннель телефон. Событие в 10:00 может приехать в 10:07.</p><p>Считать надо по времени события, иначе статистика поедет: все события из туннеля свалятся в одну минуту. Но тогда возникает вопрос: когда закрывать окно? Ждать вечно нельзя, а закроешь рано — потеряешь опоздавших.</p><p>Компромисс называется <b>watermark</b>: система объявляет «события старше такого-то времени я больше не жду». Всё, что приходит после этой отметки, считается <b>опоздавшим</b> и либо отбрасывается, либо уходит в отдельный поток на разбор. Величину задержки подбирают по реальным данным: обычно секунды или минуты.</p>",
+              "uz": "<p><code>ts // size * size</code> formulasi — tumbling oynaning butun siri: butun sonli bo'lish qoldiqni tashlaydi, ko'paytirish esa kesma boshini qaytaradi.</p><p>Endi oqimlarning asosiy bosh og'rig'i. Ikki vaqt bor: <b>hodisa vaqti</b> (bosish haqiqatda qachon bo'lgani) va <b>qayta ishlash vaqti</b> (hodisa serverga qachon yetgani). Ular orasida — tarmoq, buferlar, tunnelga kirib ketgan telefon. 10:00 dagi hodisa 10:07 da kelishi mumkin.</p><p>Hisoblash hodisa vaqti bo'yicha bo'lishi kerak, aks holda statistika buziladi: tunneldagi barcha hodisalar bitta daqiqaga yig'iladi. Lekin unda savol tug'iladi: oynani qachon yopish kerak? Abadiy kutib bo'lmaydi, erta yopsang — kechikkanlarni yo'qotasan.</p><p>Murosa <b>watermark</b> deyiladi: tizim «falon vaqtdan eski hodisalarni endi kutmayman» deb e'lon qiladi. Bu belgidan keyin kelgan hamma narsa <b>kechikkan</b> hisoblanadi va yo tashlanadi, yo tahlil uchun alohida oqimga ketadi. Kechikish qiymati haqiqiy ma'lumot bo'yicha tanlanadi: odatda soniyalar yoki daqiqalar.</p>",
+              "en": "<p>The formula <code>ts // size * size</code> is the entire secret of a tumbling window: integer division drops the remainder and the multiplication returns the interval's start.</p><p>Now the main headache of streams. There are two times: <b>event time</b> (when the click actually happened) and <b>processing time</b> (when the event reached the server). Between them lie the network, buffers, a phone that went into a tunnel. An event from 10:00 can arrive at 10:07.</p><p>You must count by event time, otherwise the statistics skew: every event from the tunnel piles into one minute. But then the question arises: when do you close the window? You cannot wait forever, and closing early loses the stragglers.</p><p>The compromise is called a <b>watermark</b>: the system declares \"I no longer expect events older than this moment\". Anything arriving after that mark counts as <b>late</b> and is either dropped or diverted to a separate stream for review. The size of the allowance is tuned to the real data: usually seconds or minutes.</p>"
+            }
+          },
+          {
+            "type": "note",
+            "kind": "trap",
+            "html": {
+              "ru": "В потоках почти никогда нет строгой гарантии «ровно один раз» бесплатно. По умолчанию системы дают <b>at-least-once</b>: при сбое событие может обработаться дважды. Если это платёж или начисление баллов, дубль виден пользователю. Лечение то же, что в dt-03 и be-03: обработчик делают <b>идемпотентным</b> — по ключу события проверяют, не обработано ли оно уже.",
+              "uz": "Oqimlarda «aynan bir marta» qat'iy kafolati deyarli hech qachon bepul bo'lmaydi. Standart holda tizimlar <b>at-least-once</b> beradi: nosozlikda hodisa ikki marta qayta ishlanishi mumkin. Agar bu to'lov yoki ball hisoblash bo'lsa, dublikat foydalanuvchiga ko'rinadi. Davosi dt-03 va be-03 dagidek: ishlovchi <b>idempotent</b> qilinadi — hodisa kaliti bo'yicha u allaqachon ishlanmaganmi deb tekshiriladi.",
+              "en": "In streams a strict \"exactly once\" guarantee is almost never free. By default systems give <b>at-least-once</b>: on a failure an event may be processed twice. If that is a payment or a loyalty credit, the duplicate is visible to the user. The cure is the same as in dt-03 and be-03: make the handler <b>idempotent</b> — check by the event's key whether it has already been processed."
+            }
+          },
+          {
+            "type": "summary",
+            "items": [
+              { "ru": "Джойн требует, чтобы строки с одним ключом оказались на одной машине", "uz": "Join bitta kalitli qatorlar bitta mashinada bo'lishini talab qiladi", "en": "A join requires rows with the same key to be on one machine" },
+              { "ru": "Broadcast join рассылает маленькую таблицу; shuffle join двигает обе", "uz": "Broadcast join kichik jadvalni tarqatadi; shuffle join ikkalasini ham qimirlatadi", "en": "A broadcast join sends the small table around; a shuffle join moves both" },
+              { "ru": "Шаффл вызывают GROUP BY, JOIN, DISTINCT и сортировка — фильтруй до него", "uz": "Shuffle ni GROUP BY, JOIN, DISTINCT va saralash chaqiradi — undan oldin filtrlang", "en": "GROUP BY, JOIN, DISTINCT and sorting trigger a shuffle — filter before it" },
+              { "ru": "Партиция выбирается хешем ключа, поэтому перекос ключей = перекос нагрузки", "uz": "Partitsiya kalit xeshi bilan tanlanadi, shuning uchun kalitlar qiyshiqligi = yuklama qiyshiqligi", "en": "The partition is chosen by the key's hash, so key skew is load skew" },
+              { "ru": "Поток режут на окна; тумблинговое окно — <code>ts // size * size</code>", "uz": "Oqim oynalarga kesiladi; tumbling oyna — <code>ts // size * size</code>", "en": "A stream is cut into windows; a tumbling window is <code>ts // size * size</code>" },
+              { "ru": "Считай по времени события, а не по времени обработки", "uz": "Qayta ishlash vaqti bo'yicha emas, hodisa vaqti bo'yicha hisoblang", "en": "Count by event time, not by processing time" },
+              { "ru": "Watermark решает, когда закрыть окно; остальное — опоздавшие", "uz": "Watermark oynani qachon yopishni hal qiladi; qolgani — kechikkanlar", "en": "The watermark decides when to close a window; the rest are late" }
+            ]
+          }
+        ]
+      }
+    ],
+    "quiz": [
+      {
+        "q": {
+          "ru": "Почему джойн в кластере дороже, чем на одной машине?",
+          "uz": "Nega klasterdagi join bitta mashinadagidan qimmat?",
+          "en": "Why is a join more expensive in a cluster than on one machine?"
+        },
+        "options": [
+          { "ru": "Строки с одинаковым ключом лежат на разных узлах, их нужно свести вместе по сети", "uz": "Bir xil kalitli qatorlar turli tugunlarda yotadi, ularni tarmoq orqali birga keltirish kerak", "en": "Rows with the same key live on different nodes and must be brought together over the network" },
+          { "ru": "В кластере медленнее процессоры", "uz": "Klasterda protsessorlar sekinroq", "en": "Cluster processors are slower" },
+          { "ru": "Кластер не умеет строить индексы", "uz": "Klaster indeks qura olmaydi", "en": "A cluster cannot build indexes" },
+          { "ru": "Джойн в кластере не дороже", "uz": "Klasterdagi join qimmat emas", "en": "It isn't more expensive" }
+        ],
+        "a": 0,
+        "explain": {
+          "ru": "Узел видит только свою память. Чтобы сопоставить <code>u1</code> с <code>u1</code>, обе строки должны приехать на одну машину — а это передача данных по сети, самая медленная часть кластера.",
+          "uz": "Tugun faqat o'z xotirasini ko'radi. <code>u1</code> ni <code>u1</code> bilan solishtirish uchun ikkala qator ham bitta mashinaga kelishi kerak — bu esa tarmoq orqali ma'lumot uzatish, klasterning eng sekin qismi.",
+          "en": "A node sees only its own memory. To match <code>u1</code> with <code>u1</code>, both rows must travel to one machine — and that is network transfer, the slowest part of a cluster."
+        }
+      },
+      {
+        "q": {
+          "ru": "Когда движок выбирает broadcast join?",
+          "uz": "Dvigatel broadcast joinni qachon tanlaydi?",
+          "en": "When does an engine pick a broadcast join?"
+        },
+        "options": [
+          { "ru": "Когда обе таблицы большие", "uz": "Ikkala jadval ham katta bo'lganda", "en": "When both tables are large" },
+          { "ru": "Когда одна из таблиц помещается в память узла", "uz": "Jadvallardan biri tugun xotirasiga sig'ganda", "en": "When one of the tables fits into a node's memory" },
+          { "ru": "Когда таблицы отсортированы", "uz": "Jadvallar tartiblangan bo'lganda", "en": "When the tables are sorted" },
+          { "ru": "Когда в ключе нет NULL", "uz": "Kalitda NULL bo'lmaganda", "en": "When the key has no NULLs" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Маленькую таблицу копируют на каждый узел, и большая вообще не двигается по сети. Если обе большие, копировать нечего — остаётся shuffle.",
+          "uz": "Kichik jadval har bir tugunga nusxalanadi va kattasi tarmoq bo'ylab umuman qimirlamaydi. Ikkalasi ham katta bo'lsa, nusxalaydigan narsa yo'q — shuffle qoladi.",
+          "en": "The small table is copied to every node and the large one never crosses the network. If both are large there is nothing to copy — a shuffle it is."
+        }
+      },
+      {
+        "q": {
+          "ru": "Какая операция НЕ вызывает шаффл?",
+          "uz": "Qaysi amal shuffle ni chaqirMAYDI?",
+          "en": "Which operation does NOT trigger a shuffle?"
+        },
+        "options": [
+          { "ru": "GROUP BY", "uz": "GROUP BY", "en": "GROUP BY" },
+          { "ru": "Фильтрация строк по условию", "uz": "Qatorlarni shart bo'yicha filtrlash", "en": "Filtering rows by a condition" },
+          { "ru": "DISTINCT", "uz": "DISTINCT", "en": "DISTINCT" },
+          { "ru": "JOIN двух больших таблиц", "uz": "Ikki katta jadvalning JOIN i", "en": "A JOIN of two large tables" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Фильтр работает построчно: каждый узел решает судьбу своих строк сам, ничего никуда не пересылая. Поэтому фильтровать надо как можно раньше — до всех операций с ключами.",
+          "uz": "Filtr qatorma-qator ishlaydi: har bir tugun o'z qatorlari taqdirini o'zi hal qiladi, hech nimani hech qayerga yubormaydi. Shuning uchun iloji boricha erta filtrlash kerak — kalitlar bilan barcha amallardan oldin.",
+          "en": "A filter works row by row: each node decides the fate of its own rows without sending anything anywhere. So filter as early as possible — before any key-based operation."
+        }
+      },
+      {
+        "q": {
+          "ru": "В ключе джойна много значений NULL. Что произойдёт?",
+          "uz": "Join kalitida NULL qiymatlar ko'p. Nima bo'ladi?",
+          "en": "The join key contains many NULL values. What happens?"
+        },
+        "options": [
+          { "ru": "NULL распределятся равномерно", "uz": "NULL lar tekis taqsimlanadi", "en": "The NULLs spread out evenly" },
+          { "ru": "Все NULL дадут один хеш и съедутся на один узел — сильный перекос", "uz": "Barcha NULL bitta xesh berib, bitta tugunga yig'iladi — kuchli qiyshiqlik", "en": "All NULLs hash the same and converge on one node — heavy skew" },
+          { "ru": "Движок автоматически их отфильтрует", "uz": "Dvigatel ularni avtomatik filtrlaydi", "en": "The engine filters them out automatically" },
+          { "ru": "Джойн выдаст ошибку", "uz": "Join xato beradi", "en": "The join raises an error" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Хеш одинакового значения одинаков, а <code>NULL</code> — это одно значение на всех. Узел получает десятки миллионов строк и падает по памяти. Фильтруй <code>NULL</code> до джойна.",
+          "uz": "Bir xil qiymatning xeshi bir xil, <code>NULL</code> esa hamma uchun bitta qiymat. Tugun o'nlab million qator olib, xotiradan quladi. <code>NULL</code> ni joindan oldin filtrlang.",
+          "en": "The hash of an identical value is identical, and <code>NULL</code> is one value shared by all. The node receives tens of millions of rows and dies on memory. Filter <code>NULL</code>s before the join."
+        }
+      },
+      {
+        "q": {
+          "ru": "Событие произошло в 10:00, а доехало до сервера в 10:07. По какому времени его нужно считать?",
+          "uz": "Hodisa 10:00 da bo'ldi, serverga esa 10:07 da yetdi. Uni qaysi vaqt bo'yicha hisoblash kerak?",
+          "en": "An event happened at 10:00 and reached the server at 10:07. Which time should it be counted by?"
+        },
+        "options": [
+          { "ru": "По времени обработки — 10:07", "uz": "Qayta ishlash vaqti bo'yicha — 10:07", "en": "By processing time — 10:07" },
+          { "ru": "По времени события — 10:00", "uz": "Hodisa vaqti bo'yicha — 10:00", "en": "By event time — 10:00" },
+          { "ru": "По среднему между ними", "uz": "Ular orasidagi o'rtacha bo'yicha", "en": "By the average of the two" },
+          { "ru": "Такие события надо отбрасывать", "uz": "Bunday hodisalarni tashlash kerak", "en": "Such events should be dropped" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Иначе статистика врёт: тысяча событий из туннеля свалится в одну минуту и создаст всплеск, которого не было. Время события — единственное, что отражает реальность.",
+          "uz": "Aks holda statistika aldaydi: tunneldagi mingta hodisa bitta daqiqaga yig'ilib, bo'lmagan to'lqin yaratadi. Hodisa vaqti — haqiqatni aks ettiradigan yagona narsa.",
+          "en": "Otherwise the statistics lie: a thousand events from the tunnel pile into one minute and create a spike that never happened. Event time is the only thing that reflects reality."
+        }
+      },
+      {
+        "q": {
+          "ru": "Что делает watermark в потоковой обработке?",
+          "uz": "Oqimli qayta ishlashda watermark nima qiladi?",
+          "en": "What does a watermark do in stream processing?"
+        },
+        "options": [
+          { "ru": "Ускоряет обработку событий", "uz": "Hodisalarni qayta ishlashni tezlashtiradi", "en": "It speeds up event processing" },
+          { "ru": "Объявляет, что события старше некоторой отметки больше не ждут — окно можно закрывать", "uz": "Ma'lum belgidan eski hodisalar endi kutilmasligini e'lon qiladi — oynani yopish mumkin", "en": "It declares that events older than a mark are no longer expected — the window can close" },
+          { "ru": "Помечает дубликаты", "uz": "Dublikatlarni belgilaydi", "en": "It marks duplicates" },
+          { "ru": "Задаёт размер окна", "uz": "Oyna o'lchamini belgilaydi", "en": "It sets the window size" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Без watermark окно нельзя закрыть никогда: вдруг что-то ещё приедет. Watermark и есть тот компромисс между «подождать опоздавших» и «выдать результат вовремя».",
+          "uz": "Watermark siz oynani hech qachon yopib bo'lmaydi: birdan yana biror narsa kelib qolsa-chi. Watermark — bu «kechikkanlarni kutish» va «natijani o'z vaqtida berish» orasidagi murosaning o'zi.",
+          "en": "Without a watermark a window can never close: something else might still arrive. The watermark is precisely the compromise between \"wait for stragglers\" and \"deliver the result on time\"."
+        }
+      }
+    ],
+    "tasks": [
+      {
+        "id": "t1",
+        "kind": "python",
+        "title": {
+          "ru": "Хеш-джойн",
+          "uz": "Xesh-join",
+          "en": "Hash join"
+        },
+        "brief": {
+          "ru": "Соедини две таблицы по ключу",
+          "uz": "Ikki jadvalni kalit bo'yicha birlashtiring",
+          "en": "Join two tables by key"
+        },
+        "desc": {
+          "ru": "Напиши функцию <code>hash_join(left, right)</code>. Оба аргумента — списки пар <code>(ключ, значение)</code>; ключи могут повторяться в обеих таблицах.<br><br>Верни список троек <code>(ключ, значение_слева, значение_справа)</code> для всех совпавших ключей — обычный внутренний джойн. Строки без пары в результат не попадают.<br><br>Порядок: сначала по порядку строк в <code>left</code>, а для каждой из них — по порядку совпавших строк в <code>right</code>. Правую таблицу проиндексируй словарём, а не перебирай заново для каждой левой строки.",
+          "uz": "<code>hash_join(left, right)</code> funksiyasini yozing. Ikkala argument ham <code>(kalit, qiymat)</code> juftliklari ro'yxati; kalitlar ikkala jadvalda ham takrorlanishi mumkin.<br><br>Barcha mos kelgan kalitlar uchun <code>(kalit, chapdagi_qiymat, o'ngdagi_qiymat)</code> uchliklari ro'yxatini qaytaring — oddiy ichki join. Jufti yo'q qatorlar natijaga tushmaydi.<br><br>Tartib: avval <code>left</code> dagi qatorlar tartibida, ularning har biri uchun esa — <code>right</code> dagi mos kelgan qatorlar tartibida. O'ng jadvalni lug'at bilan indekslang, har bir chap qator uchun qaytadan saralamang.",
+          "en": "Write a function <code>hash_join(left, right)</code>. Both arguments are lists of <code>(key, value)</code> pairs; keys may repeat in either table.<br><br>Return a list of triples <code>(key, left_value, right_value)</code> for every matching key — an ordinary inner join. Rows with no match do not appear in the result.<br><br>Order: first by the order of rows in <code>left</code>, and within each of those by the order of matching rows in <code>right</code>. Index the right table with a dictionary rather than rescanning it for every left row."
+        },
+        "starter": "def hash_join(left, right):\n    # индекс по правой таблице, потом проход по левой\n    ...\n",
+        "tests": "left = [(\"a\", 1), (\"b\", 2), (\"c\", 3)]\nright = [(\"a\", \"x\"), (\"a\", \"y\"), (\"d\", \"z\")]\nassert hash_join(left, right) == [(\"a\", 1, \"x\"), (\"a\", 1, \"y\")]\nassert hash_join([], right) == []\nassert hash_join(left, []) == []\nassert hash_join([(\"a\", 1), (\"a\", 2)], [(\"a\", \"x\")]) == [(\"a\", 1, \"x\"), (\"a\", 2, \"x\")]\nassert hash_join([(\"k\", 1)], [(\"k\", 2)]) == [(\"k\", 1, 2)]\nassert hash_join([(\"a\", 1)], [(\"b\", 2)]) == []\nassert hash_join([(\"b\", 1), (\"a\", 2)], [(\"a\", 9), (\"b\", 8)]) == [(\"b\", 1, 8), (\"a\", 2, 9)]\n",
+        "hint": {
+          "ru": "Индекс строится так: <code>index.setdefault(key, []).append(value)</code> в цикле по <code>right</code>. Потом для каждой пары из <code>left</code> достаёшь <code>index.get(key, [])</code> и добавляешь по тройке на каждое найденное значение. Метод <code>get</code> с пустым списком по умолчанию избавляет от проверки «есть ли ключ».",
+          "uz": "Indeks shunday quriladi: <code>right</code> bo'yicha siklda <code>index.setdefault(key, []).append(value)</code>. Keyin <code>left</code> dagi har bir juft uchun <code>index.get(key, [])</code> ni olib, topilgan har bir qiymatga bittadan uchlik qo'shasiz. Standart bo'sh ro'yxatli <code>get</code> metodi «kalit bormi» tekshiruvidan xalos qiladi.",
+          "en": "Build the index with <code>index.setdefault(key, []).append(value)</code> in a loop over <code>right</code>. Then for each pair from <code>left</code> take <code>index.get(key, [])</code> and append a triple per value found. Using <code>get</code> with an empty-list default saves you the \"is the key there\" check."
+        }
+      },
+      {
+        "id": "t2",
+        "kind": "python",
+        "title": {
+          "ru": "Распределение по партициям",
+          "uz": "Partitsiyalarga taqsimlash",
+          "en": "Distributing across partitions"
+        },
+        "brief": {
+          "ru": "Разложи строки по узлам так, чтобы ключи не разъехались",
+          "uz": "Qatorlarni tugunlarga kalitlar ajralib ketmaydigan qilib joylang",
+          "en": "Spread rows across nodes so keys don't get separated"
+        },
+        "desc": {
+          "ru": "Напиши функцию <code>shuffle(rows, partitions)</code>. <code>rows</code> — список пар <code>(ключ, значение)</code>. Верни список из <code>partitions</code> списков: строка попадает в партицию с номером <code>сумма кодов символов ключа % partitions</code>.<br><br>Код символа даёт <code>ord(c)</code>. Внутри каждой партиции сохрани исходный порядок строк. Пустые партиции тоже должны присутствовать в результате — как пустые списки.",
+          "uz": "<code>shuffle(rows, partitions)</code> funksiyasini yozing. <code>rows</code> — <code>(kalit, qiymat)</code> juftliklari ro'yxati. <code>partitions</code> ta ro'yxatdan iborat ro'yxat qaytaring: qator <code>kalit belgilari kodlari yig'indisi % partitions</code> raqamli partitsiyaga tushadi.<br><br>Belgi kodini <code>ord(c)</code> beradi. Har bir partitsiya ichida qatorlarning dastlabki tartibini saqlang. Bo'sh partitsiyalar ham natijada bo'lishi kerak — bo'sh ro'yxat sifatida.",
+          "en": "Write a function <code>shuffle(rows, partitions)</code>. <code>rows</code> is a list of <code>(key, value)</code> pairs. Return a list of <code>partitions</code> lists: a row goes to the partition numbered <code>sum of the key's character codes % partitions</code>.<br><br>A character's code comes from <code>ord(c)</code>. Preserve the original row order inside each partition. Empty partitions must still appear in the result — as empty lists."
+        },
+        "starter": "def shuffle(rows, partitions):\n    # номер партиции = сумма ord() символов ключа % partitions\n    ...\n",
+        "tests": "rows = [(\"a\", 1), (\"b\", 2), (\"a\", 3), (\"c\", 4)]\nassert shuffle(rows, 2) == [[(\"b\", 2)], [(\"a\", 1), (\"a\", 3), (\"c\", 4)]]\nassert shuffle(rows, 1) == [rows]\nassert shuffle([], 3) == [[], [], []]\nassert shuffle(rows, 3) == [[(\"c\", 4)], [(\"a\", 1), (\"a\", 3)], [(\"b\", 2)]]\nassert shuffle([(\"ab\", 1)], 2) == [[], [(\"ab\", 1)]]\nparts = shuffle([(\"x\", 1), (\"y\", 2), (\"x\", 3)], 4)\nassert len(parts) == 4\nassert len([p for p in parts if any(k == \"x\" for k, _ in p)]) == 1\n",
+        "hint": {
+          "ru": "Заготовь результат заранее: <code>buckets = [[] for _ in range(partitions)]</code> — именно так, а не <code>[[]] * partitions</code>, иначе все списки окажутся одним и тем же объектом. Номер партиции — <code>sum(ord(c) for c in key) % partitions</code>.",
+          "uz": "Natijani oldindan tayyorlang: <code>buckets = [[] for _ in range(partitions)]</code> — aynan shunday, <code>[[]] * partitions</code> emas, aks holda barcha ro'yxatlar bitta obyekt bo'lib qoladi. Partitsiya raqami — <code>sum(ord(c) for c in key) % partitions</code>.",
+          "en": "Prepare the result up front: <code>buckets = [[] for _ in range(partitions)]</code> — exactly that, not <code>[[]] * partitions</code>, or every list will be the same object. The partition number is <code>sum(ord(c) for c in key) % partitions</code>."
+        }
+      },
+      {
+        "id": "t3",
+        "kind": "python",
+        "title": {
+          "ru": "Тумблинговые окна",
+          "uz": "Tumbling oynalar",
+          "en": "Tumbling windows"
+        },
+        "brief": {
+          "ru": "Сгруппируй события потока по отрезкам времени",
+          "uz": "Oqim hodisalarini vaqt kesmalari bo'yicha guruhlang",
+          "en": "Group stream events into time intervals"
+        },
+        "desc": {
+          "ru": "Напиши функцию <code>tumbling(events, size)</code>. <code>events</code> — список пар <code>(время, значение)</code>, время в секундах и может идти не по порядку.<br><br>Верни словарь «начало окна → сумма значений в этом окне». Окна непересекающиеся и начинаются с нуля: при <code>size = 5</code> это <code>[0, 5)</code>, <code>[5, 10)</code>, <code>[10, 15)</code> и так далее.<br><br>Окна, в которые не попало ни одного события, в словарь не включай.",
+          "uz": "<code>tumbling(events, size)</code> funksiyasini yozing. <code>events</code> — <code>(vaqt, qiymat)</code> juftliklari ro'yxati, vaqt soniyalarda va tartibsiz kelishi mumkin.<br><br>«Oyna boshi → shu oynadagi qiymatlar yig'indisi» lug'atini qaytaring. Oynalar kesishmaydi va noldan boshlanadi: <code>size = 5</code> da bu <code>[0, 5)</code>, <code>[5, 10)</code>, <code>[10, 15)</code> va hokazo.<br><br>Birorta hodisa tushmagan oynalarni lug'atga qo'shmang.",
+          "en": "Write a function <code>tumbling(events, size)</code>. <code>events</code> is a list of <code>(time, value)</code> pairs, the time in seconds and possibly out of order.<br><br>Return a dict \"window start → sum of values in that window\". The windows do not overlap and start at zero: with <code>size = 5</code> they are <code>[0, 5)</code>, <code>[5, 10)</code>, <code>[10, 15)</code> and so on.<br><br>Windows that received no events must not appear in the dict."
+        },
+        "starter": "def tumbling(events, size):\n    # начало окна = ts // size * size\n    ...\n",
+        "tests": "events = [(0, 5), (2, 3), (6, 8), (7, 1), (12, 4)]\nassert tumbling(events, 5) == {0: 8, 5: 9, 10: 4}\nassert tumbling(events, 10) == {0: 17, 10: 4}\nassert tumbling([], 5) == {}\nassert tumbling([(0, 1)], 5) == {0: 1}\nassert tumbling([(4, 1), (5, 1)], 5) == {0: 1, 5: 1}\nassert tumbling([(7, 2), (1, 3)], 5) == {5: 2, 0: 3}\nassert tumbling([(3, 1), (3, 1), (3, 1)], 1) == {3: 3}\n",
+        "hint": {
+          "ru": "Начало окна — <code>ts // size * size</code>: целочисленное деление отбрасывает остаток, умножение возвращает границу. Дальше обычное накопление: <code>result[start] = result.get(start, 0) + value</code>.",
+          "uz": "Oyna boshi — <code>ts // size * size</code>: butun sonli bo'lish qoldiqni tashlaydi, ko'paytirish chegarani qaytaradi. Keyin oddiy to'plash: <code>result[start] = result.get(start, 0) + value</code>.",
+          "en": "The window start is <code>ts // size * size</code>: integer division drops the remainder, the multiplication returns the boundary. Then the usual accumulation: <code>result[start] = result.get(start, 0) + value</code>."
+        }
+      }
+    ],
+    "exam": {
+      "time": 660,
+      "questions": [
+        {
+          "q": {
+            "ru": "Что делает шаффл?",
+            "uz": "Shuffle nima qiladi?",
+            "en": "What does a shuffle do?"
+          },
+          "options": [
+            { "ru": "Пересылает данные между узлами, чтобы одинаковые ключи оказались вместе", "uz": "Bir xil kalitlar birga bo'lishi uchun tugunlar orasida ma'lumot uzatadi", "en": "Moves data between nodes so equal keys end up together" },
+            { "ru": "Перемешивает строки в случайном порядке", "uz": "Qatorlarni tasodifiy tartibda aralashtiradi", "en": "Randomly shuffles the row order" },
+            { "ru": "Сжимает данные перед записью", "uz": "Yozishdan oldin ma'lumotni siqadi", "en": "Compresses data before writing" },
+            { "ru": "Разбивает файл на партиции на диске", "uz": "Faylni diskda partitsiyalarga bo'ladi", "en": "Splits a file into partitions on disk" }
+          ],
+          "a": 0
+        },
+        {
+          "q": {
+            "ru": "Где лучше поставить фильтр в конвейере с GROUP BY?",
+            "uz": "GROUP BY li konveyerda filtrni qayerga qo'ygan ma'qul?",
+            "en": "Where should a filter go in a pipeline with GROUP BY?"
+          },
+          "options": [
+            { "ru": "До группировки — отброшенные строки не поедут по сети", "uz": "Guruhlashdan oldin — tashlangan qatorlar tarmoq bo'ylab ketmaydi", "en": "Before the grouping — the dropped rows never cross the network" },
+            { "ru": "После группировки, так читается понятнее", "uz": "Guruhlashdan keyin, shunday tushunarliroq o'qiladi", "en": "After the grouping, it reads better" },
+            { "ru": "Разницы нет, движок сам оптимизирует", "uz": "Farqi yo'q, dvigatel o'zi optimallashtiradi", "en": "It makes no difference, the engine optimizes it" },
+            { "ru": "Фильтр в таком конвейере не нужен", "uz": "Bunday konveyerda filtr kerak emas", "en": "No filter is needed in such a pipeline" }
+          ],
+          "a": 0
+        },
+        {
+          "q": {
+            "ru": "Что гарантирует хеш ключа при распределении по партициям?",
+            "uz": "Partitsiyalarga taqsimlashda kalit xeshi nimani kafolatlaydi?",
+            "en": "What does hashing the key guarantee when distributing across partitions?"
+          },
+          "options": [
+            { "ru": "Что партиции будут одинакового размера", "uz": "Partitsiyalar bir xil o'lchamda bo'lishini", "en": "That the partitions will be equal in size" },
+            { "ru": "Что все строки с одним ключом попадут в одну партицию", "uz": "Bitta kalitli barcha qatorlar bitta partitsiyaga tushishini", "en": "That all rows with the same key land in one partition" },
+            { "ru": "Что данные будут сжаты", "uz": "Ma'lumot siqilishini", "en": "That the data will be compressed" },
+            { "ru": "Что не будет коллизий", "uz": "To'qnashuvlar bo'lmasligini", "en": "That there will be no collisions" }
+          ],
+          "a": 1
+        },
+        {
+          "q": {
+            "ru": "Событие с временем 13 попадает в тумблинговое окно размером 5. Какое начало у этого окна?",
+            "uz": "Vaqti 13 bo'lgan hodisa o'lchami 5 bo'lgan tumbling oynaga tushadi. Bu oynaning boshi qanday?",
+            "en": "An event at time 13 lands in a tumbling window of size 5. What is that window's start?"
+          },
+          "options": [
+            { "ru": "10", "uz": "10", "en": "10" },
+            { "ru": "13", "uz": "13", "en": "13" },
+            { "ru": "15", "uz": "15", "en": "15" },
+            { "ru": "5", "uz": "5", "en": "5" }
+          ],
+          "a": 0
+        },
+        {
+          "q": {
+            "ru": "Что такое опоздавшее событие?",
+            "uz": "Kechikkan hodisa nima?",
+            "en": "What is a late event?"
+          },
+          "options": [
+            { "ru": "Событие, которое пришло после того, как watermark разрешил закрыть его окно", "uz": "Watermark uning oynasini yopishga ruxsat bergandan keyin kelgan hodisa", "en": "An event that arrives after the watermark has allowed its window to close" },
+            { "ru": "Событие с ошибкой в данных", "uz": "Ma'lumotida xato bo'lgan hodisa", "en": "An event with corrupted data" },
+            { "ru": "Дубликат уже обработанного события", "uz": "Allaqachon qayta ishlangan hodisaning dublikati", "en": "A duplicate of an already processed event" },
+            { "ru": "Событие из будущего", "uz": "Kelajakdan kelgan hodisa", "en": "An event from the future" }
+          ],
+          "a": 0
+        },
+        {
+          "q": {
+            "ru": "Система гарантирует доставку at-least-once. Что нужно сделать с обработчиком платежей?",
+            "uz": "Tizim at-least-once yetkazishni kafolatlaydi. To'lovlar ishlovchisi bilan nima qilish kerak?",
+            "en": "The system guarantees at-least-once delivery. What must be done to a payment handler?"
+          },
+          "options": [
+            { "ru": "Ничего, дубли невозможны", "uz": "Hech nima, dublikatlar bo'lishi mumkin emas", "en": "Nothing, duplicates are impossible" },
+            { "ru": "Сделать его идемпотентным — проверять по ключу события, не обработано ли оно", "uz": "Uni idempotent qilish — hodisa kaliti bo'yicha u ishlanganmi deb tekshirish", "en": "Make it idempotent — check by the event key whether it was already processed" },
+            { "ru": "Увеличить размер окна", "uz": "Oyna o'lchamini oshirish", "en": "Increase the window size" },
+            { "ru": "Отключить watermark", "uz": "Watermark ni o'chirish", "en": "Turn off the watermark" }
+          ],
+          "a": 1
+        }
+      ],
+      "tasks": [
+        {
+          "id": "e1",
+          "kind": "python",
+          "title": {
+            "ru": "Окна с опоздавшими событиями",
+            "uz": "Kechikkan hodisali oynalar",
+            "en": "Windows with late events"
+          },
+          "desc": {
+            "ru": "Собери упрощённую потоковую агрегацию с watermark.<br><br>Напиши функцию <code>aggregate(events, size, lateness)</code>. <code>events</code> — список пар <code>(время, значение)</code> <b>в порядке поступления</b>, время может идти вразнобой.<br><br>Обрабатывай события по одному. Веди максимальное время, встреченное с начала, — обновляй его <b>до</b> проверки текущего события. Событие считается опоздавшим, если его время <b>строго меньше</b>, чем <code>максимум − lateness</code>: такое событие не попадает ни в одно окно, только увеличивает счётчик опоздавших. Остальные события складывай в тумблинговые окна размером <code>size</code>.<br><br>Верни кортеж <code>(окна, число_опоздавших)</code>, где окна — словарь «начало окна → сумма значений».",
+            "uz": "Watermark li soddalashtirilgan oqim agregatsiyasini yig'ing.<br><br><code>aggregate(events, size, lateness)</code> funksiyasini yozing. <code>events</code> — <b>kelish tartibida</b> <code>(vaqt, qiymat)</code> juftliklari ro'yxati, vaqt tartibsiz bo'lishi mumkin.<br><br>Hodisalarni bittalab qayta ishlang. Boshidan uchragan maksimal vaqtni yuriting — uni joriy hodisani tekshirishdan <b>oldin</b> yangilang. Hodisa kechikkan hisoblanadi, agar uning vaqti <code>maksimum − lateness</code> dan <b>qat'iy kichik</b> bo'lsa: bunday hodisa hech qaysi oynaga tushmaydi, faqat kechikkanlar hisoblagichini oshiradi. Qolgan hodisalarni <code>size</code> o'lchamli tumbling oynalarga qo'shing.<br><br><code>(oynalar, kechikkanlar_soni)</code> kortejini qaytaring, oynalar — «oyna boshi → qiymatlar yig'indisi» lug'ati.",
+            "en": "Build a simplified stream aggregation with a watermark.<br><br>Write a function <code>aggregate(events, size, lateness)</code>. <code>events</code> is a list of <code>(time, value)</code> pairs <b>in arrival order</b>; the times may be out of order.<br><br>Process the events one at a time. Track the maximum time seen so far, updating it <b>before</b> checking the current event. An event counts as late if its time is <b>strictly less</b> than <code>maximum − lateness</code>: such an event enters no window and only increments the late counter. All other events go into tumbling windows of size <code>size</code>.<br><br>Return the tuple <code>(windows, late_count)</code>, where windows is a dict \"window start → sum of values\"."
+          },
+          "starter": "def aggregate(events, size, lateness):\n    # максимум времени -> проверка на опоздание -> окно\n    ...\n",
+          "tests": "assert aggregate([(0, 1), (3, 2), (5, 3), (1, 4)], 5, 2) == ({0: 3, 5: 3}, 1)\nassert aggregate([], 5, 2) == ({}, 0)\nassert aggregate([(0, 1)], 5, 0) == ({0: 1}, 0)\nassert aggregate([(10, 5), (2, 1)], 5, 0) == ({10: 5}, 1)\nassert aggregate([(10, 5), (2, 1)], 5, 100) == ({10: 5, 0: 1}, 0)\nassert aggregate([(0, 1), (1, 1), (2, 1)], 1, 0) == ({0: 1, 1: 1, 2: 1}, 0)\nassert aggregate([(9, 1), (9, 1)], 5, 0) == ({5: 2}, 0)\nassert aggregate([(20, 1), (17, 1), (14, 1)], 10, 3) == ({20: 1, 10: 1}, 1)\n",
+            "hint": {
+            "ru": "Заведи <code>seen = None</code> (или очень маленькое число) и в цикле сразу делай <code>seen = ts if seen is None else max(seen, ts)</code>. Потом одна проверка: <code>if ts &lt; seen - lateness: late += 1; continue</code>. Остальное — ровно тот же код, что в задаче t3.",
+            "uz": "<code>seen = None</code> (yoki juda kichik son) oling va siklda darrov <code>seen = ts if seen is None else max(seen, ts)</code> qiling. Keyin bitta tekshiruv: <code>if ts &lt; seen - lateness: late += 1; continue</code>. Qolgani — t3 masalasidagi aynan o'sha kod.",
+            "en": "Keep a <code>seen = None</code> (or a very small number) and inside the loop immediately do <code>seen = ts if seen is None else max(seen, ts)</code>. Then a single check: <code>if ts &lt; seen - lateness: late += 1; continue</code>. The rest is exactly the code from task t3."
+          }
+        }
+      ]
+    }
   }
  ]
 }

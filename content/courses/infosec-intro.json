@@ -625,6 +625,487 @@
      }
     ]
    }
+  },
+  {
+    "id": "is-03",
+    "title": {
+      "ru": "Шифрование, резервные копии и защита персональных данных",
+      "uz": "Shifrlash, zaxira nusxalar va shaxsiy ma'lumotlarni himoya qilish",
+      "en": "Encryption, backups and personal data protection"
+    },
+    "tagline": {
+      "ru": "Чем хеш отличается от шифра, почему бэкап без теста восстановления не бэкап и как хранить меньше",
+      "uz": "Xesh shifrdan nimasi bilan farq qiladi, nega tiklash sinovisiz zaxira — zaxira emas va qanday qilib kamroq saqlash mumkin",
+      "en": "How a hash differs from a cipher, why an untested backup is not a backup, and how to store less"
+    },
+    "lessons": [
+      {
+        "id": "l1",
+        "title": {
+          "ru": "Хеш, шифр и подпись",
+          "uz": "Xesh, shifr va imzo",
+          "en": "Hash, cipher and signature"
+        },
+        "blocks": [
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>Три криптографических инструмента постоянно путают, хотя решают они разные задачи.</p><ul><li><b>Хеш</b> — превращает данные любой длины в короткую строку фиксированного размера. Дорога односторонняя: из хеша исходные данные не восстановить. Нужен, чтобы <i>проверить</i>: тот же файл или другой, тот же пароль или нет.</li><li><b>Шифрование</b> — превращает данные в нечитаемый вид <i>обратимо</i>: с ключом можно вернуть оригинал. Нужно, чтобы данные нельзя было прочитать.</li><li><b>Подпись</b> — подтверждает, кто автор и что данные не менялись. Не прячет содержимое, а гарантирует источник.</li></ul><p>Правило выбора простое: хочешь потом <b>прочитать</b> данные — шифруй. Хочешь только <b>сравнить</b> — хешируй. Пароли поэтому именно хешируют: серверу никогда не нужен сам пароль, ему нужно лишь сверить.</p>",
+              "uz": "<p>Uchta kriptografik vositani doim adashtirishadi, holbuki ular turli vazifalarni hal qiladi.</p><ul><li><b>Xesh</b> — istalgan uzunlikdagi ma'lumotni qat'iy o'lchamdagi qisqa satrga aylantiradi. Yo'l bir tomonlama: xeshdan asl ma'lumotni tiklab bo'lmaydi. U <i>tekshirish</i> uchun kerak: xuddi shu fayl-mi yoki boshqasi, xuddi shu parolmi yoki yo'q.</li><li><b>Shifrlash</b> — ma'lumotni o'qib bo'lmaydigan holga <i>qaytariladigan</i> tarzda aylantiradi: kalit bilan aslini qaytarish mumkin. Ma'lumotni o'qib bo'lmasligi uchun kerak.</li><li><b>Imzo</b> — muallif kimligini va ma'lumot o'zgarmaganini tasdiqlaydi. Mazmunni yashirmaydi, manbani kafolatlaydi.</li></ul><p>Tanlash qoidasi oddiy: keyin ma'lumotni <b>o'qimoqchi</b> bo'lsangiz — shifrlang. Faqat <b>solishtirmoqchi</b> bo'lsangiz — xeshlang. Parollar aynan shuning uchun xeshlanadi: serverga parolning o'zi hech qachon kerak emas, unga faqat solishtirish kerak.</p>",
+              "en": "<p>Three cryptographic tools get confused constantly, though they solve different problems.</p><ul><li><b>A hash</b> turns data of any length into a short fixed-size string. The road is one-way: the original cannot be recovered from the hash. It is there to <i>check</i>: same file or a different one, same password or not.</li><li><b>Encryption</b> turns data unreadable <i>reversibly</i>: with the key you get the original back. It is there so the data cannot be read.</li><li><b>A signature</b> confirms who the author is and that the data has not changed. It hides nothing; it guarantees the source.</li></ul><p>The choice rule is simple: if you will need to <b>read</b> the data later, encrypt. If you only need to <b>compare</b>, hash. That is exactly why passwords are hashed: the server never needs the password itself, only a comparison.</p>"
+            }
+          },
+          {
+            "type": "run",
+            "code": "import hashlib\n\ndef digest(text):\n    return hashlib.sha256(text.encode()).hexdigest()\n\nprint(\"пароль123 ->\", digest(\"пароль123\")[:32])\nprint(\"пароль124 ->\", digest(\"пароль124\")[:32])\nprint()\nprint(\"одинаковый вход даёт одинаковый хеш:\", digest(\"привет\") == digest(\"привет\"))\nprint(\"длина хеша не зависит от длины входа:\",\n      len(digest(\"а\")), len(digest(\"а\" * 10000)))"
+          },
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>Обрати внимание: один изменённый символ полностью меняет хеш. Это свойство и позволяет проверять целостность — подмена одного байта в файле сразу видна.</p><p>Дальше — <b>где</b> применять шифрование. Мест ровно два.</p><ul><li><b>В передаче</b> (in transit) — данные едут по сети. Это HTTPS/TLS. Без него всё, что вводит пользователь, читается на любом промежуточном узле — в кафе, у провайдера, на роутере.</li><li><b>В покое</b> (at rest) — данные лежат на диске: база, бэкапы, ноутбук, флешка. Защищает от простого сценария: диск украли или сервер вернули в дата-центр без затирания.</li></ul><p>Правильную настройку TLS подтверждает <b>сертификат</b> — подписанное удостоверяющим центром заявление «этот ключ действительно принадлежит этому домену». Именно поэтому браузер ругается на самоподписанный сертификат: подпись есть, но подтвердить её некому.</p>",
+              "uz": "<p>E'tibor bering: bitta o'zgargan belgi xeshni butunlay o'zgartiradi. Aynan shu xususiyat yaxlitlikni tekshirishga imkon beradi — fayldagi bitta baytning almashtirilishi darrov ko'rinadi.</p><p>Keyingisi — shifrlashni <b>qayerda</b> qo'llash. Joylar aynan ikkita.</p><ul><li><b>Uzatishda</b> (in transit) — ma'lumot tarmoq bo'ylab ketadi. Bu HTTPS/TLS. Usiz foydalanuvchi kiritgan hamma narsa istalgan oraliq tugunda — kafeda, provayderda, routerda — o'qiladi.</li><li><b>Tinch holatda</b> (at rest) — ma'lumot diskda yotadi: baza, zaxiralar, noutbuk, fleshka. Oddiy stsenariydan himoya qiladi: disk o'g'irlandi yoki server o'chirilmasdan data-markazga qaytarildi.</li></ul><p>TLS ning to'g'ri sozlanganini <b>sertifikat</b> tasdiqlaydi — bu tasdiqlovchi markaz imzolagan «bu kalit haqiqatan shu domenga tegishli» degan bayonot. Aynan shuning uchun brauzer o'z-o'zi imzolagan sertifikatga e'tiroz bildiradi: imzo bor, lekin uni tasdiqlaydigan hech kim yo'q.</p>",
+              "en": "<p>Notice: one changed character rewrites the hash entirely. That property is what makes integrity checks possible — swapping a single byte in a file shows up immediately.</p><p>Next — <b>where</b> to apply encryption. There are exactly two places.</p><ul><li><b>In transit</b> — data travelling over the network. That is HTTPS/TLS. Without it, everything the user types is readable at any intermediate hop — the café, the ISP, the router.</li><li><b>At rest</b> — data sitting on disk: the database, backups, a laptop, a flash drive. It protects against the simple scenario: the disk was stolen, or the server went back to the data centre without being wiped.</li></ul><p>Correct TLS setup is attested by a <b>certificate</b> — a statement signed by a certificate authority that \"this key really belongs to this domain\". That is exactly why a browser complains about a self-signed certificate: the signature is there, but there is nobody to vouch for it.</p>"
+            }
+          },
+          {
+            "type": "note",
+            "kind": "trap",
+            "html": {
+              "ru": "Две подмены, которые встречаются в реальном коде постоянно.<br><br><b>Base64 — не шифрование.</b> Это кодирование, ключа в нём нет, разворачивается в одну строчку. Если «зашифровали» пароль через base64 — он лежит открытым текстом с лишним шагом.<br><br><b>Хеш — не шифрование.</b> Хеш нельзя расшифровать в принципе, поэтому «зашифруем номер карты хешем, а потом покажем клиенту» не работает: показать будет нечего. Для карты нужен шифр с ключом, а хеш годится лишь на то, чтобы понять, та же это карта или другая.",
+              "uz": "Haqiqiy kodda doim uchraydigan ikkita almashtirish.<br><br><b>Base64 — shifrlash emas.</b> Bu kodlash, unda kalit yo'q, bir qatorda ochiladi. Agar parolni base64 orqali «shifrlagan» bo'lsangiz — u ortiqcha qadam bilan ochiq matn bo'lib yotibdi.<br><br><b>Xesh — shifrlash emas.</b> Xeshni umuman deshifrlab bo'lmaydi, shuning uchun «karta raqamini xesh bilan shifrlab, keyin mijozga ko'rsatamiz» ishlamaydi: ko'rsatadigan narsa qolmaydi. Karta uchun kalitli shifr kerak, xesh esa faqat bu o'sha kartami yoki boshqasimi degan savolga yaraydi.",
+              "en": "Two substitutions that show up in real code constantly.<br><br><b>Base64 is not encryption.</b> It is an encoding with no key, reversible in one line. If a password was \"encrypted\" with base64, it is sitting in plain text with an extra step.<br><br><b>A hash is not encryption.</b> A hash cannot be decrypted at all, so \"we'll encrypt the card number with a hash and show it to the customer later\" does not work: there will be nothing to show. A card needs a cipher with a key; a hash is only good for telling whether it is the same card or a different one."
+            }
+          },
+          {
+            "type": "checkpoint",
+            "q": {
+              "ru": "Нужно хранить номера телефонов клиентов так, чтобы их можно было показать в личном кабинете. Хеш или шифрование?",
+              "uz": "Mijozlar telefon raqamlarini shaxsiy kabinetda ko'rsatish mumkin bo'ladigan qilib saqlash kerak. Xeshmi yoki shifrlashmi?",
+              "en": "Customer phone numbers must be stored so they can be shown in the account page. Hash or encryption?"
+            },
+            "options": [
+              { "ru": "Хеш — он надёжнее", "uz": "Xesh — u ishonchliroq", "en": "A hash — it is more secure" },
+              { "ru": "Шифрование: показать нужно исходный номер, а хеш необратим", "uz": "Shifrlash: asl raqamni ko'rsatish kerak, xesh esa qaytarilmas", "en": "Encryption: the original number must be displayed, and a hash is irreversible" },
+              { "ru": "Base64 — достаточно", "uz": "Base64 — yetarli", "en": "Base64 is enough" },
+              { "ru": "Никак не защищать, номер не секрет", "uz": "Umuman himoya qilmaslik, raqam sir emas", "en": "No protection at all, a number is not a secret" }
+            ],
+            "a": 1,
+            "explain": {
+              "ru": "Раз данные нужно вернуть в исходном виде, преобразование обязано быть обратимым — это шифрование с ключом. Хеш подошёл бы, если бы требовалось только сравнивать: «этот номер уже есть в базе?».",
+              "uz": "Ma'lumotni asl holida qaytarish kerak ekan, o'zgartirish qaytariladigan bo'lishi shart — bu kalitli shifrlash. Xesh faqat solishtirish kerak bo'lganda to'g'ri kelardi: «bu raqam bazada bormi?».",
+              "en": "Since the data must come back in its original form, the transformation has to be reversible — that is encryption with a key. A hash would fit if you only needed comparisons: \"is this number already in the database?\"."
+            }
+          }
+        ]
+      },
+      {
+        "id": "l2",
+        "title": {
+          "ru": "Резервные копии и восстановление",
+          "uz": "Zaxira nusxalar va tiklash",
+          "en": "Backups and recovery"
+        },
+        "blocks": [
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>Бэкап — последняя линия обороны. Когда не сработало всё остальное — шифровальщик, удалённая по ошибке таблица, сгоревший диск — остаётся только он.</p><p>Классический ориентир называется <b>правилом 3-2-1</b>:</p><ul><li><b>3</b> копии данных — оригинал и две резервные;</li><li>на <b>2</b> разных типах носителей — чтобы отказ одного типа не убил всё;</li><li><b>1</b> копия вне площадки — в другом здании, регионе или облаке.</li></ul><p>Каждый пункт закрывает свой сценарий: три копии — от случайного удаления, два носителя — от отказа железа, внешняя копия — от пожара, затопления и шифровальщика, который прошёлся по всей локальной сети.</p><p>Дальше — два числа, которыми измеряют готовность.</p><ul><li><b>RPO</b> (recovery point objective) — сколько данных допустимо потерять, измеряется во времени. RPO = 1 час означает: копии должны сниматься не реже раза в час.</li><li><b>RTO</b> (recovery time objective) — сколько времени допустимо восстанавливаться. RTO = 4 часа означает: через четыре часа после аварии сервис должен работать.</li></ul>",
+              "uz": "<p>Zaxira — mudofaaning oxirgi chizig'i. Qolgan hamma narsa ishlamaganda — shifrlovchi virus, xato bilan o'chirilgan jadval, kuygan disk — faqat u qoladi.</p><p>Klassik mo'ljal <b>3-2-1 qoidasi</b> deyiladi:</p><ul><li>ma'lumotning <b>3</b> nusxasi — asli va ikkita zaxira;</li><li><b>2</b> xil turdagi tashuvchida — bir turning ishdan chiqishi hammasini o'ldirmasligi uchun;</li><li><b>1</b> nusxa maydondan tashqarida — boshqa binoda, regionda yoki bulutda.</li></ul><p>Har bir band o'z stsenariysini yopadi: uchta nusxa — tasodifiy o'chirishdan, ikkita tashuvchi — temirning ishdan chiqishidan, tashqi nusxa — yong'in, suv toshqini va butun lokal tarmoqni bosib o'tgan shifrlovchidan.</p><p>Keyingisi — tayyorlikni o'lchaydigan ikkita raqam.</p><ul><li><b>RPO</b> (recovery point objective) — qancha ma'lumot yo'qotish mumkin, vaqtda o'lchanadi. RPO = 1 soat degani: nusxalar soatiga kamida bir marta olinishi kerak.</li><li><b>RTO</b> (recovery time objective) — qancha vaqt tiklanish mumkin. RTO = 4 soat degani: avariyadan to'rt soat keyin xizmat ishlashi kerak.</li></ul>",
+              "en": "<p>A backup is the last line of defence. When everything else has failed — ransomware, a table dropped by mistake, a burnt-out disk — it is all that remains.</p><p>The classic benchmark is the <b>3-2-1 rule</b>:</p><ul><li><b>3</b> copies of the data — the original plus two backups;</li><li>on <b>2</b> different media types — so a failure of one type does not kill everything;</li><li><b>1</b> copy offsite — in another building, region or cloud.</li></ul><p>Each clause covers its own scenario: three copies against accidental deletion, two media against hardware failure, the offsite copy against fire, flood and ransomware that swept the whole local network.</p><p>Next — the two numbers that measure readiness.</p><ul><li><b>RPO</b> (recovery point objective) — how much data you can afford to lose, measured in time. RPO = 1 hour means backups must be taken at least hourly.</li><li><b>RTO</b> (recovery time objective) — how long you can afford to spend recovering. RTO = 4 hours means the service must be running four hours after the incident.</li></ul>"
+            }
+          },
+          {
+            "type": "run",
+            "code": "copies = [\n    {\"name\": \"диск сервера\", \"media\": \"disk\", \"offsite\": False},\n    {\"name\": \"NAS в офисе\", \"media\": \"nas\", \"offsite\": False},\n    {\"name\": \"облако\", \"media\": \"cloud\", \"offsite\": True},\n]\n\nmedia = {c[\"media\"] for c in copies}\noffsite = [c for c in copies if c[\"offsite\"]]\n\nprint(\"копий:\", len(copies), \"| нужно 3 ->\", len(copies) >= 3)\nprint(\"типов носителей:\", len(media), \"| нужно 2 ->\", len(media) >= 2)\nprint(\"копий вне площадки:\", len(offsite), \"| нужно 1 ->\", len(offsite) >= 1)\n\nlast_backup, incident, restored = 0, 240, 400   # минуты от начала суток\nprint()\nprint(\"потеря данных:\", incident - last_backup, \"мин | RPO 60 ->\", incident - last_backup <= 60)\nprint(\"простой:      \", restored - incident, \"мин | RTO 180 ->\", restored - incident <= 180)"
+          },
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>В примере оба норматива нарушены, и это типичная картина: копия снималась раз в четыре часа при RPO в час, а восстановление заняло почти три часа при RTO в три.</p><p>Отсюда главное практическое правило: <b>бэкап, который ни разу не восстанавливали, — это не бэкап, а надежда</b>. Проверять нужно регулярно и целиком: развернуть копию на отдельный стенд и убедиться, что данные читаются, приложение стартует, а время укладывается в RTO.</p><p>Список того, что обычно вскрывается только на первом настоящем восстановлении:</p><ul><li>копировалась не та папка, а данные лежали рядом;</li><li>архивы бились месяцами, но никто не читал логи задания;</li><li>восстановление упирается в пароль, который знал уволившийся коллега;</li><li>копия шифровальщиком тоже зашифрована — она лежала на подключённом сетевом диске.</li></ul><p>Последний пункт — причина, по которой одна копия должна быть <b>офлайн или неизменяемой</b>: если её видно из сети с правом записи, шифровальщик доберётся и до неё.</p>",
+              "uz": "<p>Misolda ikkala me'yor ham buzilgan va bu odatiy manzara: nusxa to'rt soatda bir olingan, RPO esa bir soat; tiklash deyarli uch soat olgan, RTO esa uch soat.</p><p>Shundan asosiy amaliy qoida: <b>hech qachon tiklanmagan zaxira — bu zaxira emas, umid</b>. Muntazam va butunlay tekshirish kerak: nusxani alohida stendga yoyib, ma'lumot o'qilishiga, ilova ishga tushishiga va vaqt RTO ga sig'ishiga ishonch hosil qilish.</p><p>Odatda faqat birinchi haqiqiy tiklashda ochiladigan narsalar ro'yxati:</p><ul><li>kerakli papka emas, boshqasi nusxalangan, ma'lumot esa yonida yotgan;</li><li>arxivlar oylab buzilgan, lekin vazifa loglarini hech kim o'qimagan;</li><li>tiklash ishdan bo'shagan hamkasb bilgan parolga tiralgan;</li><li>nusxa ham shifrlovchi tomonidan shifrlangan — u ulangan tarmoq diskida yotgan.</li></ul><p>Oxirgi band — bitta nusxa <b>oflayn yoki o'zgartirib bo'lmaydigan</b> bo'lishi kerakligining sababi: agar u tarmoqdan yozish huquqi bilan ko'rinsa, shifrlovchi unga ham yetib boradi.</p>",
+              "en": "<p>In the example both targets are missed, and that is a typical picture: the backup ran every four hours against an hourly RPO, and recovery took nearly three hours against a three-hour RTO.</p><p>Hence the main practical rule: <b>a backup that has never been restored is not a backup, it is a hope</b>. Test regularly and in full: restore the copy onto a separate stand and confirm that the data reads, the application starts, and the timing fits inside the RTO.</p><p>What usually surfaces only during the first real restore:</p><ul><li>the wrong folder was being copied while the data sat next to it;</li><li>the archives had been corrupt for months, but nobody read the job's logs;</li><li>the restore stalls on a password known only to a colleague who left;</li><li>the copy is encrypted by the ransomware too — it lived on a mounted network drive.</li></ul><p>That last point is why one copy must be <b>offline or immutable</b>: if it is visible from the network with write access, ransomware will reach it as well.</p>"
+            }
+          },
+          {
+            "type": "predict",
+            "lang": "python",
+            "code": "rpo_minutes = 60          # готовы потерять не больше часа данных\nbackup_every_hours = 6    # а копию снимаем раз в 6 часов\n\nprint(backup_every_hours * 60 <= rpo_minutes)",
+            "options": [
+              { "ru": "True", "uz": "True", "en": "True" },
+              { "ru": "False", "uz": "False", "en": "False" },
+              { "ru": "360", "uz": "360", "en": "360" },
+              { "ru": "Ошибка", "uz": "Xato", "en": "Error" }
+            ],
+            "a": 1,
+            "explain": {
+              "ru": "<code>360 &lt;= 60</code> — ложь. Расписание бэкапов физически не может обеспечить обещанный RPO: в худшем случае потеряется шесть часов работы вместо часа. RPO — это не пожелание, а требование к частоте снятия копий.",
+              "uz": "<code>360 &lt;= 60</code> — yolg'on. Zaxira jadvali va'da qilingan RPO ni jismonan ta'minlay olmaydi: eng yomon holatda bir soat o'rniga olti soatlik ish yo'qoladi. RPO — bu istak emas, nusxa olish chastotasiga qo'yilgan talab.",
+              "en": "<code>360 &lt;= 60</code> is false. The backup schedule physically cannot deliver the promised RPO: in the worst case six hours of work is lost instead of one. An RPO is not a wish — it is a requirement on how often copies are taken."
+            }
+          }
+        ]
+      },
+      {
+        "id": "l3",
+        "title": {
+          "ru": "Персональные данные: меньше значит безопаснее",
+          "uz": "Shaxsiy ma'lumotlar: kamroq — xavfsizroq",
+          "en": "Personal data: less means safer"
+        },
+        "blocks": [
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>Самый надёжный способ не потерять данные при утечке — не хранить их. Этот принцип называется <b>минимизацией</b>: собираем только те поля, без которых задача не решается, и ровно столько времени, сколько нужно.</p><p>Проверочный вопрос к каждому полю в форме: «что сломается, если этого поля не будет?». Дата рождения нужна для проверки совершеннолетия — но тогда достаточно хранить флаг «18+», а не саму дату. Адрес нужен для доставки — но после доставки он не нужен вовсе.</p><p>Второй рычаг — <b>срок хранения</b>. Данные не должны жить вечно «на всякий случай»: у каждой таблицы с персональными данными есть срок, после которого записи удаляются или обезличиваются. Это и требование законов о персональных данных, и просто здравый смысл — украсть можно только то, что лежит.</p>",
+              "uz": "<p>Oqishda ma'lumotni yo'qotmaslikning eng ishonchli yo'li — uni saqlamaslik. Bu tamoyil <b>minimallashtirish</b> deyiladi: faqat vazifa hal bo'lmaydigan maydonlarni va aynan qancha kerak bo'lsa, shuncha vaqt yig'amiz.</p><p>Shakldagi har bir maydonga tekshiruv savoli: «bu maydon bo'lmasa nima buziladi?». Tug'ilgan sana voyaga yetganlikni tekshirish uchun kerak — lekin unda sananing o'zini emas, «18+» bayrog'ini saqlash yetarli. Manzil yetkazib berish uchun kerak — lekin yetkazilgandan keyin u umuman kerak emas.</p><p>Ikkinchi richag — <b>saqlash muddati</b>. Ma'lumot «har ehtimolga qarshi» abadiy yashamasligi kerak: shaxsiy ma'lumotli har bir jadvalning muddati bor, undan keyin yozuvlar o'chiriladi yoki shaxssizlantiriladi. Bu ham shaxsiy ma'lumotlar to'g'risidagi qonunlar talabi, ham oddiy sog'lom fikr — faqat yotgan narsani o'g'irlash mumkin.</p>",
+              "en": "<p>The most reliable way not to lose data in a breach is not to hold it. The principle is called <b>minimization</b>: collect only the fields without which the task cannot be done, and only for as long as needed.</p><p>The test question for every field on a form: \"what breaks if this field is absent?\". A date of birth is needed to check adulthood — but then storing an \"18+\" flag suffices, not the date itself. An address is needed for delivery — but after delivery it is not needed at all.</p><p>The second lever is the <b>retention period</b>. Data must not live forever \"just in case\": every table with personal data has a horizon after which records are deleted or de-identified. That is both a data protection law requirement and plain common sense — only what is stored can be stolen.</p>"
+            }
+          },
+          {
+            "type": "run",
+            "code": "records = [\n    (5, {\"id\": 1, \"name\": \"Азиз\", \"phone\": \"+998901234567\", \"card\": \"4111111111111111\"}),\n    (400, {\"id\": 2, \"name\": \"Дилноза\", \"phone\": \"+998907654321\"}),\n    (10, {\"id\": 3, \"name\": \"Тимур\", \"phone\": \"+998901112233\"}),\n]\n\nNEEDED = {\"id\", \"name\"}\nRETENTION_DAYS = 365\n\nfor age, data in records:\n    if age >= RETENTION_DAYS:\n        print(f\"id={data['id']}: возраст {age} дн -> удалить по сроку хранения\")\n        continue\n    kept = {k: v for k, v in data.items() if k in NEEDED}\n    dropped = sorted(k for k in data if k not in NEEDED)\n    print(f\"id={data['id']}: оставляем {kept}, убираем {dropped}\")"
+          },
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>Когда данные всё-таки нужны — например, аналитике, — их обезличивают. И тут важно различать два уровня.</p><ul><li><b>Псевдонимизация</b> — прямой идентификатор заменяется на стабильный токен: вместо <code>aziz@mail.uz</code> появляется <code>a3f91c22</code>. Один и тот же человек всегда получает один и тот же токен, так что считать метрики можно. Но связь обратима: у того, кто знает секрет, есть способ вернуться к исходнику. Это <b>всё ещё персональные данные</b>.</li><li><b>Анонимизация</b> — связь разрывается навсегда: агрегаты, округление, удаление редких значений. Только тогда данные перестают быть персональными.</li></ul><p>Разницу постоянно недооценивают. «Мы удалили имена и телефоны» — не анонимизация: набор «город, дата рождения, пол» уникально определяет большинство людей в небольшом городе. А если в выгрузке остались точная дата покупки и сумма, человек находится по одному чеку.</p>",
+              "uz": "<p>Ma'lumot baribir kerak bo'lganda — masalan, tahlilga — u shaxssizlantiriladi. Bu yerda ikki darajani ajratish muhim.</p><ul><li><b>Psevdonimlashtirish</b> — to'g'ridan-to'g'ri identifikator barqaror tokenga almashtiriladi: <code>aziz@mail.uz</code> o'rniga <code>a3f91c22</code> paydo bo'ladi. Bitta odam doim bitta tokenni oladi, shuning uchun metrikalarni hisoblash mumkin. Lekin bog'lanish qaytariladi: sirni bilgan odamda aslga qaytish yo'li bor. Bu <b>hamon shaxsiy ma'lumot</b>.</li><li><b>Anonimlashtirish</b> — bog'lanish abadiy uziladi: agregatlar, yaxlitlash, kam uchraydigan qiymatlarni o'chirish. Faqat shundagina ma'lumot shaxsiy bo'lishdan to'xtaydi.</li></ul><p>Farqni doim past baholashadi. «Biz ism va telefonlarni o'chirdik» — anonimlashtirish emas: «shahar, tug'ilgan sana, jins» to'plami kichik shaharda ko'pchilik odamni yagona aniqlaydi. Agar yuklamada aniq xarid sanasi va summa qolgan bo'lsa, odam bitta chek bo'yicha topiladi.</p>",
+              "en": "<p>When the data is needed anyway — by analytics, say — it gets de-identified. And here two levels must be told apart.</p><ul><li><b>Pseudonymization</b> — the direct identifier is replaced by a stable token: instead of <code>aziz@mail.uz</code> you get <code>a3f91c22</code>. The same person always gets the same token, so metrics still work. But the link is reversible: whoever knows the secret has a way back to the original. This is <b>still personal data</b>.</li><li><b>Anonymization</b> — the link is severed for good: aggregates, rounding, dropping rare values. Only then does the data stop being personal.</li></ul><p>The difference is constantly underestimated. \"We removed the names and phone numbers\" is not anonymization: the combination \"city, date of birth, gender\" uniquely identifies most people in a small town. And if the export kept the exact purchase date and amount, a person is found from a single receipt.</p>"
+            }
+          },
+          {
+            "type": "note",
+            "kind": "trap",
+            "html": {
+              "ru": "Псевдонимизация без секрета бесполезна. Если токен — это просто <code>sha256(email)</code>, любой, у кого есть список адресов, переберёт его за минуты и восстановит соответствие: адресов в мире конечное число, а хеш считается мгновенно. Поэтому в токен всегда подмешивают секрет, который хранится отдельно от выгрузки, — и меняют его, если выгрузка утекла.",
+              "uz": "Sirsiz psevdonimlashtirish foydasiz. Agar token shunchaki <code>sha256(email)</code> bo'lsa, manzillar ro'yxati bor har kim uni daqiqalarda saralab, mosligini tiklaydi: dunyodagi manzillar soni chekli, xesh esa bir zumda hisoblanadi. Shuning uchun tokenga doim yuklamadan alohida saqlanadigan sir qo'shiladi — va yuklama oqib ketsa, u almashtiriladi.",
+              "en": "Pseudonymization without a secret is useless. If the token is simply <code>sha256(email)</code>, anyone with a list of addresses can brute-force it in minutes and rebuild the mapping: the number of addresses in the world is finite and a hash computes instantly. So a secret is always mixed into the token, kept separately from the export — and rotated if the export leaks."
+            }
+          },
+          {
+            "type": "summary",
+            "items": [
+              { "ru": "Хеш — для сравнения, шифр — для чтения потом, подпись — для подтверждения автора", "uz": "Xesh — solishtirish uchun, shifr — keyin o'qish uchun, imzo — muallifni tasdiqlash uchun", "en": "A hash to compare, a cipher to read later, a signature to confirm the author" },
+              { "ru": "Base64 — кодирование, а не защита", "uz": "Base64 — kodlash, himoya emas", "en": "Base64 is an encoding, not protection" },
+              { "ru": "Шифруют и в передаче (TLS), и в покое (диски, бэкапы)", "uz": "Uzatishda ham (TLS), tinch holatda ham (disklar, zaxiralar) shifrlanadi", "en": "Encrypt both in transit (TLS) and at rest (disks, backups)" },
+              { "ru": "Правило 3-2-1: три копии, два носителя, одна вне площадки", "uz": "3-2-1 qoidasi: uchta nusxa, ikkita tashuvchi, bittasi maydondan tashqarida", "en": "The 3-2-1 rule: three copies, two media, one offsite" },
+              { "ru": "RPO — сколько данных теряем, RTO — сколько восстанавливаемся", "uz": "RPO — qancha ma'lumot yo'qotamiz, RTO — qancha tiklanamiz", "en": "RPO is how much data is lost, RTO is how long recovery takes" },
+              { "ru": "Непроверенный бэкап не считается: восстановление тестируют регулярно", "uz": "Tekshirilmagan zaxira hisoblanmaydi: tiklash muntazam sinaladi", "en": "An untested backup does not count: restores are tested regularly" },
+              { "ru": "Минимизация: не собирать лишнего и удалять по сроку", "uz": "Minimallashtirish: ortiqchasini yig'maslik va muddati bo'yicha o'chirish", "en": "Minimization: don't collect the extra, and delete on schedule" },
+              { "ru": "Псевдонимизация обратима и остаётся персональными данными; анонимизация — нет", "uz": "Psevdonimlashtirish qaytariladi va shaxsiy ma'lumot bo'lib qoladi; anonimlashtirish — yo'q", "en": "Pseudonymization is reversible and stays personal data; anonymization is not" }
+            ]
+          }
+        ]
+      }
+    ],
+    "quiz": [
+      {
+        "q": {
+          "ru": "Чем хеш принципиально отличается от шифрования?",
+          "uz": "Xesh shifrlashdan tubdan nimasi bilan farq qiladi?",
+          "en": "What is the fundamental difference between a hash and encryption?"
+        },
+        "options": [
+          { "ru": "Хеш быстрее считается", "uz": "Xesh tezroq hisoblanadi", "en": "A hash is faster to compute" },
+          { "ru": "Хеш необратим: из него нельзя восстановить исходные данные", "uz": "Xesh qaytarilmas: undan asl ma'lumotni tiklab bo'lmaydi", "en": "A hash is irreversible: the original data cannot be recovered from it" },
+          { "ru": "Хеш длиннее", "uz": "Xesh uzunroq", "en": "A hash is longer" },
+          { "ru": "Разницы нет", "uz": "Farqi yo'q", "en": "There is no difference" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Шифрование обратимо по ключу — на то оно и нужно. Хеш дороги назад не имеет вовсе, поэтому годится там, где данные надо только сверять: пароли, контрольные суммы файлов.",
+          "uz": "Shifrlash kalit bo'yicha qaytariladi — u shuning uchun kerak. Xeshda orqaga yo'l umuman yo'q, shuning uchun u ma'lumotni faqat solishtirish kerak bo'lgan joyda yaraydi: parollar, fayllarning nazorat summalari.",
+          "en": "Encryption is reversible with the key — that is its whole point. A hash has no way back at all, so it fits where data only needs checking: passwords, file checksums."
+        }
+      },
+      {
+        "q": {
+          "ru": "Разработчик «зашифровал» пароли с помощью base64. Что на самом деле произошло?",
+          "uz": "Dasturchi parollarni base64 yordamida «shifrladi». Aslida nima bo'ldi?",
+          "en": "A developer \"encrypted\" the passwords with base64. What actually happened?"
+        },
+        "options": [
+          { "ru": "Пароли защищены достаточно", "uz": "Parollar yetarlicha himoyalangan", "en": "The passwords are adequately protected" },
+          { "ru": "Ничего: base64 разворачивается без ключа, пароли лежат открыто", "uz": "Hech nima: base64 kalitsiz ochiladi, parollar ochiq yotibdi", "en": "Nothing: base64 decodes without a key, the passwords are in the clear" },
+          { "ru": "Пароли захешированы", "uz": "Parollar xeshlangan", "en": "The passwords are hashed" },
+          { "ru": "Пароли подписаны", "uz": "Parollar imzolangan", "en": "The passwords are signed" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Base64 — способ записать двоичные данные текстом, ключа в нём нет по определению. Обратное преобразование делается одной строкой кода, так что защиты ноль.",
+          "uz": "Base64 — ikkilik ma'lumotni matn bilan yozish usuli, unda ta'rifiga ko'ra kalit yo'q. Teskari o'zgartirish bir qator kod bilan qilinadi, demak himoya nol.",
+          "en": "Base64 is a way of writing binary data as text; by definition it has no key. The reverse transformation is one line of code, so the protection is zero."
+        }
+      },
+      {
+        "q": {
+          "ru": "Что означает правило 3-2-1?",
+          "uz": "3-2-1 qoidasi nimani anglatadi?",
+          "en": "What does the 3-2-1 rule mean?"
+        },
+        "options": [
+          { "ru": "Три копии, два типа носителей, одна копия вне площадки", "uz": "Uchta nusxa, ikki xil tashuvchi, bitta nusxa maydondan tashqarida", "en": "Three copies, two media types, one copy offsite" },
+          { "ru": "Три бэкапа в день, два в неделю, один в месяц", "uz": "Kuniga uchta zaxira, haftasiga ikkita, oyiga bitta", "en": "Three backups a day, two a week, one a month" },
+          { "ru": "Три администратора, два пароля, один ключ", "uz": "Uchta administrator, ikkita parol, bitta kalit", "en": "Three administrators, two passwords, one key" },
+          { "ru": "Три часа RPO, два часа RTO, одна проверка", "uz": "Uch soat RPO, ikki soat RTO, bitta tekshiruv", "en": "Three hours RPO, two hours RTO, one test" }
+        ],
+        "a": 0,
+        "explain": {
+          "ru": "Каждая цифра закрывает свой сценарий: копии — от удаления, разные носители — от отказа железа, внешняя копия — от пожара и шифровальщика, прошедшего по локальной сети.",
+          "uz": "Har bir raqam o'z stsenariysini yopadi: nusxalar — o'chirishdan, turli tashuvchilar — temirning ishdan chiqishidan, tashqi nusxa — yong'in va lokal tarmoqni bosib o'tgan shifrlovchidan.",
+          "en": "Each digit covers its own scenario: the copies against deletion, the different media against hardware failure, the offsite copy against fire and ransomware that swept the local network."
+        }
+      },
+      {
+        "q": {
+          "ru": "RPO равен одному часу. Что это значит на практике?",
+          "uz": "RPO bir soatga teng. Bu amalda nimani anglatadi?",
+          "en": "The RPO is one hour. What does that mean in practice?"
+        },
+        "options": [
+          { "ru": "Восстановление должно занять не больше часа", "uz": "Tiklash bir soatdan ko'p vaqt olmasligi kerak", "en": "Recovery must take no more than an hour" },
+          { "ru": "Допустимо потерять не больше часа данных, значит копии снимают не реже раза в час", "uz": "Bir soatdan ko'p ma'lumot yo'qotmaslik kerak, demak nusxalar soatiga kamida bir marta olinadi", "en": "No more than an hour of data may be lost, so backups run at least hourly" },
+          { "ru": "Бэкап хранится один час", "uz": "Zaxira bir soat saqlanadi", "en": "The backup is kept for one hour" },
+          { "ru": "Проверка восстановления раз в час", "uz": "Tiklashni soatiga bir marta tekshirish", "en": "A restore test every hour" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "RPO отвечает на вопрос «сколько данных не жалко потерять», а «сколько восстанавливаемся» — это RTO. Из RPO напрямую вытекает расписание: реже, чем RPO, копии снимать нельзя.",
+          "uz": "RPO «qancha ma'lumot yo'qotish mumkin» degan savolga javob beradi, «qancha tiklanamiz» esa — RTO. RPO dan jadval to'g'ridan-to'g'ri kelib chiqadi: nusxalarni RPO dan kam olib bo'lmaydi.",
+          "en": "RPO answers \"how much data can we afford to lose\", while \"how long does recovery take\" is the RTO. The schedule follows straight from the RPO: backups cannot run less often than it."
+        }
+      },
+      {
+        "q": {
+          "ru": "Почему одна резервная копия должна быть офлайн или неизменяемой?",
+          "uz": "Nega bitta zaxira nusxa oflayn yoki o'zgartirib bo'lmaydigan bo'lishi kerak?",
+          "en": "Why must one backup copy be offline or immutable?"
+        },
+        "options": [
+          { "ru": "Так дешевле хранить", "uz": "Shunday saqlash arzonroq", "en": "It is cheaper to store that way" },
+          { "ru": "Шифровальщик шифрует всё, до чего дотягивается по сети, включая сетевые диски с бэкапами", "uz": "Shifrlovchi tarmoq orqali yetadigan hamma narsani, jumladan zaxirali tarmoq disklarini shifrlaydi", "en": "Ransomware encrypts everything it can reach over the network, including network drives with backups" },
+          { "ru": "Так требует закон", "uz": "Qonun shuni talab qiladi", "en": "The law requires it" },
+          { "ru": "Офлайн-копии восстанавливаются быстрее", "uz": "Oflayn nusxalar tezroq tiklanadi", "en": "Offline copies restore faster" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Смонтированный сетевой диск для шифровальщика — обычная папка. Копия, которую видно из системы с правом записи, гибнет вместе с оригиналом, и весь план восстановления превращается в ноль.",
+          "uz": "Monтlangan tarmoq diski shifrlovchi uchun oddiy papka. Tizimdan yozish huquqi bilan ko'rinadigan nusxa asl bilan birga nobud bo'ladi va butun tiklash rejasi nolga aylanadi.",
+          "en": "A mounted network drive is just another folder to ransomware. A copy visible from the system with write access dies together with the original, and the whole recovery plan turns to nothing."
+        }
+      },
+      {
+        "q": {
+          "ru": "Из выгрузки убрали имена и телефоны, остались город, дата рождения и пол. Это анонимизация?",
+          "uz": "Yuklamadan ism va telefonlar olib tashlandi, shahar, tug'ilgan sana va jins qoldi. Bu anonimlashtirishmi?",
+          "en": "An export had names and phone numbers removed, leaving city, date of birth and gender. Is that anonymization?"
+        },
+        "options": [
+          { "ru": "Да, прямых идентификаторов больше нет", "uz": "Ha, to'g'ridan-to'g'ri identifikatorlar endi yo'q", "en": "Yes, there are no direct identifiers left" },
+          { "ru": "Нет: комбинация этих полей часто уникально определяет человека", "uz": "Yo'q: bu maydonlar birikmasi ko'pincha odamni yagona aniqlaydi", "en": "No: the combination of those fields often identifies a person uniquely" },
+          { "ru": "Да, если удалить ещё и адрес", "uz": "Ha, manzilni ham o'chirsak", "en": "Yes, if the address is removed too" },
+          { "ru": "Это псевдонимизация", "uz": "Bu psevdonimlashtirish", "en": "That is pseudonymization" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Убрать имя недостаточно: в небольшом городе «дата рождения + пол» сужает круг до одного-двух человек. Настоящая анонимизация требует агрегирования, огрубления значений или удаления редких комбинаций.",
+          "uz": "Ismni olib tashlash yetarli emas: kichik shaharda «tug'ilgan sana + jins» doirani bir-ikki odamgacha toraytiradi. Haqiqiy anonimlashtirish agregatlash, qiymatlarni qo'pollashtirish yoki kam uchraydigan birikmalarni o'chirishni talab qiladi.",
+          "en": "Removing the name is not enough: in a small town \"date of birth + gender\" narrows it to one or two people. Real anonymization requires aggregation, coarsening the values, or dropping rare combinations."
+        }
+      }
+    ],
+    "tasks": [
+      {
+        "id": "t1",
+        "kind": "python",
+        "title": {
+          "ru": "Проверка правила 3-2-1",
+          "uz": "3-2-1 qoidasini tekshirish",
+          "en": "Checking the 3-2-1 rule"
+        },
+        "brief": {
+          "ru": "Найди, какие условия резервирования нарушены",
+          "uz": "Zaxiralashning qaysi shartlari buzilganini toping",
+          "en": "Find which backup conditions are violated"
+        },
+        "desc": {
+          "ru": "Напиши функцию <code>check_321(copies)</code>. <code>copies</code> — список словарей с ключами <code>\"media\"</code> (тип носителя, строка) и <code>\"offsite\"</code> (<code>True</code>, если копия вне площадки).<br><br>Верни отсортированный по алфавиту список нарушенных условий:<br><code>\"copies\"</code> — копий меньше трёх;<br><code>\"media\"</code> — различных типов носителей меньше двух;<br><code>\"offsite\"</code> — ни одной копии вне площадки.<br><br>Если всё в порядке, верни пустой список.",
+          "uz": "<code>check_321(copies)</code> funksiyasini yozing. <code>copies</code> — <code>\"media\"</code> (tashuvchi turi, satr) va <code>\"offsite\"</code> (nusxa maydondan tashqarida bo'lsa <code>True</code>) kalitli lug'atlar ro'yxati.<br><br>Buzilgan shartlarning alifbo bo'yicha tartiblangan ro'yxatini qaytaring:<br><code>\"copies\"</code> — nusxalar uchtadan kam;<br><code>\"media\"</code> — turli tashuvchi turlari ikkitadan kam;<br><code>\"offsite\"</code> — maydondan tashqarida birorta nusxa yo'q.<br><br>Hammasi joyida bo'lsa, bo'sh ro'yxat qaytaring.",
+          "en": "Write a function <code>check_321(copies)</code>. <code>copies</code> is a list of dicts with the keys <code>\"media\"</code> (media type, a string) and <code>\"offsite\"</code> (<code>True</code> if the copy is offsite).<br><br>Return an alphabetically sorted list of the violated conditions:<br><code>\"copies\"</code> — fewer than three copies;<br><code>\"media\"</code> — fewer than two distinct media types;<br><code>\"offsite\"</code> — no copy offsite.<br><br>If everything checks out, return an empty list."
+        },
+        "starter": "def check_321(copies):\n    # три копии, два носителя, одна вне площадки\n    ...\n",
+        "tests": "ok = [{\"media\": \"disk\", \"offsite\": False},\n      {\"media\": \"disk\", \"offsite\": False},\n      {\"media\": \"tape\", \"offsite\": True}]\nassert check_321(ok) == []\nassert check_321([]) == [\"copies\", \"media\", \"offsite\"]\nassert check_321(ok[:2]) == [\"copies\", \"media\", \"offsite\"]\nassert check_321([{\"media\": \"disk\", \"offsite\": False}] * 3) == [\"media\", \"offsite\"]\nassert check_321([{\"media\": \"disk\", \"offsite\": True},\n                  {\"media\": \"tape\", \"offsite\": False},\n                  {\"media\": \"cloud\", \"offsite\": True}]) == []\nassert check_321([{\"media\": \"disk\", \"offsite\": True},\n                  {\"media\": \"tape\", \"offsite\": False}]) == [\"copies\"]\n",
+        "hint": {
+          "ru": "Различные носители удобно считать множеством: <code>len({c[\"media\"] for c in copies})</code>. Внешние копии — <code>any(c[\"offsite\"] for c in copies)</code>. Собери имена нарушенных условий в список тремя проверками и в конце верни <code>sorted(...)</code>.",
+          "uz": "Turli tashuvchilarni to'plam bilan sanash qulay: <code>len({c[\"media\"] for c in copies})</code>. Tashqi nusxalar — <code>any(c[\"offsite\"] for c in copies)</code>. Buzilgan shartlar nomlarini uchta tekshiruv bilan ro'yxatga yig'ing va oxirida <code>sorted(...)</code> qaytaring.",
+          "en": "Distinct media are easiest to count with a set: <code>len({c[\"media\"] for c in copies})</code>. Offsite copies: <code>any(c[\"offsite\"] for c in copies)</code>. Collect the violated names into a list with three checks and return <code>sorted(...)</code> at the end."
+        }
+      },
+      {
+        "id": "t2",
+        "kind": "python",
+        "title": {
+          "ru": "RPO и RTO после аварии",
+          "uz": "Avariyadan keyingi RPO va RTO",
+          "en": "RPO and RTO after an incident"
+        },
+        "brief": {
+          "ru": "Уложились в нормативы или нет",
+          "uz": "Me'yorlarga sig'dikmi yoki yo'q",
+          "en": "Did we meet the targets or not"
+        },
+        "desc": {
+          "ru": "Напиши функцию <code>recovery_report(last_backup, incident, restored, rpo, rto)</code>. Все значения — моменты времени в минутах.<br><br>Посчитай две величины: <code>data_loss = incident - last_backup</code> (сколько данных потеряно) и <code>downtime = restored - incident</code> (сколько длился простой).<br><br>Верни словарь с четырьмя ключами: <code>\"data_loss\"</code>, <code>\"downtime\"</code>, <code>\"rpo_ok\"</code> и <code>\"rto_ok\"</code>. Норматив выполнен, если величина <b>не превышает</b> соответствующий предел: ровно на границе — считается выполненным.",
+          "uz": "<code>recovery_report(last_backup, incident, restored, rpo, rto)</code> funksiyasini yozing. Barcha qiymatlar — daqiqalardagi vaqt nuqtalari.<br><br>Ikki miqdorni hisoblang: <code>data_loss = incident - last_backup</code> (qancha ma'lumot yo'qolgan) va <code>downtime = restored - incident</code> (to'xtash qancha davom etgan).<br><br>To'rtta kalitli lug'at qaytaring: <code>\"data_loss\"</code>, <code>\"downtime\"</code>, <code>\"rpo_ok\"</code> va <code>\"rto_ok\"</code>. Me'yor bajarilgan hisoblanadi, agar miqdor tegishli chegaradan <b>oshmasa</b>: aynan chegarada — bajarilgan.",
+          "en": "Write a function <code>recovery_report(last_backup, incident, restored, rpo, rto)</code>. All values are moments in time, in minutes.<br><br>Compute two quantities: <code>data_loss = incident - last_backup</code> (how much data was lost) and <code>downtime = restored - incident</code> (how long the outage lasted).<br><br>Return a dict with four keys: <code>\"data_loss\"</code>, <code>\"downtime\"</code>, <code>\"rpo_ok\"</code> and <code>\"rto_ok\"</code>. A target is met when the value <b>does not exceed</b> its limit: exactly on the boundary counts as met."
+        },
+        "starter": "def recovery_report(last_backup, incident, restored, rpo, rto):\n    # потеря данных и простой, потом сравнение с нормативами\n    ...\n",
+        "tests": "assert recovery_report(100, 160, 200, 60, 60) == {\n    \"data_loss\": 60, \"downtime\": 40, \"rpo_ok\": True, \"rto_ok\": True}\nassert recovery_report(0, 120, 400, 60, 120) == {\n    \"data_loss\": 120, \"downtime\": 280, \"rpo_ok\": False, \"rto_ok\": False}\nassert recovery_report(50, 50, 50, 0, 0) == {\n    \"data_loss\": 0, \"downtime\": 0, \"rpo_ok\": True, \"rto_ok\": True}\nassert recovery_report(0, 240, 400, 60, 180)[\"rpo_ok\"] is False\nassert recovery_report(0, 240, 400, 60, 180)[\"rto_ok\"] is True\nassert recovery_report(0, 30, 90, 30, 60)[\"rpo_ok\"] is True\n",
+        "hint": {
+          "ru": "Обе величины — простые вычитания. Сравнение делай нестрогим: <code>data_loss &lt;= rpo</code>, иначе ровно граничный случай из тестов провалится. Возвращай словарь целиком, а не по частям.",
+          "uz": "Ikkala miqdor ham oddiy ayirish. Taqqoslashni qat'iy bo'lmagan qiling: <code>data_loss &lt;= rpo</code>, aks holda testlardagi aynan chegaraviy holat yiqiladi. Lug'atni butunlay qaytaring, qismlarga bo'lib emas.",
+          "en": "Both quantities are simple subtractions. Use a non-strict comparison: <code>data_loss &lt;= rpo</code>, otherwise the exact-boundary case from the tests fails. Return the whole dict, not pieces of it."
+        }
+      },
+      {
+        "id": "t3",
+        "kind": "python",
+        "title": {
+          "ru": "Минимизация данных",
+          "uz": "Ma'lumotni minimallashtirish",
+          "en": "Data minimization"
+        },
+        "brief": {
+          "ru": "Оставь только нужные поля и свежие записи",
+          "uz": "Faqat kerakli maydonlar va yangi yozuvlarni qoldiring",
+          "en": "Keep only the needed fields and fresh records"
+        },
+        "desc": {
+          "ru": "Напиши функцию <code>minimize(records, needed, retention_days)</code>. <code>records</code> — список пар <code>(возраст_в_днях, словарь_записи)</code>. <code>needed</code> — множество имён полей, которые нужны для работы.<br><br>Записи с возрастом <b>не меньше</b> <code>retention_days</code> удаляются целиком — срок хранения истёк. У оставшихся оставь только те поля, которые есть в <code>needed</code>; поля из <code>needed</code>, которых в записи нет, просто пропускай.<br><br>Верни список новых словарей в исходном порядке. Исходные словари менять нельзя.",
+          "uz": "<code>minimize(records, needed, retention_days)</code> funksiyasini yozing. <code>records</code> — <code>(yosh_kunlarda, yozuv_lug'ati)</code> juftliklari ro'yxati. <code>needed</code> — ish uchun kerak bo'lgan maydon nomlari to'plami.<br><br>Yoshi <code>retention_days</code> dan <b>kam bo'lmagan</b> yozuvlar butunlay o'chiriladi — saqlash muddati tugagan. Qolganlarida faqat <code>needed</code> dagi maydonlarni qoldiring; <code>needed</code> da bor, lekin yozuvda yo'q maydonlarni shunchaki o'tkazib yuboring.<br><br>Dastlabki tartibda yangi lug'atlar ro'yxatini qaytaring. Asl lug'atlarni o'zgartirib bo'lmaydi.",
+          "en": "Write a function <code>minimize(records, needed, retention_days)</code>. <code>records</code> is a list of <code>(age_in_days, record_dict)</code> pairs. <code>needed</code> is the set of field names the work requires.<br><br>Records whose age is <b>at least</b> <code>retention_days</code> are dropped entirely — the retention period has expired. In the rest keep only the fields present in <code>needed</code>; fields from <code>needed</code> that the record lacks are simply skipped.<br><br>Return a list of new dicts in the original order. The original dicts must not be modified."
+        },
+        "starter": "def minimize(records, needed, retention_days):\n    # выбросить старое, у остального оставить только нужные поля\n    ...\n",
+        "tests": "records = [\n    (5, {\"id\": 1, \"name\": \"Азиз\", \"phone\": \"+998901234567\", \"card\": \"4111\"}),\n    (400, {\"id\": 2, \"name\": \"Дилноза\", \"phone\": \"+998907654321\"}),\n    (10, {\"id\": 3, \"name\": \"Тимур\"}),\n]\nassert minimize(records, {\"id\", \"name\"}, 365) == [\n    {\"id\": 1, \"name\": \"Азиз\"},\n    {\"id\": 3, \"name\": \"Тимур\"},\n]\nassert minimize(records, {\"id\"}, 1) == []\nassert minimize([], {\"id\"}, 30) == []\nassert minimize(records, set(), 365) == [{}, {}]\nassert minimize(records, {\"card\"}, 365) == [{\"card\": \"4111\"}, {}]\nassert records[0][1] == {\"id\": 1, \"name\": \"Азиз\", \"phone\": \"+998901234567\", \"card\": \"4111\"}\n",
+        "hint": {
+          "ru": "Одно списочное включение с двумя уровнями: внешнее — по записям с условием <code>age &lt; retention_days</code>, внутреннее — словарное включение <code>{k: v for k, v in data.items() if k in needed}</code>. Оно само создаёт новый словарь, так что исходные останутся нетронутыми.",
+          "uz": "Ikki darajali bitta ro'yxat ichkilashi: tashqisi — <code>age &lt; retention_days</code> shartli yozuvlar bo'yicha, ichkisi — <code>{k: v for k, v in data.items() if k in needed}</code> lug'at ichkilashi. U o'zi yangi lug'at yaratadi, shuning uchun asllari tegilmagan qoladi.",
+          "en": "One comprehension with two levels: the outer over records with the condition <code>age &lt; retention_days</code>, the inner a dict comprehension <code>{k: v for k, v in data.items() if k in needed}</code>. It creates a new dict by itself, so the originals stay untouched."
+        }
+      }
+    ],
+    "exam": {
+      "time": 660,
+      "questions": [
+        {
+          "q": {
+            "ru": "Нужно проверять, не загружал ли пользователь этот файл раньше. Что применить?",
+            "uz": "Foydalanuvchi bu faylni ilgari yuklamaganini tekshirish kerak. Nimani qo'llash kerak?",
+            "en": "You need to check whether the user has uploaded this file before. What do you use?"
+          },
+          "options": [
+            { "ru": "Хеш файла — сравнивать нужно, а читать обратно нет", "uz": "Fayl xeshi — solishtirish kerak, qaytarib o'qish emas", "en": "The file's hash — you need to compare, not to read back" },
+            { "ru": "Шифрование с ключом", "uz": "Kalitli shifrlash", "en": "Encryption with a key" },
+            { "ru": "Base64", "uz": "Base64", "en": "Base64" },
+            { "ru": "Цифровую подпись", "uz": "Raqamli imzo", "en": "A digital signature" }
+          ],
+          "a": 0
+        },
+        {
+          "q": {
+            "ru": "Что защищает TLS?",
+            "uz": "TLS nimani himoya qiladi?",
+            "en": "What does TLS protect?"
+          },
+          "options": [
+            { "ru": "Данные в передаче — между браузером и сервером", "uz": "Uzatishdagi ma'lumotni — brauzer va server orasida", "en": "Data in transit — between the browser and the server" },
+            { "ru": "Данные на диске сервера", "uz": "Server diskidagi ma'lumotni", "en": "Data on the server's disk" },
+            { "ru": "Пароли в базе данных", "uz": "Bazadagi parollarni", "en": "Passwords in the database" },
+            { "ru": "Резервные копии", "uz": "Zaxira nusxalarni", "en": "Backups" }
+          ],
+          "a": 0
+        },
+        {
+          "q": {
+            "ru": "Копия снимается раз в сутки, RPO обещан в 2 часа. Что не так?",
+            "uz": "Nusxa kuniga bir marta olinadi, RPO 2 soat deb va'da qilingan. Nimasi noto'g'ri?",
+            "en": "Backups run once a day but the promised RPO is 2 hours. What's wrong?"
+          },
+          "options": [
+            { "ru": "Ничего, RPO про восстановление", "uz": "Hech nima, RPO tiklash haqida", "en": "Nothing, RPO is about recovery" },
+            { "ru": "Расписание не может обеспечить RPO: в худшем случае потеряются сутки данных", "uz": "Jadval RPO ni ta'minlay olmaydi: eng yomon holatda bir kunlik ma'lumot yo'qoladi", "en": "The schedule cannot deliver the RPO: in the worst case a day of data is lost" },
+            { "ru": "Нужно уменьшить RTO", "uz": "RTO ni kamaytirish kerak", "en": "The RTO should be reduced" },
+            { "ru": "Нужно больше копий", "uz": "Ko'proq nusxa kerak", "en": "More copies are needed" }
+          ],
+          "a": 1
+        },
+        {
+          "q": {
+            "ru": "Бэкапы делаются два года, восстановление ни разу не проверяли. Насколько это надёжно?",
+            "uz": "Zaxiralar ikki yildan beri olinadi, tiklash bir marta ham tekshirilmagan. Bu qanchalik ishonchli?",
+            "en": "Backups have run for two years and a restore has never been tested. How reliable is that?"
+          },
+          "options": [
+            { "ru": "Надёжно, копии же есть", "uz": "Ishonchli, nusxalar bor-ku", "en": "Reliable, the copies exist" },
+            { "ru": "Ненадёжно: непроверенная копия может оказаться битой, неполной или незапускаемой", "uz": "Ishonchsiz: tekshirilmagan nusxa buzilgan, to'liq bo'lmagan yoki ishga tushmaydigan bo'lishi mumkin", "en": "Unreliable: an untested copy may be corrupt, incomplete or unrestorable" },
+            { "ru": "Зависит от объёма данных", "uz": "Ma'lumot hajmiga bog'liq", "en": "It depends on the data volume" },
+            { "ru": "Достаточно проверить размер файлов", "uz": "Fayllar hajmini tekshirish yetarli", "en": "Checking file sizes is enough" }
+          ],
+          "a": 1
+        },
+        {
+          "q": {
+            "ru": "Что такое минимизация данных?",
+            "uz": "Ma'lumotni minimallashtirish nima?",
+            "en": "What is data minimization?"
+          },
+          "options": [
+            { "ru": "Сжатие данных перед хранением", "uz": "Saqlashdan oldin ma'lumotni siqish", "en": "Compressing data before storage" },
+            { "ru": "Сбор только необходимых полей и удаление данных по истечении срока хранения", "uz": "Faqat zarur maydonlarni yig'ish va saqlash muddati tugagach o'chirish", "en": "Collecting only the necessary fields and deleting data once its retention expires" },
+            { "ru": "Уменьшение числа пользователей с доступом", "uz": "Kirish huquqiga ega foydalanuvchilar sonini kamaytirish", "en": "Reducing the number of users with access" },
+            { "ru": "Хранение данных в одном месте", "uz": "Ma'lumotni bitta joyda saqlash", "en": "Storing data in one place" }
+          ],
+          "a": 1
+        },
+        {
+          "q": {
+            "ru": "Email заменили на токен, секрет для токена хранится отдельно. Это анонимизация?",
+            "uz": "Email token bilan almashtirildi, token uchun sir alohida saqlanadi. Bu anonimlashtirishmi?",
+            "en": "Emails were replaced by tokens and the token secret is stored separately. Is that anonymization?"
+          },
+          "options": [
+            { "ru": "Да, исходный адрес не виден", "uz": "Ha, asl manzil ko'rinmaydi", "en": "Yes, the original address is not visible" },
+            { "ru": "Нет, это псевдонимизация: связь обратима и данные остаются персональными", "uz": "Yo'q, bu psevdonimlashtirish: bog'lanish qaytariladi va ma'lumot shaxsiy bo'lib qoladi", "en": "No, it is pseudonymization: the link is reversible and the data stays personal" },
+            { "ru": "Зависит от длины токена", "uz": "Token uzunligiga bog'liq", "en": "It depends on the token length" },
+            { "ru": "Да, если токен длиннее 8 символов", "uz": "Ha, agar token 8 belgidan uzun bo'lsa", "en": "Yes, if the token is longer than 8 characters" }
+          ],
+          "a": 1
+        }
+      ],
+      "tasks": [
+        {
+          "id": "e1",
+          "kind": "python",
+          "title": {
+            "ru": "Псевдонимизация выгрузки",
+            "uz": "Yuklamani psevdonimlashtirish",
+            "en": "Pseudonymizing an export"
+          },
+          "desc": {
+            "ru": "Напиши функцию <code>pseudonymize(records, secret, fields)</code>, которая готовит выгрузку для аналитики.<br><br><code>records</code> — список словарей, <code>fields</code> — множество имён полей, которые нужно заменить токенами. Для каждой записи создай <b>новый</b> словарь: значения полей из <code>fields</code> замени токеном, остальные оставь как есть. Полей, которых в записи нет, не добавляй.<br><br>Токен считается так: <code>hashlib.sha256((secret + str(значение)).encode()).hexdigest()[:8]</code> — первые 8 шестнадцатеричных символов.<br><br>Одно и то же значение с одним и тем же секретом всегда даёт один токен, а смена секрета меняет все токены. Исходные словари менять нельзя. Модуль <code>hashlib</code> уже импортирован.",
+            "uz": "<code>pseudonymize(records, secret, fields)</code> funksiyasini yozing: u tahlil uchun yuklamani tayyorlaydi.<br><br><code>records</code> — lug'atlar ro'yxati, <code>fields</code> — tokenlar bilan almashtirilishi kerak bo'lgan maydon nomlari to'plami. Har bir yozuv uchun <b>yangi</b> lug'at yarating: <code>fields</code> dagi maydonlar qiymatlarini token bilan almashtiring, qolganlarini o'z holicha qoldiring. Yozuvda yo'q maydonlarni qo'shmang.<br><br>Token shunday hisoblanadi: <code>hashlib.sha256((secret + str(qiymat)).encode()).hexdigest()[:8]</code> — birinchi 8 o'n oltilik belgi.<br><br>Bitta qiymat bitta sir bilan doim bitta token beradi, sir almashsa esa barcha tokenlar o'zgaradi. Asl lug'atlarni o'zgartirib bo'lmaydi. <code>hashlib</code> moduli allaqachon import qilingan.",
+            "en": "Write a function <code>pseudonymize(records, secret, fields)</code> that prepares an export for analytics.<br><br><code>records</code> is a list of dicts, <code>fields</code> the set of field names to be replaced with tokens. For each record build a <b>new</b> dict: replace the values of fields in <code>fields</code> with a token and leave the rest as they are. Do not add fields the record does not have.<br><br>The token is computed as <code>hashlib.sha256((secret + str(value)).encode()).hexdigest()[:8]</code> — the first 8 hex characters.<br><br>The same value with the same secret always yields the same token, and changing the secret changes every token. The original dicts must not be modified. The <code>hashlib</code> module is already imported."
+          },
+          "starter": "import hashlib\n\n\ndef pseudonymize(records, secret, fields):\n    # заменить указанные поля стабильным токеном\n    ...\n",
+          "tests": "import hashlib\nrecords = [\n    {\"user\": \"aziz\", \"city\": \"Tashkent\"},\n    {\"user\": \"aziz\", \"city\": \"Samarkand\"},\n    {\"user\": \"bob\", \"city\": \"Tashkent\"},\n]\nout = pseudonymize(records, \"s3cret\", {\"user\"})\nassert out[0][\"user\"] == out[1][\"user\"]\nassert out[0][\"user\"] != out[2][\"user\"]\nassert out[0][\"city\"] == \"Tashkent\"\nassert len(out[0][\"user\"]) == 8\nassert out[0][\"user\"] == hashlib.sha256((\"s3cret\" + \"aziz\").encode()).hexdigest()[:8]\nassert records[0][\"user\"] == \"aziz\"\nother = pseudonymize(records, \"another\", {\"user\"})\nassert other[0][\"user\"] != out[0][\"user\"]\nassert pseudonymize([], \"x\", {\"a\"}) == []\nassert pseudonymize([{\"b\": 1}], \"x\", {\"a\"}) == [{\"b\": 1}]\nboth = pseudonymize(records, \"s3cret\", {\"user\", \"city\"})\nassert both[0][\"city\"] == both[2][\"city\"]\nassert both[0][\"city\"] != both[1][\"city\"]\n",
+          "hint": {
+            "ru": "Вынеси токен в маленькую функцию: <code>def token(value): return hashlib.sha256((secret + str(value)).encode()).hexdigest()[:8]</code> — она увидит <code>secret</code> из внешней функции. Дальше двойное включение: <code>[{k: (token(v) if k in fields else v) for k, v in r.items()} for r in records]</code>. Ключи берутся из самой записи, поэтому лишних полей не появится.",
+            "uz": "Tokenni kichik funksiyaga chiqaring: <code>def token(value): return hashlib.sha256((secret + str(value)).encode()).hexdigest()[:8]</code> — u tashqi funksiyadagi <code>secret</code> ni ko'radi. Keyin ikki qavatli ichkilash: <code>[{k: (token(v) if k in fields else v) for k, v in r.items()} for r in records]</code>. Kalitlar yozuvning o'zidan olinadi, shuning uchun ortiqcha maydon paydo bo'lmaydi.",
+            "en": "Extract the token into a small function: <code>def token(value): return hashlib.sha256((secret + str(value)).encode()).hexdigest()[:8]</code> — it will see <code>secret</code> from the enclosing function. Then a nested comprehension: <code>[{k: (token(v) if k in fields else v) for k, v in r.items()} for r in records]</code>. The keys come from the record itself, so no extra fields appear."
+          }
+        }
+      ]
+    }
   }
  ]
 }

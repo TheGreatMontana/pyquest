@@ -868,6 +868,481 @@
      }
     ]
    }
+  },
+  {
+    "id": "cl-03",
+    "title": {
+      "ru": "Модели сервисов, хранилища и сетевые границы",
+      "uz": "Xizmat modellari, saqlagichlar va tarmoq chegaralari",
+      "en": "Service models, storage and network boundaries"
+    },
+    "tagline": {
+      "ru": "Что облако обслуживает за тебя, где хранить данные дешевле и почему база не должна смотреть в интернет",
+      "uz": "Bulut siz uchun nimani xizmat qiladi, ma'lumotni qayerda saqlash arzonroq va nega baza internetga qaramasligi kerak",
+      "en": "What the cloud runs for you, where storing data is cheaper, and why a database must not face the internet"
+    },
+    "lessons": [
+      {
+        "id": "l1",
+        "title": {
+          "ru": "IaaS, PaaS и serverless",
+          "uz": "IaaS, PaaS va serverless",
+          "en": "IaaS, PaaS and serverless"
+        },
+        "blocks": [
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>«Арендовать в облаке» можно на разной глубине, и отличаются варианты одним: <b>сколько работы остаётся тебе</b>.</p><ul><li><b>IaaS</b> — арендуешь виртуальную машину. Дальше сам: ставишь ОС, обновляешь пакеты, настраиваешь бэкапы. Максимум контроля и максимум обслуживания.</li><li><b>PaaS</b> — отдаёшь код, платформа сама держит рантайм, обновления и масштаб. Ты отвечаешь за приложение и данные.</li><li><b>Serverless</b> — отдаёшь отдельную функцию. Платформа запускает её на время выполнения и гасит. Платишь за миллисекунды работы, простой стоит ноль.</li><li><b>Управляемые сервисы</b> — та же логика для баз, очередей и кешей: managed PostgreSQL вместо своего PostgreSQL на виртуалке.</li></ul><p>Дороже за единицу ресурса — но дешевле по людям. Один инженер вместо трёх часто перевешивает разницу в счёте.</p>",
+              "uz": "<p>«Bulutda ijaraga olish» ni turli chuqurlikda qilish mumkin va variantlar bittasi bilan farq qiladi: <b>sizga qancha ish qoladi</b>.</p><ul><li><b>IaaS</b> — virtual mashina ijaraga olasiz. Keyingisi o'zingizdan: OS o'rnatasiz, paketlarni yangilaysiz, zaxira nusxalarni sozlaysiz. Maksimal nazorat va maksimal xizmat ko'rsatish.</li><li><b>PaaS</b> — kodni berasiz, platforma runtime, yangilanishlar va masshtabni o'zi ushlaydi. Siz ilova va ma'lumot uchun javob berasiz.</li><li><b>Serverless</b> — alohida funksiyani berasiz. Platforma uni bajarilish vaqtiga ishga tushirib, o'chiradi. Ish millisekundlari uchun to'laysiz, bo'sh turish nol turadi.</li><li><b>Boshqariladigan xizmatlar</b> — bazalar, navbatlar va keshlar uchun xuddi shu mantiq: virtualkadagi o'z PostgreSQL o'rniga managed PostgreSQL.</li></ul><p>Resurs birligi uchun qimmatroq — lekin odamlar bo'yicha arzonroq. Uchta o'rniga bitta muhandis ko'pincha hisobdagi farqni bosib ketadi.</p>",
+              "en": "<p>\"Renting in the cloud\" comes at different depths, and the options differ in one thing: <b>how much work is left to you</b>.</p><ul><li><b>IaaS</b> — you rent a virtual machine. The rest is yours: install the OS, patch packages, configure backups. Maximum control, maximum maintenance.</li><li><b>PaaS</b> — you hand over the code and the platform keeps the runtime, updates and scaling. You are responsible for the application and the data.</li><li><b>Serverless</b> — you hand over a single function. The platform starts it for the duration of the call and shuts it down. You pay for milliseconds of work; idling costs zero.</li><li><b>Managed services</b> — the same logic for databases, queues and caches: managed PostgreSQL instead of your own PostgreSQL on a VM.</li></ul><p>More expensive per unit of resource — but cheaper in people. One engineer instead of three often outweighs the difference on the bill.</p>"
+            }
+          },
+          {
+            "type": "run",
+            "code": "models = {\n    \"своё железо\": [\"сеть\", \"серверы\", \"ОС\", \"рантайм\", \"приложение\", \"данные\"],\n    \"IaaS\": [\"ОС\", \"рантайм\", \"приложение\", \"данные\"],\n    \"PaaS\": [\"приложение\", \"данные\"],\n    \"serverless\": [\"код функции\", \"данные\"],\n}\n\nfor name, mine in models.items():\n    print(f\"{name:>12}: {len(mine)} зон -> {', '.join(mine)}\")"
+          },
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>У serverless есть особенность, которая ломает планы новичкам, — <b>холодный старт</b>. Если функцию давно не вызывали, платформа поднимает контейнер с нуля: распаковывает образ, запускает рантайм, импортирует зависимости. Это сотни миллисекунд, иногда секунды.</p><p>Следующие вызовы попадают в уже прогретый контейнер и отвечают быстро. Поэтому средняя задержка сильно зависит от того, как часто функцию дёргают.</p>",
+              "uz": "<p>Serverless da yangi boshlovchilarning rejasini buzadigan xususiyat bor — <b>sovuq start</b>. Agar funksiya uzoq vaqt chaqirilmagan bo'lsa, platforma konteynerni noldan ko'taradi: obrazni ochadi, runtime ni ishga tushiradi, bog'liqliklarni import qiladi. Bu yuzlab millisekund, ba'zan soniyalar.</p><p>Keyingi chaqiruvlar allaqachon isitilgan konteynerga tushadi va tez javob beradi. Shuning uchun o'rtacha kechikish funksiya qanchalik tez-tez chaqirilishiga kuchli bog'liq.</p>",
+              "en": "<p>Serverless has one quirk that upsets newcomers' plans — the <b>cold start</b>. If a function has not been called for a while, the platform brings a container up from scratch: unpacks the image, starts the runtime, imports dependencies. That is hundreds of milliseconds, sometimes seconds.</p><p>Subsequent calls land in an already warm container and answer fast. So the average latency depends heavily on how often the function is invoked.</p>"
+            }
+          },
+          {
+            "type": "run",
+            "code": "COLD_START_MS = 800\nWARM_MS = 40\n\nfor calls in [1, 10, 100, 1000]:\n    total = COLD_START_MS + (calls - 1) * WARM_MS\n    print(f\"{calls:>5} вызовов -> {total:>6} мс всего, в среднем {total / calls:>6.1f} мс\")"
+          },
+          {
+            "type": "checkpoint",
+            "q": {
+              "ru": "Функцию вызывают раз в час, и каждый вызов должен отвечать быстрее 200 мс. Подходит ли serverless?",
+              "uz": "Funksiya soatiga bir marta chaqiriladi va har bir chaqiruv 200 ms dan tez javob berishi kerak. Serverless to'g'ri keladimi?",
+              "en": "A function is called once an hour and every call must answer within 200 ms. Is serverless a fit?"
+            },
+            "options": [
+              { "ru": "Да, serverless всегда быстрее виртуалки", "uz": "Ha, serverless doim virtualkadan tez", "en": "Yes, serverless is always faster than a VM" },
+              { "ru": "Нет: между вызовами контейнер погаснет, и каждый раз будет холодный старт", "uz": "Yo'q: chaqiruvlar orasida konteyner o'chadi va har safar sovuq start bo'ladi", "en": "No: between calls the container shuts down, so every call pays a cold start" },
+              { "ru": "Да, если увеличить память функции", "uz": "Ha, funksiya xotirasini oshirsak", "en": "Yes, if you raise the function's memory" },
+              { "ru": "Разницы нет, холодный старт бывает и на виртуалке", "uz": "Farqi yo'q, sovuq start virtualkada ham bo'ladi", "en": "No difference, a VM has cold starts too" }
+            ],
+            "a": 1,
+            "explain": {
+              "ru": "Редкие вызовы — худший сценарий для serverless: греть нечего, и каждый раз платишь полный холодный старт. При жёстком требовании к задержке берут либо постоянно тёплый экземпляр (это уже платная опция), либо обычный сервис на PaaS.",
+              "uz": "Kam chaqiruv — serverless uchun eng yomon stsenariy: isitadigan narsa yo'q va har safar to'liq sovuq start to'laysiz. Kechikishga qattiq talab bo'lsa, yo doim iliq nusxa olishadi (bu allaqachon pullik variant), yo PaaS dagi oddiy xizmat.",
+              "en": "Rare calls are the worst case for serverless: there is nothing to keep warm, so you pay a full cold start every time. Under a hard latency requirement you either keep an always-warm instance (already a paid option) or run an ordinary service on PaaS."
+            }
+          }
+        ]
+      },
+      {
+        "id": "l2",
+        "title": {
+          "ru": "Хранилища и классы хранения",
+          "uz": "Saqlagichlar va saqlash sinflari",
+          "en": "Storage and storage classes"
+        },
+        "blocks": [
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>Хранилищ в облаке три вида, и путать их дорого.</p><ul><li><b>Блочное</b> — виртуальный диск, который подключают к одной машине. Быстрое, но привязано к машине и оплачивается за выделенный объём, даже пустой.</li><li><b>Файловое</b> — сетевая папка, которую монтируют сразу несколько машин. Удобно для общих файлов, дороже блочного.</li><li><b>Объектное</b> — S3 и его аналоги: кладёшь файл по ключу и забираешь по HTTP. Практически бесконечное, самое дешёвое за гигабайт, но это не файловая система: кусок файла не поменять, только перезаписать целиком.</li></ul><p>Логи, бэкапы, картинки, выгрузки, данные для аналитики — почти всегда объектное хранилище. Именно там лежат те самые колоночные файлы из bd-02.</p><p>Внутри объектного хранилища есть <b>классы хранения</b>. Чем реже нужен доступ, тем дешевле гигабайт — но тем дороже и медленнее чтение. Горячий класс отдаёт файл мгновенно; архивный может «доставать» его минуты или часы и берёт отдельную плату за извлечение.</p>",
+              "uz": "<p>Bulutda saqlagichlar uch xil va ularni adashtirish qimmatga tushadi.</p><ul><li><b>Blokli</b> — bitta mashinaga ulanadigan virtual disk. Tez, lekin mashinaga bog'langan va ajratilgan hajm uchun, hatto bo'sh bo'lsa ham, to'lanadi.</li><li><b>Fayl</b> — bir necha mashina birdaniga monтlaydigan tarmoq papkasi. Umumiy fayllar uchun qulay, bloklidan qimmat.</li><li><b>Obyektli</b> — S3 va uning analoglari: faylni kalit bo'yicha qo'yasiz va HTTP orqali olasiz. Deyarli cheksiz, gigabayt uchun eng arzon, lekin bu fayl tizimi emas: faylning bir bo'lagini o'zgartirib bo'lmaydi, faqat butunlay qayta yozish mumkin.</li></ul><p>Loglar, zaxira nusxalar, rasmlar, yuklamalar, tahlil uchun ma'lumot — deyarli doim obyektli saqlagich. bd-02 dagi o'sha ustunli fayllar aynan shu yerda yotadi.</p><p>Obyektli saqlagich ichida <b>saqlash sinflari</b> bor. Kirish qanchalik kam kerak bo'lsa, gigabayt shunchalik arzon — lekin o'qish shunchalik qimmat va sekin. Issiq sinf faylni bir zumda beradi; arxiv sinfi uni daqiqalar yoki soatlab «olib chiqishi» va chiqarish uchun alohida haq olishi mumkin.</p>",
+              "en": "<p>There are three kinds of cloud storage, and confusing them is expensive.</p><ul><li><b>Block</b> — a virtual disk attached to one machine. Fast, but tied to that machine and billed for the allocated size even when empty.</li><li><b>File</b> — a network folder several machines mount at once. Convenient for shared files, pricier than block.</li><li><b>Object</b> — S3 and its equivalents: you put a file under a key and fetch it over HTTP. Practically infinite, the cheapest per gigabyte, but it is not a filesystem: you cannot change part of a file, only rewrite it whole.</li></ul><p>Logs, backups, images, exports, analytics data — almost always object storage. That is exactly where the columnar files from bd-02 live.</p><p>Inside object storage there are <b>storage classes</b>. The rarer the access, the cheaper the gigabyte — but the pricier and slower the read. The hot class hands the file over instantly; the archive class may take minutes or hours to \"retrieve\" it and charges a separate retrieval fee.</p>"
+            }
+          },
+          {
+            "type": "run",
+            "code": "prices = {\"hot\": 0.02, \"cold\": 0.01, \"archive\": 0.004}   # $ за ГБ в месяц\n\nobjects = [\n    (\"свежие логи\", 100, 5),\n    (\"отчёты квартала\", 50, 40),\n    (\"архив за 2023\", 2000, 400),\n]\n\ndef storage_class(age_days):\n    if age_days < 30:\n        return \"hot\"\n    if age_days < 90:\n        return \"cold\"\n    return \"archive\"\n\ntotal = 0.0\nfor name, size_gb, age in objects:\n    cls = storage_class(age)\n    cost = size_gb * prices[cls]\n    total += cost\n    print(f\"{name:>16}: {size_gb:>5} ГБ, {age:>3} дн -> {cls:>7} = ${cost:.2f}\")\n\nprint(f\"{'итого в месяц':>16}: ${total:.2f}\")"
+          },
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>Перекладывать файлы между классами руками никто не будет. Для этого задают <b>политику жизненного цикла</b>: «через 30 дней в холодный, через 90 в архив, через 3 года удалить». Дальше облако делает это само.</p><p>И отдельная строка счёта, которая удивляет чаще всего — <b>исходящий трафик</b>. Загрузка данных в облако обычно бесплатна, хранение стоит копейки за гигабайт, а вот отдача данных наружу — в интернет или в другой регион — тарифицируется отдельно и в разы дороже хранения.</p><p>Практический вывод: держи вычисления там же, где данные. Аналитика, которая каждую ночь выкачивает терабайт из облака к себе, платит не за хранение, а за трафик — и это будет самая большая цифра в счёте.</p>",
+              "uz": "<p>Fayllarni sinflar orasida qo'lda ko'chirish bilan hech kim shug'ullanmaydi. Buning uchun <b>hayot sikli siyosati</b> beriladi: «30 kundan keyin sovuqqa, 90 kundan keyin arxivga, 3 yildan keyin o'chirish». Keyin bulut buni o'zi qiladi.</p><p>Va eng ko'p hayratlantiradigan alohida hisob qatori — <b>chiquvchi trafik</b>. Ma'lumotni bulutga yuklash odatda bepul, saqlash gigabayt uchun tiyin turadi, ma'lumotni tashqariga — internetga yoki boshqa regionga — berish esa alohida tariflanadi va saqlashdan bir necha barobar qimmat.</p><p>Amaliy xulosa: hisoblashni ma'lumot turgan joyda saqlang. Har kecha bulutdan terabaytni o'ziga tortadigan tahlil saqlash uchun emas, trafik uchun to'laydi — va bu hisobdagi eng katta raqam bo'ladi.</p>",
+              "en": "<p>Nobody moves files between classes by hand. For that you set a <b>lifecycle policy</b>: \"after 30 days to cold, after 90 to archive, after 3 years delete\". The cloud then does it itself.</p><p>And the single line on the bill that surprises people most — <b>egress traffic</b>. Uploading data into the cloud is usually free, storing it costs pennies per gigabyte, but sending data out — to the internet or to another region — is billed separately and costs several times more than storage.</p><p>The practical takeaway: keep the compute where the data is. An analytics job that pulls a terabyte out of the cloud every night is not paying for storage, it is paying for traffic — and that will be the biggest figure on the bill.</p>"
+            }
+          },
+          {
+            "type": "predict",
+            "lang": "python",
+            "code": "storage_per_gb = 0.02      # хранение, $ за ГБ в месяц\negress_per_gb = 0.09       # исходящий трафик, $ за ГБ\n\nsize_gb = 1000\nprint(round(size_gb * storage_per_gb, 2), round(size_gb * egress_per_gb, 2))",
+            "options": [
+              { "ru": "20.0 20.0", "uz": "20.0 20.0", "en": "20.0 20.0" },
+              { "ru": "20.0 90.0", "uz": "20.0 90.0", "en": "20.0 90.0" },
+              { "ru": "0.02 0.09", "uz": "0.02 0.09", "en": "0.02 0.09" },
+              { "ru": "2.0 9.0", "uz": "2.0 9.0", "en": "2.0 9.0" }
+            ],
+            "a": 1,
+            "explain": {
+              "ru": "Хранить терабайт целый месяц — 20 долларов. Один раз выкачать его наружу — 90. Скачать данные дороже, чем хранить их четыре месяца; отсюда и правило «вычисления едут к данным, а не наоборот».",
+              "uz": "Terabaytni butun oy saqlash — 20 dollar. Uni bir marta tashqariga chiqarish — 90. Ma'lumotni yuklab olish uni to'rt oy saqlashdan qimmat; «hisoblash ma'lumotga boradi, aksincha emas» qoidasi shundan.",
+              "en": "Storing a terabyte for a whole month costs 20 dollars. Pulling it out once costs 90. Downloading the data is dearer than storing it for four months; hence the rule \"compute travels to the data, not the other way around\"."
+            }
+          }
+        ]
+      },
+      {
+        "id": "l3",
+        "title": {
+          "ru": "Сеть: что видно из интернета",
+          "uz": "Tarmoq: internetdan nima ko'rinadi",
+          "en": "Networking: what the internet can see"
+        },
+        "blocks": [
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>Все арендованные машины живут внутри <b>виртуальной сети</b> (VPC) — изолированного куска адресного пространства, который принадлежит только тебе. Внутри сети машины видят друг друга; снаружи не видно ничего, пока ты явно не откроешь.</p><p>Сеть делят на подсети:</p><ul><li><b>Публичная</b> — у машин есть внешний адрес, к ним можно обратиться из интернета. Сюда ставят балансировщик и веб-серверы.</li><li><b>Приватная</b> — внешнего адреса нет. Сюда ставят базы, кеши, очереди и всё, к чему обращается только твоё же приложение.</li></ul><p>Правило, которое стоит запомнить раз и навсегда: <b>база данных не должна быть доступна из интернета</b>. Ей нужен ровно один вход — из приватной подсети от приложения. Открытая наружу база с паролем — это вопрос времени, а не вероятности: сканеры находят её за часы.</p>",
+              "uz": "<p>Barcha ijaraga olingan mashinalar <b>virtual tarmoq</b> (VPC) ichida yashaydi — bu faqat sizga tegishli izolyatsiyalangan manzil fazosi bo'lagi. Tarmoq ichida mashinalar bir-birini ko'radi; tashqaridan siz aniq ochmaguningizcha hech nima ko'rinmaydi.</p><p>Tarmoq quyi tarmoqlarga bo'linadi:</p><ul><li><b>Ochiq</b> — mashinalarda tashqi manzil bor, ularga internetdan murojaat qilish mumkin. Bu yerga balansirovchi va veb-serverlar qo'yiladi.</li><li><b>Yopiq</b> — tashqi manzil yo'q. Bu yerga bazalar, keshlar, navbatlar va faqat sizning ilovangiz murojaat qiladigan hamma narsa qo'yiladi.</li></ul><p>Bir umrga eslab qolishga arziydigan qoida: <b>ma'lumotlar bazasi internetdan ochiq bo'lmasligi kerak</b>. Unga aynan bitta kirish kerak — yopiq quyi tarmoqdan ilovadan. Parol bilan tashqariga ochilgan baza — bu ehtimollik emas, vaqt masalasi: skanerlar uni soatlar ichida topadi.</p>",
+              "en": "<p>Every rented machine lives inside a <b>virtual network</b> (VPC) — an isolated slice of address space that belongs only to you. Inside the network the machines see each other; from outside nothing is visible until you explicitly open it.</p><p>The network is split into subnets:</p><ul><li><b>Public</b> — the machines have an external address and can be reached from the internet. This is where the load balancer and web servers go.</li><li><b>Private</b> — no external address. This is where databases, caches, queues and everything only your own application talks to belong.</li></ul><p>A rule worth memorizing once and for all: <b>a database must not be reachable from the internet</b>. It needs exactly one entrance — from the private subnet, from the application. A database exposed to the world behind a password is a matter of time, not probability: scanners find it within hours.</p>"
+            }
+          },
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>Кому именно можно стучаться и на какой порт, описывают <b>группы безопасности</b> — по сути правила файрвола перед машиной. Логика у них одна и та же почти во всех облаках:</p><ol><li>По умолчанию <b>всё запрещено</b>. Пустой список правил — значит не пройдёт никто.</li><li>Правило <code>allow</code> открывает конкретный порт для конкретного источника.</li><li>Правило <code>deny</code> сильнее любого <code>allow</code>: если под запрет попал, дальше можно не смотреть.</li></ol><p>Это тот же принцип наименьших привилегий, что и в правах доступа: открываем ровно то, что нужно, и ничего сверх.</p>",
+              "uz": "<p>Kim va qaysi portga murojaat qila olishini <b>xavfsizlik guruhlari</b> tasvirlaydi — bu mohiyatan mashina oldidagi fayrvol qoidalari. Ularning mantig'i deyarli barcha bulutlarda bir xil:</p><ol><li>Standart holda <b>hamma narsa taqiqlangan</b>. Bo'sh qoidalar ro'yxati — demak hech kim o'tmaydi.</li><li><code>allow</code> qoidasi aniq manba uchun aniq portni ochadi.</li><li><code>deny</code> qoidasi har qanday <code>allow</code> dan kuchli: taqiqqa tushdingizmi, keyingisiga qaramasa ham bo'ladi.</li></ol><p>Bu kirish huquqlaridagi kabi eng kam imtiyoz tamoyilining o'zi: aynan kerak bo'lganini ochamiz, ortiqchasini emas.</p>",
+              "en": "<p>Exactly who may knock and on which port is described by <b>security groups</b> — essentially firewall rules in front of a machine. Their logic is the same in almost every cloud:</p><ol><li>By default <b>everything is denied</b>. An empty rule list means nobody gets through.</li><li>An <code>allow</code> rule opens a specific port for a specific source.</li><li>A <code>deny</code> rule beats any <code>allow</code>: once something is denied, there is no need to look further.</li></ol><p>This is the same principle of least privilege as in access rights: open exactly what is needed and nothing beyond.</p>"
+            }
+          },
+          {
+            "type": "run",
+            "code": "rules = [\n    {\"action\": \"allow\", \"port\": 443, \"source\": \"*\"},\n    {\"action\": \"allow\", \"port\": 22, \"source\": \"10.0.0.5\"},\n    {\"action\": \"deny\", \"port\": 22, \"source\": \"10.0.0.99\"},\n]\n\ndef matches(rule, packet):\n    port_ok = rule[\"port\"] == \"*\" or rule[\"port\"] == packet[\"port\"]\n    src_ok = rule[\"source\"] == \"*\" or rule[\"source\"] == packet[\"source\"]\n    return port_ok and src_ok\n\ndef allowed(rules, packet):\n    hits = [r for r in rules if matches(r, packet)]\n    if any(r[\"action\"] == \"deny\" for r in hits):\n        return False\n    return any(r[\"action\"] == \"allow\" for r in hits)\n\nfor packet in [\n    {\"port\": 443, \"source\": \"1.2.3.4\"},\n    {\"port\": 22, \"source\": \"10.0.0.5\"},\n    {\"port\": 22, \"source\": \"10.0.0.99\"},\n    {\"port\": 5432, \"source\": \"1.2.3.4\"},\n]:\n    print(packet, \"->\", \"разрешено\" if allowed(rules, packet) else \"запрещено\")"
+          },
+          {
+            "type": "note",
+            "kind": "trap",
+            "html": {
+              "ru": "Правило <code>allow</code> на порт <code>22</code> с источником <code>*</code> открывает SSH всему интернету. Это самая частая находка при аудите облачных аккаунтов — и самая дорогая: боты перебирают пароли круглосуточно, а найденная машина за час становится майнером или частью ботнета. То же касается портов баз (<code>5432</code>, <code>3306</code>, <code>6379</code>, <code>27017</code>): их источником никогда не должна быть звёздочка.",
+              "uz": "<code>22</code> portga <code>*</code> manba bilan <code>allow</code> qoidasi SSH ni butun internetga ochadi. Bu bulut akkauntlarini auditda eng ko'p uchraydigan topilma — va eng qimmati: botlar kechayu kunduz parol tanlaydi, topilgan mashina esa bir soatda mayner yoki botnet bo'lagiga aylanadi. Baza portlariga ham shu tegishli (<code>5432</code>, <code>3306</code>, <code>6379</code>, <code>27017</code>): ularning manbasi hech qachon yulduzcha bo'lmasligi kerak.",
+              "en": "An <code>allow</code> rule on port <code>22</code> with source <code>*</code> opens SSH to the entire internet. It is the most common finding in cloud account audits — and the costliest: bots guess passwords round the clock, and a discovered machine becomes a miner or a botnet node within the hour. The same goes for database ports (<code>5432</code>, <code>3306</code>, <code>6379</code>, <code>27017</code>): their source must never be an asterisk."
+            }
+          },
+          {
+            "type": "summary",
+            "items": [
+              { "ru": "IaaS → PaaS → serverless: чем выше, тем меньше своей эксплуатации", "uz": "IaaS → PaaS → serverless: qanchalik yuqori bo'lsa, o'z ekspluatatsiyasi shunchalik kam", "en": "IaaS → PaaS → serverless: the higher you go, the less you operate yourself" },
+              { "ru": "Serverless платит за миллисекунды, но платит и холодным стартом", "uz": "Serverless millisekundlar uchun to'laydi, lekin sovuq start bilan ham to'laydi", "en": "Serverless pays by the millisecond, but also pays in cold starts" },
+              { "ru": "Объектное хранилище — дефолт для логов, бэкапов и аналитики", "uz": "Obyektli saqlagich — loglar, zaxiralar va tahlil uchun standart", "en": "Object storage is the default for logs, backups and analytics" },
+              { "ru": "Классы хранения и политика жизненного цикла режут счёт в разы", "uz": "Saqlash sinflari va hayot sikli siyosati hisobni bir necha barobar kamaytiradi", "en": "Storage classes and a lifecycle policy cut the bill several times over" },
+              { "ru": "Исходящий трафик дороже хранения — держи вычисления рядом с данными", "uz": "Chiquvchi trafik saqlashdan qimmat — hisoblashni ma'lumot yonida saqlang", "en": "Egress costs more than storage — keep compute next to the data" },
+              { "ru": "База живёт в приватной подсети и не имеет внешнего адреса", "uz": "Baza yopiq quyi tarmoqda yashaydi va tashqi manzilga ega emas", "en": "A database lives in a private subnet and has no external address" },
+              { "ru": "Группа безопасности: по умолчанию запрещено, deny сильнее allow", "uz": "Xavfsizlik guruhi: standart holda taqiqlangan, deny allow dan kuchli", "en": "A security group: deny by default, and deny beats allow" }
+            ]
+          }
+        ]
+      }
+    ],
+    "quiz": [
+      {
+        "q": {
+          "ru": "За что платишь в serverless?",
+          "uz": "Serverless da nima uchun to'laysiz?",
+          "en": "What do you pay for in serverless?"
+        },
+        "options": [
+          { "ru": "За арендованную машину круглосуточно", "uz": "Kecha-yu kunduz ijaraga olingan mashina uchun", "en": "For a rented machine around the clock" },
+          { "ru": "За фактическое время выполнения функции и число вызовов", "uz": "Funksiyaning haqiqiy bajarilish vaqti va chaqiruvlar soni uchun", "en": "For the function's actual execution time and the number of calls" },
+          { "ru": "За объём диска", "uz": "Disk hajmi uchun", "en": "For disk volume" },
+          { "ru": "Фиксированную плату в месяц", "uz": "Oyiga qat'iy haq", "en": "A fixed monthly fee" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Простой стоит ноль — в этом весь смысл модели. Обратная сторона: при постоянной высокой нагрузке serverless может выйти дороже обычной виртуалки, поэтому счёт всё равно надо считать.",
+          "uz": "Bo'sh turish nol turadi — modelning butun ma'nosi shunda. Teskari tomoni: doimiy yuqori yuklamada serverless oddiy virtualkadan qimmatga tushishi mumkin, shuning uchun hisobni baribir hisoblash kerak.",
+          "en": "Idling costs zero — that is the entire point of the model. The flip side: under constant heavy load serverless can end up dearer than a plain VM, so you still have to do the math."
+        }
+      },
+      {
+        "q": {
+          "ru": "Что такое холодный старт?",
+          "uz": "Sovuq start nima?",
+          "en": "What is a cold start?"
+        },
+        "options": [
+          { "ru": "Первый запуск сервера после установки ОС", "uz": "OS o'rnatilgandan keyingi birinchi ishga tushirish", "en": "The first boot of a server after installing the OS" },
+          { "ru": "Задержка на подъём контейнера, когда функцию давно не вызывали", "uz": "Funksiya uzoq chaqirilmaganda konteynerni ko'tarish kechikishi", "en": "The delay to bring up a container when the function hasn't been called for a while" },
+          { "ru": "Сбой при масштабировании", "uz": "Masshtablashdagi nosozlik", "en": "A failure during scaling" },
+          { "ru": "Перезапуск после обновления", "uz": "Yangilanishdan keyingi qayta ishga tushirish", "en": "A restart after an update" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Платформа гасит неиспользуемые контейнеры, чтобы не тратить ресурсы. Следующий вызов поднимает всё заново — распаковка образа, запуск рантайма, импорты. Это сотни миллисекунд поверх обычного времени ответа.",
+          "uz": "Platforma resurs sarflamaslik uchun ishlatilmayotgan konteynerlarni o'chiradi. Keyingi chaqiruv hammasini qaytadan ko'taradi — obrazni ochish, runtime ni ishga tushirish, importlar. Bu odatiy javob vaqti ustiga yuzlab millisekund.",
+          "en": "The platform shuts down unused containers so as not to waste resources. The next call brings everything up again — unpacking the image, starting the runtime, imports. That's hundreds of milliseconds on top of the normal response time."
+        }
+      },
+      {
+        "q": {
+          "ru": "Куда класть логи и бэкапы?",
+          "uz": "Loglar va zaxira nusxalarni qayerga qo'yish kerak?",
+          "en": "Where should logs and backups go?"
+        },
+        "options": [
+          { "ru": "В блочный диск виртуалки", "uz": "Virtualkaning blokli diskiga", "en": "On the VM's block disk" },
+          { "ru": "В объектное хранилище — оно дешевле всех за гигабайт и практически бесконечно", "uz": "Obyektli saqlagichga — u gigabayt uchun eng arzon va deyarli cheksiz", "en": "In object storage — cheapest per gigabyte and practically infinite" },
+          { "ru": "В оперативную память", "uz": "Operativ xotiraga", "en": "In RAM" },
+          { "ru": "В базу данных", "uz": "Ma'lumotlar bazasiga", "en": "In the database" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Блочный диск оплачивается за выделенный объём и умирает вместе с машиной. Объектное хранилище растёт само, платится по факту и переживает любую виртуалку.",
+          "uz": "Blokli disk ajratilgan hajm uchun to'lanadi va mashina bilan birga o'ladi. Obyektli saqlagich o'zi o'sadi, fakt bo'yicha to'lanadi va istalgan virtualkadan uzoq yashaydi.",
+          "en": "A block disk is billed for the allocated size and dies with the machine. Object storage grows on its own, is billed for what you use, and outlives any VM."
+        }
+      },
+      {
+        "q": {
+          "ru": "Что делает политика жизненного цикла в объектном хранилище?",
+          "uz": "Obyektli saqlagichda hayot sikli siyosati nima qiladi?",
+          "en": "What does a lifecycle policy do in object storage?"
+        },
+        "options": [
+          { "ru": "Шифрует файлы", "uz": "Fayllarni shifrlaydi", "en": "Encrypts the files" },
+          { "ru": "Сама переводит объекты в более дешёвые классы по возрасту и удаляет старьё", "uz": "Obyektlarni yoshiga qarab arzonroq sinflarga o'zi o'tkazadi va eskilarini o'chiradi", "en": "Moves objects to cheaper classes by age on its own and deletes the old ones" },
+          { "ru": "Делает резервные копии", "uz": "Zaxira nusxalar yaratadi", "en": "Makes backups" },
+          { "ru": "Ускоряет чтение файлов", "uz": "Fayllarni o'qishni tezlashtiradi", "en": "Speeds up file reads" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Правило вида «30 дней горячий, 90 холодный, потом архив» задают один раз, и оно работает без участия человека. Это самый простой способ сократить счёт за хранение в несколько раз.",
+          "uz": "«30 kun issiq, 90 kun sovuq, keyin arxiv» ko'rinishidagi qoida bir marta beriladi va odam ishtirokisiz ishlaydi. Bu saqlash hisobini bir necha barobar kamaytirishning eng oddiy yo'li.",
+          "en": "A rule like \"30 days hot, 90 cold, then archive\" is set once and works without human involvement. It is the simplest way to cut the storage bill several times over."
+        }
+      },
+      {
+        "q": {
+          "ru": "Какая строка счёта обычно оказывается неожиданно большой?",
+          "uz": "Hisobning qaysi qatori odatda kutilmaganda katta chiqadi?",
+          "en": "Which line on the bill is usually unexpectedly large?"
+        },
+        "options": [
+          { "ru": "Загрузка данных в облако", "uz": "Ma'lumotni bulutga yuklash", "en": "Uploading data into the cloud" },
+          { "ru": "Исходящий трафик — отдача данных наружу", "uz": "Chiquvchi trafik — ma'lumotni tashqariga berish", "en": "Egress traffic — sending data out" },
+          { "ru": "Создание виртуальной сети", "uz": "Virtual tarmoq yaratish", "en": "Creating a virtual network" },
+          { "ru": "Хранение метаданных", "uz": "Metama'lumotlarni saqlash", "en": "Storing metadata" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Входящий трафик обычно бесплатный, исходящий — нет. Терабайт хранения в месяц может стоить 20 долларов, а один его вывоз наружу — 90. Поэтому вычисления держат рядом с данными.",
+          "uz": "Kiruvchi trafik odatda bepul, chiquvchisi — yo'q. Oyiga terabayt saqlash 20 dollar turishi mumkin, uni bir marta tashqariga chiqarish esa — 90. Shuning uchun hisoblash ma'lumot yonida saqlanadi.",
+          "en": "Ingress is normally free, egress is not. A terabyte of storage per month may cost 20 dollars while one export of it costs 90. That is why compute is kept next to the data."
+        }
+      },
+      {
+        "q": {
+          "ru": "В группе безопасности нет ни одного правила. Кто сможет подключиться?",
+          "uz": "Xavfsizlik guruhida birorta qoida yo'q. Kim ulana oladi?",
+          "en": "A security group has no rules at all. Who can connect?"
+        },
+        "options": [
+          { "ru": "Никто — по умолчанию запрещено всё", "uz": "Hech kim — standart holda hammasi taqiqlangan", "en": "Nobody — everything is denied by default" },
+          { "ru": "Все — раз запретов нет", "uz": "Hamma — taqiq yo'q ekan", "en": "Everyone — since there are no denials" },
+          { "ru": "Только машины из той же подсети", "uz": "Faqat o'sha quyi tarmoqdagi mashinalar", "en": "Only machines from the same subnet" },
+          { "ru": "Только администратор облака", "uz": "Faqat bulut administratori", "en": "Only the cloud administrator" }
+        ],
+        "a": 0,
+        "explain": {
+          "ru": "Группы безопасности работают по принципу «запрещено всё, кроме явно разрешённого». Пустой список — это глухая стена, и это правильное поведение по умолчанию: забыть добавить правило безопаснее, чем забыть убрать.",
+          "uz": "Xavfsizlik guruhlari «aniq ruxsat berilganidan boshqasi taqiqlangan» tamoyili bo'yicha ishlaydi. Bo'sh ro'yxat — bu qalin devor va bu to'g'ri standart xatti-harakat: qoida qo'shishni unutish uni olib tashlashni unutishdan xavfsizroq.",
+          "en": "Security groups work on \"everything denied except what is explicitly allowed\". An empty list is a solid wall, and that is the right default: forgetting to add a rule is safer than forgetting to remove one."
+        }
+      }
+    ],
+    "tasks": [
+      {
+        "id": "t1",
+        "kind": "python",
+        "title": {
+          "ru": "Счёт за serverless",
+          "uz": "Serverless uchun hisob",
+          "en": "The serverless bill"
+        },
+        "brief": {
+          "ru": "Посчитай стоимость функции за месяц",
+          "uz": "Funksiyaning oylik narxini hisoblang",
+          "en": "Compute a function's monthly cost"
+        },
+        "desc": {
+          "ru": "Напиши функцию <code>serverless_cost(requests, avg_ms, memory_mb, price_gb_s, price_million)</code>.<br><br>Считается так: сначала <b>гигабайт-секунды</b> — <code>requests × (avg_ms / 1000) × (memory_mb / 1024)</code>. Их умножают на <code>price_gb_s</code>. К этому прибавляют плату за вызовы: <code>requests / 1_000_000 × price_million</code>.<br><br>Верни итог, округлённый до двух знаков функцией <code>round</code>.",
+          "uz": "<code>serverless_cost(requests, avg_ms, memory_mb, price_gb_s, price_million)</code> funksiyasini yozing.<br><br>Shunday hisoblanadi: avval <b>gigabayt-soniyalar</b> — <code>requests × (avg_ms / 1000) × (memory_mb / 1024)</code>. Ular <code>price_gb_s</code> ga ko'paytiriladi. Bunga chaqiruvlar uchun haq qo'shiladi: <code>requests / 1_000_000 × price_million</code>.<br><br>Natijani <code>round</code> bilan ikki xonagacha yaxlitlab qaytaring.",
+          "en": "Write a function <code>serverless_cost(requests, avg_ms, memory_mb, price_gb_s, price_million)</code>.<br><br>It works like this: first the <b>gigabyte-seconds</b> — <code>requests × (avg_ms / 1000) × (memory_mb / 1024)</code>. Multiply them by <code>price_gb_s</code>. Then add the invocation fee: <code>requests / 1_000_000 × price_million</code>.<br><br>Return the total, rounded to two decimals with <code>round</code>."
+        },
+        "starter": "def serverless_cost(requests, avg_ms, memory_mb, price_gb_s, price_million):\n    # гигабайт-секунды плюс плата за вызовы\n    ...\n",
+        "tests": "assert serverless_cost(1_000_000, 200, 512, 0.00002, 0.20) == 2.2\nassert serverless_cost(0, 200, 512, 0.00002, 0.20) == 0.0\nassert serverless_cost(2_000_000, 100, 1024, 0.00002, 0.20) == 4.4\nassert serverless_cost(1_000_000, 500, 1024, 0.00002, 0.20) == 10.2\nassert serverless_cost(250_000, 400, 256, 0.00002, 0.40) == 0.6\nassert serverless_cost(1_000_000, 200, 512, 0.0, 0.0) == 0.0\n",
+        "hint": {
+          "ru": "Пиши по шагам, а не одной формулой: <code>seconds = avg_ms / 1000</code>, <code>gb = memory_mb / 1024</code>, <code>gb_seconds = requests * seconds * gb</code>. Потом <code>gb_seconds * price_gb_s + requests / 1_000_000 * price_million</code> и <code>round(..., 2)</code> в самом конце.",
+          "uz": "Bitta formula bilan emas, qadamma-qadam yozing: <code>seconds = avg_ms / 1000</code>, <code>gb = memory_mb / 1024</code>, <code>gb_seconds = requests * seconds * gb</code>. Keyin <code>gb_seconds * price_gb_s + requests / 1_000_000 * price_million</code> va eng oxirida <code>round(..., 2)</code>.",
+          "en": "Write it step by step rather than as one formula: <code>seconds = avg_ms / 1000</code>, <code>gb = memory_mb / 1024</code>, <code>gb_seconds = requests * seconds * gb</code>. Then <code>gb_seconds * price_gb_s + requests / 1_000_000 * price_million</code> with <code>round(..., 2)</code> at the very end."
+        }
+      },
+      {
+        "id": "t2",
+        "kind": "python",
+        "title": {
+          "ru": "Жизненный цикл хранилища",
+          "uz": "Saqlagich hayot sikli",
+          "en": "Storage lifecycle"
+        },
+        "brief": {
+          "ru": "Разложи объекты по классам и посчитай счёт",
+          "uz": "Obyektlarni sinflarga ajratib, hisobni hisoblang",
+          "en": "Sort objects into classes and total the bill"
+        },
+        "desc": {
+          "ru": "Напиши функцию <code>lifecycle_cost(objects, prices, hot_days, cold_days)</code>.<br><br><code>objects</code> — список пар <code>(размер_в_ГБ, возраст_в_днях)</code>. <code>prices</code> — словарь с ключами <code>\"hot\"</code>, <code>\"cold\"</code>, <code>\"archive\"</code>: цена за гигабайт в месяц.<br><br>Класс объекта: возраст <b>меньше</b> <code>hot_days</code> → <code>\"hot\"</code>; иначе меньше <code>cold_days</code> → <code>\"cold\"</code>; иначе <code>\"archive\"</code>.<br><br>Верни словарь с теми же тремя ключами: стоимость всех объектов каждого класса, округлённая до двух знаков. Классы без объектов должны присутствовать со значением <code>0.0</code>.",
+          "uz": "<code>lifecycle_cost(objects, prices, hot_days, cold_days)</code> funksiyasini yozing.<br><br><code>objects</code> — <code>(hajm_GB_da, yosh_kunlarda)</code> juftliklari ro'yxati. <code>prices</code> — <code>\"hot\"</code>, <code>\"cold\"</code>, <code>\"archive\"</code> kalitli lug'at: oyiga gigabayt narxi.<br><br>Obyekt sinfi: yosh <code>hot_days</code> dan <b>kichik</b> → <code>\"hot\"</code>; aks holda <code>cold_days</code> dan kichik → <code>\"cold\"</code>; aks holda <code>\"archive\"</code>.<br><br>Xuddi shu uchta kalitli lug'at qaytaring: har bir sinfdagi barcha obyektlar narxi, ikki xonagacha yaxlitlangan. Obyekti yo'q sinflar <code>0.0</code> qiymat bilan bo'lishi kerak.",
+          "en": "Write a function <code>lifecycle_cost(objects, prices, hot_days, cold_days)</code>.<br><br><code>objects</code> is a list of <code>(size_in_gb, age_in_days)</code> pairs. <code>prices</code> is a dict with the keys <code>\"hot\"</code>, <code>\"cold\"</code>, <code>\"archive\"</code>: the price per gigabyte per month.<br><br>An object's class: age <b>below</b> <code>hot_days</code> → <code>\"hot\"</code>; else below <code>cold_days</code> → <code>\"cold\"</code>; else <code>\"archive\"</code>.<br><br>Return a dict with those same three keys: the cost of all objects in each class, rounded to two decimals. Classes with no objects must be present with the value <code>0.0</code>."
+        },
+        "starter": "def lifecycle_cost(objects, prices, hot_days, cold_days):\n    # класс по возрасту, потом сумма по каждому классу\n    ...\n",
+        "tests": "prices = {\"hot\": 0.02, \"cold\": 0.01, \"archive\": 0.004}\nobjects = [(100, 5), (50, 40), (200, 400)]\nassert lifecycle_cost(objects, prices, 30, 90) == {\"hot\": 2.0, \"cold\": 0.5, \"archive\": 0.8}\nassert lifecycle_cost([], prices, 30, 90) == {\"hot\": 0.0, \"cold\": 0.0, \"archive\": 0.0}\nassert lifecycle_cost([(10, 30)], prices, 30, 90) == {\"hot\": 0.0, \"cold\": 0.1, \"archive\": 0.0}\nassert lifecycle_cost([(10, 90)], prices, 30, 90) == {\"hot\": 0.0, \"cold\": 0.0, \"archive\": 0.04}\nassert lifecycle_cost([(1000, 0)], prices, 30, 90) == {\"hot\": 20.0, \"cold\": 0.0, \"archive\": 0.0}\nassert lifecycle_cost([(10, 5), (20, 5)], prices, 30, 90)[\"hot\"] == 0.6\n",
+        "hint": {
+          "ru": "Начни с <code>totals = {\"hot\": 0.0, \"cold\": 0.0, \"archive\": 0.0}</code> — так пустые классы окажутся в ответе сами. В цикле определи класс тремя ветками <code>if</code> и прибавь <code>size * prices[cls]</code>. Округляй в конце, отдельным проходом по <code>totals</code>, а не на каждом объекте.",
+          "uz": "<code>totals = {\"hot\": 0.0, \"cold\": 0.0, \"archive\": 0.0}</code> dan boshlang — shunda bo'sh sinflar javobga o'zi tushadi. Siklda sinfni uchta <code>if</code> shoxi bilan aniqlab, <code>size * prices[cls]</code> ni qo'shing. Yaxlitlashni oxirida, <code>totals</code> bo'yicha alohida o'tishda qiling, har bir obyektda emas.",
+          "en": "Start with <code>totals = {\"hot\": 0.0, \"cold\": 0.0, \"archive\": 0.0}</code> — that way empty classes appear in the answer by themselves. In the loop pick the class with three <code>if</code> branches and add <code>size * prices[cls]</code>. Round at the end in a separate pass over <code>totals</code>, not per object."
+        }
+      },
+      {
+        "id": "t3",
+        "kind": "python",
+        "title": {
+          "ru": "Группа безопасности",
+          "uz": "Xavfsizlik guruhi",
+          "en": "Security group"
+        },
+        "brief": {
+          "ru": "Пропустить пакет или отбить",
+          "uz": "Paketni o'tkazish yoki qaytarish",
+          "en": "Let the packet through or block it"
+        },
+        "desc": {
+          "ru": "Напиши функцию <code>packet_allowed(rules, packet)</code>.<br><br><code>rules</code> — список словарей с ключами <code>\"action\"</code> (<code>\"allow\"</code> или <code>\"deny\"</code>), <code>\"port\"</code> и <code>\"source\"</code>. Значение <code>\"*\"</code> в порту или источнике означает «любой». <code>packet</code> — словарь с конкретными <code>\"port\"</code> и <code>\"source\"</code>.<br><br>Правило подходит пакету, если совпал и порт, и источник (с учётом звёздочек). Решение принимается так: если среди подошедших правил есть хоть один <code>\"deny\"</code> — верни <code>False</code>. Иначе если есть хоть один <code>\"allow\"</code> — верни <code>True</code>. Если не подошло ничего — <code>False</code>: по умолчанию запрещено.",
+          "uz": "<code>packet_allowed(rules, packet)</code> funksiyasini yozing.<br><br><code>rules</code> — <code>\"action\"</code> (<code>\"allow\"</code> yoki <code>\"deny\"</code>), <code>\"port\"</code> va <code>\"source\"</code> kalitli lug'atlar ro'yxati. Port yoki manbadagi <code>\"*\"</code> qiymati «istalgan» degani. <code>packet</code> — aniq <code>\"port\"</code> va <code>\"source\"</code> li lug'at.<br><br>Qoida paketga mos keladi, agar port ham, manba ham mos kelsa (yulduzchalarni hisobga olib). Qaror shunday qabul qilinadi: mos kelgan qoidalar orasida bitta bo'lsa ham <code>\"deny\"</code> bo'lsa — <code>False</code> qaytaring. Aks holda bitta bo'lsa ham <code>\"allow\"</code> bo'lsa — <code>True</code>. Hech nima mos kelmasa — <code>False</code>: standart holda taqiqlangan.",
+          "en": "Write a function <code>packet_allowed(rules, packet)</code>.<br><br><code>rules</code> is a list of dicts with the keys <code>\"action\"</code> (<code>\"allow\"</code> or <code>\"deny\"</code>), <code>\"port\"</code> and <code>\"source\"</code>. A value of <code>\"*\"</code> in the port or source means \"any\". <code>packet</code> is a dict with a concrete <code>\"port\"</code> and <code>\"source\"</code>.<br><br>A rule matches the packet when both the port and the source match (asterisks included). The decision: if any matching rule is a <code>\"deny\"</code>, return <code>False</code>. Otherwise, if any matching rule is an <code>\"allow\"</code>, return <code>True</code>. If nothing matched, return <code>False</code>: denied by default."
+        },
+        "starter": "def packet_allowed(rules, packet):\n    # deny сильнее allow, по умолчанию запрещено\n    ...\n",
+        "tests": "rules = [\n    {\"action\": \"allow\", \"port\": 443, \"source\": \"*\"},\n    {\"action\": \"allow\", \"port\": 22, \"source\": \"10.0.0.5\"},\n    {\"action\": \"deny\", \"port\": 22, \"source\": \"10.0.0.99\"},\n]\nassert packet_allowed(rules, {\"port\": 443, \"source\": \"1.2.3.4\"}) is True\nassert packet_allowed(rules, {\"port\": 22, \"source\": \"10.0.0.5\"}) is True\nassert packet_allowed(rules, {\"port\": 22, \"source\": \"1.2.3.4\"}) is False\nassert packet_allowed(rules, {\"port\": 22, \"source\": \"10.0.0.99\"}) is False\nassert packet_allowed(rules, {\"port\": 5432, \"source\": \"10.0.0.5\"}) is False\nassert packet_allowed([], {\"port\": 443, \"source\": \"1.2.3.4\"}) is False\nopen_all = [{\"action\": \"allow\", \"port\": \"*\", \"source\": \"*\"}]\nassert packet_allowed(open_all, {\"port\": 22, \"source\": \"1.2.3.4\"}) is True\nassert packet_allowed(open_all + [{\"action\": \"deny\", \"port\": 22, \"source\": \"*\"}],\n                      {\"port\": 22, \"source\": \"1.2.3.4\"}) is False\n",
+        "hint": {
+          "ru": "Сделай маленькую вспомогательную функцию <code>matches(rule, packet)</code>: <code>(rule[\"port\"] == \"*\" or rule[\"port\"] == packet[\"port\"])</code> и то же для источника. Дальше собери подошедшие правила в список и проверь его двумя <code>any(...)</code> — сначала на <code>deny</code>, потом на <code>allow</code>. Порядок проверок и есть правило «deny сильнее».",
+          "uz": "Kichik yordamchi funksiya tuzing <code>matches(rule, packet)</code>: <code>(rule[\"port\"] == \"*\" or rule[\"port\"] == packet[\"port\"])</code> va manba uchun xuddi shunday. Keyin mos kelgan qoidalarni ro'yxatga yig'ib, uni ikkita <code>any(...)</code> bilan tekshiring — avval <code>deny</code> ga, keyin <code>allow</code> ga. Tekshiruvlar tartibi «deny kuchliroq» qoidasining o'zi.",
+          "en": "Write a small helper <code>matches(rule, packet)</code>: <code>(rule[\"port\"] == \"*\" or rule[\"port\"] == packet[\"port\"])</code> and the same for the source. Then collect the matching rules into a list and check it with two <code>any(...)</code> calls — <code>deny</code> first, <code>allow</code> second. The order of those checks is the \"deny wins\" rule."
+        }
+      }
+    ],
+    "exam": {
+      "time": 660,
+      "questions": [
+        {
+          "q": {
+            "ru": "В какой модели ты сам обновляешь операционную систему?",
+            "uz": "Qaysi modelda operatsion tizimni o'zingiz yangilaysiz?",
+            "en": "In which model do you patch the operating system yourself?"
+          },
+          "options": [
+            { "ru": "IaaS", "uz": "IaaS", "en": "IaaS" },
+            { "ru": "PaaS", "uz": "PaaS", "en": "PaaS" },
+            { "ru": "Serverless", "uz": "Serverless", "en": "Serverless" },
+            { "ru": "Управляемая база данных", "uz": "Boshqariladigan ma'lumotlar bazasi", "en": "A managed database" }
+          ],
+          "a": 0
+        },
+        {
+          "q": {
+            "ru": "Какое хранилище выбрать для терабайтов логов, которые читают редко?",
+            "uz": "Kam o'qiladigan terabaytlab loglar uchun qaysi saqlagichni tanlash kerak?",
+            "en": "Which storage suits terabytes of rarely read logs?"
+          },
+          "options": [
+            { "ru": "Объектное с политикой жизненного цикла", "uz": "Hayot sikli siyosatli obyektli", "en": "Object storage with a lifecycle policy" },
+            { "ru": "Блочный диск на виртуалке", "uz": "Virtualkadagi blokli disk", "en": "A block disk on a VM" },
+            { "ru": "Оперативную память", "uz": "Operativ xotira", "en": "RAM" },
+            { "ru": "Управляемую реляционную базу", "uz": "Boshqariladigan relyatsion baza", "en": "A managed relational database" }
+          ],
+          "a": 0
+        },
+        {
+          "q": {
+            "ru": "Хранение 1 ТБ стоит $20 в месяц, исходящий трафик — $0.09 за ГБ. Сколько будет стоить одна выгрузка этого терабайта наружу?",
+            "uz": "1 TB saqlash oyiga $20, chiquvchi trafik — GB uchun $0.09. Shu terabaytni bir marta tashqariga chiqarish qancha turadi?",
+            "en": "Storing 1 TB costs $20 a month, egress is $0.09 per GB. What does one export of that terabyte cost?"
+          },
+          "options": [
+            { "ru": "$9 — дешевле хранения", "uz": "$9 — saqlashdan arzon", "en": "$9 — cheaper than storage" },
+            { "ru": "$90 — дороже, чем хранить его четыре месяца", "uz": "$90 — uni to'rt oy saqlashdan qimmat", "en": "$90 — more than storing it for four months" },
+            { "ru": "$20, как и хранение", "uz": "$20, saqlash kabi", "en": "$20, the same as storage" },
+            { "ru": "Бесплатно", "uz": "Bepul", "en": "Free" }
+          ],
+          "a": 1
+        },
+        {
+          "q": {
+            "ru": "Где должна стоять база данных?",
+            "uz": "Ma'lumotlar bazasi qayerda turishi kerak?",
+            "en": "Where should a database sit?"
+          },
+          "options": [
+            { "ru": "В приватной подсети, без внешнего адреса", "uz": "Yopiq quyi tarmoqda, tashqi manzilsiz", "en": "In a private subnet, with no external address" },
+            { "ru": "В публичной подсети с надёжным паролем", "uz": "Ishonchli parolli ochiq quyi tarmoqda", "en": "In a public subnet behind a strong password" },
+            { "ru": "На той же машине, что и веб-сервер", "uz": "Veb-server bilan bitta mashinada", "en": "On the same machine as the web server" },
+            { "ru": "В объектном хранилище", "uz": "Obyektli saqlagichda", "en": "In object storage" }
+          ],
+          "a": 0
+        },
+        {
+          "q": {
+            "ru": "Правило <code>allow</code> порт 22, источник <code>*</code>. Чем это опасно?",
+            "uz": "<code>allow</code> qoidasi, 22-port, manba <code>*</code>. Bu nimasi bilan xavfli?",
+            "en": "An <code>allow</code> rule on port 22 with source <code>*</code>. Why is that dangerous?"
+          },
+          "options": [
+            { "ru": "Ничем, порт 22 стандартный", "uz": "Hech nimasi bilan, 22-port standart", "en": "It isn't, port 22 is standard" },
+            { "ru": "SSH открыт всему интернету — боты найдут машину за часы и начнут перебор", "uz": "SSH butun internetga ochiq — botlar mashinani soatlar ichida topib, brutfors boshlaydi", "en": "SSH is open to the whole internet — bots find the machine within hours and start guessing" },
+            { "ru": "Замедлится сеть", "uz": "Tarmoq sekinlashadi", "en": "The network slows down" },
+            { "ru": "Вырастет счёт за трафик", "uz": "Trafik uchun hisob oshadi", "en": "The traffic bill goes up" }
+          ],
+          "a": 1
+        },
+        {
+          "q": {
+            "ru": "Правилу подходит и <code>allow</code>, и <code>deny</code>. Что победит?",
+            "uz": "Paketga ham <code>allow</code>, ham <code>deny</code> mos keldi. Qaysi biri g'olib?",
+            "en": "Both an <code>allow</code> and a <code>deny</code> match. Which wins?"
+          },
+          "options": [
+            { "ru": "Тот, что записан первым", "uz": "Birinchi yozilgani", "en": "Whichever is listed first" },
+            { "ru": "<code>deny</code> — запрет всегда сильнее разрешения", "uz": "<code>deny</code> — taqiq doim ruxsatdan kuchli", "en": "<code>deny</code> — a denial always beats a permission" },
+            { "ru": "<code>allow</code> — разрешение конкретнее", "uz": "<code>allow</code> — ruxsat aniqroq", "en": "<code>allow</code> — the permission is more specific" },
+            { "ru": "Тот, что записан последним", "uz": "Oxirgi yozilgani", "en": "Whichever is listed last" }
+          ],
+          "a": 1
+        }
+      ],
+      "tasks": [
+        {
+          "id": "e1",
+          "kind": "python",
+          "title": {
+            "ru": "Аудит групп безопасности",
+            "uz": "Xavfsizlik guruhlari auditi",
+            "en": "Auditing security groups"
+          },
+          "desc": {
+            "ru": "Напиши функцию <code>risky_groups(groups, dangerous_ports)</code>, которая находит группы, открытые всему интернету на опасных портах.<br><br><code>groups</code> — словарь «имя группы → список правил» в том же формате, что в задаче t3. <code>dangerous_ports</code> — список номеров портов.<br><br>Для каждой группы и каждого опасного порта проверь, прошёл бы пакет из интернета: источник у такого пакета — строка <code>\"0.0.0.0/0\"</code>, и он совпадёт только с правилами, у которых источник <code>\"*\"</code>. Логика решения та же: <code>deny</code> сильнее <code>allow</code>, по умолчанию запрещено.<br><br>Верни словарь «имя группы → отсортированный список опасных портов, которые открыты». Группы без находок в результат не включай.",
+            "uz": "<code>risky_groups(groups, dangerous_ports)</code> funksiyasini yozing: u xavfli portlarda butun internetga ochiq guruhlarni topadi.<br><br><code>groups</code> — t3 masalasidagi formatdagi «guruh nomi → qoidalar ro'yxati» lug'ati. <code>dangerous_ports</code> — port raqamlari ro'yxati.<br><br>Har bir guruh va har bir xavfli port uchun internetdan kelgan paket o'tarmidi deb tekshiring: bunday paketning manbasi — <code>\"0.0.0.0/0\"</code> satri va u faqat manbasi <code>\"*\"</code> bo'lgan qoidalarga mos keladi. Qaror mantig'i o'sha: <code>deny</code> <code>allow</code> dan kuchli, standart holda taqiqlangan.<br><br>«Guruh nomi → ochiq xavfli portlarning tartiblangan ro'yxati» lug'atini qaytaring. Topilmasi yo'q guruhlarni natijaga qo'shmang.",
+            "en": "Write a function <code>risky_groups(groups, dangerous_ports)</code> that finds groups open to the whole internet on dangerous ports.<br><br><code>groups</code> maps a group name to a list of rules in the same format as task t3. <code>dangerous_ports</code> is a list of port numbers.<br><br>For each group and each dangerous port, check whether a packet from the internet would get through: such a packet's source is the string <code>\"0.0.0.0/0\"</code>, and it matches only rules whose source is <code>\"*\"</code>. The decision logic is the same: <code>deny</code> beats <code>allow</code>, denied by default.<br><br>Return a dict \"group name → sorted list of the dangerous ports that are open\". Groups with no findings must not appear in the result."
+          },
+          "starter": "def risky_groups(groups, dangerous_ports):\n    # что пропустит группа, если пакет пришёл из интернета\n    ...\n",
+          "tests": "groups = {\n    \"web\": [{\"action\": \"allow\", \"port\": 443, \"source\": \"*\"},\n            {\"action\": \"allow\", \"port\": 22, \"source\": \"10.0.0.5\"}],\n    \"db\": [{\"action\": \"allow\", \"port\": 5432, \"source\": \"*\"}],\n    \"bastion\": [{\"action\": \"allow\", \"port\": \"*\", \"source\": \"*\"},\n                {\"action\": \"deny\", \"port\": 5432, \"source\": \"*\"}],\n}\nassert risky_groups(groups, [22, 3389, 5432]) == {\"db\": [5432], \"bastion\": [22, 3389]}\nassert risky_groups(groups, [443]) == {\"web\": [443], \"bastion\": [443]}\nassert risky_groups(groups, []) == {}\nassert risky_groups({}, [22]) == {}\nassert risky_groups({\"quiet\": []}, [22, 443]) == {}\nassert risky_groups({\"one\": [{\"action\": \"allow\", \"port\": 22, \"source\": \"*\"}]}, [3389, 22]) == {\"one\": [22]}\n",
+          "hint": {
+            "ru": "Функция <code>packet_allowed</code> из задачи t3 нужна целиком — напиши её рядом и вызывай с пакетом <code>{\"port\": port, \"source\": \"0.0.0.0/0\"}</code>. Дальше для каждой группы собери <code>[p for p in dangerous_ports if packet_allowed(rules, ...)]</code>, отсортируй и клади в результат, только если список непустой.",
+            "uz": "t3 masalasidagi <code>packet_allowed</code> funksiyasi butunlay kerak — uni yoniga yozing va <code>{\"port\": port, \"source\": \"0.0.0.0/0\"}</code> paketi bilan chaqiring. Keyin har bir guruh uchun <code>[p for p in dangerous_ports if packet_allowed(rules, ...)]</code> ni yig'ing, tartiblang va faqat ro'yxat bo'sh bo'lmasa natijaga qo'ying.",
+            "en": "You need the whole <code>packet_allowed</code> from task t3 — write it alongside and call it with the packet <code>{\"port\": port, \"source\": \"0.0.0.0/0\"}</code>. Then for each group collect <code>[p for p in dangerous_ports if packet_allowed(rules, ...)]</code>, sort it, and store it only when the list is non-empty."
+          }
+        }
+      ]
+    }
   }
  ]
 }

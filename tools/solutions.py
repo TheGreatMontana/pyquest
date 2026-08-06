@@ -1577,4 +1577,144 @@ def attention(query, keys, values):
         'changed': changed,
     }
 """,
+
+    'bigdata-intro/bd-03/t1': """def hash_join(left, right):
+    index = {}
+    for key, value in right:
+        index.setdefault(key, []).append(value)
+
+    result = []
+    for key, value in left:
+        for other in index.get(key, []):
+            result.append((key, value, other))
+    return result
+""",
+
+    'bigdata-intro/bd-03/t2': """def shuffle(rows, partitions):
+    buckets = [[] for _ in range(partitions)]
+    for key, value in rows:
+        buckets[sum(ord(c) for c in key) % partitions].append((key, value))
+    return buckets
+""",
+
+    'bigdata-intro/bd-03/t3': """def tumbling(events, size):
+    windows = {}
+    for ts, value in events:
+        start = ts // size * size
+        windows[start] = windows.get(start, 0) + value
+    return windows
+""",
+
+    'bigdata-intro/bd-03/exam0': """def aggregate(events, size, lateness):
+    windows = {}
+    late = 0
+    seen = None
+    for ts, value in events:
+        seen = ts if seen is None else max(seen, ts)
+        if ts < seen - lateness:
+            late += 1
+            continue
+        start = ts // size * size
+        windows[start] = windows.get(start, 0) + value
+    return (windows, late)
+""",
+
+    'cloud-intro/cl-03/t1': """def serverless_cost(requests, avg_ms, memory_mb, price_gb_s, price_million):
+    seconds = avg_ms / 1000
+    gb = memory_mb / 1024
+    gb_seconds = requests * seconds * gb
+    total = gb_seconds * price_gb_s + requests / 1_000_000 * price_million
+    return round(total, 2)
+""",
+
+    'cloud-intro/cl-03/t2': """def lifecycle_cost(objects, prices, hot_days, cold_days):
+    totals = {'hot': 0.0, 'cold': 0.0, 'archive': 0.0}
+    for size_gb, age_days in objects:
+        if age_days < hot_days:
+            cls = 'hot'
+        elif age_days < cold_days:
+            cls = 'cold'
+        else:
+            cls = 'archive'
+        totals[cls] += size_gb * prices[cls]
+    return {cls: round(value, 2) for cls, value in totals.items()}
+""",
+
+    'cloud-intro/cl-03/t3': """def packet_allowed(rules, packet):
+    def matches(rule):
+        port_ok = rule['port'] == '*' or rule['port'] == packet['port']
+        src_ok = rule['source'] == '*' or rule['source'] == packet['source']
+        return port_ok and src_ok
+
+    hits = [rule for rule in rules if matches(rule)]
+    if any(rule['action'] == 'deny' for rule in hits):
+        return False
+    return any(rule['action'] == 'allow' for rule in hits)
+""",
+
+    'cloud-intro/cl-03/exam0': """def risky_groups(groups, dangerous_ports):
+    def packet_allowed(rules, packet):
+        def matches(rule):
+            port_ok = rule['port'] == '*' or rule['port'] == packet['port']
+            src_ok = rule['source'] == '*' or rule['source'] == packet['source']
+            return port_ok and src_ok
+
+        hits = [rule for rule in rules if matches(rule)]
+        if any(rule['action'] == 'deny' for rule in hits):
+            return False
+        return any(rule['action'] == 'allow' for rule in hits)
+
+    report = {}
+    for name, rules in groups.items():
+        open_ports = sorted(
+            port for port in dangerous_ports
+            if packet_allowed(rules, {'port': port, 'source': '0.0.0.0/0'})
+        )
+        if open_ports:
+            report[name] = open_ports
+    return report
+""",
+
+    'infosec-intro/is-03/t1': """def check_321(copies):
+    broken = []
+    if len(copies) < 3:
+        broken.append('copies')
+    if len({c['media'] for c in copies}) < 2:
+        broken.append('media')
+    if not any(c['offsite'] for c in copies):
+        broken.append('offsite')
+    return sorted(broken)
+""",
+
+    'infosec-intro/is-03/t2': """def recovery_report(last_backup, incident, restored, rpo, rto):
+    data_loss = incident - last_backup
+    downtime = restored - incident
+    return {
+        'data_loss': data_loss,
+        'downtime': downtime,
+        'rpo_ok': data_loss <= rpo,
+        'rto_ok': downtime <= rto,
+    }
+""",
+
+    'infosec-intro/is-03/t3': """def minimize(records, needed, retention_days):
+    return [
+        {k: v for k, v in data.items() if k in needed}
+        for age, data in records
+        if age < retention_days
+    ]
+""",
+
+    'infosec-intro/is-03/exam0': """import hashlib
+
+
+def pseudonymize(records, secret, fields):
+    def token(value):
+        return hashlib.sha256((secret + str(value)).encode()).hexdigest()[:8]
+
+    return [
+        {k: (token(v) if k in fields else v) for k, v in record.items()}
+        for record in records
+    ]
+""",
 }

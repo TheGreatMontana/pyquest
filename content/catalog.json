@@ -1055,7 +1055,7 @@
    "color": "#f59e0b",
    "level": "intermediate",
    "status": "full",
-   "estimatedHours": 15,
+   "estimatedHours": 21,
    "requires": [
     "python-collections"
    ],
@@ -1063,7 +1063,7 @@
     "bigdata-basics"
    ],
    "legacyIds": [],
-   "moduleCount": 2,
+   "moduleCount": 3,
    "runner": "python"
   },
   {
@@ -1082,7 +1082,7 @@
    "color": "#60a5fa",
    "level": "intermediate",
    "status": "full",
-   "estimatedHours": 14,
+   "estimatedHours": 20,
    "requires": [
     "python-collections"
    ],
@@ -1090,7 +1090,7 @@
     "cloud-basics"
    ],
    "legacyIds": [],
-   "moduleCount": 2,
+   "moduleCount": 3,
    "runner": "python"
   },
   {
@@ -1109,7 +1109,7 @@
    "color": "#f87171",
    "level": "intermediate",
    "status": "full",
-   "estimatedHours": 14,
+   "estimatedHours": 20,
    "requires": [
     "security-basics"
    ],
@@ -1117,7 +1117,7 @@
     "infosec-basics"
    ],
    "legacyIds": [],
-   "moduleCount": 2,
+   "moduleCount": 3,
    "runner": "python"
   }
  ],
