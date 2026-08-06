@@ -1029,6 +1029,355 @@
      }
     ]
    }
+  },
+  {
+   "id": "cs-03",
+   "title": { "ru": "LINQ вглубь и паттерн-матчинг", "uz": "LINQ chuqurroq va patternlarga moslash", "en": "LINQ in depth and pattern matching" },
+   "tagline": { "ru": "GroupBy, Join, отложенное выполнение и switch, который вернулся выражением", "uz": "GroupBy, Join, kechiktirilgan bajarilish va ifodaga aylangan switch", "en": "GroupBy, Join, deferred execution and the switch that came back as an expression" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "Группировка и соединение", "uz": "Guruhlash va birlashtirish", "en": "Grouping and joining" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>В первом модуле LINQ выглядел как «фильтр и проекция». Настоящая его сила — в операциях, которые повторяют SQL один в один:</p><ul><li><code>GroupBy</code> — то же, что <code>GROUP BY</code>; у каждой группы есть <code>Key</code> и сами элементы</li><li><code>Join</code> — <code>INNER JOIN</code> по ключу</li><li><code>OrderBy</code> / <code>ThenBy</code> — сортировка по нескольким полям</li><li><code>Sum</code>, <code>Average</code>, <code>Min</code>, <code>Max</code>, <code>Count</code> — агрегаты</li><li><code>Select</code> в анонимный тип — «выбрать только нужные колонки»</li></ul><p>Анонимный тип <code>new { City = g.Key, Total = g.Sum(...) }</code> — это класс, который компилятор создаёт на лету. Имена полей ты придумываешь прямо в запросе.</p>",
+        "uz": "<p>Birinchi modulda LINQ «filtr va proyeksiya» kabi ko'rinardi. Uning haqiqiy kuchi SQL ni bir-biriga aynan takrorlaydigan amallarda:</p><ul><li><code>GroupBy</code> — <code>GROUP BY</code> bilan bir xil; har guruhda <code>Key</code> va elementlarning o'zi bor</li><li><code>Join</code> — kalit bo'yicha <code>INNER JOIN</code></li><li><code>OrderBy</code> / <code>ThenBy</code> — bir necha maydon bo'yicha saralash</li><li><code>Sum</code>, <code>Average</code>, <code>Min</code>, <code>Max</code>, <code>Count</code> — agregatlar</li><li>Anonim turga <code>Select</code> — «faqat kerakli ustunlarni tanlash»</li></ul><p><code>new { City = g.Key, Total = g.Sum(...) }</code> anonim turi — kompilyator uchib ketayotganda yaratadigan sinf. Maydon nomlarini so'rovning o'zida siz o'ylab topasiz.</p>",
+        "en": "<p>In the first module LINQ looked like “a filter and a projection”. Its real power lies in operations that mirror SQL exactly:</p><ul><li><code>GroupBy</code> — the same as <code>GROUP BY</code>; each group has a <code>Key</code> and its elements</li><li><code>Join</code> — an <code>INNER JOIN</code> on a key</li><li><code>OrderBy</code> / <code>ThenBy</code> — sorting by several fields</li><li><code>Sum</code>, <code>Average</code>, <code>Min</code>, <code>Max</code>, <code>Count</code> — aggregates</li><li><code>Select</code> into an anonymous type — “take only the columns you need”</li></ul><p>The anonymous type <code>new { City = g.Key, Total = g.Sum(...) }</code> is a class the compiler creates on the fly. You invent the field names right inside the query.</p>"
+       }
+      },
+      {
+       "type": "code",
+       "lang": "csharp",
+       "code": "using System;\nusing System.Collections.Generic;\nusing System.Linq;\n\nrecord Order(int UserId, string City, int Amount);\nrecord User(int Id, string Name);\n\nclass Program\n{\n    static void Main()\n    {\n        var orders = new List<Order>\n        {\n            new Order(1, \"Ташкент\", 250), new Order(2, \"Бухара\", 100),\n            new Order(1, \"Ташкент\", 400), new Order(3, \"Самарканд\", 180),\n        };\n        var users = new List<User> { new User(1, \"Азиз\"), new User(2, \"Дилноза\") };\n\n        // GROUP BY city\n        var byCity = orders\n            .GroupBy(o => o.City)\n            .Select(g => new { City = g.Key, Total = g.Sum(o => o.Amount), Count = g.Count() })\n            .OrderByDescending(x => x.Total)\n            .ThenBy(x => x.City);\n\n        foreach (var row in byCity)\n            Console.WriteLine($\"{row.City}: {row.Total} ({row.Count} заказ.)\");\n\n        // INNER JOIN orders ON users\n        var named = orders.Join(\n            users,\n            o => o.UserId,\n            u => u.Id,\n            (o, u) => new { u.Name, o.Amount });\n\n        Console.WriteLine(\"--- с именами ---\");\n        foreach (var row in named)\n            Console.WriteLine($\"{row.Name}: {row.Amount}\");\n\n        Console.WriteLine($\"средний чек: {orders.Average(o => o.Amount)}\");\n        Console.WriteLine($\"максимум: {orders.Max(o => o.Amount)}\");\n    }\n}"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Обрати внимание на <code>Join</code>: у него четыре аргумента — вторая коллекция, ключ слева, ключ справа и функция, собирающая результат. Это буквально <code>ON a.id = b.id</code>, только записанное функциями.</p><p>И на важное следствие: <code>Join</code> — это <b>внутреннее</b> соединение. Заказ пользователя №3, которого нет в справочнике, из результата <b>пропал</b>. Если нужны все заказы, берут <code>GroupJoin</code> с <code>DefaultIfEmpty</code> — это аналог <code>LEFT JOIN</code>.</p><p>Такая потеря строк — самая частая ошибка в отчётах: цифры сходятся между собой, но не сходятся с реальностью.</p>",
+        "uz": "<p><code>Join</code> ga e'tibor bering: unda to'rt argument — ikkinchi to'plam, chapdagi kalit, o'ngdagi kalit va natijani yig'adigan funksiya. Bu tom ma'noda <code>ON a.id = b.id</code>, faqat funksiyalar bilan yozilgan.</p><p>Va muhim natijaga: <code>Join</code> — bu <b>ichki</b> birlashtirish. Ma'lumotnomada yo'q 3-foydalanuvchining buyurtmasi natijadan <b>yo'qoldi</b>. Barcha buyurtmalar kerak bo'lsa, <code>DefaultIfEmpty</code> bilan <code>GroupJoin</code> olinadi — bu <code>LEFT JOIN</code> analogi.</p><p>Bunday qator yo'qolishi hisobotlardagi eng ko'p uchraydigan xato: raqamlar o'zaro to'g'ri keladi, lekin haqiqatga to'g'ri kelmaydi.</p>",
+        "en": "<p>Note <code>Join</code>: it takes four arguments — the second collection, the key on the left, the key on the right and a function assembling the result. It is literally <code>ON a.id = b.id</code>, written with functions.</p><p>And note the important consequence: <code>Join</code> is an <b>inner</b> join. The order from user 3, who is absent from the reference table, <b>disappeared</b> from the result. If you need every order, use <code>GroupJoin</code> with <code>DefaultIfEmpty</code> — the equivalent of a <code>LEFT JOIN</code>.</p><p>This loss of rows is the most common bug in reports: the numbers agree with each other but not with reality.</p>"
+       }
+      },
+      {
+       "type": "checkpoint",
+       "q": { "ru": "Заказ ссылается на пользователя, которого нет в списке. Что сделает <code>Join</code>?", "uz": "Buyurtma ro'yxatda yo'q foydalanuvchiga havola qiladi. <code>Join</code> nima qiladi?", "en": "An order references a user absent from the list. What does <code>Join</code> do?" },
+       "options": [
+        { "ru": "Подставит null", "uz": "null qo'yadi", "en": "It substitutes null" },
+        { "ru": "Выбросит эту строку из результата — это внутреннее соединение", "uz": "Bu qatorni natijadan tashlaydi — bu ichki birlashtirish", "en": "It drops the row from the result — this is an inner join" },
+        { "ru": "Бросит исключение", "uz": "Istisno tashlaydi", "en": "It throws an exception" },
+        { "ru": "Создаст пустого пользователя", "uz": "Bo'sh foydalanuvchi yaratadi", "en": "It creates an empty user" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Ровно как <code>INNER JOIN</code> в SQL. Чтобы сохранить все заказы, нужен <code>GroupJoin</code> с <code>DefaultIfEmpty</code>.",
+        "uz": "Aynan SQL dagi <code>INNER JOIN</code> kabi. Barcha buyurtmalarni saqlash uchun <code>DefaultIfEmpty</code> bilan <code>GroupJoin</code> kerak.",
+        "en": "Exactly like <code>INNER JOIN</code> in SQL. To keep every order you need <code>GroupJoin</code> with <code>DefaultIfEmpty</code>."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "Отложенное выполнение", "uz": "Kechiktirilgan bajarilish", "en": "Deferred execution" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Здесь живёт особенность LINQ, которая удивляет почти всех новичков.</p><p><code>Where</code>, <code>Select</code>, <code>OrderBy</code> <b>ничего не вычисляют</b>. Они возвращают описание запроса. Настоящая работа начинается, когда результат просят: <code>foreach</code>, <code>ToList()</code>, <code>Count()</code>, <code>First()</code>.</p><p>Отсюда два практических следствия.</p><p><b>Первое.</b> Изменил исходную коллекцию после создания запроса — запрос увидит изменения, потому что выполнится позже.</p><p><b>Второе.</b> Каждое обращение к запросу выполняет его <b>заново</b>. Пройдёшь по нему трижды — трижды и посчитается. Если результат нужен несколько раз, зафиксируй его через <code>ToList()</code>.</p>",
+        "uz": "<p>Bu yerda LINQ ning deyarli barcha yangi boshlovchilarni hayratga soladigan xususiyati yashaydi.</p><p><code>Where</code>, <code>Select</code>, <code>OrderBy</code> <b>hech nima hisoblamaydi</b>. Ular so'rov tavsifini qaytaradi. Haqiqiy ish natija so'ralganda boshlanadi: <code>foreach</code>, <code>ToList()</code>, <code>Count()</code>, <code>First()</code>.</p><p>Shundan ikki amaliy natija.</p><p><b>Birinchi.</b> So'rov yaratilgandan keyin asl to'plamni o'zgartirdingiz — so'rov o'zgarishlarni ko'radi, chunki u keyinroq bajariladi.</p><p><b>Ikkinchi.</b> So'rovga har murojaat uni <b>qaytadan</b> bajaradi. Uni uch marta aylansangiz — uch marta hisoblanadi. Natija bir necha marta kerak bo'lsa, uni <code>ToList()</code> orqali qayd eting.</p>",
+        "en": "<p>Here lives the LINQ feature that surprises almost every newcomer.</p><p><code>Where</code>, <code>Select</code> and <code>OrderBy</code> <b>compute nothing</b>. They return a description of the query. The real work begins when the result is asked for: <code>foreach</code>, <code>ToList()</code>, <code>Count()</code>, <code>First()</code>.</p><p>Two practical consequences follow.</p><p><b>First.</b> Change the source collection after building the query and the query will see the change, because it runs later.</p><p><b>Second.</b> Every use of the query runs it <b>again</b>. Walk it three times and it computes three times. If you need the result more than once, freeze it with <code>ToList()</code>.</p>"
+       }
+      },
+      {
+       "type": "code",
+       "lang": "csharp",
+       "code": "using System;\nusing System.Collections.Generic;\nusing System.Linq;\n\nclass Program\n{\n    static void Main()\n    {\n        var nums = new List<int> { 1, 2, 3 };\n\n        // запрос описан, но не выполнен\n        var big = nums.Where(n => n > 2);\n\n        nums.Add(10);          // добавили ПОСЛЕ описания запроса\n\n        Console.WriteLine(string.Join(\",\", big));   // 3,10 — запрос увидел новое число\n\n        // ToList фиксирует результат прямо сейчас\n        var frozen = nums.Where(n => n > 2).ToList();\n        nums.Add(99);\n        Console.WriteLine(string.Join(\",\", frozen)); // 3,10 — снимок не изменился\n        Console.WriteLine(string.Join(\",\", big));    // 3,10,99 — а живой запрос изменился\n\n        // каждый проход выполняет запрос заново\n        int calls = 0;\n        var counted = nums.Where(n => { calls++; return n > 0; });\n        _ = counted.Count();\n        _ = counted.Count();\n        Console.WriteLine($\"проверок выполнено: {calls}\");\n    }\n}"
+      },
+      {
+       "type": "note",
+       "kind": "trap",
+       "html": {
+        "ru": "Самая дорогая версия этой ловушки — запрос к базе данных. Написал <code>var q = db.Orders.Where(...)</code>, потом трижды прошёлся по <code>q</code> в разных местах кода — получил <b>три похода в базу</b> вместо одного. Профилировщик покажет непонятную нагрузку, а код будет выглядеть невинно. Правило простое: как только результат нужен больше одного раза, ставь <code>ToList()</code>.",
+        "uz": "Bu tuzoqning eng qimmat versiyasi — ma'lumotlar bazasiga so'rov. <code>var q = db.Orders.Where(...)</code> yozdingiz, keyin kodning turli joylarida <code>q</code> ni uch marta aylandingiz — bitta o'rniga <b>bazaga uch marta borish</b> oldingiz. Profillovchi tushunarsiz yukni ko'rsatadi, kod esa begunoh ko'rinadi. Qoida oddiy: natija bir martadan ko'p kerak bo'lishi bilan <code>ToList()</code> qo'ying.",
+        "en": "The most expensive version of this trap is a database query. You wrote <code>var q = db.Orders.Where(...)</code>, then walked <code>q</code> three times in different places — and got <b>three trips to the database</b> instead of one. The profiler shows puzzling load while the code looks innocent. The rule is simple: as soon as the result is needed more than once, add <code>ToList()</code>."
+       }
+      },
+      {
+       "type": "predict",
+       "lang": "csharp",
+       "code": "using System;\nusing System.Collections.Generic;\nusing System.Linq;\n\nclass Program\n{\n    static void Main()\n    {\n        var list = new List<int> { 1, 2 };\n        var q = list.Where(n => n > 0);\n        list.Add(3);\n        Console.WriteLine(q.Count());\n    }\n}",
+       "options": [
+        { "ru": "2 — запрос запомнил старое состояние", "uz": "2 — so'rov eski holatni esladi", "en": "2 — the query remembered the old state" },
+        { "ru": "3 — запрос выполняется в момент Count и видит добавленное", "uz": "3 — so'rov Count paytida bajariladi va qo'shilganini ko'radi", "en": "3 — the query runs at Count and sees the added element" },
+        { "ru": "0", "uz": "0", "en": "0" },
+        { "ru": "Ошибка: коллекция изменена", "uz": "Xato: to'plam o'zgartirildi", "en": "An error: the collection was modified" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Это и есть отложенное выполнение. Хочешь снимок на момент написания — добавь <code>.ToList()</code> сразу.",
+        "uz": "Bu kechiktirilgan bajarilishning o'zi. Yozilgan paytdagi suratni xohlasangiz — darhol <code>.ToList()</code> qo'shing.",
+        "en": "This is deferred execution. If you want a snapshot at the moment of writing, add <code>.ToList()</code> right away."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "Паттерн-матчинг: switch как выражение", "uz": "Patternlarga moslash: ifoda sifatidagi switch", "en": "Pattern matching: switch as an expression" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Современный C# умеет разбирать значения по образцу — это заметно короче цепочки <code>if</code>.</p><ul><li><b>switch-выражение</b> — <code>value switch { … }</code> возвращает результат, а не выполняет команды</li><li><b>по типу</b> — <code>Sq q =&gt; q.A * q.A</code> проверяет тип и сразу даёт переменную</li><li><b>по свойству</b> — <code>{ Amount: &gt; 1000 }</code> проверяет поле объекта</li><li><b>with guard</b> — <code>n when n &gt; 10 =&gt; …</code> добавляет условие</li><li><code>_</code> — «всё остальное», аналог <code>default</code></li></ul><p>Ключевое отличие от старого <code>switch</code>: новый — это <b>выражение</b>. У него есть значение, его можно вернуть из метода или присвоить переменной одной строкой.</p>",
+        "uz": "<p>Zamonaviy C# qiymatlarni namuna bo'yicha ajrata oladi — bu <code>if</code> zanjiridan sezilarli qisqa.</p><ul><li><b>switch-ifoda</b> — <code>value switch { … }</code> buyruq bajarmaydi, natija qaytaradi</li><li><b>tur bo'yicha</b> — <code>Sq q =&gt; q.A * q.A</code> turni tekshirib, darhol o'zgaruvchi beradi</li><li><b>xususiyat bo'yicha</b> — <code>{ Amount: &gt; 1000 }</code> obyekt maydonini tekshiradi</li><li><b>guard bilan</b> — <code>n when n &gt; 10 =&gt; …</code> shart qo'shadi</li><li><code>_</code> — «qolgan hammasi», <code>default</code> analogi</li></ul><p>Eski <code>switch</code> dan asosiy farqi: yangisi — <b>ifoda</b>. Uning qiymati bor, uni metoddan qaytarish yoki bir qatorda o'zgaruvchiga tayinlash mumkin.</p>",
+        "en": "<p>Modern C# can destructure values by pattern — noticeably shorter than a chain of <code>if</code>s.</p><ul><li>A <b>switch expression</b> — <code>value switch { … }</code> returns a result instead of executing statements</li><li><b>by type</b> — <code>Sq q =&gt; q.A * q.A</code> checks the type and gives you the variable at once</li><li><b>by property</b> — <code>{ Amount: &gt; 1000 }</code> tests a field of the object</li><li><b>with a guard</b> — <code>n when n &gt; 10 =&gt; …</code> adds a condition</li><li><code>_</code> — “everything else”, the equivalent of <code>default</code></li></ul><p>The key difference from the old <code>switch</code>: the new one is an <b>expression</b>. It has a value you can return from a method or assign to a variable in one line.</p>"
+       }
+      },
+      {
+       "type": "code",
+       "lang": "csharp",
+       "code": "using System;\nusing System.Collections.Generic;\n\nabstract record Shape;\nrecord Sq(double Side) : Shape;\nrecord Rect(double W, double H) : Shape;\nrecord Circle(double R) : Shape;\n\nrecord Order(string City, int Amount);\n\nclass Program\n{\n    // switch-выражение по типу: короче и полнее, чем цепочка if\n    static double Area(Shape s) => s switch\n    {\n        Sq q => q.Side * q.Side,\n        Rect r => r.W * r.H,\n        Circle c => Math.Round(3.14159 * c.R * c.R, 2),\n        _ => 0,\n    };\n\n    // сопоставление по свойствам и условиям\n    static string Grade(Order o) => o switch\n    {\n        { Amount: > 300 } and { City: \"Ташкент\" } => \"крупный столичный\",\n        { Amount: > 300 } => \"крупный\",\n        { Amount: > 100 } => \"средний\",\n        _ => \"мелкий\",\n    };\n\n    static string Describe(object x) => x switch\n    {\n        int n when n < 0 => $\"отрицательное {n}\",\n        int n => $\"число {n}\",\n        string s => $\"строка длиной {s.Length}\",\n        null => \"пусто\",\n        _ => \"что-то ещё\",\n    };\n\n    static void Main()\n    {\n        var shapes = new List<Shape> { new Sq(3), new Rect(2, 5), new Circle(1) };\n        foreach (var s in shapes) Console.WriteLine($\"{s.GetType().Name}: {Area(s)}\");\n\n        Console.WriteLine(Grade(new Order(\"Ташкент\", 400)));\n        Console.WriteLine(Grade(new Order(\"Бухара\", 400)));\n        Console.WriteLine(Grade(new Order(\"Бухара\", 50)));\n\n        Console.WriteLine(Describe(42));\n        Console.WriteLine(Describe(-7));\n        Console.WriteLine(Describe(\"привет\"));\n        Console.WriteLine(Describe(null));\n    }\n}"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Порядок веток важен так же, как в <code>elif</code>: выполняется <b>первая подходящая</b>. Поэтому <code>{ Amount: &gt; 300 } and { City: \"Ташкент\" }</code> стоит выше, чем просто <code>{ Amount: &gt; 300 }</code> — иначе более общая ветка перехватила бы всё.</p><p>Компилятор здесь помогает: если он видит, что какая-то ветка недостижима или что не все случаи покрыты, он предупредит. Со цепочкой <code>if</code> такой проверки нет вообще.</p>",
+        "uz": "<p>Tarmoqlar tartibi <code>elif</code> dagidek muhim: <b>birinchi mos keladigani</b> bajariladi. Shuning uchun <code>{ Amount: &gt; 300 } and { City: \"Ташкент\" }</code> shunchaki <code>{ Amount: &gt; 300 }</code> dan yuqorida turadi — aks holda umumiyroq tarmoq hammasini tutib olardi.</p><p>Kompilyator bu yerda yordam beradi: biror tarmoqqa yetib bo'lmasligini yoki barcha holatlar qoplanmaganini ko'rsa, ogohlantiradi. <code>if</code> zanjirida bunday tekshiruv umuman yo'q.</p>",
+        "en": "<p>The order of arms matters just as with <code>elif</code>: the <b>first matching one</b> wins. That is why <code>{ Amount: &gt; 300 } and { City: \"Ташкент\" }</code> stands above the plain <code>{ Amount: &gt; 300 }</code> — otherwise the more general arm would catch everything.</p><p>The compiler helps here: if it sees an unreachable arm or uncovered cases, it warns you. A chain of <code>if</code>s gets no such check at all.</p>"
+       }
+      },
+      {
+       "type": "summary",
+       "items": [
+        { "ru": "GroupBy даёт группы с Key; агрегат считают внутри Select", "uz": "GroupBy Key li guruhlar beradi; agregat Select ichida hisoblanadi", "en": "GroupBy yields groups with a Key; the aggregate is computed inside Select" },
+        { "ru": "Join — это INNER JOIN: строки без пары исчезают", "uz": "Join — bu INNER JOIN: jufti yo'q qatorlar yo'qoladi", "en": "Join is an INNER JOIN: rows without a match disappear" },
+        { "ru": "Where и Select ничего не считают, пока результат не запросили", "uz": "Natija so'ralmaguncha Where va Select hech nima hisoblamaydi", "en": "Where and Select compute nothing until the result is requested" },
+        { "ru": "Каждый проход по запросу выполняет его заново — фиксируй через ToList()", "uz": "So'rov bo'ylab har o'tish uni qaytadan bajaradi — ToList() bilan qayd eting", "en": "Every walk over a query re-runs it — freeze it with ToList()" },
+        { "ru": "switch-выражение возвращает значение, а не выполняет команды", "uz": "switch-ifoda buyruq bajarmaydi, qiymat qaytaradi", "en": "A switch expression returns a value instead of executing statements" },
+        { "ru": "Порядок веток решает: срабатывает первая подходящая", "uz": "Tarmoqlar tartibi hal qiladi: birinchi mos keladigani ishlaydi", "en": "The order of arms decides: the first matching one fires" }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": { "ru": "Что вернёт <code>GroupBy(o =&gt; o.City)</code>?", "uz": "<code>GroupBy(o =&gt; o.City)</code> nima qaytaradi?", "en": "What does <code>GroupBy(o =&gt; o.City)</code> return?" },
+     "options": [
+      { "ru": "Список городов", "uz": "Shaharlar ro'yxatini", "en": "A list of cities" },
+      { "ru": "Группы, у каждой есть Key и её элементы", "uz": "Guruhlarni, har birida Key va uning elementlari bor", "en": "Groups, each with a Key and its elements" },
+      { "ru": "Словарь строк", "uz": "Satrlar lug'atini", "en": "A dictionary of strings" },
+      { "ru": "Число групп", "uz": "Guruhlar sonini", "en": "The number of groups" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Агрегат считают внутри <code>Select</code>: <code>g.Sum(o =&gt; o.Amount)</code>. Сама группа — это ключ плюс перечисление её элементов.",
+      "uz": "Agregat <code>Select</code> ichida hisoblanadi: <code>g.Sum(o =&gt; o.Amount)</code>. Guruhning o'zi — kalit va uning elementlari sanog'i.",
+      "en": "The aggregate is computed inside <code>Select</code>: <code>g.Sum(o =&gt; o.Amount)</code>. The group itself is a key plus an enumeration of its elements."
+     }
+    },
+    {
+     "q": { "ru": "Когда выполнится <code>list.Where(x =&gt; x &gt; 0)</code>?", "uz": "<code>list.Where(x =&gt; x &gt; 0)</code> qachon bajariladi?", "en": "When does <code>list.Where(x =&gt; x &gt; 0)</code> execute?" },
+     "options": [
+      { "ru": "Сразу в этой строке", "uz": "Darhol shu qatorda", "en": "Immediately on this line" },
+      { "ru": "Когда результат запросят: foreach, ToList, Count", "uz": "Natija so'ralganda: foreach, ToList, Count", "en": "When the result is requested: foreach, ToList, Count" },
+      { "ru": "Никогда", "uz": "Hech qachon", "en": "Never" },
+      { "ru": "При компиляции", "uz": "Kompilyatsiyada", "en": "At compile time" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Это отложенное выполнение. Пока никто не спросил результат, запрос — просто описание намерений.",
+      "uz": "Bu kechiktirilgan bajarilish. Hech kim natijani so'ramaguncha, so'rov — shunchaki niyatlar tavsifi.",
+      "en": "This is deferred execution. Until someone asks for the result, the query is merely a statement of intent."
+     }
+    },
+    {
+     "q": { "ru": "Прошли по одному и тому же запросу три раза. Сколько раз он выполнится?", "uz": "Bitta so'rov bo'ylab uch marta yurildi. U necha marta bajariladi?", "en": "You walked the same query three times. How many times does it execute?" },
+     "options": [
+      { "ru": "Один раз, результат закешируется", "uz": "Bir marta, natija keshlanadi", "en": "Once, the result is cached" },
+      { "ru": "Три раза — каждый проход считает заново", "uz": "Uch marta — har o'tish qaytadan hisoblaydi", "en": "Three times — each walk recomputes" },
+      { "ru": "Ни разу", "uz": "Birorta ham", "en": "Not at all" },
+      { "ru": "Зависит от типа коллекции", "uz": "To'plam turiga bog'liq", "en": "It depends on the collection type" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "На списке это лишняя работа, а на запросе к базе — три отдельных обращения к серверу. Спасает <code>ToList()</code>.",
+      "uz": "Ro'yxatda bu ortiqcha ish, bazaga so'rovda esa — serverga uchta alohida murojaat. <code>ToList()</code> qutqaradi.",
+      "en": "On a list that is wasted work; on a database query it is three separate round trips to the server. <code>ToList()</code> saves you."
+     }
+    },
+    {
+     "q": { "ru": "Нужны ВСЕ заказы, включая те, у кого нет пользователя в справочнике. Что использовать?", "uz": "BARCHA buyurtmalar kerak, ma'lumotnomada foydalanuvchisi yo'qlari ham. Nima ishlatiladi?", "en": "You need EVERY order, including those whose user is missing. What do you use?" },
+     "options": [
+      { "ru": "Join — он и так всё вернёт", "uz": "Join — u baribir hammasini qaytaradi", "en": "Join — it returns everything anyway" },
+      { "ru": "GroupJoin с DefaultIfEmpty — это LEFT JOIN", "uz": "DefaultIfEmpty bilan GroupJoin — bu LEFT JOIN", "en": "GroupJoin with DefaultIfEmpty — that is a LEFT JOIN" },
+      { "ru": "Concat", "uz": "Concat", "en": "Concat" },
+      { "ru": "Union", "uz": "Union", "en": "Union" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Обычный <code>Join</code> тихо выбросит такие строки — и отчёт покажет меньше денег, чем есть на самом деле.",
+      "uz": "Oddiy <code>Join</code> bunday qatorlarni jimgina tashlaydi — va hisobot haqiqatdagidan kam pul ko'rsatadi.",
+      "en": "A plain <code>Join</code> silently drops those rows — and the report shows less money than actually exists."
+     }
+    },
+    {
+     "q": { "ru": "Чем switch-выражение отличается от обычного switch?", "uz": "switch-ifoda oddiy switch dan nimasi bilan farq qiladi?", "en": "How does a switch expression differ from an ordinary switch?" },
+     "options": [
+      { "ru": "Ничем, это синоним", "uz": "Hech nimasi bilan, bu sinonim", "en": "Not at all, it is a synonym" },
+      { "ru": "Оно возвращает значение, поэтому его можно присвоить или вернуть", "uz": "U qiymat qaytaradi, shuning uchun uni tayinlash yoki qaytarish mumkin", "en": "It returns a value, so it can be assigned or returned" },
+      { "ru": "Работает только с числами", "uz": "Faqat sonlar bilan ishlaydi", "en": "It works only with numbers" },
+      { "ru": "Не требует default", "uz": "default talab qilmaydi", "en": "It needs no default" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Отсюда и запись <code>static double Area(Shape s) =&gt; s switch { … };</code> — весь метод в одну строку.",
+      "uz": "Shundan <code>static double Area(Shape s) =&gt; s switch { … };</code> yozuvi — butun metod bir qatorda.",
+      "en": "Hence the form <code>static double Area(Shape s) =&gt; s switch { … };</code> — the whole method in one line."
+     }
+    },
+    {
+     "q": { "ru": "Что означает <code>_</code> в switch-выражении?", "uz": "switch-ifodadagi <code>_</code> nimani anglatadi?", "en": "What does <code>_</code> mean in a switch expression?" },
+     "options": [
+      { "ru": "Пустое значение", "uz": "Bo'sh qiymat", "en": "An empty value" },
+      { "ru": "Все остальные случаи — аналог default", "uz": "Qolgan barcha holatlar — default analogi", "en": "All remaining cases — the equivalent of default" },
+      { "ru": "Ошибку", "uz": "Xato", "en": "An error" },
+      { "ru": "Значение null", "uz": "null qiymati", "en": "The null value" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Без него компилятор предупредит, что покрыты не все случаи, а при выполнении неучтённое значение приведёт к исключению.",
+      "uz": "Usiz kompilyator barcha holatlar qoplanmaganini ogohlantiradi, bajarilishda esa hisobga olinmagan qiymat istisnoga olib keladi.",
+      "en": "Without it the compiler warns that not all cases are covered, and at runtime an unhandled value raises an exception."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "csharp",
+     "title": { "ru": "Отчёт по городам", "uz": "Shaharlar bo'yicha hisobot", "en": "A report by city" },
+     "brief": { "ru": "GroupBy и сортировка", "uz": "GroupBy va saralash", "en": "GroupBy and sorting" },
+     "desc": {
+      "ru": "<p>Для списка заказов посчитай по каждому городу сумму и количество, отсортируй по сумме <b>по убыванию</b>, при равенстве — по названию города.</p><p>Выведи в формате <code>Ташкент: 650 (2)</code>, каждый с новой строки.</p>",
+      "uz": "<p>Buyurtmalar ro'yxati uchun har shahar bo'yicha summa va sonni hisoblang, summa bo'yicha <b>kamayish</b> tartibida, tenglikda esa shahar nomi bo'yicha saralang.</p><p><code>Ташкент: 650 (2)</code> formatida, har birini yangi qatordan chiqaring.</p>",
+      "en": "<p>For the list of orders compute the total and the count per city, sort by total <b>descending</b> and by city name on a tie.</p><p>Print as <code>Ташкент: 650 (2)</code>, one per line.</p>"
+     },
+     "starter": "using System;\nusing System.Collections.Generic;\nusing System.Linq;\n\nrecord Order(string City, int Amount);\n\nclass Program\n{\n    static void Main()\n    {\n        var orders = new List<Order>\n        {\n            new Order(\"Ташкент\", 250), new Order(\"Бухара\", 100),\n            new Order(\"Ташкент\", 400), new Order(\"Самарканд\", 180),\n            new Order(\"Бухара\", 80),\n        };\n\n        // твой код\n    }\n}\n",
+     "solution": "using System;\nusing System.Collections.Generic;\nusing System.Linq;\n\nrecord Order(string City, int Amount);\n\nclass Program\n{\n    static void Main()\n    {\n        var orders = new List<Order>\n        {\n            new Order(\"Ташкент\", 250), new Order(\"Бухара\", 100),\n            new Order(\"Ташкент\", 400), new Order(\"Самарканд\", 180),\n            new Order(\"Бухара\", 80),\n        };\n\n        var report = orders\n            .GroupBy(o => o.City)\n            .Select(g => new { City = g.Key, Total = g.Sum(o => o.Amount), Count = g.Count() })\n            .OrderByDescending(x => x.Total)\n            .ThenBy(x => x.City);\n\n        foreach (var row in report)\n            Console.WriteLine($\"{row.City}: {row.Total} ({row.Count})\");\n    }\n}\n",
+     "expected": "Ташкент: 650 (2)\nБухара: 180 (2)\nСамарканд: 180 (1)",
+     "hint": {
+      "ru": "<code>GroupBy(o =&gt; o.City)</code> → <code>Select(g =&gt; new { … })</code> с <code>g.Key</code>, <code>g.Sum(...)</code> и <code>g.Count()</code> → <code>OrderByDescending</code> и <code>ThenBy</code>.",
+      "uz": "<code>GroupBy(o =&gt; o.City)</code> → <code>g.Key</code>, <code>g.Sum(...)</code> va <code>g.Count()</code> bilan <code>Select(g =&gt; new { … })</code> → <code>OrderByDescending</code> va <code>ThenBy</code>.",
+      "en": "<code>GroupBy(o =&gt; o.City)</code> → <code>Select(g =&gt; new { … })</code> with <code>g.Key</code>, <code>g.Sum(...)</code> and <code>g.Count()</code> → <code>OrderByDescending</code> then <code>ThenBy</code>."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "csharp",
+     "title": { "ru": "Соединение с именами", "uz": "Ismlar bilan birlashtirish", "en": "Joining with names" },
+     "brief": { "ru": "Join по ключу", "uz": "Kalit bo'yicha Join", "en": "Join on a key" },
+     "desc": {
+      "ru": "<p>Соедини заказы с пользователями по <code>UserId</code> и выведи <code>имя: сумма</code> для каждого совпадения, отсортировав по имени.</p><p>Заказ пользователя, которого нет в справочнике, в результат не попадёт — это и есть внутреннее соединение.</p>",
+      "uz": "<p>Buyurtmalarni foydalanuvchilar bilan <code>UserId</code> bo'yicha birlashtiring va har moslik uchun <code>ism: summa</code> ni ism bo'yicha saralab chiqaring.</p><p>Ma'lumotnomada yo'q foydalanuvchining buyurtmasi natijaga tushmaydi — bu ichki birlashtirishning o'zi.</p>",
+      "en": "<p>Join the orders with the users on <code>UserId</code> and print <code>name: amount</code> for every match, sorted by name.</p><p>An order from a user missing from the reference table will not appear — that is what an inner join means.</p>"
+     },
+     "starter": "using System;\nusing System.Collections.Generic;\nusing System.Linq;\n\nrecord Order(int UserId, int Amount);\nrecord User(int Id, string Name);\n\nclass Program\n{\n    static void Main()\n    {\n        var orders = new List<Order>\n        {\n            new Order(1, 250), new Order(2, 100), new Order(9, 700),\n        };\n        var users = new List<User> { new User(1, \"Азиз\"), new User(2, \"Дилноза\") };\n\n        // твой код\n    }\n}\n",
+     "solution": "using System;\nusing System.Collections.Generic;\nusing System.Linq;\n\nrecord Order(int UserId, int Amount);\nrecord User(int Id, string Name);\n\nclass Program\n{\n    static void Main()\n    {\n        var orders = new List<Order>\n        {\n            new Order(1, 250), new Order(2, 100), new Order(9, 700),\n        };\n        var users = new List<User> { new User(1, \"Азиз\"), new User(2, \"Дилноза\") };\n\n        var named = orders\n            .Join(users, o => o.UserId, u => u.Id, (o, u) => new { u.Name, o.Amount })\n            .OrderBy(x => x.Name);\n\n        foreach (var row in named)\n            Console.WriteLine($\"{row.Name}: {row.Amount}\");\n    }\n}\n",
+     "expected": "Азиз: 250\nДилноза: 100",
+     "hint": {
+      "ru": "У <code>Join</code> четыре аргумента: вторая коллекция, ключ слева (<code>o =&gt; o.UserId</code>), ключ справа (<code>u =&gt; u.Id</code>) и сборка результата (<code>(o, u) =&gt; new { u.Name, o.Amount }</code>).",
+      "uz": "<code>Join</code> da to'rt argument: ikkinchi to'plam, chapdagi kalit (<code>o =&gt; o.UserId</code>), o'ngdagi kalit (<code>u =&gt; u.Id</code>) va natijani yig'ish (<code>(o, u) =&gt; new { u.Name, o.Amount }</code>).",
+      "en": "<code>Join</code> takes four arguments: the second collection, the left key (<code>o =&gt; o.UserId</code>), the right key (<code>u =&gt; u.Id</code>) and the result selector (<code>(o, u) =&gt; new { u.Name, o.Amount }</code>)."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "csharp",
+     "title": { "ru": "Классификация switch-выражением", "uz": "switch-ifoda bilan tasniflash", "en": "Classifying with a switch expression" },
+     "brief": { "ru": "Паттерны по свойствам", "uz": "Xususiyatlar bo'yicha patternlar", "en": "Property patterns" },
+     "desc": {
+      "ru": "<p>Напиши метод <code>static string Grade(Order o)</code> через <b>switch-выражение</b>:</p><ul><li>сумма больше 300 и город <code>\"Ташкент\"</code> → <code>\"крупный столичный\"</code></li><li>сумма больше 300 → <code>\"крупный\"</code></li><li>сумма больше 100 → <code>\"средний\"</code></li><li>иначе → <code>\"мелкий\"</code></li></ul><p>Цепочку <code>if</code> использовать нельзя — только <code>switch</code>.</p>",
+      "uz": "<p><b>switch-ifoda</b> orqali <code>static string Grade(Order o)</code> metodini yozing:</p><ul><li>summa 300 dan katta va shahar <code>\"Ташкент\"</code> → <code>\"крупный столичный\"</code></li><li>summa 300 dan katta → <code>\"крупный\"</code></li><li>summa 100 dan katta → <code>\"средний\"</code></li><li>aks holda → <code>\"мелкий\"</code></li></ul><p><code>if</code> zanjirini ishlatib bo'lmaydi — faqat <code>switch</code>.</p>",
+      "en": "<p>Write a method <code>static string Grade(Order o)</code> using a <b>switch expression</b>:</p><ul><li>amount above 300 and city <code>\"Ташкент\"</code> → <code>\"крупный столичный\"</code></li><li>amount above 300 → <code>\"крупный\"</code></li><li>amount above 100 → <code>\"средний\"</code></li><li>otherwise → <code>\"мелкий\"</code></li></ul><p>A chain of <code>if</code>s is not allowed — only <code>switch</code>.</p>"
+     },
+     "starter": "using System;\n\nrecord Order(string City, int Amount);\n\nclass Program\n{\n    static string Grade(Order o) => o switch\n    {\n        // твой код\n        _ => \"мелкий\",\n    };\n\n    static void Main()\n    {\n        Console.WriteLine(Grade(new Order(\"Ташкент\", 400)));\n        Console.WriteLine(Grade(new Order(\"Бухара\", 400)));\n        Console.WriteLine(Grade(new Order(\"Бухара\", 150)));\n        Console.WriteLine(Grade(new Order(\"Хива\", 50)));\n    }\n}\n",
+     "solution": "using System;\n\nrecord Order(string City, int Amount);\n\nclass Program\n{\n    // порядок веток важен: сначала самая узкая\n    static string Grade(Order o) => o switch\n    {\n        { Amount: > 300, City: \"Ташкент\" } => \"крупный столичный\",\n        { Amount: > 300 } => \"крупный\",\n        { Amount: > 100 } => \"средний\",\n        _ => \"мелкий\",\n    };\n\n    static void Main()\n    {\n        Console.WriteLine(Grade(new Order(\"Ташкент\", 400)));\n        Console.WriteLine(Grade(new Order(\"Бухара\", 400)));\n        Console.WriteLine(Grade(new Order(\"Бухара\", 150)));\n        Console.WriteLine(Grade(new Order(\"Хива\", 50)));\n    }\n}\n",
+     "expected": "крупный столичный\nкрупный\nсредний\nмелкий",
+     "hint": {
+      "ru": "Два условия в одном паттерне пишутся через запятую: <code>{ Amount: &gt; 300, City: \"Ташкент\" }</code>. Самую узкую ветку ставь первой, иначе её перехватит более общая.",
+      "uz": "Bitta patterndagi ikki shart vergul bilan yoziladi: <code>{ Amount: &gt; 300, City: \"Ташкент\" }</code>. Eng tor tarmoqni birinchi qo'ying, aks holda uni umumiyrog'i tutib oladi.",
+      "en": "Two conditions in one pattern are written with a comma: <code>{ Amount: &gt; 300, City: \"Ташкент\" }</code>. Put the narrowest arm first, otherwise a broader one intercepts it."
+     }
+    }
+   ],
+   "exam": {
+    "time": 600,
+    "questions": [
+     {
+      "q": { "ru": "Что делает <code>ThenBy</code> после <code>OrderByDescending</code>?", "uz": "<code>OrderByDescending</code> dan keyin <code>ThenBy</code> nima qiladi?", "en": "What does <code>ThenBy</code> do after <code>OrderByDescending</code>?" },
+      "options": [
+       { "ru": "Заменяет предыдущую сортировку", "uz": "Oldingi saralashni almashtiradi", "en": "It replaces the previous sort" },
+       { "ru": "Задаёт вторичную сортировку при равных значениях первой", "uz": "Birinchisining qiymatlari teng bo'lganda ikkilamchi saralashni beradi", "en": "It defines a secondary sort when the first values are equal" },
+       { "ru": "Сортирует в обратную сторону", "uz": "Teskari tomonga saralaydi", "en": "It sorts in reverse" },
+       { "ru": "Ничего", "uz": "Hech nima", "en": "Nothing" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Запрос выполняется трижды в разных местах кода. Как выполнить его один раз?", "uz": "So'rov kodning turli joylarida uch marta bajariladi. Uni bir marta qanday bajarish mumkin?", "en": "A query runs three times in different places. How do you run it once?" },
+      "options": [
+       { "ru": "Добавить Where", "uz": "Where qo'shish", "en": "Add a Where" },
+       { "ru": "Зафиксировать результат через ToList()", "uz": "Natijani ToList() bilan qayd etish", "en": "Freeze the result with ToList()" },
+       { "ru": "Убрать Select", "uz": "Select ni olib tashlash", "en": "Remove the Select" },
+       { "ru": "Никак", "uz": "Hech qanday", "en": "You cannot" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Что означает паттерн <code>{ Amount: &gt; 1000 }</code>?", "uz": "<code>{ Amount: &gt; 1000 }</code> patterni nimani anglatadi?", "en": "What does the pattern <code>{ Amount: &gt; 1000 }</code> mean?" },
+      "options": [
+       { "ru": "Создать объект с Amount", "uz": "Amount li obyekt yaratish", "en": "Create an object with Amount" },
+       { "ru": "Проверить, что у объекта свойство Amount больше 1000", "uz": "Obyektning Amount xususiyati 1000 dan katta ekanini tekshirish", "en": "Check that the object's Amount property exceeds 1000" },
+       { "ru": "Присвоить Amount значение 1000", "uz": "Amount ga 1000 qiymatini tayinlash", "en": "Assign 1000 to Amount" },
+       { "ru": "Это синтаксическая ошибка", "uz": "Bu sintaksis xatosi", "en": "It is a syntax error" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "В switch-выражении общая ветка стоит выше узкой. Что будет?", "uz": "switch-ifodada umumiy tarmoq tor tarmoqdan yuqorida. Nima bo'ladi?", "en": "In a switch expression a broad arm sits above a narrow one. What happens?" },
+      "options": [
+       { "ru": "Компилятор сам переставит", "uz": "Kompilyator o'zi joyini almashtiradi", "en": "The compiler reorders them" },
+       { "ru": "Узкая ветка никогда не сработает — общая перехватит всё", "uz": "Tor tarmoq hech qachon ishlamaydi — umumiysi hammasini tutib oladi", "en": "The narrow arm never fires — the broad one catches everything" },
+       { "ru": "Сработают обе", "uz": "Ikkalasi ham ishlaydi", "en": "Both fire" },
+       { "ru": "Ошибка при выполнении", "uz": "Bajarilishdagi xato", "en": "A runtime error" }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "csharp",
+      "title": { "ru": "Полный отчёт", "uz": "To'liq hisobot", "en": "The full report" },
+      "desc": {
+       "ru": "<p>Собери всё вместе: Join, GroupBy и switch-выражение.</p><ol><li>Соедини заказы с пользователями по <code>UserId</code>.</li><li>Сгруппируй по городу пользователя, посчитай сумму.</li><li>Для каждого города определи размер через switch-выражение: больше 500 → <code>\"крупный\"</code>, больше 200 → <code>\"средний\"</code>, иначе <code>\"мелкий\"</code>.</li><li>Выведи по убыванию суммы в формате <code>Ташкент: 650 крупный</code>.</li></ol>",
+       "uz": "<p>Hammasini birlashtiring: Join, GroupBy va switch-ifoda.</p><ol><li>Buyurtmalarni foydalanuvchilar bilan <code>UserId</code> bo'yicha birlashtiring.</li><li>Foydalanuvchi shahri bo'yicha guruhlang, summani hisoblang.</li><li>Har shahar uchun o'lchamni switch-ifoda bilan aniqlang: 500 dan katta → <code>\"крупный\"</code>, 200 dan katta → <code>\"средний\"</code>, aks holda <code>\"мелкий\"</code>.</li><li>Summa kamayishi bo'yicha <code>Ташкент: 650 крупный</code> formatida chiqaring.</li></ol>",
+       "en": "<p>Put it all together: Join, GroupBy and a switch expression.</p><ol><li>Join the orders with the users on <code>UserId</code>.</li><li>Group by the user's city and compute the total.</li><li>For each city decide the size with a switch expression: above 500 → <code>\"крупный\"</code>, above 200 → <code>\"средний\"</code>, otherwise <code>\"мелкий\"</code>.</li><li>Print by descending total as <code>Ташкент: 650 крупный</code>.</li></ol>"
+      },
+      "starter": "using System;\nusing System.Collections.Generic;\nusing System.Linq;\n\nrecord Order(int UserId, int Amount);\nrecord User(int Id, string City);\n\nclass Program\n{\n    static void Main()\n    {\n        var orders = new List<Order>\n        {\n            new Order(1, 250), new Order(2, 100), new Order(1, 400),\n            new Order(3, 180), new Order(2, 80),\n        };\n        var users = new List<User>\n        {\n            new User(1, \"Ташкент\"), new User(2, \"Бухара\"), new User(3, \"Самарканд\"),\n        };\n\n        // твой код\n    }\n}\n",
+      "solution": "using System;\nusing System.Collections.Generic;\nusing System.Linq;\n\nrecord Order(int UserId, int Amount);\nrecord User(int Id, string City);\n\nclass Program\n{\n    static string Size(int total) => total switch\n    {\n        > 500 => \"крупный\",\n        > 200 => \"средний\",\n        _ => \"мелкий\",\n    };\n\n    static void Main()\n    {\n        var orders = new List<Order>\n        {\n            new Order(1, 250), new Order(2, 100), new Order(1, 400),\n            new Order(3, 180), new Order(2, 80),\n        };\n        var users = new List<User>\n        {\n            new User(1, \"Ташкент\"), new User(2, \"Бухара\"), new User(3, \"Самарканд\"),\n        };\n\n        var report = orders\n            .Join(users, o => o.UserId, u => u.Id, (o, u) => new { u.City, o.Amount })\n            .GroupBy(x => x.City)\n            .Select(g => new { City = g.Key, Total = g.Sum(x => x.Amount) })\n            .OrderByDescending(x => x.Total)\n            .ThenBy(x => x.City)\n            .ToList();\n\n        foreach (var row in report)\n            Console.WriteLine($\"{row.City}: {row.Total} {Size(row.Total)}\");\n    }\n}\n",
+      "expected": "Ташкент: 650 крупный\nБухара: 180 мелкий\nСамарканд: 180 мелкий",
+      "hint": {
+       "ru": "Цепочка: <code>Join</code> → <code>GroupBy(x =&gt; x.City)</code> → <code>Select</code> с суммой → <code>OrderByDescending</code> и <code>ThenBy</code>. Размер вынеси отдельным методом со switch-выражением по числу: <code>total switch { &gt; 500 =&gt; …, &gt; 200 =&gt; …, _ =&gt; … }</code>.",
+       "uz": "Zanjir: <code>Join</code> → <code>GroupBy(x =&gt; x.City)</code> → summali <code>Select</code> → <code>OrderByDescending</code> va <code>ThenBy</code>. O'lchamni son bo'yicha switch-ifodali alohida metodga chiqaring: <code>total switch { &gt; 500 =&gt; …, &gt; 200 =&gt; …, _ =&gt; … }</code>.",
+       "en": "The chain: <code>Join</code> → <code>GroupBy(x =&gt; x.City)</code> → <code>Select</code> with the sum → <code>OrderByDescending</code> then <code>ThenBy</code>. Put the size into its own method with a switch expression over the number: <code>total switch { &gt; 500 =&gt; …, &gt; 200 =&gt; …, _ =&gt; … }</code>."
+      }
+     }
+    ]
+   }
   }
  ]
 }

@@ -1284,6 +1284,352 @@
      }
     ]
    }
+  },
+  {
+   "id": "cpp-03",
+   "title": { "ru": "STL: контейнеры", "uz": "STL: konteynerlar", "en": "STL: containers" },
+   "tagline": { "ru": "vector, map, set, deque — что выбрать и почему это важнее, чем кажется", "uz": "vector, map, set, deque — nimani tanlash va nega bu ko'ringanidan muhimroq", "en": "vector, map, set, deque — what to pick and why it matters more than it seems" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "vector: массив, который растёт", "uz": "vector: o'sadigan massiv", "en": "vector: the array that grows" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><code>std::vector</code> — контейнер по умолчанию. Если не знаешь, что взять, бери его: непрерывная память как у массива C плюс автоматический рост.</p><p>Как он растёт: когда места не хватает, вектор выделяет новый блок <b>вдвое больше</b>, копирует туда всё и освобождает старый. Отсюда два следствия:</p><ul><li>Добавление в конец в среднем <b>O(1)</b> — удвоение случается редко.</li><li>После роста <b>все указатели и ссылки на элементы протухают</b>: данные переехали.</li></ul><p>Если знаешь размер заранее — скажи об этом через <code>reserve</code>: вектор выделит память один раз и не будет переезжать.</p>",
+        "uz": "<p><code>std::vector</code> — sukut bo'yicha konteyner. Nimani olishni bilmasangiz, uni oling: C massividagi kabi uzluksiz xotira va avtomatik o'sish.</p><p>U qanday o'sadi: joy yetmaganda vektor <b>ikki barobar katta</b> yangi blok ajratadi, hammasini u yerga nusxalaydi va eskisini bo'shatadi. Shundan ikki natija:</p><ul><li>Oxiriga qo'shish o'rtacha <b>O(1)</b> — ikkilanish kam sodir bo'ladi.</li><li>O'sishdan keyin <b>elementlarga barcha ko'rsatkich va havolalar eskiradi</b>: ma'lumot ko'chib ketdi.</li></ul><p>Hajmni oldindan bilsangiz — buni <code>reserve</code> orqali ayting: vektor xotirani bir marta ajratadi va ko'chmaydi.</p>",
+        "en": "<p><code>std::vector</code> is the default container. If you do not know what to take, take this: contiguous memory like a C array plus automatic growth.</p><p>How it grows: when space runs out the vector allocates a new block <b>twice as large</b>, copies everything into it and frees the old one. Two consequences follow:</p><ul><li>Appending at the end is <b>O(1)</b> on average — doubling happens rarely.</li><li>After a growth <b>every pointer and reference to an element goes stale</b>: the data has moved.</li></ul><p>If you know the size in advance, say so with <code>reserve</code>: the vector allocates once and never relocates.</p>"
+       }
+      },
+      {
+       "type": "cpprun",
+       "code": "#include <iostream>\n#include <vector>\n#include <string>\n\nint main() {\n    std::vector<int> v{5, 3, 9};\n    v.push_back(1);\n    v.insert(v.begin(), 7);          // вставка в начало — сдвигает всё, O(n)\n    v.pop_back();\n\n    std::cout << \"размер: \" << v.size() << \", ёмкость: \" << v.capacity() << \"\\n\";\n    for (int x : v) std::cout << x << ' ';\n    std::cout << \"\\n\";\n\n    std::cout << \"первый: \" << v.front() << \", последний: \" << v.back() << \"\\n\";\n    std::cout << \"по индексу [1]: \" << v[1] << \"\\n\";\n\n    // at() проверяет границы, [] — нет\n    std::cout << \"at(0): \" << v.at(0) << \"\\n\";\n\n    // reserve заранее: одно выделение вместо цепочки удвоений\n    std::vector<std::string> names;\n    names.reserve(3);\n    names.push_back(\"aziz\");\n    names.push_back(\"bek\");\n    names.push_back(\"dilnoza\");\n    for (const std::string& n : names) std::cout << n << ' ';\n    std::cout << \"\\n\";\n\n    std::vector<std::vector<int>> grid(2, std::vector<int>(3, 0));\n    grid[1][2] = 42;\n    std::cout << \"матрица[1][2] = \" << grid[1][2] << \"\\n\";\n    return 0;\n}"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Два обращения к элементу — <code>v[1]</code> и <code>v.at(1)</code> — выглядят одинаково, но ведут себя по-разному.</p><p><code>[]</code> не проверяет границы: выход за размер — неопределённое поведение. Программа может упасть, а может тихо прочитать чужие байты и работать «нормально» до продакшена.</p><p><code>at()</code> границы проверяет и в обычном C++ бросает исключение. <b>В нашем браузерном компиляторе исключения выключены</b>, поэтому здесь <code>at()</code> просто завершит программу. Разница в скорости мизерная — в спорных местах бери <code>at()</code>.</p><p>И ещё про <code>const std::string&amp;</code> в цикле: без <code>&amp;</code> каждая строка копировалась бы. Для <code>int</code> это неважно, для строк и структур — заметно.</p>",
+        "uz": "<p>Elementga ikki murojaat — <code>v[1]</code> va <code>v.at(1)</code> — bir xil ko'rinadi, lekin turlicha tutadi.</p><p><code>[]</code> chegaralarni tekshirmaydi: hajmdan chiqish — aniqlanmagan xatti-harakat. Dastur yiqilishi ham, jimgina begona baytlarni o'qib, ishlab chiqarishgacha «normal» ishlashi ham mumkin.</p><p><code>at()</code> chegaralarni tekshiradi va oddiy C++ da istisno tashlaydi. <b>Bizning brauzer kompilyatorimizda istisnolar o'chirilgan</b>, shuning uchun bu yerda <code>at()</code> shunchaki dasturni tugatadi. Tezlikdagi farq juda kichik — bahsli joylarda <code>at()</code> ni oling.</p><p>Va sikldagi <code>const std::string&amp;</code> haqida: <code>&amp;</code> siz har satr nusxalanardi. <code>int</code> uchun bu ahamiyatsiz, satr va strukturalar uchun — sezilarli.</p>",
+        "en": "<p>Two ways to reach an element — <code>v[1]</code> and <code>v.at(1)</code> — look the same but behave differently.</p><p><code>[]</code> does not check bounds: going past the size is undefined behaviour. The program may crash, or may quietly read someone else's bytes and work “fine” right up to production.</p><p><code>at()</code> does check and, in ordinary C++, throws an exception. <b>In our browser compiler exceptions are disabled</b>, so here <code>at()</code> simply terminates the program. The speed difference is minute — take <code>at()</code> where you are unsure.</p><p>And about <code>const std::string&amp;</code> in the loop: without the <code>&amp;</code> every string would be copied. For <code>int</code> that hardly matters; for strings and structs it does.</p>"
+       }
+      },
+      {
+       "type": "checkpoint",
+       "q": { "ru": "Что произойдёт с указателем на элемент вектора после push_back?", "uz": "push_back dan keyin vektor elementiga ko'rsatkich bilan nima bo'ladi?", "en": "What happens to a pointer to a vector element after push_back?" },
+       "options": [
+        { "ru": "Ничего, он всегда валиден", "uz": "Hech nima, u doim yaroqli", "en": "Nothing, it stays valid" },
+        { "ru": "Может протухнуть: при росте данные переезжают в новую память", "uz": "Eskirishi mumkin: o'sishda ma'lumot yangi xotiraga ko'chadi", "en": "It may go stale: on growth the data moves to new memory" },
+        { "ru": "Он станет NULL", "uz": "U NULL bo'ladi", "en": "It becomes NULL" },
+        { "ru": "Компилятор не даст его взять", "uz": "Kompilyator uni olishga yo'l qo'ymaydi", "en": "The compiler will not let you take it" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Это одна из самых коварных ошибок в C++: указатель выглядит рабочим, но показывает на освобождённую память. Спасает <code>reserve</code> заранее или хранение индексов вместо указателей.",
+        "uz": "Bu C++ dagi eng ayyor xatolardan biri: ko'rsatkich ishlayotgandek ko'rinadi, lekin bo'shatilgan xotiraga ishora qiladi. Oldindan <code>reserve</code> yoki ko'rsatkich o'rniga indeks saqlash qutqaradi.",
+        "en": "One of the nastiest bugs in C++: the pointer looks fine but points at freed memory. Calling <code>reserve</code> up front, or storing indices instead of pointers, saves you."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "map и set: порядок и уникальность", "uz": "map va set: tartib va noyoblik", "en": "map and set: order and uniqueness" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Четыре контейнера, которые закрывают почти все задачи с поиском:</p><ul><li><code>std::map</code> — ключ → значение, ключи <b>отсортированы</b>, поиск O(log n)</li><li><code>std::unordered_map</code> — то же, но на хеш-таблице: порядка нет, поиск O(1) в среднем</li><li><code>std::set</code> — только ключи, уникальные и отсортированные</li><li><code>std::unordered_set</code> — уникальные без порядка</li></ul><p>Правило выбора: <b>нужен порядок или обход по возрастанию — map; нужна скорость — unordered_map</b>. В реальном коде чаще берут второй, но map незаменим, когда надо «все ключи от A до K».</p>",
+        "uz": "<p>Qidiruv bilan bog'liq deyarli barcha vazifalarni yopadigan to'rt konteyner:</p><ul><li><code>std::map</code> — kalit → qiymat, kalitlar <b>saralangan</b>, qidiruv O(log n)</li><li><code>std::unordered_map</code> — o'sha, lekin xesh-jadvalda: tartib yo'q, qidiruv o'rtacha O(1)</li><li><code>std::set</code> — faqat kalitlar, noyob va saralangan</li><li><code>std::unordered_set</code> — tartibsiz noyoblar</li></ul><p>Tanlash qoidasi: <b>tartib yoki o'sish bo'yicha aylanish kerak bo'lsa — map; tezlik kerak bo'lsa — unordered_map</b>. Haqiqiy kodda ko'proq ikkinchisi olinadi, lekin «A dan K gacha barcha kalitlar» kerak bo'lganda map o'rnini bosib bo'lmaydi.</p>",
+        "en": "<p>Four containers that cover almost every lookup task:</p><ul><li><code>std::map</code> — key → value, the keys are <b>sorted</b>, lookup is O(log n)</li><li><code>std::unordered_map</code> — the same on a hash table: no order, lookup O(1) on average</li><li><code>std::set</code> — keys only, unique and sorted</li><li><code>std::unordered_set</code> — unique without order</li></ul><p>The rule: <b>need order or an ascending walk — map; need speed — unordered_map</b>. Real code more often takes the second, but map is irreplaceable when you need “every key from A to K”.</p>"
+       }
+      },
+      {
+       "type": "cpprun",
+       "code": "#include <iostream>\n#include <map>\n#include <unordered_map>\n#include <set>\n#include <string>\n\nint main() {\n    std::map<std::string, int> prices{{\"кофе\", 25000}, {\"чай\", 15000}};\n    prices[\"сок\"] = 18000;\n    prices[\"чай\"] = 16000;              // перезапись\n\n    // map всегда обходится по возрастанию ключа\n    for (const auto& [name, price] : prices)\n        std::cout << name << \" = \" << price << \"\\n\";\n\n    // find возвращает итератор; end() значит «не нашли»\n    auto it = prices.find(\"кофе\");\n    if (it != prices.end()) std::cout << \"нашли кофе: \" << it->second << \"\\n\";\n    std::cout << \"есть пиво? \" << prices.count(\"пиво\") << \"\\n\";\n\n    // ОСТОРОЖНО: обращение через [] к отсутствующему ключу СОЗДАЁТ его\n    std::cout << \"размер до: \" << prices.size() << \"\\n\";\n    int beer = prices[\"пиво\"];\n    std::cout << \"пиво = \" << beer << \", размер после: \" << prices.size() << \"\\n\";\n\n    std::set<int> uniq{5, 2, 9, 2, 5};\n    std::cout << \"уникальных: \" << uniq.size() << \" -> \";\n    for (int x : uniq) std::cout << x << ' ';\n    std::cout << \"\\n\";\n\n    std::unordered_map<char, int> freq;\n    for (char c : std::string(\"abracadabra\")) freq[c]++;\n    std::cout << \"a встречается \" << freq['a'] << \" раз\\n\";\n    return 0;\n}"
+      },
+      {
+       "type": "note",
+       "kind": "trap",
+       "html": {
+        "ru": "Обращение <code>map[ключ]</code> к <b>отсутствующему</b> ключу молча создаёт его со значением по умолчанию. Проверка вида <code>if (m[\"x\"] &gt; 0)</code> не только читает, но и добавляет запись — и словарь растёт от одних только проверок. Чтобы посмотреть, не меняя, есть <code>count</code> и <code>find</code>. В C++20 добавили и <code>contains</code>.",
+        "uz": "<b>Mavjud bo'lmagan</b> kalitga <code>map[kalit]</code> murojaati uni sukut qiymati bilan jimgina yaratadi. <code>if (m[\"x\"] &gt; 0)</code> ko'rinishidagi tekshiruv nafaqat o'qiydi, balki yozuv qo'shadi ham — va lug'at faqat tekshiruvlardan o'sadi. O'zgartirmasdan qarash uchun <code>count</code> va <code>find</code> bor. C++20 da <code>contains</code> ham qo'shilgan.",
+        "en": "Accessing <code>map[key]</code> for a <b>missing</b> key silently creates it with a default value. A check like <code>if (m[\"x\"] &gt; 0)</code> does not just read but inserts — and the map grows from checks alone. To look without changing, use <code>count</code> and <code>find</code>. C++20 added <code>contains</code> as well."
+       }
+      },
+      {
+       "type": "predict",
+       "lang": "cpp",
+       "code": "#include <iostream>\n#include <map>\n\nint main() {\n    std::map<int, int> m;\n    m[1] = 10;\n    if (m[2] == 0) { }\n    std::cout << m.size() << '\\n';\n    return 0;\n}",
+       "options": [
+        { "ru": "1 — второй ключ только прочитали", "uz": "1 — ikkinchi kalit faqat o'qildi", "en": "1 — the second key was only read" },
+        { "ru": "2 — обращение через [] создало ключ 2", "uz": "2 — [] orqali murojaat 2 kalitini yaratdi", "en": "2 — the [] access created key 2" },
+        { "ru": "0", "uz": "0", "en": "0" },
+        { "ru": "Ошибка компиляции", "uz": "Kompilyatsiya xatosi", "en": "A compile error" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Ровно та ловушка из заметки: <code>m[2]</code> вставил пару <code>2 → 0</code>, хотя мы всего лишь сравнивали. Правильная проверка — <code>m.count(2)</code> или <code>m.find(2) != m.end()</code>.",
+        "uz": "Aynan eslatmadagi tuzoq: <code>m[2]</code> biz shunchaki solishtirgan bo'lsak ham <code>2 → 0</code> juftligini qo'ydi. To'g'ri tekshiruv — <code>m.count(2)</code> yoki <code>m.find(2) != m.end()</code>.",
+        "en": "Exactly the trap from the note: <code>m[2]</code> inserted the pair <code>2 → 0</code> although we were merely comparing. The correct check is <code>m.count(2)</code> or <code>m.find(2) != m.end()</code>."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "Что выбрать: цена операций", "uz": "Nimani tanlash: amallar narxi", "en": "What to choose: the cost of operations" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Выбор контейнера — это выбор того, какая операция будет дешёвой. Вот честная таблица:</p><table><tr><th>Операция</th><th>vector</th><th>deque</th><th>list</th><th>map</th><th>unordered_map</th></tr><tr><td>доступ по индексу</td><td>O(1)</td><td>O(1)</td><td>—</td><td>—</td><td>—</td></tr><tr><td>добавить в конец</td><td>O(1)*</td><td>O(1)</td><td>O(1)</td><td>—</td><td>—</td></tr><tr><td>добавить в начало</td><td>O(n)</td><td>O(1)</td><td>O(1)</td><td>—</td><td>—</td></tr><tr><td>поиск по ключу</td><td>O(n)</td><td>O(n)</td><td>O(n)</td><td>O(log n)</td><td>O(1)**</td></tr><tr><td>обход по порядку</td><td>да</td><td>да</td><td>да</td><td>да</td><td>нет</td></tr></table><p>* в среднем, с редким удвоением &nbsp;&nbsp; ** в среднем, при хороших хешах</p><p>Практический совет: <b>начинай с vector всегда</b>. Он проигрывает по бумаге в паре операций, но выигрывает на кэше процессора: непрерывная память читается быстрее, чем разбросанные узлы списка. Меняй контейнер, когда измерил, а не когда предположил.</p>",
+        "uz": "<p>Konteyner tanlash — qaysi amal arzon bo'lishini tanlash. Mana halol jadval:</p><table><tr><th>Amal</th><th>vector</th><th>deque</th><th>list</th><th>map</th><th>unordered_map</th></tr><tr><td>indeks bo'yicha kirish</td><td>O(1)</td><td>O(1)</td><td>—</td><td>—</td><td>—</td></tr><tr><td>oxiriga qo'shish</td><td>O(1)*</td><td>O(1)</td><td>O(1)</td><td>—</td><td>—</td></tr><tr><td>boshiga qo'shish</td><td>O(n)</td><td>O(1)</td><td>O(1)</td><td>—</td><td>—</td></tr><tr><td>kalit bo'yicha qidiruv</td><td>O(n)</td><td>O(n)</td><td>O(n)</td><td>O(log n)</td><td>O(1)**</td></tr><tr><td>tartib bo'yicha aylanish</td><td>ha</td><td>ha</td><td>ha</td><td>ha</td><td>yo'q</td></tr></table><p>* o'rtacha, kam uchraydigan ikkilanish bilan &nbsp;&nbsp; ** o'rtacha, yaxshi xeshlarda</p><p>Amaliy maslahat: <b>doim vector dan boshlang</b>. U qog'ozda bir necha amalda yutqazadi, lekin protsessor keshida yutadi: uzluksiz xotira ro'yxatning sochilgan tugunlaridan tez o'qiladi. Konteynerni taxmin qilganda emas, o'lchaganda almashtiring.</p>",
+        "en": "<p>Choosing a container is choosing which operation will be cheap. Here is the honest table:</p><table><tr><th>Operation</th><th>vector</th><th>deque</th><th>list</th><th>map</th><th>unordered_map</th></tr><tr><td>access by index</td><td>O(1)</td><td>O(1)</td><td>—</td><td>—</td><td>—</td></tr><tr><td>append at the end</td><td>O(1)*</td><td>O(1)</td><td>O(1)</td><td>—</td><td>—</td></tr><tr><td>insert at the front</td><td>O(n)</td><td>O(1)</td><td>O(1)</td><td>—</td><td>—</td></tr><tr><td>lookup by key</td><td>O(n)</td><td>O(n)</td><td>O(n)</td><td>O(log n)</td><td>O(1)**</td></tr><tr><td>ordered traversal</td><td>yes</td><td>yes</td><td>yes</td><td>yes</td><td>no</td></tr></table><p>* on average, with rare doubling &nbsp;&nbsp; ** on average, with good hashes</p><p>Practical advice: <b>always start with vector</b>. It loses on paper in a couple of operations but wins on the CPU cache: contiguous memory reads faster than the scattered nodes of a list. Change the container when you have measured, not when you have guessed.</p>"
+       }
+      },
+      {
+       "type": "cpprun",
+       "code": "#include <iostream>\n#include <vector>\n#include <deque>\n#include <map>\n#include <string>\n\nint main() {\n    // задача: посчитать заказы по городам и вывести по алфавиту\n    std::vector<std::pair<std::string, int>> orders{\n        {\"Ташкент\", 250}, {\"Бухара\", 100}, {\"Ташкент\", 400}, {\"Самарканд\", 180},\n    };\n\n    std::map<std::string, int> totals;      // map — потому что нужен алфавит\n    for (const auto& [city, amount] : orders)\n        totals[city] += amount;             // здесь [] уместен: создаём ноль и прибавляем\n\n    for (const auto& [city, total] : totals)\n        std::cout << city << \": \" << total << \"\\n\";\n\n    // deque — когда добавляем с обоих концов\n    std::deque<std::string> queue;\n    queue.push_back(\"второй\");\n    queue.push_front(\"первый\");\n    queue.push_back(\"третий\");\n    std::cout << \"очередь: \";\n    for (const auto& s : queue) std::cout << s << ' ';\n    std::cout << \"\\nвзяли спереди: \" << queue.front() << \"\\n\";\n\n    return 0;\n}"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Обрати внимание на строку <code>totals[city] += amount;</code>. Здесь та самая «ловушка» с созданием ключа работает <b>на нас</b>: для нового города создаётся ноль, к нему сразу прибавляется сумма. Одна строка вместо проверки «есть ли уже такой ключ».</p><p>Так и отличается знание языка от знания синтаксиса: одна и та же особенность бывает ловушкой и инструментом, и надо понимать, когда именно.</p>",
+        "uz": "<p><code>totals[city] += amount;</code> qatoriga e'tibor bering. Bu yerda kalit yaratish bilan bog'liq o'sha «tuzoq» <b>biz uchun</b> ishlaydi: yangi shahar uchun nol yaratiladi va unga darhol summa qo'shiladi. «Bunday kalit bormi» tekshiruvi o'rniga bitta qator.</p><p>Tilni bilish sintaksisni bilishdan shu bilan farq qiladi: bitta xususiyat ham tuzoq, ham asbob bo'ladi va qachon aynan qaysi ekanini tushunish kerak.</p>",
+        "en": "<p>Note the line <code>totals[city] += amount;</code>. Here that very “trap” of creating a key works <b>in our favour</b>: for a new city a zero is created and the amount is added to it at once. One line instead of a “does this key exist” check.</p><p>That is how knowing a language differs from knowing its syntax: the same feature is sometimes a trap and sometimes a tool, and you need to know which is which.</p>"
+       }
+      },
+      {
+       "type": "summary",
+       "items": [
+        { "ru": "vector — контейнер по умолчанию: непрерывная память и рост удвоением", "uz": "vector — sukut bo'yicha konteyner: uzluksiz xotira va ikkilanish bilan o'sish", "en": "vector is the default: contiguous memory and growth by doubling" },
+        { "ru": "После роста вектора старые указатели на элементы недействительны", "uz": "Vektor o'sgandan keyin elementlarga eski ko'rsatkichlar yaroqsiz", "en": "After a vector grows, old pointers to its elements are invalid" },
+        { "ru": "[] не проверяет границы, at() проверяет", "uz": "[] chegaralarni tekshirmaydi, at() tekshiradi", "en": "[] does not check bounds, at() does" },
+        { "ru": "map хранит ключи по порядку, unordered_map — быстрее, но без порядка", "uz": "map kalitlarni tartib bilan saqlaydi, unordered_map tezroq, lekin tartibsiz", "en": "map keeps keys in order, unordered_map is faster but unordered" },
+        { "ru": "map[отсутствующий ключ] создаёт запись — для проверки бери count или find", "uz": "map[yo'q kalit] yozuv yaratadi — tekshirish uchun count yoki find oling", "en": "map[missing key] inserts an entry — use count or find to check" },
+        { "ru": "Выбирай контейнер по тому, какая операция должна быть дешёвой", "uz": "Konteynerni qaysi amal arzon bo'lishi kerakligiga qarab tanlang", "en": "Choose a container by which operation must be cheap" }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": { "ru": "Как растёт <code>std::vector</code>, когда кончается место?", "uz": "Joy tugaganda <code>std::vector</code> qanday o'sadi?", "en": "How does <code>std::vector</code> grow when it runs out of space?" },
+     "options": [
+      { "ru": "Добавляет одну ячейку", "uz": "Bitta katak qo'shadi", "en": "It adds one cell" },
+      { "ru": "Выделяет блок примерно вдвое больше и переносит данные", "uz": "Taxminan ikki barobar katta blok ajratib, ma'lumotni ko'chiradi", "en": "It allocates a block about twice as large and moves the data" },
+      { "ru": "Не растёт, бросает ошибку", "uz": "O'smaydi, xato tashlaydi", "en": "It does not grow, it errors" },
+      { "ru": "Разбивается на куски", "uz": "Bo'laklarga bo'linadi", "en": "It splits into chunks" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Из-за переноса добавление стоит O(1) только «в среднем», а старые указатели на элементы после него недействительны.",
+      "uz": "Ko'chirish tufayli qo'shish faqat «o'rtacha» O(1) turadi, elementlarga eski ko'rsatkichlar esa undan keyin yaroqsiz.",
+      "en": "Because of the move, appending is O(1) only “on average”, and old pointers to elements are invalid afterwards."
+     }
+    },
+    {
+     "q": { "ru": "Чем <code>v.at(5)</code> отличается от <code>v[5]</code>?", "uz": "<code>v.at(5)</code> <code>v[5]</code> dan nimasi bilan farq qiladi?", "en": "How does <code>v.at(5)</code> differ from <code>v[5]</code>?" },
+     "options": [
+      { "ru": "Ничем", "uz": "Hech nimasi bilan", "en": "Not at all" },
+      { "ru": "at проверяет границы, [] — нет", "uz": "at chegaralarni tekshiradi, [] — yo'q", "en": "at checks bounds, [] does not" },
+      { "ru": "at быстрее", "uz": "at tezroq", "en": "at is faster" },
+      { "ru": "[] работает только с числами", "uz": "[] faqat sonlar bilan ishlaydi", "en": "[] works only with numbers" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Выход за границы через <code>[]</code> — неопределённое поведение: может упасть, а может тихо испортить память.",
+      "uz": "<code>[]</code> orqali chegaradan chiqish — aniqlanmagan xatti-harakat: yiqilishi ham, jimgina xotirani buzishi ham mumkin.",
+      "en": "Going out of bounds through <code>[]</code> is undefined behaviour: it may crash or quietly corrupt memory."
+     }
+    },
+    {
+     "q": { "ru": "Нужен словарь с обходом ключей по алфавиту. Что взять?", "uz": "Kalitlarni alifbo bo'yicha aylanadigan lug'at kerak. Nima olinadi?", "en": "You need a dictionary you can walk in alphabetical order. What do you take?" },
+     "options": [
+      { "ru": "unordered_map — он быстрее", "uz": "unordered_map — u tezroq", "en": "unordered_map — it is faster" },
+      { "ru": "map — он хранит ключи отсортированными", "uz": "map — u kalitlarni saralangan holda saqlaydi", "en": "map — it keeps the keys sorted" },
+      { "ru": "vector пар", "uz": "juftliklar vektori", "en": "A vector of pairs" },
+      { "ru": "set", "uz": "set", "en": "set" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "У <code>unordered_map</code> порядок обхода не определён и может меняться между запусками. Нужен алфавит — только <code>map</code>.",
+      "uz": "<code>unordered_map</code> da aylanish tartibi aniqlanmagan va ishga tushirishlar orasida o'zgarishi mumkin. Alifbo kerak bo'lsa — faqat <code>map</code>.",
+      "en": "In <code>unordered_map</code> the traversal order is unspecified and can change between runs. If you need alphabetical order, only <code>map</code> will do."
+     }
+    },
+    {
+     "q": { "ru": "Что сделает <code>m[\"нет-такого\"]</code> у пустого map?", "uz": "Bo'sh map da <code>m[\"yo'q\"]</code> nima qiladi?", "en": "What does <code>m[\"missing\"]</code> do on an empty map?" },
+     "options": [
+      { "ru": "Вернёт ошибку", "uz": "Xato qaytaradi", "en": "Returns an error" },
+      { "ru": "Создаст ключ со значением по умолчанию и вернёт его", "uz": "Sukut qiymatli kalit yaratib, uni qaytaradi", "en": "Creates the key with a default value and returns it" },
+      { "ru": "Вернёт NULL", "uz": "NULL qaytaradi", "en": "Returns NULL" },
+      { "ru": "Ничего не сделает", "uz": "Hech nima qilmaydi", "en": "Does nothing" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Поэтому проверять наличие надо через <code>count</code> или <code>find</code>: иначе словарь растёт от одних только проверок.",
+      "uz": "Shuning uchun mavjudlikni <code>count</code> yoki <code>find</code> orqali tekshirish kerak: aks holda lug'at faqat tekshiruvlardan o'sadi.",
+      "en": "That is why you check existence with <code>count</code> or <code>find</code>: otherwise the map grows from checks alone."
+     }
+    },
+    {
+     "q": { "ru": "Где вставка в начало дешёвая?", "uz": "Boshiga qo'shish qayerda arzon?", "en": "Where is inserting at the front cheap?" },
+     "options": [
+      { "ru": "vector", "uz": "vector", "en": "vector" },
+      { "ru": "deque", "uz": "deque", "en": "deque" },
+      { "ru": "map", "uz": "map", "en": "map" },
+      { "ru": "set", "uz": "set", "en": "set" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "У вектора вставка в начало сдвигает все элементы — O(n). Deque устроен из блоков и добавляет с обоих концов за O(1).",
+      "uz": "Vektorda boshiga qo'shish barcha elementlarni siljitadi — O(n). Deque bloklardan tuzilgan va ikki uchidan ham O(1) da qo'shadi.",
+      "en": "In a vector, inserting at the front shifts every element — O(n). A deque is built from blocks and adds at both ends in O(1)."
+     }
+    },
+    {
+     "q": { "ru": "Почему <code>for (const std::string&amp; s : v)</code> лучше, чем <code>for (std::string s : v)</code>?", "uz": "Nega <code>for (const std::string&amp; s : v)</code> <code>for (std::string s : v)</code> dan yaxshi?", "en": "Why is <code>for (const std::string&amp; s : v)</code> better than <code>for (std::string s : v)</code>?" },
+     "options": [
+      { "ru": "Красивее выглядит", "uz": "Chiroyliroq ko'rinadi", "en": "It looks nicer" },
+      { "ru": "Без ссылки каждая строка копируется на каждой итерации", "uz": "Havolasiz har satr har takrorlanishda nusxalanadi", "en": "Without the reference every string is copied on each iteration" },
+      { "ru": "Только со ссылкой можно менять элементы", "uz": "Faqat havola bilan elementlarni o'zgartirish mumkin", "en": "Only a reference lets you modify elements" },
+      { "ru": "Разницы нет", "uz": "Farqi yo'q", "en": "There is no difference" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Для <code>int</code> копия бесплатна, для строк и структур — нет. <code>const</code> при этом обещает, что мы не меняем оригинал.",
+      "uz": "<code>int</code> uchun nusxa bepul, satr va strukturalar uchun — yo'q. <code>const</code> esa asl nusxani o'zgartirmasligimizni va'da qiladi.",
+      "en": "For an <code>int</code> the copy is free; for strings and structs it is not. The <code>const</code> promises we do not modify the original."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "cpp",
+     "title": { "ru": "Частота слов через map", "uz": "map orqali so'zlar chastotasi", "en": "Word frequency with map" },
+     "brief": { "ru": "Порядок достаётся бесплатно", "uz": "Tartib bepul keladi", "en": "Order comes for free" },
+     "desc": {
+      "ru": "<p>Посчитай, сколько раз встречается каждое слово в векторе <code>words</code>, и выведи результат <b>по алфавиту</b> в формате <code>слово: количество</code>, каждое с новой строки.</p><p>Подсказка по выбору: алфавит нужен — значит <code>std::map</code>.</p>",
+      "uz": "<p><code>words</code> vektorida har so'z necha marta uchrashini sanang va natijani <b>alifbo bo'yicha</b> <code>so'z: son</code> formatida, har birini yangi qatordan chiqaring.</p><p>Tanlash bo'yicha maslahat: alifbo kerak — demak <code>std::map</code>.</p>",
+      "en": "<p>Count how many times each word occurs in the vector <code>words</code> and print the result <b>in alphabetical order</b> as <code>word: count</code>, one per line.</p><p>A hint on the choice: you need alphabetical order, so <code>std::map</code>.</p>"
+     },
+     "starter": "#include <iostream>\n#include <vector>\n#include <string>\n#include <map>\n\nint main() {\n    std::vector<std::string> words{\"кот\", \"пёс\", \"кот\", \"мышь\", \"кот\", \"пёс\"};\n\n    // твой код\n\n    return 0;\n}\n",
+     "solution": "#include <iostream>\n#include <vector>\n#include <string>\n#include <map>\n\nint main() {\n    std::vector<std::string> words{\"кот\", \"пёс\", \"кот\", \"мышь\", \"кот\", \"пёс\"};\n\n    std::map<std::string, int> freq;\n    for (const std::string& w : words)\n        freq[w]++;                    // новый ключ создастся нулём — это нам и нужно\n\n    for (const auto& [word, count] : freq)\n        std::cout << word << \": \" << count << \"\\n\";\n\n    return 0;\n}\n",
+     "expected": "кот: 3\nмышь: 1\nпёс: 2",
+     "hint": {
+      "ru": "<code>std::map&lt;std::string, int&gt; freq;</code> и в цикле <code>freq[w]++;</code> — новый ключ создастся со значением 0. Вывод — обходом по map, он уже отсортирован.",
+      "uz": "<code>std::map&lt;std::string, int&gt; freq;</code> va siklda <code>freq[w]++;</code> — yangi kalit 0 qiymati bilan yaratiladi. Chiqarish — map bo'ylab aylanish, u allaqachon saralangan.",
+      "en": "<code>std::map&lt;std::string, int&gt; freq;</code> and <code>freq[w]++;</code> in the loop — a new key is created with the value 0. Print by walking the map, which is already sorted."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "cpp",
+     "title": { "ru": "Уникальные по порядку", "uz": "Tartib bilan noyoblar", "en": "Unique in order" },
+     "brief": { "ru": "set для проверки, vector для порядка", "uz": "Tekshirish uchun set, tartib uchun vector", "en": "set to check, vector to keep order" },
+     "desc": {
+      "ru": "<p>Из вектора чисел <code>nums</code> оставь только те, что встречаются <b>впервые</b>, сохранив исходный порядок, и выведи их в одну строку через пробел.</p><p>Для <code>{5, 3, 5, 9, 3, 1}</code> ответ: <code>5 3 9 1</code>.</p><p>Два контейнера сразу: <code>set</code> помнит, что уже было, <code>vector</code> держит порядок.</p>",
+      "uz": "<p><code>nums</code> sonlar vektoridan faqat <b>birinchi marta</b> uchraganlarini qoldiring, dastlabki tartibni saqlab, va ularni bo'shliq bilan bitta qatorda chiqaring.</p><p><code>{5, 3, 5, 9, 3, 1}</code> uchun javob: <code>5 3 9 1</code>.</p><p>Bir vaqtda ikki konteyner: <code>set</code> nima bo'lganini eslaydi, <code>vector</code> tartibni ushlab turadi.</p>",
+      "en": "<p>From the vector <code>nums</code> keep only the values that appear for the <b>first time</b>, preserving the original order, and print them on one line separated by spaces.</p><p>For <code>{5, 3, 5, 9, 3, 1}</code> the answer is <code>5 3 9 1</code>.</p><p>Two containers at once: a <code>set</code> remembers what has been seen, a <code>vector</code> keeps the order.</p>"
+     },
+     "starter": "#include <iostream>\n#include <vector>\n#include <set>\n\nint main() {\n    std::vector<int> nums{5, 3, 5, 9, 3, 1};\n\n    // твой код\n\n    return 0;\n}\n",
+     "solution": "#include <iostream>\n#include <vector>\n#include <set>\n\nint main() {\n    std::vector<int> nums{5, 3, 5, 9, 3, 1};\n\n    std::set<int> seen;\n    std::vector<int> unique;\n    for (int x : nums) {\n        // insert возвращает пару: итератор и признак «вставили ли»\n        if (seen.insert(x).second)\n            unique.push_back(x);\n    }\n\n    for (size_t i = 0; i < unique.size(); i++) {\n        if (i > 0) std::cout << ' ';\n        std::cout << unique[i];\n    }\n    std::cout << \"\\n\";\n    return 0;\n}\n",
+     "expected": "5 3 9 1",
+     "hint": {
+      "ru": "<code>seen.insert(x).second</code> вернёт <code>true</code>, если элемент раньше не встречался — это готовая проверка «первый раз». Тогда добавляй его в <code>unique</code>.",
+      "uz": "Element ilgari uchramagan bo'lsa <code>seen.insert(x).second</code> <code>true</code> qaytaradi — bu tayyor «birinchi marta» tekshiruvi. Shunda uni <code>unique</code> ga qo'shing.",
+      "en": "<code>seen.insert(x).second</code> returns <code>true</code> when the element was not there before — a ready-made “first time” check. Then push it into <code>unique</code>."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "cpp",
+     "title": { "ru": "Выручка по городам", "uz": "Shaharlar bo'yicha tushum", "en": "Revenue by city" },
+     "brief": { "ru": "vector пар в map", "uz": "Juftliklar vektoridan map ga", "en": "A vector of pairs into a map" },
+     "desc": {
+      "ru": "<p>Дан вектор пар <code>(город, сумма)</code>. Посчитай выручку по каждому городу и выведи по алфавиту в формате <code>город = сумма</code>.</p><p>Затем отдельной строкой выведи <code>всего = N</code> — сумму по всем городам.</p>",
+      "uz": "<p><code>(shahar, summa)</code> juftliklar vektori berilgan. Har shahar bo'yicha tushumni hisoblang va alifbo bo'yicha <code>shahar = summa</code> formatida chiqaring.</p><p>So'ng alohida qatorda <code>всего = N</code> — barcha shaharlar bo'yicha yig'indini chiqaring.</p>",
+      "en": "<p>You are given a vector of <code>(city, amount)</code> pairs. Compute the revenue per city and print it alphabetically as <code>city = amount</code>.</p><p>Then, on a separate line, print <code>всего = N</code> — the total across all cities.</p>"
+     },
+     "starter": "#include <iostream>\n#include <vector>\n#include <string>\n#include <map>\n\nint main() {\n    std::vector<std::pair<std::string, int>> orders{\n        {\"Ташкент\", 250}, {\"Бухара\", 100}, {\"Ташкент\", 400}, {\"Самарканд\", 180},\n    };\n\n    // твой код\n\n    return 0;\n}\n",
+     "solution": "#include <iostream>\n#include <vector>\n#include <string>\n#include <map>\n\nint main() {\n    std::vector<std::pair<std::string, int>> orders{\n        {\"Ташкент\", 250}, {\"Бухара\", 100}, {\"Ташкент\", 400}, {\"Самарканд\", 180},\n    };\n\n    std::map<std::string, int> totals;\n    int all = 0;\n    for (const auto& [city, amount] : orders) {\n        totals[city] += amount;\n        all += amount;\n    }\n\n    for (const auto& [city, sum] : totals)\n        std::cout << city << \" = \" << sum << \"\\n\";\n    std::cout << \"всего = \" << all << \"\\n\";\n    return 0;\n}\n",
+     "expected": "Бухара = 100\nСамарканд = 180\nТашкент = 650\nвсего = 930",
+     "hint": {
+      "ru": "Структурная привязка <code>for (const auto&amp; [city, amount] : orders)</code> разбирает пару сразу. Внутри — <code>totals[city] += amount;</code> и накопление общей суммы.",
+      "uz": "<code>for (const auto&amp; [city, amount] : orders)</code> struktura bog'lanishi juftlikni darhol ajratadi. Ichida — <code>totals[city] += amount;</code> va umumiy summani to'plash.",
+      "en": "The structured binding <code>for (const auto&amp; [city, amount] : orders)</code> unpacks the pair at once. Inside: <code>totals[city] += amount;</code> plus accumulating the grand total."
+     }
+    }
+   ],
+   "exam": {
+    "time": 600,
+    "questions": [
+     {
+      "q": { "ru": "Нужен контейнер для миллиона чисел с быстрым доступом по индексу. Что взять?", "uz": "Indeks bo'yicha tez kiriladigan million son uchun konteyner kerak. Nima olinadi?", "en": "You need a container for a million numbers with fast index access. What do you take?" },
+      "options": [
+       { "ru": "std::list", "uz": "std::list", "en": "std::list" },
+       { "ru": "std::vector", "uz": "std::vector", "en": "std::vector" },
+       { "ru": "std::map", "uz": "std::map", "en": "std::map" },
+       { "ru": "std::set", "uz": "std::set", "en": "std::set" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Нужно проверять «есть ли такой email» среди миллиона. Что быстрее?", "uz": "Million ichida «bunday email bormi» ni tekshirish kerak. Qaysi biri tezroq?", "en": "You need to check “does this email exist” among a million. What is faster?" },
+      "options": [
+       { "ru": "vector с перебором", "uz": "aylanib chiqiladigan vector", "en": "A vector with a scan" },
+       { "ru": "unordered_set — поиск O(1) в среднем", "uz": "unordered_set — qidiruv o'rtacha O(1)", "en": "unordered_set — lookup is O(1) on average" },
+       { "ru": "deque", "uz": "deque", "en": "deque" },
+       { "ru": "Разницы нет", "uz": "Farqi yo'q", "en": "There is no difference" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Что произойдёт после <code>v.reserve(1000)</code>?", "uz": "<code>v.reserve(1000)</code> dan keyin nima bo'ladi?", "en": "What happens after <code>v.reserve(1000)</code>?" },
+      "options": [
+       { "ru": "Вектор получит 1000 элементов", "uz": "Vektor 1000 element oladi", "en": "The vector gets 1000 elements" },
+       { "ru": "Память под 1000 элементов выделится сразу, size останется прежним", "uz": "1000 element uchun xotira darhol ajratiladi, size o'sha qoladi", "en": "Memory for 1000 elements is allocated at once, size stays the same" },
+       { "ru": "Вектор станет неизменяемым", "uz": "Vektor o'zgarmas bo'ladi", "en": "The vector becomes immutable" },
+       { "ru": "Ничего", "uz": "Hech nima", "en": "Nothing" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "<code>if (m[key] == 0)</code> для map. В чём беда?", "uz": "map uchun <code>if (m[key] == 0)</code>. Bardagi nima?", "en": "<code>if (m[key] == 0)</code> on a map. What is the trouble?" },
+      "options": [
+       { "ru": "Ни в чём", "uz": "Hech nimada", "en": "None" },
+       { "ru": "Проверка сама вставляет ключ, и map растёт", "uz": "Tekshiruvning o'zi kalit qo'yadi va map o'sadi", "en": "The check itself inserts the key and the map grows" },
+       { "ru": "Не скомпилируется", "uz": "Kompilyatsiya qilinmaydi", "en": "It will not compile" },
+       { "ru": "Работает только с int", "uz": "Faqat int bilan ishlaydi", "en": "It works only with int" }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "cpp",
+      "title": { "ru": "Топ покупателей", "uz": "Top xaridorlar", "en": "Top customers" },
+      "desc": {
+       "ru": "<p>Дан вектор пар <code>(имя, сумма)</code> — покупки за день, одно имя может встречаться несколько раз.</p><ol><li>Просуммируй покупки по каждому имени.</li><li>Отсортируй по сумме <b>по убыванию</b>; при равных суммах — по имени по алфавиту.</li><li>Выведи в формате <code>1. имя 650</code>, каждого с новой строки.</li></ol><p>Подсказка по структуре: <code>map</code> для подсчёта, потом перелей в <code>vector</code> пар и отсортируй его.</p>",
+       "uz": "<p><code>(ism, summa)</code> juftliklar vektori berilgan — kunlik xaridlar, bitta ism bir necha marta uchrashi mumkin.</p><ol><li>Har ism bo'yicha xaridlarni jamlang.</li><li>Summa bo'yicha <b>kamayish</b> tartibida saralang; summalar teng bo'lsa — ism bo'yicha alifbo tartibida.</li><li><code>1. ism 650</code> formatida, har birini yangi qatordan chiqaring.</li></ol><p>Tuzilma bo'yicha maslahat: sanash uchun <code>map</code>, keyin juftliklar <code>vector</code> iga quyib, uni saralang.</p>",
+       "en": "<p>You are given a vector of <code>(name, amount)</code> pairs — a day of purchases, where one name may appear several times.</p><ol><li>Sum the purchases per name.</li><li>Sort by amount <b>descending</b>; on equal amounts, by name alphabetically.</li><li>Print as <code>1. name 650</code>, one per line.</li></ol><p>A structural hint: a <code>map</code> to count, then pour it into a <code>vector</code> of pairs and sort that.</p>"
+      },
+      "starter": "#include <iostream>\n#include <vector>\n#include <string>\n#include <map>\n#include <algorithm>\n\nint main() {\n    std::vector<std::pair<std::string, int>> purchases{\n        {\"aziz\", 250}, {\"bek\", 410}, {\"aziz\", 400}, {\"dilnoza\", 250}, {\"bek\", 240},\n    };\n\n    // твой код\n\n    return 0;\n}\n",
+      "solution": "#include <iostream>\n#include <vector>\n#include <string>\n#include <map>\n#include <algorithm>\n\nint main() {\n    std::vector<std::pair<std::string, int>> purchases{\n        {\"aziz\", 250}, {\"bek\", 410}, {\"aziz\", 400}, {\"dilnoza\", 250}, {\"bek\", 240},\n    };\n\n    std::map<std::string, int> totals;\n    for (const auto& [name, amount] : purchases)\n        totals[name] += amount;\n\n    // map нельзя отсортировать по значению — переливаем в vector\n    std::vector<std::pair<std::string, int>> rows(totals.begin(), totals.end());\n    std::sort(rows.begin(), rows.end(), [](const auto& a, const auto& b) {\n        if (a.second != b.second) return a.second > b.second;   // по сумме убывая\n        return a.first < b.first;                               // при равенстве — по имени\n    });\n\n    for (size_t i = 0; i < rows.size(); i++)\n        std::cout << (i + 1) << \". \" << rows[i].first << ' ' << rows[i].second << \"\\n\";\n    return 0;\n}\n",
+      "expected": "1. aziz 650\n2. bek 650\n3. dilnoza 250",
+      "hint": {
+       "ru": "<code>map</code> сортирует по ключу, а нам нужен порядок по значению — поэтому переливаем: <code>std::vector&lt;...&gt; rows(totals.begin(), totals.end());</code>. Дальше <code>std::sort</code> с лямбдой, где сначала сравниваем суммы, а при равенстве — имена.",
+       "uz": "<code>map</code> kalit bo'yicha saralaydi, bizga esa qiymat bo'yicha tartib kerak — shuning uchun quyamiz: <code>std::vector&lt;...&gt; rows(totals.begin(), totals.end());</code>. Keyin lambdali <code>std::sort</code>, unda avval summalarni, tenglikda esa ismlarni solishtiramiz.",
+       "en": "<code>map</code> sorts by key while we need order by value — so pour it over: <code>std::vector&lt;...&gt; rows(totals.begin(), totals.end());</code>. Then <code>std::sort</code> with a lambda comparing amounts first and names on a tie."
+      }
+     }
+    ]
+   }
   }
  ]
 }

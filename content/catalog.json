@@ -729,14 +729,14 @@
    "color": "#94a3b8",
    "level": "beginner",
    "status": "full",
-   "estimatedHours": 20,
+   "estimatedHours": 26,
    "requires": [],
    "grants": [
     "c-memory",
     "c-strings"
    ],
    "legacyIds": [],
-   "moduleCount": 2,
+   "moduleCount": 3,
    "compiled": true,
    "runner": "c"
   },
@@ -756,7 +756,7 @@
    "color": "#818cf8",
    "level": "intermediate",
    "status": "full",
-   "estimatedHours": 22,
+   "estimatedHours": 28,
    "requires": [
     "c-memory"
    ],
@@ -765,7 +765,7 @@
     "cpp-templates"
    ],
    "legacyIds": [],
-   "moduleCount": 2,
+   "moduleCount": 3,
    "compiled": true,
    "runner": "cpp"
   },
@@ -785,14 +785,14 @@
    "color": "#a78bfa",
    "level": "beginner",
    "status": "full",
-   "estimatedHours": 16,
+   "estimatedHours": 22,
    "requires": [],
    "grants": [
     "csharp-basics-skill",
     "static-typing"
    ],
    "legacyIds": [],
-   "moduleCount": 2,
+   "moduleCount": 3,
    "compiled": true,
    "runner": "csharp"
   },
@@ -812,14 +812,14 @@
    "color": "#f97316",
    "level": "beginner",
    "status": "full",
-   "estimatedHours": 20,
+   "estimatedHours": 32,
    "requires": [],
    "grants": [
     "java-basics-skill",
     "java-collections"
    ],
    "legacyIds": [],
-   "moduleCount": 2,
+   "moduleCount": 4,
    "compiled": true,
    "runner": "java"
   },

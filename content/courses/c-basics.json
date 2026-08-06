@@ -1308,6 +1308,353 @@
      }
     ]
    }
+  },
+  {
+   "id": "c-03",
+   "title": { "ru": "Стандартная библиотека C", "uz": "C standart kutubxonasi", "en": "The C standard library" },
+   "tagline": { "ru": "stdio, string.h, stdlib и math — то, что не надо писать самому", "uz": "stdio, string.h, stdlib va math — o'zingiz yozmasligingiz kerak bo'lgan narsa", "en": "stdio, string.h, stdlib and math — what you should not write yourself" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "Файлы: fopen, fprintf, fscanf", "uz": "Fayllar: fopen, fprintf, fscanf", "en": "Files: fopen, fprintf, fscanf" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Файл в C — это <code>FILE*</code>, указатель на структуру, которой управляет библиотека. Работа всегда идёт по одной схеме: открыл → проверил → поработал → закрыл.</p><ul><li><code>fopen(имя, режим)</code> — режимы те же, что везде: <code>\"r\"</code>, <code>\"w\"</code>, <code>\"a\"</code></li><li><code>fprintf(f, ...)</code> и <code>fscanf(f, ...)</code> — как printf/scanf, только в файл</li><li><code>fgets(буфер, размер, f)</code> — прочитать строку целиком</li><li><code>fclose(f)</code> — закрыть; без этого данные могут не долететь до диска</li></ul><p>Ключевое отличие от Python: <b>никто не закроет файл за тебя</b>. Нет <code>with</code>, нет сборщика мусора — забыл <code>fclose</code>, потерял данные.</p>",
+        "uz": "<p>C dagi fayl — bu <code>FILE*</code>, kutubxona boshqaradigan strukturaga ko'rsatkich. Ish doim bitta sxema bo'yicha ketadi: ochdi → tekshirdi → ishladi → yopdi.</p><ul><li><code>fopen(nom, rejim)</code> — rejimlar hamma joydagidek: <code>\"r\"</code>, <code>\"w\"</code>, <code>\"a\"</code></li><li><code>fprintf(f, ...)</code> va <code>fscanf(f, ...)</code> — printf/scanf kabi, faqat faylga</li><li><code>fgets(bufer, hajm, f)</code> — qatorni butunlay o'qish</li><li><code>fclose(f)</code> — yopish; usiz ma'lumot diskka yetib bormasligi mumkin</li></ul><p>Python dan asosiy farq: <b>faylni siz uchun hech kim yopmaydi</b>. <code>with</code> yo'q, axlat yig'uvchi yo'q — <code>fclose</code> ni unutdingiz, ma'lumotni yo'qotdingiz.</p>",
+        "en": "<p>A file in C is a <code>FILE*</code>, a pointer to a structure the library manages. The work always follows one shape: open → check → work → close.</p><ul><li><code>fopen(name, mode)</code> — the modes are the usual ones: <code>\"r\"</code>, <code>\"w\"</code>, <code>\"a\"</code></li><li><code>fprintf(f, ...)</code> and <code>fscanf(f, ...)</code> — like printf/scanf but into a file</li><li><code>fgets(buffer, size, f)</code> — read a whole line</li><li><code>fclose(f)</code> — close it; without this the data may never reach the disk</li></ul><p>The key difference from Python: <b>nobody closes the file for you</b>. There is no <code>with</code> and no garbage collector — forget <code>fclose</code> and you lose data.</p>"
+       }
+      },
+      {
+       "type": "crun",
+       "code": "#include <stdio.h>\n\nint main(void) {\n    FILE* f = fopen(\"scores.txt\", \"w\");\n    if (f == NULL) {                 /* проверять обязательно: диск может быть занят */\n        printf(\"не смог открыть файл\\n\");\n        return 1;\n    }\n    fprintf(f, \"aziz 300\\n\");\n    fprintf(f, \"bek 250\\n\");\n    fprintf(f, \"dilnoza 410\\n\");\n    fclose(f);\n\n    f = fopen(\"scores.txt\", \"r\");\n    if (f == NULL) return 1;\n\n    char name[32];\n    int score, total = 0, count = 0;\n    /* fscanf возвращает, сколько значений удалось прочитать */\n    while (fscanf(f, \"%31s %d\", name, &score) == 2) {\n        printf(\"%-10s %d\\n\", name, score);\n        total += score;\n        count++;\n    }\n    fclose(f);\n\n    printf(\"строк: %d, сумма: %d, среднее: %.1f\\n\", count, total, (double)total / count);\n    return 0;\n}"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Три вещи в этом коде стоят внимания.</p><p><b>Проверка на <code>NULL</code>.</b> <code>fopen</code> возвращает <code>NULL</code>, если файла нет или прав не хватило. Работать с таким указателем — мгновенное падение.</p><p><b>Ширина в <code>%31s</code>.</b> Буфер на 32 байта, читаем максимум 31 символ плюс завершающий ноль. Без ограничения длинное слово молча запишется за пределы массива — это классическая уязвимость, из-за которой ломают программы.</p><p><b>Условие цикла.</b> <code>fscanf</code> возвращает число успешно прочитанных значений, а не признак конца. Сравнение с <code>2</code> и означает «обе колонки на месте».</p>",
+        "uz": "<p>Bu kodda uch narsa e'tiborga arziydi.</p><p><b><code>NULL</code> ga tekshirish.</b> Fayl bo'lmasa yoki huquq yetmasa <code>fopen</code> <code>NULL</code> qaytaradi. Bunday ko'rsatkich bilan ishlash — bir zumda yiqilish.</p><p><b><code>%31s</code> dagi kenglik.</b> Bufer 32 bayt, ko'pi bilan 31 belgi va yakuniy nolni o'qiymiz. Cheklovsiz uzun so'z jimgina massiv chegarasidan tashqariga yoziladi — bu dasturlarni buzadigan klassik zaiflik.</p><p><b>Sikl sharti.</b> <code>fscanf</code> tugash belgisini emas, muvaffaqiyatli o'qilgan qiymatlar sonini qaytaradi. <code>2</code> bilan solishtirish «ikkala ustun ham joyida» degani.</p>",
+        "en": "<p>Three things in this code deserve attention.</p><p><b>The <code>NULL</code> check.</b> <code>fopen</code> returns <code>NULL</code> if the file is missing or permissions are lacking. Working with such a pointer is an instant crash.</p><p><b>The width in <code>%31s</code>.</b> The buffer is 32 bytes, so we read at most 31 characters plus the terminating zero. Without the limit a long word is silently written past the end of the array — the classic vulnerability programs are broken through.</p><p><b>The loop condition.</b> <code>fscanf</code> returns the number of values successfully read, not an end-of-file flag. Comparing with <code>2</code> means “both columns are there”.</p>"
+       }
+      },
+      {
+       "type": "checkpoint",
+       "q": { "ru": "Почему <code>%s</code> в scanf без ширины опасен?", "uz": "Nega scanf dagi kengliksiz <code>%s</code> xavfli?", "en": "Why is <code>%s</code> in scanf without a width dangerous?" },
+       "options": [
+        { "ru": "Работает медленно", "uz": "Sekin ishlaydi", "en": "It works slowly" },
+        { "ru": "Длинный ввод запишется за границу массива и испортит память", "uz": "Uzun kiritish massiv chegarasidan tashqariga yozilib, xotirani buzadi", "en": "Long input writes past the end of the array and corrupts memory" },
+        { "ru": "Не читает пробелы", "uz": "Bo'shliqlarni o'qimaydi", "en": "It does not read spaces" },
+        { "ru": "Требует free", "uz": "free talab qiladi", "en": "It requires free" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Это переполнение буфера — то, чем взламывают программы на C десятилетиями. Всегда указывай ширину: <code>%31s</code> для массива <code>char[32]</code>.",
+        "uz": "Bu bufer to'lib ketishi — C dasturlarini o'nlab yillar davomida shu bilan buzishadi. Doim kenglikni ko'rsating: <code>char[32]</code> massiv uchun <code>%31s</code>.",
+        "en": "This is a buffer overflow — how C programs have been exploited for decades. Always give a width: <code>%31s</code> for a <code>char[32]</code> array."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "string.h: работа со строками", "uz": "string.h: satrlar bilan ishlash", "en": "string.h: working with strings" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>В C нет типа «строка» — есть массив <code>char</code>, который заканчивается нулевым байтом <code>'\\0'</code>. Все функции из <code>string.h</code> ищут именно его.</p><ul><li><code>strlen(s)</code> — длина <b>без</b> нулевого байта</li><li><code>strcpy(dst, src)</code> / <code>strncpy</code> — копирование</li><li><code>strcmp(a, b)</code> — сравнение: <code>0</code> значит «равны»</li><li><code>strcat(dst, src)</code> — склейка</li><li><code>strchr(s, c)</code> / <code>strstr(s, sub)</code> — поиск символа и подстроки</li></ul><p>Обрати внимание на <code>strcmp</code>: он возвращает <b>ноль при равенстве</b>. Условие <code>if (strcmp(a, b))</code> означает «строки РАЗНЫЕ» — на этом спотыкаются все.</p>",
+        "uz": "<p>C da «satr» turi yo'q — nol bayt <code>'\\0'</code> bilan tugaydigan <code>char</code> massivi bor. <code>string.h</code> dagi barcha funksiyalar aynan uni qidiradi.</p><ul><li><code>strlen(s)</code> — nol baytsiz uzunlik</li><li><code>strcpy(dst, src)</code> / <code>strncpy</code> — nusxalash</li><li><code>strcmp(a, b)</code> — solishtirish: <code>0</code> «teng» degani</li><li><code>strcat(dst, src)</code> — yopishtirish</li><li><code>strchr(s, c)</code> / <code>strstr(s, sub)</code> — belgi va qism satr qidirish</li></ul><p><code>strcmp</code> ga e'tibor bering: u <b>tenglikda nol</b> qaytaradi. <code>if (strcmp(a, b))</code> sharti «satrlar HAR XIL» degani — hamma shunda qoqiladi.</p>",
+        "en": "<p>C has no “string” type — it has a <code>char</code> array ending with a zero byte <code>'\\0'</code>. Every function in <code>string.h</code> looks for exactly that.</p><ul><li><code>strlen(s)</code> — the length <b>without</b> the zero byte</li><li><code>strcpy(dst, src)</code> / <code>strncpy</code> — copying</li><li><code>strcmp(a, b)</code> — comparison: <code>0</code> means “equal”</li><li><code>strcat(dst, src)</code> — concatenation</li><li><code>strchr(s, c)</code> / <code>strstr(s, sub)</code> — finding a character and a substring</li></ul><p>Note <code>strcmp</code>: it returns <b>zero on equality</b>. The condition <code>if (strcmp(a, b))</code> means “the strings DIFFER” — everybody trips on this.</p>"
+       }
+      },
+      {
+       "type": "crun",
+       "code": "#include <stdio.h>\n#include <string.h>\n\nint main(void) {\n    char name[32] = \"Aziz\";\n    char greeting[64];\n\n    printf(\"длина: %zu\\n\", strlen(name));\n\n    strcpy(greeting, \"Привет, \");\n    strcat(greeting, name);\n    strcat(greeting, \"!\");\n    printf(\"%s\\n\", greeting);\n\n    /* strcmp: 0 = равны, <0 = первая раньше, >0 = позже */\n    printf(\"cmp(Aziz, Aziz) = %d\\n\", strcmp(\"Aziz\", \"Aziz\"));\n    printf(\"равны? %s\\n\", strcmp(name, \"Aziz\") == 0 ? \"да\" : \"нет\");\n\n    const char* text = \"level=42;hp=100\";\n    const char* found = strstr(text, \"hp=\");\n    printf(\"нашли подстроку: %s\\n\", found ? found : \"нет\");\n\n    /* строка — массив байтов, поэтому кириллица занимает по два байта */\n    printf(\"strlen(\\\"Привет\\\") = %zu байт\\n\", strlen(\"Привет\"));\n\n    /* безопасное копирование с ограничением */\n    char small[8];\n    strncpy(small, \"очень длинная строка\", sizeof(small) - 1);\n    small[sizeof(small) - 1] = '\\0';   /* strncpy сам ноль не поставит */\n    printf(\"обрезано: %s\\n\", small);\n    return 0;\n}"
+      },
+      {
+       "type": "note",
+       "kind": "trap",
+       "html": {
+        "ru": "<code>strncpy</code> не гарантирует нулевой байт: если источник длиннее лимита, копия останется без завершения, и следующий <code>printf</code> прочитает чужую память. Поэтому строку из примера всегда дописывают вручную: <code>small[sizeof(small) - 1] = '\\0';</code>. Это не придирка, а обязательная строчка.",
+        "uz": "<code>strncpy</code> nol baytni kafolatlamaydi: manba limitdan uzun bo'lsa, nusxa yakunlanmasdan qoladi va keyingi <code>printf</code> begona xotirani o'qiydi. Shuning uchun misoldagi qator doim qo'lda yoziladi: <code>small[sizeof(small) - 1] = '\\0';</code>. Bu injiqlik emas, majburiy qator.",
+        "en": "<code>strncpy</code> does not guarantee a zero byte: if the source is longer than the limit, the copy is left unterminated and the next <code>printf</code> reads someone else's memory. That is why the line from the example is always written by hand: <code>small[sizeof(small) - 1] = '\\0';</code>. Not pedantry — a mandatory line."
+       }
+      },
+      {
+       "type": "predict",
+       "lang": "c",
+       "code": "#include <stdio.h>\n#include <string.h>\n\nint main(void) {\n    if (strcmp(\"abc\", \"abc\"))\n        printf(\"равны\\n\");\n    else\n        printf(\"не равны\\n\");\n    return 0;\n}",
+       "options": [
+        { "ru": "равны", "uz": "равны", "en": "равны" },
+        { "ru": "не равны", "uz": "не равны", "en": "не равны" },
+        { "ru": "Ошибка компиляции", "uz": "Kompilyatsiya xatosi", "en": "A compile error" },
+        { "ru": "Ничего не выведет", "uz": "Hech nima chiqarmaydi", "en": "It prints nothing" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Строки одинаковые, значит <code>strcmp</code> вернул <code>0</code>, а ноль в условии — это ложь. Сработала ветка <code>else</code>. Правильно писать <code>if (strcmp(a, b) == 0)</code>.",
+        "uz": "Satrlar bir xil, demak <code>strcmp</code> <code>0</code> qaytardi, shartdagi nol esa yolg'on. <code>else</code> tarmog'i ishladi. To'g'risi <code>if (strcmp(a, b) == 0)</code> deb yozish.",
+        "en": "The strings are identical, so <code>strcmp</code> returned <code>0</code>, and zero in a condition is false. The <code>else</code> branch ran. The correct form is <code>if (strcmp(a, b) == 0)</code>."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "stdlib и math: сортировка, числа, случайность", "uz": "stdlib va math: saralash, sonlar, tasodif", "en": "stdlib and math: sorting, numbers, randomness" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><code>stdlib.h</code> — это швейцарский нож: память, преобразования, сортировка, случайные числа.</p><ul><li><code>malloc</code>, <code>calloc</code>, <code>realloc</code>, <code>free</code> — память</li><li><code>atoi</code>, <code>atof</code>, <code>strtol</code> — строка в число</li><li><code>qsort</code> — сортировка чего угодно</li><li><code>abs</code>, <code>rand</code>, <code>srand</code> — модуль и случайность</li></ul><p><code>qsort</code> заслуживает отдельного разговора. Она сортирует массив <b>любого</b> типа, потому что ничего о нём не знает: ей дают адрес, количество элементов, размер одного элемента и <b>функцию сравнения</b>. Это и есть обобщённое программирование до появления шаблонов.</p><p>А <code>math.h</code> даёт <code>sqrt</code>, <code>pow</code>, <code>fabs</code>, <code>floor</code>, <code>ceil</code>, <code>round</code> и тригонометрию.</p>",
+        "uz": "<p><code>stdlib.h</code> — bu shveytsariya pichog'i: xotira, o'zgartirishlar, saralash, tasodifiy sonlar.</p><ul><li><code>malloc</code>, <code>calloc</code>, <code>realloc</code>, <code>free</code> — xotira</li><li><code>atoi</code>, <code>atof</code>, <code>strtol</code> — satrdan songa</li><li><code>qsort</code> — istalgan narsani saralash</li><li><code>abs</code>, <code>rand</code>, <code>srand</code> — modul va tasodif</li></ul><p><code>qsort</code> alohida suhbatga arziydi. U <b>har qanday</b> turdagi massivni saralaydi, chunki u haqida hech nima bilmaydi: unga manzil, elementlar soni, bitta element hajmi va <b>solishtirish funksiyasi</b> beriladi. Bu shablonlar paydo bo'lishidan oldingi umumlashgan dasturlash.</p><p><code>math.h</code> esa <code>sqrt</code>, <code>pow</code>, <code>fabs</code>, <code>floor</code>, <code>ceil</code>, <code>round</code> va trigonometriyani beradi.</p>",
+        "en": "<p><code>stdlib.h</code> is the Swiss army knife: memory, conversions, sorting, random numbers.</p><ul><li><code>malloc</code>, <code>calloc</code>, <code>realloc</code>, <code>free</code> — memory</li><li><code>atoi</code>, <code>atof</code>, <code>strtol</code> — string to number</li><li><code>qsort</code> — sorting anything</li><li><code>abs</code>, <code>rand</code>, <code>srand</code> — absolute value and randomness</li></ul><p><code>qsort</code> deserves its own conversation. It sorts an array of <b>any</b> type precisely because it knows nothing about it: you give it an address, an element count, the size of one element and a <b>comparison function</b>. This is generic programming before templates existed.</p><p>And <code>math.h</code> provides <code>sqrt</code>, <code>pow</code>, <code>fabs</code>, <code>floor</code>, <code>ceil</code>, <code>round</code> and trigonometry.</p>"
+       }
+      },
+      {
+       "type": "crun",
+       "code": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <math.h>\n\n/* qsort передаёт указатели на элементы — их надо привести к своему типу */\nint cmp_int(const void* a, const void* b) {\n    int x = *(const int*)a;\n    int y = *(const int*)b;\n    return (x > y) - (x < y);        /* безопаснее, чем x - y: не переполнится */\n}\n\ntypedef struct { char name[16]; int score; } Player;\n\nint cmp_player(const void* a, const void* b) {\n    const Player* p = (const Player*)a;\n    const Player* q = (const Player*)b;\n    return q->score - p->score;      /* по убыванию очков */\n}\n\nint main(void) {\n    int nums[] = {42, 7, 19, 3, 25};\n    int n = sizeof(nums) / sizeof(nums[0]);\n    qsort(nums, n, sizeof(int), cmp_int);\n    for (int i = 0; i < n; i++) printf(\"%d \", nums[i]);\n    printf(\"\\n\");\n\n    Player players[3];\n    strcpy(players[0].name, \"aziz\");    players[0].score = 300;\n    strcpy(players[1].name, \"bek\");     players[1].score = 410;\n    strcpy(players[2].name, \"dilnoza\"); players[2].score = 250;\n    qsort(players, 3, sizeof(Player), cmp_player);\n    for (int i = 0; i < 3; i++) printf(\"%s:%d \", players[i].name, players[i].score);\n    printf(\"\\n\");\n\n    printf(\"atoi(\\\"250\\\") + 50 = %d\\n\", atoi(\"250\") + 50);\n    printf(\"sqrt(144) = %.0f, pow(2, 10) = %.0f\\n\", sqrt(144.0), pow(2.0, 10.0));\n    printf(\"round(2.5) = %.0f, floor(2.9) = %.0f\\n\", round(2.5), floor(2.9));\n    return 0;\n}"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Функция сравнения — договор с <code>qsort</code>: верни отрицательное, если первый меньше, ноль при равенстве, положительное иначе.</p><p>Обрати внимание на <code>(x &gt; y) - (x &lt; y)</code> вместо привычного <code>x - y</code>. Разность двух больших int может <b>переполниться</b> и дать неправильный знак — сортировка молча сломается на редких данных. Это тот случай, когда «очевидная» короткая запись хуже.</p><p>И про <code>atoi</code>: на нечисловой строке она возвращает <code>0</code>, не сообщая об ошибке. Отличить «ноль» от «мусор» она не умеет — в серьёзном коде берут <code>strtol</code>, которая умеет.</p>",
+        "uz": "<p>Solishtirish funksiyasi — <code>qsort</code> bilan shartnoma: birinchisi kichik bo'lsa manfiy, teng bo'lsa nol, aks holda musbat qaytaring.</p><p>Odatiy <code>x - y</code> o'rniga <code>(x &gt; y) - (x &lt; y)</code> ga e'tibor bering. Ikki katta int ayirmasi <b>to'lib ketishi</b> va noto'g'ri ishora berishi mumkin — saralash kam uchraydigan ma'lumotda jimgina buziladi. Bu «ravshan» qisqa yozuv yomonroq bo'lgan holat.</p><p>Va <code>atoi</code> haqida: sonli bo'lmagan satrda u xato haqida xabar bermasdan <code>0</code> qaytaradi. «Nol» ni «axlat» dan ajrata olmaydi — jiddiy kodda buni biladigan <code>strtol</code> olinadi.</p>",
+        "en": "<p>The comparison function is your contract with <code>qsort</code>: return negative if the first is smaller, zero on equality, positive otherwise.</p><p>Note <code>(x &gt; y) - (x &lt; y)</code> instead of the familiar <code>x - y</code>. The difference of two large ints can <b>overflow</b> and produce the wrong sign — the sort quietly breaks on rare data. This is a case where the “obvious” short form is worse.</p><p>And about <code>atoi</code>: on a non-numeric string it returns <code>0</code> without reporting an error. It cannot tell “zero” from “garbage” — serious code uses <code>strtol</code>, which can.</p>"
+       }
+      },
+      {
+       "type": "summary",
+       "items": [
+        { "ru": "fopen может вернуть NULL — проверяй всегда", "uz": "fopen NULL qaytarishi mumkin — doim tekshiring", "en": "fopen can return NULL — always check" },
+        { "ru": "В scanf указывай ширину: %31s для char[32]", "uz": "scanf da kenglikni ko'rsating: char[32] uchun %31s", "en": "Give scanf a width: %31s for a char[32]" },
+        { "ru": "Строка кончается '\\0'; strlen считает байты, а не символы", "uz": "Satr '\\0' bilan tugaydi; strlen belgilarni emas, baytlarni sanaydi", "en": "A string ends with '\\0'; strlen counts bytes, not characters" },
+        { "ru": "strcmp возвращает 0 при равенстве — пиши == 0 явно", "uz": "strcmp tenglikda 0 qaytaradi — == 0 ni aniq yozing", "en": "strcmp returns 0 on equality — write == 0 explicitly" },
+        { "ru": "strncpy не ставит нулевой байт — дописывай его сам", "uz": "strncpy nol bayt qo'ymaydi — uni o'zingiz yozing", "en": "strncpy does not add the zero byte — write it yourself" },
+        { "ru": "qsort работает с любым типом через функцию сравнения", "uz": "qsort solishtirish funksiyasi orqali har qanday tur bilan ishlaydi", "en": "qsort works with any type through a comparison function" },
+        { "ru": "В сравнении не пиши x - y: разность может переполниться", "uz": "Solishtirishda x - y yozmang: ayirma to'lib ketishi mumkin", "en": "Do not write x - y in a comparator: the difference can overflow" }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": { "ru": "Что вернёт <code>fopen</code>, если файла нет?", "uz": "Fayl bo'lmasa <code>fopen</code> nima qaytaradi?", "en": "What does <code>fopen</code> return if the file is missing?" },
+     "options": [
+      { "ru": "0", "uz": "0", "en": "0" },
+      { "ru": "NULL", "uz": "NULL", "en": "NULL" },
+      { "ru": "-1", "uz": "-1", "en": "-1" },
+      { "ru": "Пустой FILE", "uz": "Bo'sh FILE", "en": "An empty FILE" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Проверка <code>if (f == NULL)</code> обязательна: работа с нулевым указателем роняет программу сразу.",
+      "uz": "<code>if (f == NULL)</code> tekshiruvi majburiy: nol ko'rsatkich bilan ishlash dasturni darhol yiqitadi.",
+      "en": "The <code>if (f == NULL)</code> check is mandatory: working with a null pointer crashes the program instantly."
+     }
+    },
+    {
+     "q": { "ru": "Чему равно <code>strcmp(\"abc\", \"abc\")</code>?", "uz": "<code>strcmp(\"abc\", \"abc\")</code> nechaga teng?", "en": "What is <code>strcmp(\"abc\", \"abc\")</code>?" },
+     "options": [
+      { "ru": "1 — строки равны", "uz": "1 — satrlar teng", "en": "1 — the strings are equal" },
+      { "ru": "0 — ноль означает равенство", "uz": "0 — nol tenglikni bildiradi", "en": "0 — zero means equality" },
+      { "ru": "3 — длина строки", "uz": "3 — satr uzunligi", "en": "3 — the string length" },
+      { "ru": "-1", "uz": "-1", "en": "-1" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Именно поэтому <code>if (strcmp(a, b))</code> без сравнения читается наоборот: срабатывает, когда строки РАЗНЫЕ.",
+      "uz": "Aynan shuning uchun solishtirishsiz <code>if (strcmp(a, b))</code> teskari o'qiladi: satrlar HAR XIL bo'lganda ishlaydi.",
+      "en": "That is exactly why <code>if (strcmp(a, b))</code> without a comparison reads backwards: it fires when the strings DIFFER."
+     }
+    },
+    {
+     "q": { "ru": "Чему равен <code>strlen(\"Привет\")</code>?", "uz": "<code>strlen(\"Привет\")</code> nechaga teng?", "en": "What is <code>strlen(\"Привет\")</code>?" },
+     "options": [
+      { "ru": "6 — по числу букв", "uz": "6 — harflar soniga ko'ra", "en": "6 — one per letter" },
+      { "ru": "12 — считаются байты, а кириллица занимает по два", "uz": "12 — baytlar sanaladi, kirill esa ikkitadan egallaydi", "en": "12 — bytes are counted and Cyrillic takes two each" },
+      { "ru": "7 — с нулевым байтом", "uz": "7 — nol bayt bilan", "en": "7 — including the zero byte" },
+      { "ru": "0", "uz": "0", "en": "0" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "<code>strlen</code> считает байты до <code>'\\0'</code>. В UTF-8 кириллическая буква занимает два байта — отсюда 12. Для латиницы совпало бы с числом букв.",
+      "uz": "<code>strlen</code> <code>'\\0'</code> gacha baytlarni sanaydi. UTF-8 da kirill harfi ikki bayt egallaydi — shundan 12. Lotin uchun harflar soniga mos kelardi.",
+      "en": "<code>strlen</code> counts bytes up to <code>'\\0'</code>. In UTF-8 a Cyrillic letter takes two bytes — hence 12. For Latin it would match the letter count."
+     }
+    },
+    {
+     "q": { "ru": "Что нужно передать <code>qsort</code>, кроме массива и его размеров?", "uz": "Massiv va uning o'lchamlaridan tashqari <code>qsort</code> ga nima uzatish kerak?", "en": "Besides the array and its sizes, what must <code>qsort</code> receive?" },
+     "options": [
+      { "ru": "Тип элементов", "uz": "Elementlar turini", "en": "The element type" },
+      { "ru": "Функцию сравнения двух элементов", "uz": "Ikki elementni solishtirish funksiyasini", "en": "A function comparing two elements" },
+      { "ru": "Порядок сортировки строкой", "uz": "Saralash tartibini satr bilan", "en": "The sort order as a string" },
+      { "ru": "Ничего больше", "uz": "Boshqa hech nima", "en": "Nothing else" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Именно поэтому qsort работает с любым типом: она не сравнивает сама, а спрашивает твою функцию.",
+      "uz": "Aynan shuning uchun qsort har qanday tur bilan ishlaydi: u o'zi solishtirmaydi, sizning funksiyangizdan so'raydi.",
+      "en": "That is exactly why qsort works with any type: it does not compare itself, it asks your function."
+     }
+    },
+    {
+     "q": { "ru": "Почему в компараторе лучше не писать <code>return x - y;</code>?", "uz": "Nega komparatorda <code>return x - y;</code> yozmagan yaxshi?", "en": "Why is <code>return x - y;</code> a poor comparator?" },
+     "options": [
+      { "ru": "Это медленно", "uz": "Bu sekin", "en": "It is slow" },
+      { "ru": "Разность больших чисел может переполниться и дать неверный знак", "uz": "Katta sonlar ayirmasi to'lib ketib, noto'g'ri ishora berishi mumkin", "en": "The difference of large numbers can overflow and give the wrong sign" },
+      { "ru": "qsort не принимает int", "uz": "qsort int ni qabul qilmaydi", "en": "qsort does not accept int" },
+      { "ru": "Так нельзя по стандарту", "uz": "Standart bo'yicha mumkin emas", "en": "The standard forbids it" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Надёжный вариант — <code>(x &gt; y) - (x &lt; y)</code>: он даёт ровно −1, 0 или 1 и никогда не переполняется.",
+      "uz": "Ishonchli variant — <code>(x &gt; y) - (x &lt; y)</code>: u aynan −1, 0 yoki 1 beradi va hech qachon to'lib ketmaydi.",
+      "en": "The reliable form is <code>(x &gt; y) - (x &lt; y)</code>: it yields exactly −1, 0 or 1 and never overflows."
+     }
+    },
+    {
+     "q": { "ru": "<code>atoi(\"abc\")</code> вернёт…", "uz": "<code>atoi(\"abc\")</code> nima qaytaradi…", "en": "<code>atoi(\"abc\")</code> returns…" },
+     "options": [
+      { "ru": "ошибку", "uz": "xato", "en": "an error" },
+      { "ru": "0 — и отличить это от настоящего нуля нельзя", "uz": "0 — va buni haqiqiy noldan ajratib bo'lmaydi", "en": "0 — and you cannot tell it from a real zero" },
+      { "ru": "-1", "uz": "-1", "en": "-1" },
+      { "ru": "NULL", "uz": "NULL", "en": "NULL" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Поэтому для пользовательского ввода берут <code>strtol</code>: она сообщает, где остановился разбор, и позволяет отличить мусор от нуля.",
+      "uz": "Shuning uchun foydalanuvchi kiritishi uchun <code>strtol</code> olinadi: u tahlil qayerda to'xtaganini aytadi va axlatni noldan ajratish imkonini beradi.",
+      "en": "That is why user input is parsed with <code>strtol</code>: it reports where parsing stopped and lets you tell garbage from zero."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "c",
+     "title": { "ru": "Своя strlen", "uz": "O'z strlen ingiz", "en": "Your own strlen" },
+     "brief": { "ru": "Нулевой байт как граница", "uz": "Chegara sifatidagi nol bayt", "en": "The zero byte as a boundary" },
+     "desc": {
+      "ru": "<p>Напиши <code>size_t my_strlen(const char* s)</code> — длину строки без нулевого байта. Библиотечной <code>strlen</code> пользоваться нельзя.</p><p>Затем напиши <code>int count_char(const char* s, char c)</code> — сколько раз символ <code>c</code> встречается в строке.</p><p><code>main</code> в заготовке уже написан и печатает ожидаемый вывод.</p>",
+      "uz": "<p><code>size_t my_strlen(const char* s)</code> yozing — nol baytsiz satr uzunligi. Kutubxonadagi <code>strlen</code> dan foydalanib bo'lmaydi.</p><p>So'ng <code>int count_char(const char* s, char c)</code> yozing — <code>c</code> belgisi satrda necha marta uchraydi.</p><p>Zagotovkadagi <code>main</code> allaqachon yozilgan va kutilgan chiqishni chop etadi.</p>",
+      "en": "<p>Write <code>size_t my_strlen(const char* s)</code> — the string length without the zero byte. The library <code>strlen</code> is not allowed.</p><p>Then write <code>int count_char(const char* s, char c)</code> — how many times the character <code>c</code> occurs in the string.</p><p>The <code>main</code> in the starter is already written and prints the expected output.</p>"
+     },
+     "starter": "#include <stdio.h>\n\nsize_t my_strlen(const char* s) {\n    /* твой код */\n    return 0;\n}\n\nint count_char(const char* s, char c) {\n    /* твой код */\n    return 0;\n}\n\nint main(void) {\n    printf(\"%zu\\n\", my_strlen(\"hello\"));\n    printf(\"%zu\\n\", my_strlen(\"\"));\n    printf(\"%d\\n\", count_char(\"level\", 'l'));\n    printf(\"%d\\n\", count_char(\"abc\", 'z'));\n    return 0;\n}\n",
+     "solution": "#include <stdio.h>\n\nsize_t my_strlen(const char* s) {\n    size_t n = 0;\n    while (s[n] != '\\0') n++;      /* идём до нулевого байта */\n    return n;\n}\n\nint count_char(const char* s, char c) {\n    int found = 0;\n    for (const char* p = s; *p != '\\0'; p++)\n        if (*p == c) found++;\n    return found;\n}\n\nint main(void) {\n    printf(\"%zu\\n\", my_strlen(\"hello\"));\n    printf(\"%zu\\n\", my_strlen(\"\"));\n    printf(\"%d\\n\", count_char(\"level\", 'l'));\n    printf(\"%d\\n\", count_char(\"abc\", 'z'));\n    return 0;\n}\n",
+     "expected": "5\n0\n2\n0",
+     "hint": {
+      "ru": "Цикл <code>while (s[n] != '\\0') n++;</code> и есть вся реализация. Для подсчёта иди указателем: <code>for (const char* p = s; *p; p++)</code>.",
+      "uz": "<code>while (s[n] != '\\0') n++;</code> sikli butun amalga oshirishning o'zi. Sanash uchun ko'rsatkich bilan yuring: <code>for (const char* p = s; *p; p++)</code>.",
+      "en": "The loop <code>while (s[n] != '\\0') n++;</code> is the whole implementation. To count, walk with a pointer: <code>for (const char* p = s; *p; p++)</code>."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "c",
+     "title": { "ru": "Сортировка через qsort", "uz": "qsort orqali saralash", "en": "Sorting with qsort" },
+     "brief": { "ru": "Функция сравнения", "uz": "Solishtirish funksiyasi", "en": "The comparison function" },
+     "desc": {
+      "ru": "<p>Напиши функцию сравнения <code>cmp_desc</code> и отсортируй массив <code>nums</code> по <b>убыванию</b> через <code>qsort</code>.</p><p>Сравнение должно быть безопасным: не <code>a - b</code>, а через два сравнения. <code>main</code> печатает результат сам.</p>",
+      "uz": "<p><code>cmp_desc</code> solishtirish funksiyasini yozing va <code>nums</code> massivini <code>qsort</code> orqali <b>kamayish</b> bo'yicha saralang.</p><p>Solishtirish xavfsiz bo'lishi kerak: <code>a - b</code> emas, ikki solishtirish orqali. <code>main</code> natijani o'zi chop etadi.</p>",
+      "en": "<p>Write the comparison function <code>cmp_desc</code> and sort the array <code>nums</code> in <b>descending</b> order with <code>qsort</code>.</p><p>The comparison must be safe: not <code>a - b</code> but two comparisons. <code>main</code> prints the result itself.</p>"
+     },
+     "starter": "#include <stdio.h>\n#include <stdlib.h>\n\nint cmp_desc(const void* a, const void* b) {\n    /* твой код: по убыванию, без вычитания */\n    return 0;\n}\n\nint main(void) {\n    int nums[] = {42, 7, 19, 3, 25};\n    int n = sizeof(nums) / sizeof(nums[0]);\n    qsort(nums, n, sizeof(int), cmp_desc);\n    for (int i = 0; i < n; i++) printf(\"%d \", nums[i]);\n    printf(\"\\n\");\n    return 0;\n}\n",
+     "solution": "#include <stdio.h>\n#include <stdlib.h>\n\nint cmp_desc(const void* a, const void* b) {\n    int x = *(const int*)a;\n    int y = *(const int*)b;\n    /* по убыванию: знак развёрнут относительно возрастания */\n    return (y > x) - (y < x);\n}\n\nint main(void) {\n    int nums[] = {42, 7, 19, 3, 25};\n    int n = sizeof(nums) / sizeof(nums[0]);\n    qsort(nums, n, sizeof(int), cmp_desc);\n    for (int i = 0; i < n; i++) printf(\"%d \", nums[i]);\n    printf(\"\\n\");\n    return 0;\n}\n",
+     "expected": "42 25 19 7 3",
+     "hint": {
+      "ru": "Приведи указатели: <code>int x = *(const int*)a;</code>. Для убывания разверни сравнение: <code>return (y &gt; x) - (y &lt; x);</code>.",
+      "uz": "Ko'rsatkichlarni keltiring: <code>int x = *(const int*)a;</code>. Kamayish uchun solishtirishni ag'daring: <code>return (y &gt; x) - (y &lt; x);</code>.",
+      "en": "Cast the pointers: <code>int x = *(const int*)a;</code>. For descending order, flip the comparison: <code>return (y &gt; x) - (y &lt; x);</code>."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "c",
+     "title": { "ru": "Файл со счётом", "uz": "Hisobli fayl", "en": "A file of scores" },
+     "brief": { "ru": "Запись, чтение, разбор", "uz": "Yozish, o'qish, tahlil", "en": "Write, read, parse" },
+     "desc": {
+      "ru": "<p>Запиши в файл <code>game.txt</code> три строки вида <code>имя очки</code>:</p><pre class=\"code\">aziz 300\nbek 250\ndilnoza 410</pre><p>Затем прочитай файл обратно и напечатай сумму очков и имя лидера:</p><pre class=\"code\">сумма 960\nлидер dilnoza</pre><p>Не забудь проверить <code>fopen</code> на <code>NULL</code> и указать ширину в <code>%s</code>.</p>",
+      "uz": "<p><code>game.txt</code> fayliga <code>ism ochko</code> ko'rinishidagi uch qator yozing:</p><pre class=\"code\">aziz 300\nbek 250\ndilnoza 410</pre><p>So'ng faylni qaytadan o'qing va ochkolar yig'indisi bilan yetakchi ismini chop eting:</p><pre class=\"code\">сумма 960\nлидер dilnoza</pre><p><code>fopen</code> ni <code>NULL</code> ga tekshirish va <code>%s</code> da kenglikni ko'rsatishni unutmang.</p>",
+      "en": "<p>Write three lines of the form <code>name score</code> into the file <code>game.txt</code>:</p><pre class=\"code\">aziz 300\nbek 250\ndilnoza 410</pre><p>Then read the file back and print the total score and the leader's name:</p><pre class=\"code\">сумма 960\nлидер dilnoza</pre><p>Do not forget to check <code>fopen</code> for <code>NULL</code> and to give a width in <code>%s</code>.</p>"
+     },
+     "starter": "#include <stdio.h>\n#include <string.h>\n\nint main(void) {\n    /* 1. запиши три строки в game.txt */\n\n    /* 2. прочитай обратно, посчитай сумму и найди лидера */\n\n    return 0;\n}\n",
+     "solution": "#include <stdio.h>\n#include <string.h>\n\nint main(void) {\n    FILE* f = fopen(\"game.txt\", \"w\");\n    if (f == NULL) return 1;\n    fprintf(f, \"aziz 300\\n\");\n    fprintf(f, \"bek 250\\n\");\n    fprintf(f, \"dilnoza 410\\n\");\n    fclose(f);\n\n    f = fopen(\"game.txt\", \"r\");\n    if (f == NULL) return 1;\n\n    char name[32], best[32] = \"\";\n    int score, total = 0, best_score = -1;\n    while (fscanf(f, \"%31s %d\", name, &score) == 2) {\n        total += score;\n        if (score > best_score) {\n            best_score = score;\n            strcpy(best, name);\n        }\n    }\n    fclose(f);\n\n    printf(\"сумма %d\\n\", total);\n    printf(\"лидер %s\\n\", best);\n    return 0;\n}\n",
+     "expected": "сумма 960\nлидер dilnoza",
+     "hint": {
+      "ru": "Запись: три <code>fprintf</code> и <code>fclose</code>. Чтение: <code>while (fscanf(f, \"%31s %d\", name, &score) == 2)</code>, внутри накапливай сумму и запоминай лучшего через <code>strcpy</code>.",
+      "uz": "Yozish: uchta <code>fprintf</code> va <code>fclose</code>. O'qish: <code>while (fscanf(f, \"%31s %d\", name, &score) == 2)</code>, ichida summani to'plang va eng yaxshisini <code>strcpy</code> bilan eslab qoling.",
+      "en": "Writing: three <code>fprintf</code> calls and <code>fclose</code>. Reading: <code>while (fscanf(f, \"%31s %d\", name, &score) == 2)</code>, accumulating the total and remembering the best with <code>strcpy</code>."
+     }
+    }
+   ],
+   "exam": {
+    "time": 600,
+    "questions": [
+     {
+      "q": { "ru": "Что обязательно сделать после работы с файлом?", "uz": "Fayl bilan ishlagandan keyin nima qilish shart?", "en": "What must you do after working with a file?" },
+      "options": [
+       { "ru": "Ничего, всё закроется само", "uz": "Hech nima, hammasi o'zi yopiladi", "en": "Nothing, it closes itself" },
+       { "ru": "Вызвать fclose — иначе данные могут не дойти до диска", "uz": "fclose chaqirish — aks holda ma'lumot diskka yetmasligi mumkin", "en": "Call fclose — otherwise the data may never reach the disk" },
+       { "ru": "Вызвать free", "uz": "free chaqirish", "en": "Call free" },
+       { "ru": "Удалить файл", "uz": "Faylni o'chirish", "en": "Delete the file" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "<code>char buf[16]</code>. Как безопасно прочитать слово?", "uz": "<code>char buf[16]</code>. So'zni qanday xavfsiz o'qish mumkin?", "en": "<code>char buf[16]</code>. How do you read a word safely?" },
+      "options": [
+       { "ru": "scanf(\"%s\", buf)", "uz": "scanf(\"%s\", buf)", "en": "scanf(\"%s\", buf)" },
+       { "ru": "scanf(\"%15s\", buf)", "uz": "scanf(\"%15s\", buf)", "en": "scanf(\"%15s\", buf)" },
+       { "ru": "scanf(\"%16s\", buf)", "uz": "scanf(\"%16s\", buf)", "en": "scanf(\"%16s\", buf)" },
+       { "ru": "scanf(\"%c\", buf)", "uz": "scanf(\"%c\", buf)", "en": "scanf(\"%c\", buf)" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Массив из 5 int. Как получить его длину, зная только имя?", "uz": "5 ta int massiv. Faqat nomini bilib, uzunligini qanday olish mumkin?", "en": "An array of 5 ints. How do you get its length knowing only its name?" },
+      "options": [
+       { "ru": "len(arr)", "uz": "len(arr)", "en": "len(arr)" },
+       { "ru": "sizeof(arr) / sizeof(arr[0])", "uz": "sizeof(arr) / sizeof(arr[0])", "en": "sizeof(arr) / sizeof(arr[0])" },
+       { "ru": "strlen(arr)", "uz": "strlen(arr)", "en": "strlen(arr)" },
+       { "ru": "arr.length", "uz": "arr.length", "en": "arr.length" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Почему этот приём не работает внутри функции, куда массив передали параметром?", "uz": "Nega bu usul massiv parametr bilan uzatilgan funksiya ichida ishlamaydi?", "en": "Why does that trick fail inside a function the array was passed to?" },
+      "options": [
+       { "ru": "sizeof запрещён в функциях", "uz": "sizeof funksiyalarda taqiqlangan", "en": "sizeof is forbidden in functions" },
+       { "ru": "Массив превращается в указатель, и sizeof даёт размер указателя", "uz": "Massiv ko'rsatkichga aylanadi va sizeof ko'rsatkich hajmini beradi", "en": "The array decays to a pointer, and sizeof gives the pointer's size" },
+       { "ru": "Функция копирует массив", "uz": "Funksiya massivni nusxalaydi", "en": "The function copies the array" },
+       { "ru": "Работает точно так же", "uz": "Xuddi shunday ishlaydi", "en": "It works exactly the same" }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "c",
+      "title": { "ru": "Отчёт по игрокам", "uz": "O'yinchilar bo'yicha hisobot", "en": "A player report" },
+      "desc": {
+       "ru": "<p>Собери весь модуль: структура, файл, qsort и строки.</p><ol><li>Объяви <code>typedef struct { char name[16]; int score; } Player;</code></li><li>Запиши в файл <code>rank.txt</code> четыре строки: <code>aziz 300</code>, <code>bek 410</code>, <code>dilnoza 250</code>, <code>umid 380</code></li><li>Прочитай их обратно в массив структур</li><li>Отсортируй <code>qsort</code>-ом по убыванию очков</li><li>Напечатай места в формате <code>1. bek 410</code>, каждое с новой строки</li></ol>",
+       "uz": "<p>Butun modulni yig'ing: struktura, fayl, qsort va satrlar.</p><ol><li><code>typedef struct { char name[16]; int score; } Player;</code> e'lon qiling</li><li><code>rank.txt</code> fayliga to'rt qator yozing: <code>aziz 300</code>, <code>bek 410</code>, <code>dilnoza 250</code>, <code>umid 380</code></li><li>Ularni struktura massiviga qaytadan o'qing</li><li><code>qsort</code> bilan ochkolar kamayishi bo'yicha saralang</li><li>O'rinlarni <code>1. bek 410</code> formatida, har birini yangi qatordan chop eting</li></ol>",
+       "en": "<p>Assemble the whole module: a struct, a file, qsort and strings.</p><ol><li>Declare <code>typedef struct { char name[16]; int score; } Player;</code></li><li>Write four lines into <code>rank.txt</code>: <code>aziz 300</code>, <code>bek 410</code>, <code>dilnoza 250</code>, <code>umid 380</code></li><li>Read them back into an array of structs</li><li>Sort with <code>qsort</code> by descending score</li><li>Print the places in the format <code>1. bek 410</code>, one per line</li></ol>"
+      },
+      "starter": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\n/* твой код: структура, компаратор, запись, чтение, сортировка, вывод */\n\nint main(void) {\n    return 0;\n}\n",
+      "solution": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\ntypedef struct { char name[16]; int score; } Player;\n\nint cmp_desc(const void* a, const void* b) {\n    const Player* p = (const Player*)a;\n    const Player* q = (const Player*)b;\n    return (q->score > p->score) - (q->score < p->score);\n}\n\nint main(void) {\n    FILE* f = fopen(\"rank.txt\", \"w\");\n    if (f == NULL) return 1;\n    fprintf(f, \"aziz 300\\n\");\n    fprintf(f, \"bek 410\\n\");\n    fprintf(f, \"dilnoza 250\\n\");\n    fprintf(f, \"umid 380\\n\");\n    fclose(f);\n\n    Player players[16];\n    int n = 0;\n\n    f = fopen(\"rank.txt\", \"r\");\n    if (f == NULL) return 1;\n    while (n < 16 && fscanf(f, \"%15s %d\", players[n].name, &players[n].score) == 2)\n        n++;\n    fclose(f);\n\n    qsort(players, n, sizeof(Player), cmp_desc);\n\n    for (int i = 0; i < n; i++)\n        printf(\"%d. %s %d\\n\", i + 1, players[i].name, players[i].score);\n    return 0;\n}\n",
+      "expected": "1. bek 410\n2. umid 380\n3. aziz 300\n4. dilnoza 250",
+      "hint": {
+       "ru": "Читай прямо в поля структуры: <code>fscanf(f, \"%15s %d\", players[n].name, &amp;players[n].score)</code>. Имя — уже массив, поэтому <code>&amp;</code> перед ним не нужен, а перед <code>score</code> — нужен.",
+       "uz": "To'g'ridan-to'g'ri struktura maydonlariga o'qing: <code>fscanf(f, \"%15s %d\", players[n].name, &amp;players[n].score)</code>. Ism allaqachon massiv, shuning uchun undan oldin <code>&amp;</code> kerak emas, <code>score</code> dan oldin esa kerak.",
+       "en": "Read straight into the struct fields: <code>fscanf(f, \"%15s %d\", players[n].name, &amp;players[n].score)</code>. The name is already an array, so it needs no <code>&amp;</code>, while <code>score</code> does."
+      }
+     }
+    ]
+   }
   }
  ]
 }

@@ -1273,6 +1273,700 @@
      }
     ]
    }
+  },
+  {
+   "id": "jv-03",
+   "title": { "ru": "ООП вглубь: наследование и полиморфизм", "uz": "OOP chuqurroq: meros va polimorfizm", "en": "OOP in depth: inheritance and polymorphism" },
+   "tagline": { "ru": "Абстрактные классы, переопределение, equals и toString — как устроен настоящий Java-код", "uz": "Abstrakt sinflar, qayta aniqlash, equals va toString — haqiqiy Java kodi qanday tuzilgan", "en": "Abstract classes, overriding, equals and toString — how real Java code is built" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "Наследование и абстрактные классы", "uz": "Meros va abstrakt sinflar", "en": "Inheritance and abstract classes" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Класс может наследовать другой через <code>extends</code>: забрать все поля и методы и добавить своё. Родитель описывает общее, наследники — особенное.</p><p><b>Абстрактный класс</b> — родитель, которого нельзя создать напрямую. Он говорит «у всех моих наследников есть метод <code>area()</code>», но сам его не пишет:</p><pre class=\"code\">abstract class Shape {\n    abstract double area();          // без тела — обязателен у наследников\n    String describe() {              // с телом — общий для всех\n        return getClass().getSimpleName() + \": \" + area();\n    }\n}</pre><p>Разница с интерфейсом: <b>наследовать класс можно только один</b>, а интерфейсов реализовать сколько угодно. Правило простое: абстрактный класс — когда есть общий код и состояние, интерфейс — когда есть только договор о поведении.</p>",
+        "uz": "<p>Sinf <code>extends</code> orqali boshqasini meros qilib olishi mumkin: barcha maydon va metodlarni olib, o'zinikini qo'shadi. Ota-ona umumiyni, merosxo'rlar o'ziga xosni tasvirlaydi.</p><p><b>Abstrakt sinf</b> — to'g'ridan-to'g'ri yaratib bo'lmaydigan ota-ona. U «barcha merosxo'rlarimda <code>area()</code> metodi bor» deydi, lekin uni o'zi yozmaydi:</p><pre class=\"code\">abstract class Shape {\n    abstract double area();          // tanasiz — merosxo'rlarda majburiy\n    String describe() {              // tanali — hamma uchun umumiy\n        return getClass().getSimpleName() + \": \" + area();\n    }\n}</pre><p>Interfeysdan farqi: <b>sinfni faqat bittasini meros olish mumkin</b>, interfeyslarni esa xohlagancha amalga oshirish mumkin. Qoida oddiy: umumiy kod va holat bo'lsa — abstrakt sinf, faqat xatti-harakat shartnomasi bo'lsa — interfeys.</p>",
+        "en": "<p>A class can inherit another with <code>extends</code>: take all its fields and methods and add its own. The parent describes what is common, the children what is special.</p><p>An <b>abstract class</b> is a parent you cannot instantiate directly. It says “all my children have an <code>area()</code> method” without writing it itself:</p><pre class=\"code\">abstract class Shape {\n    abstract double area();          // no body — mandatory in children\n    String describe() {              // with a body — shared by all\n        return getClass().getSimpleName() + \": \" + area();\n    }\n}</pre><p>The difference from an interface: <b>you can inherit only one class</b> but implement as many interfaces as you like. The rule is simple: an abstract class when there is shared code and state, an interface when there is only a contract about behaviour.</p>"
+       }
+      },
+      {
+       "type": "javarun",
+       "code": "import java.util.*;\n\nabstract class Shape {\n    abstract double area();\n\n    // общий метод: работает через абстрактный area() наследника\n    String describe() {\n        return getClass().getSimpleName() + \" площадью \" + area();\n    }\n}\n\nclass Square extends Shape {\n    private final double side;\n    Square(double side) { this.side = side; }\n    @Override double area() { return side * side; }\n}\n\nclass Rect extends Shape {\n    private final double w, h;\n    Rect(double w, double h) { this.w = w; this.h = h; }\n    @Override double area() { return w * h; }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        List<Shape> shapes = Arrays.asList(new Square(3), new Rect(2, 5));\n\n        // полиморфизм: вызывается версия того класса, который реально в переменной\n        for (Shape s : shapes) System.out.println(s.describe());\n\n        double total = 0;\n        for (Shape s : shapes) total += s.area();\n        System.out.println(\"суммарная площадь: \" + total);\n\n        // Shape s = new Shape();  // не скомпилируется: абстрактный класс\n    }\n}"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Это и есть <b>полиморфизм</b>: переменная объявлена как <code>Shape</code>, а вызывается метод того класса, который реально лежит внутри. Цикл ничего не знает про квадраты и прямоугольники — и это его сила: добавишь треугольник, цикл менять не придётся.</p><p>Аннотация <code>@Override</code> формально необязательна, но пиши её всегда. Она просит компилятор проверить: «я точно переопределяю метод родителя?» Опечатался в имени — получишь ошибку сборки вместо тихо не работающей программы.</p>",
+        "uz": "<p>Bu <b>polimorfizm</b>: o'zgaruvchi <code>Shape</code> deb e'lon qilingan, chaqiriladigan metod esa ichida haqiqatan yotgan sinfniki. Sikl kvadrat va to'rtburchaklar haqida hech nima bilmaydi — va bu uning kuchi: uchburchak qo'shsangiz, siklni o'zgartirish shart emas.</p><p><code>@Override</code> annotatsiyasi rasman majburiy emas, lekin uni doim yozing. U kompilyatordan «men aniq ota-ona metodini qayta aniqlayapmanmi?» deb tekshirishni so'raydi. Nomda xato qilsangiz — jimgina ishlamaydigan dastur o'rniga yig'ish xatosini olasiz.</p>",
+        "en": "<p>This is <b>polymorphism</b>: the variable is declared as <code>Shape</code> while the method called belongs to the class actually inside it. The loop knows nothing about squares and rectangles — and that is its strength: add a triangle and the loop need not change.</p><p>The <code>@Override</code> annotation is formally optional, but always write it. It asks the compiler to check: “am I really overriding a parent method?” Misspell the name and you get a build error instead of a program that quietly does nothing.</p>"
+       }
+      },
+      {
+       "type": "checkpoint",
+       "q": { "ru": "Сколько классов можно наследовать в Java и сколько интерфейсов реализовать?", "uz": "Java da nechta sinfni meros olish va nechta interfeysni amalga oshirish mumkin?", "en": "How many classes can you inherit and how many interfaces implement in Java?" },
+       "options": [
+        { "ru": "По одному и того, и другого", "uz": "Ikkalasidan ham bittadan", "en": "One of each" },
+        { "ru": "Один класс, интерфейсов — сколько угодно", "uz": "Bitta sinf, interfeyslar — xohlagancha", "en": "One class, as many interfaces as you like" },
+        { "ru": "Сколько угодно и того, и другого", "uz": "Ikkalasidan ham xohlagancha", "en": "As many of both as you like" },
+        { "ru": "Наследование в Java запрещено", "uz": "Java da meros taqiqlangan", "en": "Inheritance is forbidden in Java" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Одиночное наследование классов — осознанное решение авторов языка: множественное наследование состояния порождает конфликты. Договоры о поведении конфликтов не создают, поэтому интерфейсов может быть много.",
+        "uz": "Sinflarning yakka merosi — til mualliflarining ongli qarori: holatning ko'p merosi ziddiyat tug'diradi. Xatti-harakat shartnomalari ziddiyat yaratmaydi, shuning uchun interfeyslar ko'p bo'lishi mumkin.",
+        "en": "Single class inheritance is a deliberate decision by the language's authors: multiple inheritance of state creates conflicts. Contracts about behaviour create none, so interfaces can be many."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "equals, hashCode и toString", "uz": "equals, hashCode va toString", "en": "equals, hashCode and toString" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Каждый класс в Java неявно наследует <code>Object</code>, а у него есть три метода, которые почти всегда надо переопределять.</p><p><b><code>toString()</code></b> — как объект печатается. Без переопределения увидишь <code>User@1b6d3586</code> — имя класса и адрес в памяти, бесполезные для отладки.</p><p><b><code>equals()</code></b> — что значит «равны». По умолчанию это сравнение <b>ссылок</b>: два объекта с одинаковыми полями не равны, потому что лежат по разным адресам.</p><p><b><code>hashCode()</code></b> — число для хеш-таблиц. И вот главное правило языка: <b>если переопределил equals, обязан переопределить hashCode</b>. Иначе <code>HashMap</code> и <code>HashSet</code> начнут терять объекты.</p>",
+        "uz": "<p>Java dagi har bir sinf yashirin ravishda <code>Object</code> ni meros oladi, unda esa deyarli doim qayta aniqlash kerak bo'lgan uch metod bor.</p><p><b><code>toString()</code></b> — obyekt qanday chop etiladi. Qayta aniqlamasangiz <code>User@1b6d3586</code> ni ko'rasiz — sinf nomi va xotiradagi manzil, nosozlik izlash uchun foydasiz.</p><p><b><code>equals()</code></b> — «teng» nimani anglatadi. Sukut bo'yicha bu <b>havolalarni</b> solishtirish: bir xil maydonli ikki obyekt teng emas, chunki turli manzillarda yotadi.</p><p><b><code>hashCode()</code></b> — xesh-jadvallar uchun son. Va mana tilning asosiy qoidasi: <b>equals ni qayta aniqlagan bo'lsangiz, hashCode ni ham qayta aniqlash shart</b>. Aks holda <code>HashMap</code> va <code>HashSet</code> obyektlarni yo'qota boshlaydi.</p>",
+        "en": "<p>Every class in Java implicitly inherits <code>Object</code>, which has three methods you almost always need to override.</p><p><b><code>toString()</code></b> — how the object prints. Without an override you see <code>User@1b6d3586</code> — the class name and a memory address, useless for debugging.</p><p><b><code>equals()</code></b> — what “equal” means. By default it compares <b>references</b>: two objects with identical fields are not equal because they live at different addresses.</p><p><b><code>hashCode()</code></b> — a number for hash tables. And here is the language's key rule: <b>if you override equals you must override hashCode</b>. Otherwise <code>HashMap</code> and <code>HashSet</code> start losing objects.</p>"
+       }
+      },
+      {
+       "type": "javarun",
+       "code": "import java.util.*;\n\nclass Plain {\n    final String name;\n    Plain(String name) { this.name = name; }\n}\n\nclass User {\n    private final String name;\n    private final int age;\n\n    User(String name, int age) { this.name = name; this.age = age; }\n\n    @Override public String toString() { return \"User{\" + name + \", \" + age + \"}\"; }\n\n    @Override public boolean equals(Object o) {\n        if (this == o) return true;\n        if (!(o instanceof User)) return false;\n        User other = (User) o;\n        return age == other.age && Objects.equals(name, other.name);\n    }\n\n    @Override public int hashCode() { return Objects.hash(name, age); }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Plain a = new Plain(\"aziz\");\n        Plain b = new Plain(\"aziz\");\n        System.out.println(\"без equals: \" + a.equals(b));\n\n        User u1 = new User(\"aziz\", 20);\n        User u2 = new User(\"aziz\", 20);\n        System.out.println(\"с equals: \" + u1.equals(u2));\n        System.out.println(\"печать: \" + u1);\n\n        // именно поэтому нужен hashCode: множество считает их одним объектом\n        Set<User> set = new HashSet<>();\n        set.add(u1);\n        set.add(u2);\n        System.out.println(\"в множестве: \" + set.size());\n\n        Set<Plain> plainSet = new HashSet<>();\n        plainSet.add(a);\n        plainSet.add(b);\n        System.out.println(\"без equals в множестве: \" + plainSet.size());\n    }\n}"
+      },
+      {
+       "type": "note",
+       "kind": "trap",
+       "html": {
+        "ru": "Переопределить <code>equals</code> и забыть <code>hashCode</code> — классическая ошибка с тихими последствиями. Объект положат в <code>HashMap</code>, а найти не смогут: поиск сначала идёт по хешу, а он у «равных» объектов разный. Данные вроде на месте, а <code>map.get(key)</code> возвращает <code>null</code>. Пиши оба метода сразу или бери <code>record</code> — он делает это сам.",
+        "uz": "<code>equals</code> ni qayta aniqlab, <code>hashCode</code> ni unutish — jim oqibatli klassik xato. Obyekt <code>HashMap</code> ga qo'yiladi, lekin topilmaydi: qidiruv avval xesh bo'yicha ketadi, u esa «teng» obyektlarda har xil. Ma'lumot joyidagidek, <code>map.get(key)</code> esa <code>null</code> qaytaradi. Ikkala metodni darhol yozing yoki <code>record</code> oling — u buni o'zi qiladi.",
+        "en": "Overriding <code>equals</code> and forgetting <code>hashCode</code> is a classic bug with silent consequences. The object goes into a <code>HashMap</code> and cannot be found: the lookup starts from the hash, which differs between “equal” objects. The data seems to be there while <code>map.get(key)</code> returns <code>null</code>. Write both at once, or take a <code>record</code> — it does this for you."
+       }
+      },
+      {
+       "type": "predict",
+       "lang": "java",
+       "code": "import java.util.*;\n\nclass Point {\n    int x;\n    Point(int x) { this.x = x; }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Set<Point> s = new HashSet<>();\n        s.add(new Point(1));\n        s.add(new Point(1));\n        System.out.println(s.size());\n    }\n}",
+       "options": [
+        { "ru": "1 — точки одинаковые", "uz": "1 — nuqtalar bir xil", "en": "1 — the points are identical" },
+        { "ru": "2 — без equals и hashCode это два разных объекта", "uz": "2 — equals va hashCode siz bu ikki turli obyekt", "en": "2 — without equals and hashCode these are two different objects" },
+        { "ru": "0", "uz": "0", "en": "0" },
+        { "ru": "Ошибка компиляции", "uz": "Kompilyatsiya xatosi", "en": "A compile error" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "По умолчанию сравниваются адреса в памяти, а они разные. Множество честно считает объекты разными — и это самая частая причина «дубликатов», которых по логике быть не должно.",
+        "uz": "Sukut bo'yicha xotiradagi manzillar solishtiriladi, ular esa har xil. To'plam obyektlarni halol turlicha sanaydi — va bu mantiqan bo'lmasligi kerak bo'lgan «dublikatlar» ning eng ko'p uchraydigan sababi.",
+        "en": "By default memory addresses are compared, and they differ. The set honestly treats the objects as different — the most common cause of “duplicates” that logically should not exist."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "Инкапсуляция и неизменяемость", "uz": "Inkapsulyatsiya va o'zgarmaslik", "en": "Encapsulation and immutability" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Модификаторы доступа отвечают на вопрос «кому можно трогать»:</p><ul><li><code>private</code> — только этому классу. По умолчанию поля делают такими.</li><li><code>protected</code> — классу и наследникам.</li><li><code>public</code> — всем.</li></ul><p>Правило: <b>поля private, доступ через методы</b>. Так класс контролирует своё состояние: нельзя записать отрицательный баланс, если запись идёт через метод с проверкой.</p><p>Дальше идёт <code>final</code> — поле, которому можно присвоить значение <b>только один раз</b>, в конструкторе. Класс, у которого все поля <code>final</code> и нет сеттеров, называется <b>неизменяемым</b>. Такой объект безопасно передавать куда угодно: его нельзя испортить.</p><p>Именно поэтому <code>String</code> в Java неизменяем: <code>s.toUpperCase()</code> не меняет строку, а возвращает новую.</p>",
+        "uz": "<p>Kirish modifikatorlari «kimga tegish mumkin» savoliga javob beradi:</p><ul><li><code>private</code> — faqat shu sinfga. Maydonlar sukut bo'yicha shunday qilinadi.</li><li><code>protected</code> — sinf va merosxo'rlarga.</li><li><code>public</code> — hammaga.</li></ul><p>Qoida: <b>maydonlar private, kirish metodlar orqali</b>. Shunda sinf o'z holatini nazorat qiladi: yozuv tekshiruvli metod orqali ketsa, manfiy balansni yozib bo'lmaydi.</p><p>Keyin <code>final</code> keladi — qiymatni <b>faqat bir marta</b>, konstruktorda tayinlash mumkin bo'lgan maydon. Barcha maydonlari <code>final</code> va setterlari yo'q sinf <b>o'zgarmas</b> deyiladi. Bunday obyektni istalgan joyga xavfsiz uzatish mumkin: uni buzib bo'lmaydi.</p><p>Aynan shuning uchun Java dagi <code>String</code> o'zgarmas: <code>s.toUpperCase()</code> satrni o'zgartirmaydi, yangisini qaytaradi.</p>",
+        "en": "<p>Access modifiers answer the question “who may touch this”:</p><ul><li><code>private</code> — this class only. Fields are made this way by default.</li><li><code>protected</code> — the class and its children.</li><li><code>public</code> — everyone.</li></ul><p>The rule: <b>fields private, access through methods</b>. That way the class controls its own state: a negative balance cannot be written if writing goes through a method that checks.</p><p>Next comes <code>final</code> — a field you can assign <b>only once</b>, in the constructor. A class whose fields are all <code>final</code> with no setters is called <b>immutable</b>. Such an object is safe to pass anywhere: it cannot be spoiled.</p><p>This is exactly why <code>String</code> in Java is immutable: <code>s.toUpperCase()</code> does not change the string but returns a new one.</p>"
+       }
+      },
+      {
+       "type": "javarun",
+       "code": "import java.util.*;\n\nclass Account {\n    private final String owner;      // final: задаётся один раз\n    private int balance;             // изменяемое, но private\n\n    Account(String owner, int start) {\n        this.owner = owner;\n        this.balance = Math.max(0, start);   // класс сам не пускает мусор внутрь\n    }\n\n    String getOwner() { return owner; }\n    int getBalance() { return balance; }\n\n    boolean withdraw(int amount) {\n        if (amount <= 0 || amount > balance) return false;\n        balance -= amount;\n        return true;\n    }\n\n    void deposit(int amount) {\n        if (amount > 0) balance += amount;\n    }\n\n    @Override public String toString() { return owner + \": \" + balance; }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Account acc = new Account(\"aziz\", 100);\n        acc.deposit(50);\n        System.out.println(\"снять 200: \" + acc.withdraw(200));   // не пустит\n        System.out.println(\"снять 30: \" + acc.withdraw(30));\n        System.out.println(acc);\n\n        Account bad = new Account(\"bek\", -500);\n        System.out.println(\"отрицательный старт стал: \" + bad.getBalance());\n\n        // строки неизменяемы: метод возвращает новую, старая не тронута\n        String s = \"привет\";\n        String upper = s.toUpperCase();\n        System.out.println(s + \" / \" + upper);\n    }\n}"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Обрати внимание, что <code>withdraw</code> возвращает <code>boolean</code>, а не молча ничего не делает. Метод, который может отказать, должен сообщать об отказе — иначе вызывающий код будет уверен, что операция прошла.</p><p>И на конструктор: <code>Math.max(0, start)</code> не даёт создать счёт с отрицательным балансом. Инкапсуляция — это не «спрятать поля», а <b>гарантировать, что объект всегда в корректном состоянии</b>. Публичное поле такой гарантии не даёт никогда.</p>",
+        "uz": "<p>E'tibor bering, <code>withdraw</code> jimgina hech nima qilmaslik o'rniga <code>boolean</code> qaytaradi. Rad eta oladigan metod rad etish haqida xabar berishi kerak — aks holda chaqiruvchi kod amal o'tgan deb ishonadi.</p><p>Va konstruktorga: <code>Math.max(0, start)</code> manfiy balansli hisob yaratishga yo'l qo'ymaydi. Inkapsulyatsiya — «maydonlarni yashirish» emas, <b>obyekt doim to'g'ri holatda ekanini kafolatlash</b>. Ochiq maydon bunday kafolatni hech qachon bermaydi.</p>",
+        "en": "<p>Note that <code>withdraw</code> returns a <code>boolean</code> rather than silently doing nothing. A method that can refuse must report the refusal — otherwise the calling code believes the operation went through.</p><p>And note the constructor: <code>Math.max(0, start)</code> forbids creating an account with a negative balance. Encapsulation is not “hiding fields” but <b>guaranteeing the object is always in a valid state</b>. A public field never gives that guarantee.</p>"
+       }
+      },
+      {
+       "type": "summary",
+       "items": [
+        { "ru": "extends наследует класс, implements реализует интерфейс", "uz": "extends sinfni meros oladi, implements interfeysni amalga oshiradi", "en": "extends inherits a class, implements realises an interface" },
+        { "ru": "Абстрактный класс задаёт общий код, интерфейс — только договор", "uz": "Abstrakt sinf umumiy kodni, interfeys esa faqat shartnomani beradi", "en": "An abstract class provides shared code, an interface only a contract" },
+        { "ru": "Классов наследуют один, интерфейсов реализуют сколько угодно", "uz": "Sinfni bittasini meros oladi, interfeyslarni xohlagancha amalga oshiradi", "en": "You inherit one class and implement any number of interfaces" },
+        { "ru": "@Override просит компилятор проверить, что метод правда переопределён", "uz": "@Override kompilyatordan metod haqiqatan qayta aniqlanganini tekshirishni so'raydi", "en": "@Override asks the compiler to verify the method really overrides something" },
+        { "ru": "equals без hashCode ломает HashMap и HashSet", "uz": "hashCode siz equals HashMap va HashSet ni buzadi", "en": "equals without hashCode breaks HashMap and HashSet" },
+        { "ru": "Поля private, доступ через методы — класс отвечает за своё состояние", "uz": "Maydonlar private, kirish metodlar orqali — sinf o'z holati uchun javob beradi", "en": "Fields private, access through methods — the class owns its state" },
+        { "ru": "final + отсутствие сеттеров = неизменяемый объект, как String", "uz": "final va setterlar yo'qligi = String kabi o'zgarmas obyekt", "en": "final plus no setters equals an immutable object, like String" }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": { "ru": "Можно ли создать объект абстрактного класса?", "uz": "Abstrakt sinf obyektini yaratish mumkinmi?", "en": "Can you instantiate an abstract class?" },
+     "options": [
+      { "ru": "Да, как обычный", "uz": "Ha, oddiy kabi", "en": "Yes, like an ordinary one" },
+      { "ru": "Нет — только объект его наследника", "uz": "Yo'q — faqat uning merosxo'ri obyektini", "en": "No — only an object of its subclass" },
+      { "ru": "Да, но без конструктора", "uz": "Ha, lekin konstruktorsiz", "en": "Yes, but without a constructor" },
+      { "ru": "Только внутри пакета", "uz": "Faqat paket ichida", "en": "Only inside the package" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "В нём есть методы без тела — создавать нечего. Зато переменная типа <code>Shape</code> прекрасно хранит любого наследника: в этом и смысл.",
+      "uz": "Unda tanasiz metodlar bor — yaratadigan narsa yo'q. Buning evaziga <code>Shape</code> turidagi o'zgaruvchi har qanday merosxo'rni ajoyib saqlaydi: mohiyat shunda.",
+      "en": "It contains methods with no body — there is nothing to create. But a variable of type <code>Shape</code> happily holds any subclass: that is the point."
+     }
+    },
+    {
+     "q": { "ru": "Зачем нужна аннотация <code>@Override</code>?", "uz": "<code>@Override</code> annotatsiyasi nima uchun kerak?", "en": "What is the <code>@Override</code> annotation for?" },
+     "options": [
+      { "ru": "Она обязательна по синтаксису", "uz": "U sintaksis bo'yicha majburiy", "en": "It is required by the syntax" },
+      { "ru": "Компилятор проверит, что метод действительно переопределяет родительский", "uz": "Kompilyator metod haqiqatan ota-onanikini qayta aniqlashini tekshiradi", "en": "The compiler checks the method really overrides a parent one" },
+      { "ru": "Она ускоряет вызов", "uz": "U chaqiruvni tezlashtiradi", "en": "It speeds up the call" },
+      { "ru": "Делает метод публичным", "uz": "Metodni ochiq qiladi", "en": "It makes the method public" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Опечатка в имени без неё создаст новый метод, который никто не вызовет, — и программа будет тихо работать неправильно.",
+      "uz": "Usiz nomdagi xato hech kim chaqirmaydigan yangi metod yaratadi — va dastur jimgina noto'g'ri ishlaydi.",
+      "en": "Without it, a typo in the name creates a new method nobody calls — and the program quietly misbehaves."
+     }
+    },
+    {
+     "q": { "ru": "Что сравнивает <code>equals</code> по умолчанию?", "uz": "<code>equals</code> sukut bo'yicha nimani solishtiradi?", "en": "What does <code>equals</code> compare by default?" },
+     "options": [
+      { "ru": "Значения всех полей", "uz": "Barcha maydonlar qiymatini", "en": "The values of all fields" },
+      { "ru": "Ссылки: один и тот же объект в памяти или нет", "uz": "Havolalarni: xotirada bir xil obyektmi yoki yo'qmi", "en": "References: the same object in memory or not" },
+      { "ru": "Имена классов", "uz": "Sinf nomlarini", "en": "The class names" },
+      { "ru": "Хеш-коды", "uz": "Xesh-kodlarni", "en": "The hash codes" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Поэтому два объекта с одинаковыми полями по умолчанию не равны — надо переопределять <code>equals</code> самому.",
+      "uz": "Shuning uchun bir xil maydonli ikki obyekt sukut bo'yicha teng emas — <code>equals</code> ni o'zingiz qayta aniqlashingiz kerak.",
+      "en": "So two objects with identical fields are not equal by default — you must override <code>equals</code> yourself."
+     }
+    },
+    {
+     "q": { "ru": "Переопределили equals, а hashCode забыли. Что сломается?", "uz": "equals qayta aniqlandi, hashCode unutildi. Nima buziladi?", "en": "You overrode equals but forgot hashCode. What breaks?" },
+     "options": [
+      { "ru": "Ничего", "uz": "Hech nima", "en": "Nothing" },
+      { "ru": "HashMap и HashSet перестанут находить объекты", "uz": "HashMap va HashSet obyektlarni topmay qo'yadi", "en": "HashMap and HashSet stop finding objects" },
+      { "ru": "Программа не скомпилируется", "uz": "Dastur kompilyatsiya qilinmaydi", "en": "The program will not compile" },
+      { "ru": "Сломается toString", "uz": "toString buziladi", "en": "toString breaks" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Поиск в хеш-таблице начинается с хеша. У «равных» объектов он разный — и <code>get</code> вернёт <code>null</code>, хотя объект в таблице лежит.",
+      "uz": "Xesh-jadvaldagi qidiruv xeshdan boshlanadi. «Teng» obyektlarda u har xil — va obyekt jadvalda yotgan bo'lsa ham <code>get</code> <code>null</code> qaytaradi.",
+      "en": "A hash table lookup starts from the hash. For “equal” objects it differs — so <code>get</code> returns <code>null</code> even though the object is in the table."
+     }
+    },
+    {
+     "q": { "ru": "Что делает <code>final</code> у поля?", "uz": "Maydondagi <code>final</code> nima qiladi?", "en": "What does <code>final</code> do to a field?" },
+     "options": [
+      { "ru": "Делает его статическим", "uz": "Uni statik qiladi", "en": "Makes it static" },
+      { "ru": "Разрешает присвоить значение только один раз", "uz": "Qiymatni faqat bir marta tayinlashga ruxsat beradi", "en": "Allows assigning a value only once" },
+      { "ru": "Скрывает его от наследников", "uz": "Uni merosxo'rlardan yashiradi", "en": "Hides it from subclasses" },
+      { "ru": "Запрещает читать его", "uz": "Uni o'qishni taqiqlaydi", "en": "Forbids reading it" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Обычно это делают в конструкторе. Класс, у которого все поля final и нет сеттеров, неизменяем — как <code>String</code>.",
+      "uz": "Odatda bu konstruktorda qilinadi. Barcha maydonlari final va setterlari yo'q sinf o'zgarmas — <code>String</code> kabi.",
+      "en": "Usually in the constructor. A class with all fields final and no setters is immutable — like <code>String</code>."
+     }
+    },
+    {
+     "q": { "ru": "<code>s.toUpperCase()</code> — что происходит со строкой <code>s</code>?", "uz": "<code>s.toUpperCase()</code> — <code>s</code> satriga nima bo'ladi?", "en": "<code>s.toUpperCase()</code> — what happens to the string <code>s</code>?" },
+     "options": [
+      { "ru": "Она меняется на месте", "uz": "U joyida o'zgaradi", "en": "It changes in place" },
+      { "ru": "Не меняется: строки неизменяемы, возвращается новая", "uz": "O'zgarmaydi: satrlar o'zgarmas, yangisi qaytariladi", "en": "It does not change: strings are immutable, a new one is returned" },
+      { "ru": "Очищается", "uz": "Tozalanadi", "en": "It is cleared" },
+      { "ru": "Становится null", "uz": "null bo'ladi", "en": "It becomes null" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Классическая ошибка новичка — вызвать метод и не присвоить результат. Строка останется прежней, а программа будет «непонятно почему» работать не так.",
+      "uz": "Yangi boshlovchining klassik xatosi — metodni chaqirib, natijani tayinlamaslik. Satr o'sha qoladi, dastur esa «nega ekani noma'lum» boshqacha ishlaydi.",
+      "en": "The classic beginner mistake is calling the method without assigning the result. The string stays as it was and the program “mysteriously” behaves differently."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "java",
+     "title": { "ru": "Иерархия фигур", "uz": "Shakllar iyerarxiyasi", "en": "A hierarchy of shapes" },
+     "brief": { "ru": "Абстрактный класс и полиморфизм", "uz": "Abstrakt sinf va polimorfizm", "en": "Abstract class and polymorphism" },
+     "desc": {
+      "ru": "<p>Объяви абстрактный класс <code>Shape</code> с абстрактным методом <code>double area()</code>.</p><p>Сделай двух наследников: <code>Square(double side)</code> и <code>Rect(double w, double h)</code>. Затем сложи их в список и выведи площадь каждого, а последней строкой — сумму.</p><p><code>main</code> в заготовке уже написан.</p>",
+      "uz": "<p>Abstrakt <code>double area()</code> metodli abstrakt <code>Shape</code> sinfini e'lon qiling.</p><p>Ikki merosxo'r qiling: <code>Square(double side)</code> va <code>Rect(double w, double h)</code>. So'ng ularni ro'yxatga soling va har birining yuzini, oxirgi qatorda esa yig'indini chiqaring.</p><p>Zagotovkadagi <code>main</code> allaqachon yozilgan.</p>",
+      "en": "<p>Declare an abstract class <code>Shape</code> with an abstract method <code>double area()</code>.</p><p>Create two subclasses: <code>Square(double side)</code> and <code>Rect(double w, double h)</code>. Then put them in a list and print each area, with the total on the last line.</p><p>The <code>main</code> in the starter is already written.</p>"
+     },
+     "starter": "import java.util.*;\n\n// твой код: abstract class Shape, class Square, class Rect\n\npublic class Main {\n    public static void main(String[] args) {\n        List<Shape> shapes = Arrays.asList(new Square(3), new Rect(2, 5));\n        double total = 0;\n        for (Shape s : shapes) {\n            System.out.println(s.area());\n            total += s.area();\n        }\n        System.out.println(\"всего \" + total);\n    }\n}\n",
+     "solution": "import java.util.*;\n\nabstract class Shape {\n    abstract double area();\n}\n\nclass Square extends Shape {\n    private final double side;\n    Square(double side) { this.side = side; }\n    @Override double area() { return side * side; }\n}\n\nclass Rect extends Shape {\n    private final double w, h;\n    Rect(double w, double h) { this.w = w; this.h = h; }\n    @Override double area() { return w * h; }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        List<Shape> shapes = Arrays.asList(new Square(3), new Rect(2, 5));\n        double total = 0;\n        for (Shape s : shapes) {\n            System.out.println(s.area());\n            total += s.area();\n        }\n        System.out.println(\"всего \" + total);\n    }\n}\n",
+     "expected": "9.0\n10.0\nвсего 19.0",
+     "hint": {
+      "ru": "<code>abstract class Shape { abstract double area(); }</code>, наследники — через <code>extends Shape</code> с <code>@Override double area()</code>. Поля храни в <code>private final</code>, задавай в конструкторе.",
+      "uz": "<code>abstract class Shape { abstract double area(); }</code>, merosxo'rlar — <code>extends Shape</code> orqali <code>@Override double area()</code> bilan. Maydonlarni <code>private final</code> da saqlang, konstruktorda bering.",
+      "en": "<code>abstract class Shape { abstract double area(); }</code>, and the subclasses use <code>extends Shape</code> with <code>@Override double area()</code>. Keep fields <code>private final</code>, set them in the constructor."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "java",
+     "title": { "ru": "equals и hashCode", "uz": "equals va hashCode", "en": "equals and hashCode" },
+     "brief": { "ru": "Равенство по значению", "uz": "Qiymat bo'yicha tenglik", "en": "Equality by value" },
+     "desc": {
+      "ru": "<p>Напиши класс <code>Point</code> с полями <code>x</code> и <code>y</code>. Переопредели <code>equals</code>, <code>hashCode</code> и <code>toString</code> так, чтобы:</p><ul><li>две точки с одинаковыми координатами были равны;</li><li>множество считало их одним элементом;</li><li>печать давала <code>Point(1, 2)</code>.</li></ul>",
+      "uz": "<p><code>x</code> va <code>y</code> maydonli <code>Point</code> sinfini yozing. <code>equals</code>, <code>hashCode</code> va <code>toString</code> ni shunday qayta aniqlangki:</p><ul><li>bir xil koordinatali ikki nuqta teng bo'lsin;</li><li>to'plam ularni bitta element deb sanasin;</li><li>chop etish <code>Point(1, 2)</code> bersin.</li></ul>",
+      "en": "<p>Write a class <code>Point</code> with fields <code>x</code> and <code>y</code>. Override <code>equals</code>, <code>hashCode</code> and <code>toString</code> so that:</p><ul><li>two points with the same coordinates are equal;</li><li>a set counts them as one element;</li><li>printing gives <code>Point(1, 2)</code>.</li></ul>"
+     },
+     "starter": "import java.util.*;\n\n// твой код: class Point с equals, hashCode и toString\n\npublic class Main {\n    public static void main(String[] args) {\n        Point a = new Point(1, 2);\n        Point b = new Point(1, 2);\n        Point c = new Point(3, 4);\n        System.out.println(a.equals(b));\n        System.out.println(a.equals(c));\n        System.out.println(a);\n        Set<Point> set = new HashSet<>(Arrays.asList(a, b, c));\n        System.out.println(set.size());\n    }\n}\n",
+     "solution": "import java.util.*;\n\nclass Point {\n    private final int x;\n    private final int y;\n\n    Point(int x, int y) { this.x = x; this.y = y; }\n\n    @Override public boolean equals(Object o) {\n        if (this == o) return true;\n        if (!(o instanceof Point)) return false;\n        Point other = (Point) o;\n        return x == other.x && y == other.y;\n    }\n\n    @Override public int hashCode() { return Objects.hash(x, y); }\n\n    @Override public String toString() { return \"Point(\" + x + \", \" + y + \")\"; }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Point a = new Point(1, 2);\n        Point b = new Point(1, 2);\n        Point c = new Point(3, 4);\n        System.out.println(a.equals(b));\n        System.out.println(a.equals(c));\n        System.out.println(a);\n        Set<Point> set = new HashSet<>(Arrays.asList(a, b, c));\n        System.out.println(set.size());\n    }\n}\n",
+     "expected": "true\nfalse\nPoint(1, 2)\n2",
+     "hint": {
+      "ru": "Шаблон equals: сначала <code>this == o</code>, потом <code>instanceof</code>, потом приведение и сравнение полей. <code>hashCode</code> проще всего собрать через <code>Objects.hash(x, y)</code>.",
+      "uz": "equals shabloni: avval <code>this == o</code>, keyin <code>instanceof</code>, so'ng keltirish va maydonlarni solishtirish. <code>hashCode</code> ni <code>Objects.hash(x, y)</code> orqali yig'ish eng oson.",
+      "en": "The equals template: first <code>this == o</code>, then <code>instanceof</code>, then a cast and a field comparison. The easiest <code>hashCode</code> is <code>Objects.hash(x, y)</code>."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "java",
+     "title": { "ru": "Счёт с проверками", "uz": "Tekshiruvli hisob", "en": "An account with checks" },
+     "brief": { "ru": "Инкапсуляция на деле", "uz": "Amaldagi inkapsulyatsiya", "en": "Encapsulation in practice" },
+     "desc": {
+      "ru": "<p>Напиши класс <code>Wallet</code>:</p><ul><li>приватное поле баланса, задаётся в конструкторе; отрицательный старт превращается в 0;</li><li><code>deposit(int)</code> — прибавляет, если сумма больше нуля;</li><li><code>withdraw(int)</code> — снимает и возвращает <code>true</code>, если сумма положительная и не больше баланса; иначе <code>false</code> и баланс не трогает;</li><li><code>getBalance()</code> — возвращает баланс.</li></ul>",
+      "uz": "<p><code>Wallet</code> sinfini yozing:</p><ul><li>balansning maxfiy maydoni, konstruktorda beriladi; manfiy boshlanish 0 ga aylanadi;</li><li><code>deposit(int)</code> — summa noldan katta bo'lsa qo'shadi;</li><li><code>withdraw(int)</code> — summa musbat va balansdan katta bo'lmasa yechadi va <code>true</code> qaytaradi; aks holda <code>false</code> va balansga tegmaydi;</li><li><code>getBalance()</code> — balansni qaytaradi.</li></ul>",
+      "en": "<p>Write a class <code>Wallet</code>:</p><ul><li>a private balance field set in the constructor; a negative start becomes 0;</li><li><code>deposit(int)</code> — adds when the amount is above zero;</li><li><code>withdraw(int)</code> — takes the money and returns <code>true</code> when the amount is positive and not above the balance; otherwise <code>false</code> and the balance is untouched;</li><li><code>getBalance()</code> — returns the balance.</li></ul>"
+     },
+     "starter": "// твой код: class Wallet\n\npublic class Main {\n    public static void main(String[] args) {\n        Wallet w = new Wallet(100);\n        w.deposit(50);\n        System.out.println(w.withdraw(200));\n        System.out.println(w.withdraw(30));\n        System.out.println(w.getBalance());\n        System.out.println(new Wallet(-500).getBalance());\n    }\n}\n",
+     "solution": "class Wallet {\n    private int balance;\n\n    Wallet(int start) {\n        this.balance = Math.max(0, start);\n    }\n\n    void deposit(int amount) {\n        if (amount > 0) balance += amount;\n    }\n\n    boolean withdraw(int amount) {\n        if (amount <= 0 || amount > balance) return false;\n        balance -= amount;\n        return true;\n    }\n\n    int getBalance() { return balance; }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Wallet w = new Wallet(100);\n        w.deposit(50);\n        System.out.println(w.withdraw(200));\n        System.out.println(w.withdraw(30));\n        System.out.println(w.getBalance());\n        System.out.println(new Wallet(-500).getBalance());\n    }\n}\n",
+     "expected": "false\ntrue\n120\n0",
+     "hint": {
+      "ru": "В конструкторе <code>Math.max(0, start)</code>. В <code>withdraw</code> сначала проверь обе беды сразу: <code>if (amount &lt;= 0 || amount &gt; balance) return false;</code> — и только потом снимай.",
+      "uz": "Konstruktorda <code>Math.max(0, start)</code>. <code>withdraw</code> da avval ikkala baloni birdan tekshiring: <code>if (amount &lt;= 0 || amount &gt; balance) return false;</code> — va faqat keyin yeching.",
+      "en": "In the constructor use <code>Math.max(0, start)</code>. In <code>withdraw</code> check both problems at once first: <code>if (amount &lt;= 0 || amount &gt; balance) return false;</code> — and only then subtract."
+     }
+    }
+   ],
+   "exam": {
+    "time": 600,
+    "questions": [
+     {
+      "q": { "ru": "Класс наследует другой класс словом…", "uz": "Sinf boshqa sinfni qaysi so'z bilan meros oladi…", "en": "A class inherits another class with…" },
+      "options": [
+       { "ru": "implements", "uz": "implements", "en": "implements" },
+       { "ru": "extends", "uz": "extends", "en": "extends" },
+       { "ru": "inherits", "uz": "inherits", "en": "inherits" },
+       { "ru": "super", "uz": "super", "en": "super" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "У двух объектов одинаковые поля, но equals не переопределён. Что вернёт equals?", "uz": "Ikki obyektning maydonlari bir xil, lekin equals qayta aniqlanmagan. equals nima qaytaradi?", "en": "Two objects have identical fields but equals is not overridden. What does equals return?" },
+      "options": [
+       { "ru": "true", "uz": "true", "en": "true" },
+       { "ru": "false — сравниваются ссылки, а не поля", "uz": "false — maydonlar emas, havolalar solishtiriladi", "en": "false — references are compared, not fields" },
+       { "ru": "null", "uz": "null", "en": "null" },
+       { "ru": "Ошибку", "uz": "Xato", "en": "An error" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Когда брать абстрактный класс, а не интерфейс?", "uz": "Qachon interfeys emas, abstrakt sinf olinadi?", "en": "When do you take an abstract class rather than an interface?" },
+      "options": [
+       { "ru": "Всегда, он новее", "uz": "Doim, u yangiroq", "en": "Always, it is newer" },
+       { "ru": "Когда у наследников есть общий код и общее состояние", "uz": "Merosxo'rlarda umumiy kod va umumiy holat bo'lganda", "en": "When the subclasses share code and state" },
+       { "ru": "Когда нужен только договор о поведении", "uz": "Faqat xatti-harakat shartnomasi kerak bo'lganda", "en": "When you only need a contract about behaviour" },
+       { "ru": "Разницы нет", "uz": "Farqi yo'q", "en": "There is no difference" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Поле объявлено <code>private</code>. Кто может его читать напрямую?", "uz": "Maydon <code>private</code> deb e'lon qilingan. Uni kim to'g'ridan-to'g'ri o'qiy oladi?", "en": "A field is declared <code>private</code>. Who can read it directly?" },
+      "options": [
+       { "ru": "Все классы", "uz": "Barcha sinflar", "en": "All classes" },
+       { "ru": "Только сам класс — остальные через методы", "uz": "Faqat sinfning o'zi — qolganlar metodlar orqali", "en": "Only the class itself — everyone else through methods" },
+       { "ru": "Класс и наследники", "uz": "Sinf va merosxo'rlar", "en": "The class and its subclasses" },
+       { "ru": "Классы того же пакета", "uz": "O'sha paketdagi sinflar", "en": "Classes in the same package" }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "java",
+      "title": { "ru": "Сотрудники и зарплата", "uz": "Xodimlar va maosh", "en": "Employees and salary" },
+      "desc": {
+       "ru": "<p>Собери всё вместе.</p><ol><li>Абстрактный класс <code>Employee</code>: приватное <code>final</code> поле имени, конструктор, метод <code>getName()</code>, абстрактный <code>int salary()</code> и <code>toString()</code>, дающий <code>имя: зарплата</code>.</li><li><code>Developer(String name, int base)</code> — зарплата равна <code>base</code>.</li><li><code>Manager(String name, int base, int teamSize)</code> — зарплата равна <code>base + 100 * teamSize</code>.</li><li>В <code>main</code> сложи их в список, выведи каждого и последней строкой — <code>фонд: N</code>, сумму зарплат.</li></ol>",
+       "uz": "<p>Hammasini birlashtiring.</p><ol><li>Abstrakt <code>Employee</code> sinfi: ismning maxfiy <code>final</code> maydoni, konstruktor, <code>getName()</code> metodi, abstrakt <code>int salary()</code> va <code>ism: maosh</code> beradigan <code>toString()</code>.</li><li><code>Developer(String name, int base)</code> — maoshi <code>base</code> ga teng.</li><li><code>Manager(String name, int base, int teamSize)</code> — maoshi <code>base + 100 * teamSize</code> ga teng.</li><li><code>main</code> da ularni ro'yxatga soling, har birini chiqaring va oxirgi qatorda — <code>фонд: N</code>, maoshlar yig'indisini.</li></ol>",
+       "en": "<p>Put it all together.</p><ol><li>An abstract class <code>Employee</code>: a private <code>final</code> name field, a constructor, a <code>getName()</code> method, an abstract <code>int salary()</code> and a <code>toString()</code> giving <code>name: salary</code>.</li><li><code>Developer(String name, int base)</code> — the salary equals <code>base</code>.</li><li><code>Manager(String name, int base, int teamSize)</code> — the salary equals <code>base + 100 * teamSize</code>.</li><li>In <code>main</code> put them into a list, print each and finish with <code>фонд: N</code>, the total of the salaries.</li></ol>"
+      },
+      "starter": "import java.util.*;\n\n// твой код: Employee, Developer, Manager\n\npublic class Main {\n    public static void main(String[] args) {\n        List<Employee> staff = Arrays.asList(\n            new Developer(\"aziz\", 3000),\n            new Manager(\"bek\", 3500, 4),\n            new Developer(\"dilnoza\", 3200)\n        );\n\n        int fund = 0;\n        for (Employee e : staff) {\n            System.out.println(e);\n            fund += e.salary();\n        }\n        System.out.println(\"фонд: \" + fund);\n    }\n}\n",
+      "solution": "import java.util.*;\n\nabstract class Employee {\n    private final String name;\n\n    Employee(String name) { this.name = name; }\n\n    String getName() { return name; }\n\n    abstract int salary();\n\n    @Override public String toString() { return name + \": \" + salary(); }\n}\n\nclass Developer extends Employee {\n    private final int base;\n    Developer(String name, int base) {\n        super(name);\n        this.base = base;\n    }\n    @Override int salary() { return base; }\n}\n\nclass Manager extends Employee {\n    private final int base;\n    private final int teamSize;\n    Manager(String name, int base, int teamSize) {\n        super(name);\n        this.base = base;\n        this.teamSize = teamSize;\n    }\n    @Override int salary() { return base + 100 * teamSize; }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        List<Employee> staff = Arrays.asList(\n            new Developer(\"aziz\", 3000),\n            new Manager(\"bek\", 3500, 4),\n            new Developer(\"dilnoza\", 3200)\n        );\n\n        int fund = 0;\n        for (Employee e : staff) {\n            System.out.println(e);\n            fund += e.salary();\n        }\n        System.out.println(\"фонд: \" + fund);\n    }\n}\n",
+      "expected": "aziz: 3000\nbek: 3900\ndilnoza: 3200\nфонд: 10100",
+      "hint": {
+       "ru": "Имя лежит в родителе, поэтому конструктор наследника начинается с <code>super(name);</code> — и только потом свои поля. <code>toString()</code> в родителе вызывает абстрактный <code>salary()</code>: у каждого наследника выполнится своя версия.",
+       "uz": "Ism ota-onada yotadi, shuning uchun merosxo'r konstruktori <code>super(name);</code> bilan boshlanadi — va faqat keyin o'z maydonlari. Ota-onadagi <code>toString()</code> abstrakt <code>salary()</code> ni chaqiradi: har merosxo'rda o'z versiyasi bajariladi.",
+       "en": "The name lives in the parent, so the subclass constructor starts with <code>super(name);</code> and only then its own fields. The parent's <code>toString()</code> calls the abstract <code>salary()</code>: each subclass runs its own version."
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "jv-04",
+   "title": { "ru": "Обобщения и Stream API", "uz": "Umumlashtirishlar va Stream API", "en": "Generics and the Stream API" },
+   "tagline": { "ru": "Свои дженерики, filter–map–collect и Optional вместо null", "uz": "O'z dženeriklaringiz, filter–map–collect va null o'rniga Optional", "en": "Your own generics, filter–map–collect and Optional instead of null" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "Обобщения: один код на любой тип", "uz": "Umumlashtirishlar: har turga bitta kod", "en": "Generics: one code for any type" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Ты уже пользуешься дженериками: <code>List&lt;String&gt;</code>, <code>Map&lt;String, Integer&gt;</code>. Угловые скобки говорят компилятору, что внутри, и он <b>проверяет это на этапе сборки</b>.</p><p>Без дженериков пришлось бы хранить <code>Object</code> и приводить обратно вручную — с риском словить <code>ClassCastException</code> уже у пользователя.</p><p>Свои писать так же просто:</p><pre class=\"code\">class Box&lt;T&gt; {\n    private T value;\n    void set(T v) { value = v; }\n    T get() { return value; }\n}</pre><p><code>T</code> — просто имя, вместо него подставится реальный тип при использовании. Обобщённым может быть и отдельный метод: <code>static &lt;T&gt; T first(List&lt;T&gt; list)</code>.</p><p>Ограничение пишут через <code>extends</code>: <code>&lt;T extends Comparable&lt;T&gt;&gt;</code> означает «любой тип, который умеет сравнивать себя с себе подобным».</p>",
+        "uz": "<p>Siz allaqachon dženeriklardan foydalanyapsiz: <code>List&lt;String&gt;</code>, <code>Map&lt;String, Integer&gt;</code>. Burchak qavslar kompilyatorga ichida nima borligini aytadi va u <b>buni yig'ish bosqichida tekshiradi</b>.</p><p>Dženeriklarsiz <code>Object</code> saqlab, qo'lda qaytarib keltirishga to'g'ri kelardi — foydalanuvchida <code>ClassCastException</code> tutish xavfi bilan.</p><p>O'zingiznikini yozish ham shunday oson:</p><pre class=\"code\">class Box&lt;T&gt; {\n    private T value;\n    void set(T v) { value = v; }\n    T get() { return value; }\n}</pre><p><code>T</code> — shunchaki nom, foydalanishda uning o'rniga haqiqiy tur qo'yiladi. Alohida metod ham umumlashgan bo'lishi mumkin: <code>static &lt;T&gt; T first(List&lt;T&gt; list)</code>.</p><p>Cheklov <code>extends</code> orqali yoziladi: <code>&lt;T extends Comparable&lt;T&gt;&gt;</code> «o'ziga o'xshashi bilan solishtira oladigan har qanday tur» degani.</p>",
+        "en": "<p>You already use generics: <code>List&lt;String&gt;</code>, <code>Map&lt;String, Integer&gt;</code>. The angle brackets tell the compiler what is inside, and it <b>checks that at build time</b>.</p><p>Without generics you would store <code>Object</code> and cast back by hand — with the risk of a <code>ClassCastException</code> landing on your user.</p><p>Writing your own is just as easy:</p><pre class=\"code\">class Box&lt;T&gt; {\n    private T value;\n    void set(T v) { value = v; }\n    T get() { return value; }\n}</pre><p><code>T</code> is just a name; the real type is substituted at the point of use. A single method can be generic too: <code>static &lt;T&gt; T first(List&lt;T&gt; list)</code>.</p><p>A bound is written with <code>extends</code>: <code>&lt;T extends Comparable&lt;T&gt;&gt;</code> means “any type that can compare itself with its own kind”.</p>"
+       }
+      },
+      {
+       "type": "javarun",
+       "code": "import java.util.*;\n\nclass Box<T> {\n    private final List<T> items = new ArrayList<>();\n\n    void add(T item) { items.add(item); }\n    T last() { return items.get(items.size() - 1); }\n    int size() { return items.size(); }\n}\n\nclass Util {\n    // обобщённый метод с ограничением: T обязан уметь сравниваться\n    static <T extends Comparable<T>> T max(List<T> list) {\n        T best = list.get(0);\n        for (T item : list)\n            if (item.compareTo(best) > 0) best = item;\n        return best;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Box<String> words = new Box<>();\n        words.add(\"один\");\n        words.add(\"два\");\n        System.out.println(words.size() + \" \" + words.last());\n\n        Box<Integer> nums = new Box<>();      // тот же класс, другой тип\n        nums.add(10);\n        nums.add(42);\n        System.out.println(nums.size() + \" \" + nums.last());\n\n        System.out.println(Util.max(Arrays.asList(3, 9, 5)));\n        System.out.println(Util.max(Arrays.asList(\"груша\", \"яблоко\", \"банан\")));\n\n        // words.add(42);  // не скомпилируется: Box<String> хранит только строки\n    }\n}"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Обрати внимание на <code>new Box&lt;&gt;()</code> — пустые угловые скобки. Компилятор сам выведет тип из левой части объявления; писать <code>new Box&lt;String&gt;()</code> не запрещено, но избыточно.</p><p>И на ограничение <code>T extends Comparable&lt;T&gt;</code>. Без него компилятор не разрешил бы вызвать <code>item.compareTo(best)</code> — он же не знает, умеет ли <code>T</code> сравниваться. Ограничение — это обещание компилятору, и он его проверит на каждом использовании.</p><p>Важная особенность Java: дженерики существуют <b>только на этапе компиляции</b>. В байт-коде <code>List&lt;String&gt;</code> и <code>List&lt;Integer&gt;</code> — один и тот же <code>List</code>. Это называется стиранием типов, и из-за него нельзя написать <code>new T[10]</code>.</p>",
+        "uz": "<p><code>new Box&lt;&gt;()</code> ga e'tibor bering — bo'sh burchak qavslar. Kompilyator turni e'lonning chap qismidan o'zi chiqaradi; <code>new Box&lt;String&gt;()</code> yozish taqiqlanmagan, lekin ortiqcha.</p><p>Va <code>T extends Comparable&lt;T&gt;</code> chekloviga. Usiz kompilyator <code>item.compareTo(best)</code> ni chaqirishga ruxsat bermasdi — u <code>T</code> solishtira oladimi yo'qmi bilmaydi-ku. Cheklov — kompilyatorga va'da va u buni har foydalanishda tekshiradi.</p><p>Java ning muhim xususiyati: dženeriklar <b>faqat kompilyatsiya bosqichida</b> mavjud. Bayt-kodda <code>List&lt;String&gt;</code> va <code>List&lt;Integer&gt;</code> — bitta <code>List</code>. Bu turlarni o'chirish deyiladi va shu sababli <code>new T[10]</code> yozib bo'lmaydi.</p>",
+        "en": "<p>Note <code>new Box&lt;&gt;()</code> — empty angle brackets. The compiler infers the type from the left-hand side; writing <code>new Box&lt;String&gt;()</code> is allowed but redundant.</p><p>And note the bound <code>T extends Comparable&lt;T&gt;</code>. Without it the compiler would not let you call <code>item.compareTo(best)</code> — it does not know whether <code>T</code> can be compared. A bound is a promise to the compiler, and it verifies it at every use.</p><p>An important Java quirk: generics exist <b>only at compile time</b>. In bytecode <code>List&lt;String&gt;</code> and <code>List&lt;Integer&gt;</code> are the same <code>List</code>. This is called type erasure, and because of it you cannot write <code>new T[10]</code>.</p>"
+       }
+      },
+      {
+       "type": "checkpoint",
+       "q": { "ru": "Что даёт <code>&lt;T extends Comparable&lt;T&gt;&gt;</code>?", "uz": "<code>&lt;T extends Comparable&lt;T&gt;&gt;</code> nima beradi?", "en": "What does <code>&lt;T extends Comparable&lt;T&gt;&gt;</code> give you?" },
+       "options": [
+        { "ru": "Ограничивает T только числами", "uz": "T ni faqat sonlar bilan cheklaydi", "en": "It restricts T to numbers only" },
+        { "ru": "Разрешает вызывать compareTo: компилятор знает, что тип умеет сравниваться", "uz": "compareTo ni chaqirishga ruxsat beradi: kompilyator tur solishtira olishini biladi", "en": "It permits calling compareTo: the compiler knows the type is comparable" },
+        { "ru": "Ускоряет сравнение", "uz": "Solishtirishni tezlashtiradi", "en": "It speeds up comparison" },
+        { "ru": "Делает класс абстрактным", "uz": "Sinfni abstrakt qiladi", "en": "It makes the class abstract" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Без ограничения <code>T</code> — это просто «что угодно», и единственные доступные методы у него — от <code>Object</code>.",
+        "uz": "Cheklovsiz <code>T</code> — shunchaki «har qanday narsa» va unda mavjud yagona metodlar <code>Object</code> dan.",
+        "en": "Without a bound, <code>T</code> is simply “anything”, and the only methods available on it come from <code>Object</code>."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "Stream API: цепочка вместо цикла", "uz": "Stream API: sikl o'rniga zanjir", "en": "The Stream API: a chain instead of a loop" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><b>Stream</b> — это не коллекция, а <i>конвейер обработки</i>. Ты описываешь, ЧТО сделать с данными, а не КАК обойти их циклом.</p><p>Операции делятся на два вида:</p><ul><li><b>Промежуточные</b> — <code>filter</code>, <code>map</code>, <code>sorted</code>, <code>distinct</code>, <code>limit</code>. Они <b>ленивые</b>: возвращают новый поток и ничего не считают.</li><li><b>Терминальные</b> — <code>collect</code>, <code>forEach</code>, <code>count</code>, <code>sum</code>, <code>anyMatch</code>, <code>reduce</code>. Вот они и запускают весь конвейер.</li></ul><p>Пока не вызвана терминальная операция, <b>не выполняется ничего</b>. Стрим без неё — просто описание намерений.</p>",
+        "uz": "<p><b>Stream</b> — to'plam emas, <i>qayta ishlash konveyeri</i>. Siz ma'lumot bilan NIMA qilishni tasvirlaysiz, uni sikl bilan QANDAY aylanishni emas.</p><p>Amallar ikki turga bo'linadi:</p><ul><li><b>Oraliq</b> — <code>filter</code>, <code>map</code>, <code>sorted</code>, <code>distinct</code>, <code>limit</code>. Ular <b>dangasa</b>: yangi oqim qaytaradi va hech nima hisoblamaydi.</li><li><b>Terminal</b> — <code>collect</code>, <code>forEach</code>, <code>count</code>, <code>sum</code>, <code>anyMatch</code>, <code>reduce</code>. Butun konveyerni ana shular ishga tushiradi.</li></ul><p>Terminal amal chaqirilmaguncha <b>hech nima bajarilmaydi</b>. Usiz strim — shunchaki niyatlar tavsifi.</p>",
+        "en": "<p>A <b>Stream</b> is not a collection but a <i>processing pipeline</i>. You describe WHAT to do with the data, not HOW to walk it with a loop.</p><p>Operations come in two kinds:</p><ul><li><b>Intermediate</b> — <code>filter</code>, <code>map</code>, <code>sorted</code>, <code>distinct</code>, <code>limit</code>. They are <b>lazy</b>: they return a new stream and compute nothing.</li><li><b>Terminal</b> — <code>collect</code>, <code>forEach</code>, <code>count</code>, <code>sum</code>, <code>anyMatch</code>, <code>reduce</code>. These are what launch the whole pipeline.</li></ul><p>Until a terminal operation is called, <b>nothing runs</b>. A stream without one is merely a statement of intent.</p>"
+       }
+      },
+      {
+       "type": "javarun",
+       "code": "import java.util.*;\nimport java.util.stream.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        List<String> names = Arrays.asList(\"aziz\", \"bek\", \"dilnoza\", \"umid\", \"aziz\");\n\n        String longUpper = names.stream()\n                .filter(n -> n.length() > 3)\n                .distinct()\n                .map(String::toUpperCase)\n                .sorted()\n                .collect(Collectors.joining(\", \"));\n        System.out.println(longUpper);\n\n        List<Integer> nums = Arrays.asList(4, 7, 2, 9, 12, 5);\n        int sumEven = nums.stream().filter(n -> n % 2 == 0).mapToInt(Integer::intValue).sum();\n        System.out.println(\"сумма чётных: \" + sumEven);\n        System.out.println(\"есть больше 10? \" + nums.stream().anyMatch(n -> n > 10));\n        System.out.println(\"все положительные? \" + nums.stream().allMatch(n -> n > 0));\n        System.out.println(\"сколько больше 4: \" + nums.stream().filter(n -> n > 4).count());\n\n        List<Integer> squares = nums.stream().map(n -> n * n).collect(Collectors.toList());\n        System.out.println(\"квадраты: \" + squares);\n\n        // группировка — прямой аналог GROUP BY\n        Map<Integer, List<String>> byLength = names.stream()\n                .distinct()\n                .collect(Collectors.groupingBy(String::length));\n        System.out.println(\"по длине: \" + byLength);\n\n        // ленивость: без терминальной операции не выполнится ничего\n        names.stream().map(n -> { System.out.println(\"это не напечатается\"); return n; });\n        System.out.println(\"конец\");\n    }\n}"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Последние две строки — важная демонстрация. Мы попросили <code>map</code> напечатать текст, но он не напечатался: терминальной операции нет, конвейер не запустился.</p><p>Про запись <code>String::toUpperCase</code>: это <b>ссылка на метод</b>, короткая форма для <code>n -&gt; n.toUpperCase()</code>. Читается лучше и пишется быстрее.</p><p>И честно о границах применения: стрим <b>не всегда лучше цикла</b>. На простом обходе с изменением состояния обычный <code>for</code> понятнее. Стрим выигрывает там, где есть цепочка «отфильтровать → преобразовать → собрать»: она читается сверху вниз как описание задачи.</p>",
+        "uz": "<p>Oxirgi ikki qator — muhim namoyish. Biz <code>map</code> dan matn chop etishni so'radik, lekin u chop etilmadi: terminal amal yo'q, konveyer ishga tushmadi.</p><p><code>String::toUpperCase</code> yozuvi haqida: bu <b>metodga havola</b>, <code>n -&gt; n.toUpperCase()</code> ning qisqa shakli. Yaxshiroq o'qiladi va tezroq yoziladi.</p><p>Va qo'llash chegaralari haqida halol: strim <b>doim ham sikldan yaxshi emas</b>. Holatni o'zgartiruvchi oddiy aylanishda odatiy <code>for</code> tushunarliroq. Strim «filtrlash → o'zgartirish → yig'ish» zanjiri bor joyda yutadi: u vazifa tavsifi kabi yuqoridan pastga o'qiladi.</p>",
+        "en": "<p>The last two lines are an important demonstration. We asked <code>map</code> to print something and it did not print: there is no terminal operation, so the pipeline never ran.</p><p>About the <code>String::toUpperCase</code> notation: it is a <b>method reference</b>, a short form of <code>n -&gt; n.toUpperCase()</code>. It reads better and writes faster.</p><p>And honestly about the limits: a stream is <b>not always better than a loop</b>. For a simple walk that mutates state, a plain <code>for</code> is clearer. Streams win where there is a chain of “filter → transform → collect”: it reads top to bottom like a description of the task.</p>"
+       }
+      },
+      {
+       "type": "predict",
+       "lang": "java",
+       "code": "import java.util.*;\nimport java.util.stream.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        List<Integer> nums = Arrays.asList(1, 2, 3);\n        nums.stream().map(n -> n * 2);\n        System.out.println(nums);\n    }\n}",
+       "options": [
+        { "ru": "[2, 4, 6] — map изменил список", "uz": "[2, 4, 6] — map ro'yxatni o'zgartirdi", "en": "[2, 4, 6] — map changed the list" },
+        { "ru": "[1, 2, 3] — стрим ленив и без терминальной операции ничего не сделал", "uz": "[1, 2, 3] — strim dangasa va terminal amalsiz hech nima qilmadi", "en": "[1, 2, 3] — the stream is lazy and did nothing without a terminal operation" },
+        { "ru": "Пустой список", "uz": "Bo'sh ro'yxat", "en": "An empty list" },
+        { "ru": "Ошибка", "uz": "Xato", "en": "An error" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Стрим вообще никогда не меняет исходную коллекцию — он строит новую. А без <code>collect</code> или другой терминальной операции он даже не начинает работу.",
+        "uz": "Strim asl to'plamni umuman hech qachon o'zgartirmaydi — u yangisini quradi. <code>collect</code> yoki boshqa terminal amalsiz esa u ishni hatto boshlamaydi.",
+        "en": "A stream never modifies the source collection — it builds a new one. And without <code>collect</code> or another terminal operation it does not even start."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "Optional вместо null", "uz": "null o'rniga Optional", "en": "Optional instead of null" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><code>NullPointerException</code> — самая частая ошибка в Java за всю её историю. Причина проста: метод вернул <code>null</code>, вызывающий код об этом не подумал.</p><p><code>Optional&lt;T&gt;</code> делает отсутствие значения <b>видимым в сигнатуре</b>. Если метод возвращает <code>Optional&lt;User&gt;</code>, ты уже не сможешь случайно забыть про «а вдруг не нашли» — компилятор не даст обратиться к значению напрямую.</p><ul><li><code>Optional.of(x)</code> — значение точно есть</li><li><code>Optional.empty()</code> — значения нет</li><li><code>isPresent()</code> / <code>ifPresent(...)</code> — проверить и использовать</li><li><code>orElse(запасное)</code> — значение или запасное</li><li><code>map(...)</code> — преобразовать, если есть</li></ul><p>Правило применения: <b>Optional — для возвращаемых значений</b>. Класть его в поля класса или передавать параметром не принято — это только запутает.</p>",
+        "uz": "<p><code>NullPointerException</code> — Java tarixidagi eng ko'p uchraydigan xato. Sababi oddiy: metod <code>null</code> qaytardi, chaqiruvchi kod bu haqda o'ylamadi.</p><p><code>Optional&lt;T&gt;</code> qiymat yo'qligini <b>imzoda ko'rinadigan</b> qiladi. Metod <code>Optional&lt;User&gt;</code> qaytarsa, siz «birdan topilmasa-chi» ni tasodifan unuta olmaysiz — kompilyator qiymatga to'g'ridan-to'g'ri murojaat qilishga yo'l qo'ymaydi.</p><ul><li><code>Optional.of(x)</code> — qiymat aniq bor</li><li><code>Optional.empty()</code> — qiymat yo'q</li><li><code>isPresent()</code> / <code>ifPresent(...)</code> — tekshirish va ishlatish</li><li><code>orElse(zaxira)</code> — qiymat yoki zaxira</li><li><code>map(...)</code> — bor bo'lsa o'zgartirish</li></ul><p>Qo'llash qoidasi: <b>Optional — qaytariladigan qiymatlar uchun</b>. Uni sinf maydonlariga qo'yish yoki parametr qilib uzatish qabul qilinmagan — bu faqat chalkashtiradi.</p>",
+        "en": "<p><code>NullPointerException</code> is the most frequent error in Java's whole history. The cause is simple: a method returned <code>null</code> and the calling code never considered it.</p><p><code>Optional&lt;T&gt;</code> makes the absence of a value <b>visible in the signature</b>. If a method returns <code>Optional&lt;User&gt;</code>, you can no longer accidentally forget “what if it was not found” — the compiler will not let you reach the value directly.</p><ul><li><code>Optional.of(x)</code> — the value is definitely there</li><li><code>Optional.empty()</code> — there is no value</li><li><code>isPresent()</code> / <code>ifPresent(...)</code> — check and use</li><li><code>orElse(fallback)</code> — the value or a fallback</li><li><code>map(...)</code> — transform if present</li></ul><p>The rule of use: <b>Optional is for return values</b>. Putting it in fields or passing it as a parameter is not customary — it only confuses.</p>"
+       }
+      },
+      {
+       "type": "javarun",
+       "code": "import java.util.*;\nimport java.util.stream.*;\n\npublic class Main {\n    // раньше вернули бы null — и кто-нибудь обязательно забыл бы проверить\n    static Optional<String> findLongest(List<String> names) {\n        return names.stream().max(Comparator.comparingInt(String::length));\n    }\n\n    public static void main(String[] args) {\n        List<String> names = Arrays.asList(\"aziz\", \"dilnoza\", \"bek\");\n\n        Optional<String> longest = findLongest(names);\n        System.out.println(\"нашли: \" + longest.isPresent());\n        System.out.println(\"значение: \" + longest.orElse(\"никого\"));\n        longest.ifPresent(n -> System.out.println(\"длина: \" + n.length()));\n\n        Optional<String> nobody = findLongest(new ArrayList<>());\n        System.out.println(\"на пустом списке: \" + nobody.orElse(\"никого\"));\n\n        // map работает, только если значение есть\n        System.out.println(longest.map(String::toUpperCase).orElse(\"—\"));\n        System.out.println(nobody.map(String::toUpperCase).orElse(\"—\"));\n\n        // findFirst тоже возвращает Optional — потому что может не найти\n        Optional<String> withZ = names.stream().filter(n -> n.contains(\"z\")).findFirst();\n        System.out.println(\"со звуком z: \" + withZ.orElse(\"нет таких\"));\n    }\n}"
+      },
+      {
+       "type": "note",
+       "kind": "trap",
+       "html": {
+        "ru": "У <code>Optional</code> есть метод <code>get()</code> — и он бросает исключение, если значения нет. Использовать его без предварительной проверки — значит вернуть себе ровно ту проблему, от которой <code>Optional</code> и придумали, только под другим именем. Бери <code>orElse</code>, <code>orElseGet</code>, <code>ifPresent</code> или <code>map</code>.",
+        "uz": "<code>Optional</code> da <code>get()</code> metodi bor — va qiymat bo'lmasa u istisno tashlaydi. Uni oldindan tekshirmasdan ishlatish — <code>Optional</code> o'ylab topilgan muammoni boshqa nom ostida o'zingizga qaytarish demakdir. <code>orElse</code>, <code>orElseGet</code>, <code>ifPresent</code> yoki <code>map</code> ni oling.",
+        "en": "<code>Optional</code> has a <code>get()</code> method — and it throws when there is no value. Using it without checking first means bringing back exactly the problem <code>Optional</code> was invented for, under a different name. Use <code>orElse</code>, <code>orElseGet</code>, <code>ifPresent</code> or <code>map</code>."
+       }
+      },
+      {
+       "type": "summary",
+       "items": [
+        { "ru": "Дженерики проверяются компилятором — ошибка типа не доедет до пользователя", "uz": "Dženeriklar kompilyator tomonidan tekshiriladi — tur xatosi foydalanuvchiga yetmaydi", "en": "Generics are checked by the compiler — a type error never reaches the user" },
+        { "ru": "Ограничение extends разрешает вызывать методы этого типа", "uz": "extends cheklovi shu turning metodlarini chaqirishga ruxsat beradi", "en": "An extends bound permits calling that type's methods" },
+        { "ru": "Дженерики стираются: в байт-коде List<String> и List<Integer> одинаковы", "uz": "Dženeriklar o'chiriladi: bayt-kodda List<String> va List<Integer> bir xil", "en": "Generics are erased: in bytecode List<String> and List<Integer> are the same" },
+        { "ru": "Промежуточные операции ленивы, работу запускает терминальная", "uz": "Oraliq amallar dangasa, ishni terminal amal boshlaydi", "en": "Intermediate operations are lazy; a terminal one starts the work" },
+        { "ru": "Стрим не меняет исходную коллекцию — он строит новую", "uz": "Strim asl to'plamni o'zgartirmaydi — yangisini quradi", "en": "A stream does not modify the source collection — it builds a new one" },
+        { "ru": "Optional делает «может не быть» видимым в сигнатуре метода", "uz": "Optional «bo'lmasligi mumkin» ni metod imzosida ko'rinadigan qiladi", "en": "Optional makes “may be absent” visible in the method signature" },
+        { "ru": "Optional.get() без проверки возвращает ту же проблему, что и null", "uz": "Tekshiruvsiz Optional.get() null bilan bir xil muammoni qaytaradi", "en": "Optional.get() without a check brings back the same problem as null" }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": { "ru": "Зачем нужны дженерики?", "uz": "Dženeriklar nima uchun kerak?", "en": "What are generics for?" },
+     "options": [
+      { "ru": "Ускоряют программу", "uz": "Dasturni tezlashtiradi", "en": "They speed up the program" },
+      { "ru": "Дают один код для разных типов с проверкой на этапе компиляции", "uz": "Kompilyatsiya bosqichida tekshiruv bilan turli turlar uchun bitta kod beradi", "en": "They give one code for many types with compile-time checking" },
+      { "ru": "Экономят память", "uz": "Xotirani tejaydi", "en": "They save memory" },
+      { "ru": "Позволяют хранить null", "uz": "null saqlash imkonini beradi", "en": "They allow storing null" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Без них пришлось бы хранить <code>Object</code> и приводить обратно вручную — с риском <code>ClassCastException</code> уже у пользователя.",
+      "uz": "Ularsiz <code>Object</code> saqlab, qo'lda qaytarib keltirishga to'g'ri kelardi — foydalanuvchida <code>ClassCastException</code> xavfi bilan.",
+      "en": "Without them you would store <code>Object</code> and cast back by hand — risking a <code>ClassCastException</code> at the user's end."
+     }
+    },
+    {
+     "q": { "ru": "Какая операция запускает выполнение стрима?", "uz": "Qaysi amal strimni bajarishni ishga tushiradi?", "en": "Which operation starts a stream running?" },
+     "options": [
+      { "ru": "filter", "uz": "filter", "en": "filter" },
+      { "ru": "collect — терминальная", "uz": "collect — terminal", "en": "collect — a terminal one" },
+      { "ru": "map", "uz": "map", "en": "map" },
+      { "ru": "sorted", "uz": "sorted", "en": "sorted" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Промежуточные операции только описывают конвейер. Пока нет терминальной — не выполнится ни одна из них.",
+      "uz": "Oraliq amallar faqat konveyerni tasvirlaydi. Terminal amal bo'lmaguncha ularning birortasi ham bajarilmaydi.",
+      "en": "Intermediate operations only describe the pipeline. Until a terminal one appears, none of them run."
+     }
+    },
+    {
+     "q": { "ru": "Что делает <code>names.stream().map(String::toUpperCase)</code> без collect?", "uz": "collect siz <code>names.stream().map(String::toUpperCase)</code> nima qiladi?", "en": "What does <code>names.stream().map(String::toUpperCase)</code> do without collect?" },
+     "options": [
+      { "ru": "Меняет исходный список", "uz": "Asl ro'yxatni o'zgartiradi", "en": "It changes the source list" },
+      { "ru": "Ничего: возвращает новый стрим, вычислений не происходит", "uz": "Hech nima: yangi strim qaytaradi, hisob bo'lmaydi", "en": "Nothing: it returns a new stream and no computation happens" },
+      { "ru": "Возвращает список", "uz": "Ro'yxat qaytaradi", "en": "It returns a list" },
+      { "ru": "Бросает исключение", "uz": "Istisno tashlaydi", "en": "It throws an exception" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "И это правильное поведение: ленивость позволяет не проходить коллекцию несколько раз, а собрать все операции в один проход при терминальной.",
+      "uz": "Va bu to'g'ri xatti-harakat: dangasalik to'plamni bir necha marta aylanmaslik, barcha amallarni terminalda bitta o'tishga yig'ish imkonini beradi.",
+      "en": "And that is the right behaviour: laziness avoids walking the collection several times, folding all operations into a single pass at the terminal step."
+     }
+    },
+    {
+     "q": { "ru": "<code>Collectors.groupingBy(String::length)</code> — аналог чего в SQL?", "uz": "<code>Collectors.groupingBy(String::length)</code> — SQL da nimaning analogi?", "en": "<code>Collectors.groupingBy(String::length)</code> is the analogue of what in SQL?" },
+     "options": [
+      { "ru": "WHERE", "uz": "WHERE", "en": "WHERE" },
+      { "ru": "GROUP BY", "uz": "GROUP BY", "en": "GROUP BY" },
+      { "ru": "ORDER BY", "uz": "ORDER BY", "en": "ORDER BY" },
+      { "ru": "JOIN", "uz": "JOIN", "en": "JOIN" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Результат — <code>Map</code> «ключ группы → список элементов». Второй аргумент позволяет сразу считать агрегат, как <code>Collectors.counting()</code>.",
+      "uz": "Natija — «guruh kaliti → elementlar ro'yxati» <code>Map</code>. Ikkinchi argument <code>Collectors.counting()</code> kabi agregatni darhol hisoblash imkonini beradi.",
+      "en": "The result is a <code>Map</code> of “group key → list of elements”. A second argument lets you compute an aggregate at once, like <code>Collectors.counting()</code>."
+     }
+    },
+    {
+     "q": { "ru": "Зачем возвращать <code>Optional&lt;User&gt;</code> вместо <code>User</code>?", "uz": "Nega <code>User</code> o'rniga <code>Optional&lt;User&gt;</code> qaytariladi?", "en": "Why return <code>Optional&lt;User&gt;</code> instead of <code>User</code>?" },
+     "options": [
+      { "ru": "Так быстрее", "uz": "Shunday tezroq", "en": "It is faster" },
+      { "ru": "Отсутствие значения становится видно в сигнатуре, и его нельзя молча забыть", "uz": "Qiymat yo'qligi imzoda ko'rinadi va uni jimgina unutib bo'lmaydi", "en": "The absence of a value becomes visible in the signature and cannot be silently ignored" },
+      { "ru": "Optional занимает меньше памяти", "uz": "Optional kamroq xotira egallaydi", "en": "Optional uses less memory" },
+      { "ru": "Это требование JVM", "uz": "Bu JVM talabi", "en": "It is a JVM requirement" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "С <code>null</code> компилятор молчит, и падение случается у пользователя. С <code>Optional</code> он заставит разобрать оба случая ещё при написании кода.",
+      "uz": "<code>null</code> bilan kompilyator jim turadi va yiqilish foydalanuvchida sodir bo'ladi. <code>Optional</code> bilan u ikkala holatni kod yozish paytidayoq ko'rib chiqishga majbur qiladi.",
+      "en": "With <code>null</code> the compiler says nothing and the crash happens at the user's end. With <code>Optional</code> it forces you to handle both cases while writing the code."
+     }
+    },
+    {
+     "q": { "ru": "Чем плох <code>optional.get()</code> без проверки?", "uz": "Tekshiruvsiz <code>optional.get()</code> nimasi bilan yomon?", "en": "What is wrong with <code>optional.get()</code> without a check?" },
+     "options": [
+      { "ru": "Ничем", "uz": "Hech nimasi bilan", "en": "Nothing" },
+      { "ru": "Бросит исключение при пустом Optional — та же проблема, что и с null", "uz": "Bo'sh Optional da istisno tashlaydi — null bilan bir xil muammo", "en": "It throws on an empty Optional — the same problem as with null" },
+      { "ru": "Он медленный", "uz": "U sekin", "en": "It is slow" },
+      { "ru": "Он устарел и удалён", "uz": "U eskirgan va o'chirilgan", "en": "It is deprecated and removed" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Смысл <code>Optional</code> в том, чтобы заставить обработать оба случая. <code>get()</code> без проверки этот смысл убивает.",
+      "uz": "<code>Optional</code> ning mohiyati ikkala holatni qayta ishlashga majburlashda. Tekshiruvsiz <code>get()</code> bu mohiyatni o'ldiradi.",
+      "en": "The point of <code>Optional</code> is to force you to handle both cases. An unchecked <code>get()</code> destroys that point."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "java",
+     "title": { "ru": "Обобщённая пара", "uz": "Umumiy juftlik", "en": "A generic pair" },
+     "brief": { "ru": "Свой класс с параметром типа", "uz": "Tur parametrli o'z sinfingiz", "en": "Your own class with a type parameter" },
+     "desc": {
+      "ru": "<p>Напиши класс <code>Pair&lt;T&gt;</code>: конструктор принимает два значения типа <code>T</code>, методы <code>first()</code> и <code>second()</code> их возвращают, метод <code>swapped()</code> возвращает <b>новую</b> пару с переставленными значениями.</p><p>Класс должен работать и с <code>String</code>, и с <code>Integer</code>.</p>",
+      "uz": "<p><code>Pair&lt;T&gt;</code> sinfini yozing: konstruktor <code>T</code> turidagi ikki qiymat oladi, <code>first()</code> va <code>second()</code> metodlari ularni qaytaradi, <code>swapped()</code> metodi qiymatlari almashgan <b>yangi</b> juftlikni qaytaradi.</p><p>Sinf <code>String</code> bilan ham, <code>Integer</code> bilan ham ishlashi kerak.</p>",
+      "en": "<p>Write a class <code>Pair&lt;T&gt;</code>: the constructor takes two values of type <code>T</code>, the methods <code>first()</code> and <code>second()</code> return them, and <code>swapped()</code> returns a <b>new</b> pair with the values exchanged.</p><p>The class must work with both <code>String</code> and <code>Integer</code>.</p>"
+     },
+     "starter": "// твой код: class Pair<T>\n\npublic class Main {\n    public static void main(String[] args) {\n        Pair<Integer> nums = new Pair<>(1, 2);\n        System.out.println(nums.first());\n        System.out.println(nums.swapped().first());\n        System.out.println(nums.first());\n\n        Pair<String> words = new Pair<>(\"да\", \"нет\");\n        System.out.println(words.swapped().first());\n    }\n}\n",
+     "solution": "class Pair<T> {\n    private final T a;\n    private final T b;\n\n    Pair(T a, T b) { this.a = a; this.b = b; }\n\n    T first() { return a; }\n    T second() { return b; }\n\n    // новая пара: исходная остаётся нетронутой\n    Pair<T> swapped() { return new Pair<>(b, a); }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Pair<Integer> nums = new Pair<>(1, 2);\n        System.out.println(nums.first());\n        System.out.println(nums.swapped().first());\n        System.out.println(nums.first());\n\n        Pair<String> words = new Pair<>(\"да\", \"нет\");\n        System.out.println(words.swapped().first());\n    }\n}\n",
+     "expected": "1\n2\n1\nнет",
+     "hint": {
+      "ru": "Поля <code>private final T a, b;</code> задаются в конструкторе. <code>swapped()</code> должен возвращать <code>new Pair&lt;&gt;(b, a)</code>, а не менять поля у себя.",
+      "uz": "<code>private final T a, b;</code> maydonlari konstruktorda beriladi. <code>swapped()</code> o'z maydonlarini o'zgartirmasdan <code>new Pair&lt;&gt;(b, a)</code> qaytarishi kerak.",
+      "en": "The fields <code>private final T a, b;</code> are set in the constructor. <code>swapped()</code> must return <code>new Pair&lt;&gt;(b, a)</code> rather than mutate its own fields."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "java",
+     "title": { "ru": "Цепочка стрима", "uz": "Strim zanjiri", "en": "A stream chain" },
+     "brief": { "ru": "filter, map, collect", "uz": "filter, map, collect", "en": "filter, map, collect" },
+     "desc": {
+      "ru": "<p>Из списка имён оставь те, что длиннее трёх букв, приведи их к верхнему регистру, отсортируй по алфавиту и склей через <code>\", \"</code>. Выведи результат.</p><p>Затем отдельной строкой выведи сумму квадратов чётных чисел из списка <code>nums</code>.</p><p>Обе задачи — одной цепочкой каждая, без циклов.</p>",
+      "uz": "<p>Ismlar ro'yxatidan uch harfdan uzunlarini qoldiring, ularni katta registrga keltiring, alifbo bo'yicha saralang va <code>\", \"</code> orqali yopishtiring. Natijani chiqaring.</p><p>So'ng alohida qatorda <code>nums</code> ro'yxatidagi juft sonlar kvadratlari yig'indisini chiqaring.</p><p>Ikkala vazifa ham bittadan zanjir bilan, siklsiz.</p>",
+      "en": "<p>From the list of names keep those longer than three letters, uppercase them, sort alphabetically and join with <code>\", \"</code>. Print the result.</p><p>Then, on a separate line, print the sum of the squares of the even numbers in the list <code>nums</code>.</p><p>Both with a single chain each, no loops.</p>"
+     },
+     "starter": "import java.util.*;\nimport java.util.stream.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        List<String> names = Arrays.asList(\"aziz\", \"bek\", \"dilnoza\", \"umid\");\n        List<Integer> nums = Arrays.asList(4, 7, 2, 9, 12, 5);\n\n        // твой код: две строки вывода\n    }\n}\n",
+     "solution": "import java.util.*;\nimport java.util.stream.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        List<String> names = Arrays.asList(\"aziz\", \"bek\", \"dilnoza\", \"umid\");\n        List<Integer> nums = Arrays.asList(4, 7, 2, 9, 12, 5);\n\n        String result = names.stream()\n                .filter(n -> n.length() > 3)\n                .map(String::toUpperCase)\n                .sorted()\n                .collect(Collectors.joining(\", \"));\n        System.out.println(result);\n\n        int sum = nums.stream()\n                .filter(n -> n % 2 == 0)\n                .mapToInt(n -> n * n)\n                .sum();\n        System.out.println(sum);\n    }\n}\n",
+     "expected": "AZIZ, DILNOZA, UMID\n164",
+     "hint": {
+      "ru": "Первая цепочка: <code>filter</code> → <code>map(String::toUpperCase)</code> → <code>sorted()</code> → <code>collect(Collectors.joining(\", \"))</code>. Вторая: <code>filter</code> → <code>mapToInt(n -&gt; n * n)</code> → <code>sum()</code>.",
+      "uz": "Birinchi zanjir: <code>filter</code> → <code>map(String::toUpperCase)</code> → <code>sorted()</code> → <code>collect(Collectors.joining(\", \"))</code>. Ikkinchisi: <code>filter</code> → <code>mapToInt(n -&gt; n * n)</code> → <code>sum()</code>.",
+      "en": "The first chain: <code>filter</code> → <code>map(String::toUpperCase)</code> → <code>sorted()</code> → <code>collect(Collectors.joining(\", \"))</code>. The second: <code>filter</code> → <code>mapToInt(n -&gt; n * n)</code> → <code>sum()</code>."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "java",
+     "title": { "ru": "Поиск с Optional", "uz": "Optional bilan qidiruv", "en": "Searching with Optional" },
+     "brief": { "ru": "Метод, который может не найти", "uz": "Topmasligi mumkin bo'lgan metod", "en": "A method that may find nothing" },
+     "desc": {
+      "ru": "<p>Напиши метод <code>static Optional&lt;String&gt; findByPrefix(List&lt;String&gt; names, String prefix)</code> — первое имя, начинающееся с <code>prefix</code>, или пустой <code>Optional</code>.</p><p>Реализуй через стрим, не через цикл. <code>main</code> в заготовке проверит оба случая.</p>",
+      "uz": "<p><code>static Optional&lt;String&gt; findByPrefix(List&lt;String&gt; names, String prefix)</code> metodini yozing — <code>prefix</code> bilan boshlanadigan birinchi ism yoki bo'sh <code>Optional</code>.</p><p>Siklda emas, strim orqali amalga oshiring. Zagotovkadagi <code>main</code> ikkala holatni tekshiradi.</p>",
+      "en": "<p>Write a method <code>static Optional&lt;String&gt; findByPrefix(List&lt;String&gt; names, String prefix)</code> — the first name starting with <code>prefix</code>, or an empty <code>Optional</code>.</p><p>Implement it with a stream, not a loop. The <code>main</code> in the starter checks both cases.</p>"
+     },
+     "starter": "import java.util.*;\nimport java.util.stream.*;\n\npublic class Main {\n    // твой код: findByPrefix\n\n    public static void main(String[] args) {\n        List<String> names = Arrays.asList(\"aziz\", \"bek\", \"dilnoza\");\n        System.out.println(findByPrefix(names, \"d\").orElse(\"нет\"));\n        System.out.println(findByPrefix(names, \"z\").orElse(\"нет\"));\n        System.out.println(findByPrefix(names, \"a\").isPresent());\n        System.out.println(findByPrefix(names, \"b\").map(String::toUpperCase).orElse(\"—\"));\n    }\n}\n",
+     "solution": "import java.util.*;\nimport java.util.stream.*;\n\npublic class Main {\n    static Optional<String> findByPrefix(List<String> names, String prefix) {\n        return names.stream()\n                .filter(n -> n.startsWith(prefix))\n                .findFirst();      // findFirst сам возвращает Optional\n    }\n\n    public static void main(String[] args) {\n        List<String> names = Arrays.asList(\"aziz\", \"bek\", \"dilnoza\");\n        System.out.println(findByPrefix(names, \"d\").orElse(\"нет\"));\n        System.out.println(findByPrefix(names, \"z\").orElse(\"нет\"));\n        System.out.println(findByPrefix(names, \"a\").isPresent());\n        System.out.println(findByPrefix(names, \"b\").map(String::toUpperCase).orElse(\"—\"));\n    }\n}\n",
+     "expected": "dilnoza\nнет\ntrue\nBEK",
+     "hint": {
+      "ru": "<code>findFirst()</code> уже возвращает <code>Optional</code> — заворачивать вручную не надо. Всё решение: <code>names.stream().filter(n -&gt; n.startsWith(prefix)).findFirst()</code>.",
+      "uz": "<code>findFirst()</code> allaqachon <code>Optional</code> qaytaradi — qo'lda o'rash shart emas. Butun yechim: <code>names.stream().filter(n -&gt; n.startsWith(prefix)).findFirst()</code>.",
+      "en": "<code>findFirst()</code> already returns an <code>Optional</code> — no manual wrapping needed. The whole solution: <code>names.stream().filter(n -&gt; n.startsWith(prefix)).findFirst()</code>."
+     }
+    }
+   ],
+   "exam": {
+    "time": 600,
+    "questions": [
+     {
+      "q": { "ru": "<code>Box&lt;String&gt; b; b.add(42);</code> — что произойдёт?", "uz": "<code>Box&lt;String&gt; b; b.add(42);</code> — nima bo'ladi?", "en": "<code>Box&lt;String&gt; b; b.add(42);</code> — what happens?" },
+      "options": [
+       { "ru": "Число сохранится как строка", "uz": "Son satr sifatida saqlanadi", "en": "The number is stored as a string" },
+       { "ru": "Ошибка компиляции — дженерик проверяется при сборке", "uz": "Kompilyatsiya xatosi — dženerik yig'ishda tekshiriladi", "en": "A compile error — the generic is checked at build time" },
+       { "ru": "Ошибка при выполнении", "uz": "Bajarilishdagi xato", "en": "A runtime error" },
+       { "ru": "Ничего, добавится", "uz": "Hech nima, qo'shiladi", "en": "Nothing, it is added" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Стрим вызвали, терминальной операции нет. Сколько элементов обработано?", "uz": "Strim chaqirildi, terminal amal yo'q. Nechta element qayta ishlandi?", "en": "A stream was created with no terminal operation. How many elements were processed?" },
+      "options": [
+       { "ru": "Все", "uz": "Hammasi", "en": "All of them" },
+       { "ru": "Ни одного", "uz": "Birortasi ham", "en": "None" },
+       { "ru": "Только первый", "uz": "Faqat birinchisi", "en": "Only the first" },
+       { "ru": "Зависит от размера", "uz": "Hajmga bog'liq", "en": "It depends on the size" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Что делает <code>mapToInt</code> перед <code>sum()</code>?", "uz": "<code>sum()</code> dan oldin <code>mapToInt</code> nima qiladi?", "en": "What does <code>mapToInt</code> do before <code>sum()</code>?" },
+      "options": [
+       { "ru": "Сортирует", "uz": "Saralaydi", "en": "It sorts" },
+       { "ru": "Превращает поток объектов в поток примитивных int, у которого есть sum()", "uz": "Obyektlar oqimini sum() ga ega primitiv int oqimiga aylantiradi", "en": "It turns a stream of objects into a stream of primitive ints, which has sum()" },
+       { "ru": "Удаляет дубликаты", "uz": "Dublikatlarni o'chiradi", "en": "It removes duplicates" },
+       { "ru": "Ничего не делает", "uz": "Hech nima qilmaydi", "en": "It does nothing" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Метод может не найти результат. Что вернуть?", "uz": "Metod natijani topmasligi mumkin. Nima qaytariladi?", "en": "A method may find no result. What do you return?" },
+      "options": [
+       { "ru": "null — и надеяться, что проверят", "uz": "null — va tekshirishlariga umid qilish", "en": "null — and hope someone checks" },
+       { "ru": "Optional — тогда забыть про пустой случай не выйдет", "uz": "Optional — shunda bo'sh holatni unutib bo'lmaydi", "en": "Optional — then the empty case cannot be forgotten" },
+       { "ru": "Пустую строку", "uz": "Bo'sh satr", "en": "An empty string" },
+       { "ru": "Бросить исключение", "uz": "Istisno tashlash", "en": "Throw an exception" }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "java",
+      "title": { "ru": "Отчёт по заказам", "uz": "Buyurtmalar bo'yicha hisobot", "en": "An order report" },
+      "desc": {
+       "ru": "<p>Собери всё вместе. Дан список строк вида <code>город:сумма</code>.</p><ol><li>Разбери их и посчитай сумму по каждому городу — через стрим и <code>Collectors.groupingBy</code> с <code>Collectors.summingInt</code>.</li><li>Выведи города <b>по алфавиту</b> в формате <code>город = сумма</code>.</li><li>Последней строкой выведи <code>лидер: город</code> — город с наибольшей суммой. Используй <code>Optional</code>, а если список пуст — напечатай <code>лидер: нет</code>.</li></ol>",
+       "uz": "<p>Hammasini birlashtiring. <code>shahar:summa</code> ko'rinishidagi satrlar ro'yxati berilgan.</p><ol><li>Ularni ajrating va har shahar bo'yicha summani hisoblang — strim va <code>Collectors.summingInt</code> bilan <code>Collectors.groupingBy</code> orqali.</li><li>Shaharlarni <b>alifbo bo'yicha</b> <code>shahar = summa</code> formatida chiqaring.</li><li>Oxirgi qatorda <code>лидер: shahar</code> — eng katta summali shaharni chiqaring. <code>Optional</code> dan foydalaning, ro'yxat bo'sh bo'lsa — <code>лидер: нет</code> chop eting.</li></ol>",
+       "en": "<p>Put it all together. You are given a list of strings shaped <code>city:amount</code>.</p><ol><li>Parse them and compute the total per city — with a stream and <code>Collectors.groupingBy</code> plus <code>Collectors.summingInt</code>.</li><li>Print the cities <b>alphabetically</b> as <code>city = amount</code>.</li><li>On the last line print <code>лидер: city</code> — the city with the largest total. Use <code>Optional</code>, and if the list is empty print <code>лидер: нет</code>.</li></ol>"
+      },
+      "starter": "import java.util.*;\nimport java.util.stream.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        List<String> rows = Arrays.asList(\n            \"Ташкент:250\", \"Бухара:100\", \"Ташкент:400\", \"Самарканд:180\"\n        );\n\n        // твой код\n    }\n}\n",
+      "solution": "import java.util.*;\nimport java.util.stream.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        List<String> rows = Arrays.asList(\n            \"Ташкент:250\", \"Бухара:100\", \"Ташкент:400\", \"Самарканд:180\"\n        );\n\n        // TreeMap, потому что нужен алфавитный порядок\n        Map<String, Integer> totals = rows.stream()\n                .map(r -> r.split(\":\"))\n                .collect(Collectors.groupingBy(\n                        p -> p[0],\n                        TreeMap::new,\n                        Collectors.summingInt(p -> Integer.parseInt(p[1]))\n                ));\n\n        for (Map.Entry<String, Integer> e : totals.entrySet())\n            System.out.println(e.getKey() + \" = \" + e.getValue());\n\n        Optional<String> leader = totals.entrySet().stream()\n                .max(Map.Entry.comparingByValue())\n                .map(Map.Entry::getKey);\n        System.out.println(\"лидер: \" + leader.orElse(\"нет\"));\n    }\n}\n",
+      "expected": "Бухара = 100\nСамарканд = 180\nТашкент = 650\nлидер: Ташкент",
+      "hint": {
+       "ru": "Разбей строку через <code>split(\":\")</code> прямо в <code>map</code>. У <code>groupingBy</code> есть форма из трёх аргументов: ключ, фабрика карты (<code>TreeMap::new</code> даст алфавит) и сборщик <code>Collectors.summingInt(...)</code>. Лидера ищи через <code>max(Map.Entry.comparingByValue())</code> — он вернёт <code>Optional</code>.",
+       "uz": "Satrni <code>map</code> ichida <code>split(\":\")</code> orqali ajrating. <code>groupingBy</code> ning uch argumentli shakli bor: kalit, karta fabrikasi (<code>TreeMap::new</code> alifbo beradi) va <code>Collectors.summingInt(...)</code> yig'uvchisi. Yetakchini <code>max(Map.Entry.comparingByValue())</code> orqali qidiring — u <code>Optional</code> qaytaradi.",
+       "en": "Split the string with <code>split(\":\")</code> right inside <code>map</code>. <code>groupingBy</code> has a three-argument form: the key, a map factory (<code>TreeMap::new</code> gives alphabetical order) and a downstream collector <code>Collectors.summingInt(...)</code>. Find the leader with <code>max(Map.Entry.comparingByValue())</code> — it returns an <code>Optional</code>."
+      }
+     }
+    ]
+   }
   }
  ]
 }
