@@ -1175,6 +1175,360 @@
      }
     ]
    }
+  },
+  {
+   "id": "cs-03",
+   "title": { "ru": "Позиционирование, слои и анимация", "uz": "Joylashtirish, qatlamlar va animatsiya", "en": "Positioning, layers and animation" },
+   "tagline": { "ru": "position, z-index, специфичность и трансформации — то, что перестаёт быть магией", "uz": "position, z-index, spetsifiklik va transformatsiyalar — sehr bo'lishdan to'xtaydigan narsa", "en": "position, z-index, specificity and transforms — the parts that stop being magic" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "position: пять слов, которые всё меняют", "uz": "position: hammasini o'zgartiradigan besh so'z", "en": "position: five words that change everything" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>По умолчанию элементы идут в потоке: один за другим. <code>position</code> позволяет выйти из потока — и именно здесь чаще всего ломается вёрстка.</p><ul><li><b><code>static</code></b> — по умолчанию, в потоке. <code>top</code> и <code>left</code> не работают.</li><li><b><code>relative</code></b> — <b>остаётся в потоке</b>, но смещается визуально. Место под него сохраняется.</li><li><b><code>absolute</code></b> — <b>выпадает из потока</b> и позиционируется относительно ближайшего родителя с <code>position</code> не <code>static</code>.</li><li><b><code>fixed</code></b> — относительно окна, не двигается при прокрутке. Шапки и модалки.</li><li><b><code>sticky</code></b> — обычный до порога, потом прилипает. Заголовки таблиц.</li></ul><p>Главное правило: <b><code>absolute</code> ищет ближайшего позиционированного родителя</b>. Не нашёл — прилипнет к странице целиком. Поэтому родителю почти всегда ставят <code>position: relative</code>, даже без смещения.</p>",
+        "uz": "<p>Sukut bo'yicha elementlar oqimda ketadi: birin-ketin. <code>position</code> oqimdan chiqish imkonini beradi — va aynan shu yerda верстка ko'pincha buziladi.</p><ul><li><b><code>static</code></b> — sukut bo'yicha, oqimda. <code>top</code> va <code>left</code> ishlamaydi.</li><li><b><code>relative</code></b> — <b>oqimda qoladi</b>, lekin vizual siljiydi. Uning ostidagi joy saqlanadi.</li><li><b><code>absolute</code></b> — <b>oqimdan tushadi</b> va <code>position</code> i <code>static</code> bo'lmagan eng yaqin ota-onaga nisbatan joylashadi.</li><li><b><code>fixed</code></b> — oynaga nisbatan, aylantirishda qimirlamaydi. Shapkalar va modallar.</li><li><b><code>sticky</code></b> — chegaragacha oddiy, keyin yopishadi. Jadval sarlavhalari.</li></ul><p>Asosiy qoida: <b><code>absolute</code> eng yaqin joylashtirilgan ota-onani qidiradi</b>. Topmasa — butun sahifaga yopishadi. Shuning uchun ota-onaga deyarli doim siljishsiz ham <code>position: relative</code> qo'yiladi.</p>",
+        "en": "<p>By default elements sit in the flow, one after another. <code>position</code> lets you leave the flow — and this is where layouts most often break.</p><ul><li><b><code>static</code></b> — the default, in the flow. <code>top</code> and <code>left</code> do nothing.</li><li><b><code>relative</code></b> — <b>stays in the flow</b> but shifts visually. The space for it is kept.</li><li><b><code>absolute</code></b> — <b>leaves the flow</b> and positions itself against the nearest ancestor whose <code>position</code> is not <code>static</code>.</li><li><b><code>fixed</code></b> — against the window; it does not move on scroll. Headers and modals.</li><li><b><code>sticky</code></b> — ordinary until a threshold, then it sticks. Table headings.</li></ul><p>The key rule: <b><code>absolute</code> looks for the nearest positioned ancestor</b>. If it finds none, it attaches to the whole page. That is why the parent almost always gets <code>position: relative</code>, even with no offset.</p>"
+       }
+      },
+      {
+       "type": "webrun",
+       "kind": "css",
+       "html": "<div class=\"demo\">\n  <div class=\"card\">\n    <span class=\"badge\">новинка</span>\n    <p>Карточка курса</p>\n  </div>\n  <div class=\"card\">\n    <span class=\"badge\">хит</span>\n    <p>Вторая карточка</p>\n  </div>\n</div>\n<div class=\"scroll\">\n  <div class=\"sticky-head\">Заголовок прилипает при прокрутке</div>\n  <p>строка 1</p><p>строка 2</p><p>строка 3</p><p>строка 4</p><p>строка 5</p>\n</div>",
+       "code": ".demo { display: flex; gap: 16px; margin-bottom: 20px; }\n\n.card {\n  position: relative;        /* якорь для absolute внутри */\n  width: 180px;\n  padding: 20px;\n  background: #f1f5f9;\n  border-radius: 12px;\n}\n\n.badge {\n  position: absolute;        /* считается от .card, а не от страницы */\n  top: -8px;\n  right: -8px;\n  background: #2563eb;\n  color: white;\n  font-size: 12px;\n  padding: 4px 8px;\n  border-radius: 999px;\n}\n\n.scroll {\n  height: 140px;\n  overflow-y: auto;\n  border: 1px solid #cbd5e1;\n  border-radius: 8px;\n}\n\n.sticky-head {\n  position: sticky;          /* обычный, пока не упрётся в верх */\n  top: 0;\n  background: #0f172a;\n  color: white;\n  padding: 8px 12px;\n}\n\n.scroll p { margin: 12px; }"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Прокрути внутренний блок — заголовок прилипнет к его верху. У <code>sticky</code> есть два обязательных условия: задано смещение (<code>top: 0</code>) и есть куда прилипать (родитель с прокруткой). Без любого из них он молча ведёт себя как <code>static</code>.</p><p>Значок «новинка» вылез за границу карточки на 8 пикселей — потому что считается от неё. Убери у <code>.card</code> строку <code>position: relative</code> — и значок улетит в угол всей страницы. Это и есть та самая ошибка, из-за которой «кнопка оказалась не там».</p>",
+        "uz": "<p>Ichki blokni aylantiring — sarlavha uning yuqorisiga yopishadi. <code>sticky</code> ning ikki majburiy sharti bor: siljish berilgan (<code>top: 0</code>) va yopishadigan joy bor (aylanadigan ota-ona). Ulardan birortasi bo'lmasa, u jimgina <code>static</code> kabi tutadi.</p><p>«Yangilik» belgisi kartochka chegarasidan 8 piksel chiqdi — chunki undan hisoblanadi. <code>.card</code> dan <code>position: relative</code> qatorini olib tashlang — va belgi butun sahifaning burchagiga uchib ketadi. «Tugma noto'g'ri joyda» xatosining sababi shu.</p>",
+        "en": "<p>Scroll the inner block — the heading sticks to its top. <code>sticky</code> has two mandatory conditions: an offset (<code>top: 0</code>) and something to stick inside (a scrollable ancestor). Without either it silently behaves like <code>static</code>.</p><p>The “new” badge sticks out 8 pixels past the card because it is measured from it. Remove <code>position: relative</code> from <code>.card</code> and the badge flies to the corner of the whole page. That is exactly the bug behind “the button ended up in the wrong place”.</p>"
+       }
+      },
+      {
+       "type": "checkpoint",
+       "q": { "ru": "У <code>absolute</code>-элемента нет позиционированного родителя. Относительно чего он встанет?", "uz": "<code>absolute</code> elementning joylashtirilgan ota-onasi yo'q. U nimaga nisbatan turadi?", "en": "An <code>absolute</code> element has no positioned ancestor. What does it position against?" },
+       "options": [
+        { "ru": "Относительно ближайшего родителя", "uz": "Eng yaqin ota-onaga nisbatan", "en": "Its nearest parent" },
+        { "ru": "Относительно всей страницы", "uz": "Butun sahifaga nisbatan", "en": "The whole page" },
+        { "ru": "Останется на месте", "uz": "Joyida qoladi", "en": "It stays where it is" },
+        { "ru": "Исчезнет", "uz": "Yo'qoladi", "en": "It disappears" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Поэтому родителю ставят <code>position: relative</code> даже без смещений — просто чтобы стать якорем.",
+        "uz": "Shuning uchun ota-onaga siljishsiz ham <code>position: relative</code> qo'yiladi — shunchaki langar bo'lish uchun.",
+        "en": "That is why the parent gets <code>position: relative</code> even with no offsets — simply to become the anchor."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "Специфичность: почему стиль не применился", "uz": "Spetsifiklik: nega uslub qo'llanmadi", "en": "Specificity: why your style did not apply" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Самый частый вопрос новичка: «я написал стиль, а он не работает». Почти всегда ответ один — другое правило оказалось <b>сильнее</b>.</p><p>Побеждает правило с большей <b>специфичностью</b>. Считают так:</p><ul><li>тег (<code>p</code>, <code>div</code>) — <b>1</b></li><li>класс, атрибут, псевдокласс (<code>.card</code>, <code>:hover</code>) — <b>10</b></li><li>идентификатор (<code>#main</code>) — <b>100</b></li><li>атрибут <code>style=\"…\"</code> прямо в теге — <b>1000</b></li></ul><p>При равной специфичности выигрывает то, что <b>ниже в файле</b>. Порядок подключения файлов тоже важен.</p><p>И есть <code>!important</code>, который бьёт всё. Именно поэтому его почти никогда не стоит писать: он выигрывает бой, но проигрывает войну — следующий человек добавит свой <code>!important</code>, и так по кругу.</p>",
+        "uz": "<p>Yangi boshlovchining eng ko'p savoli: «uslub yozdim, u ishlamayapti». Deyarli doim javob bitta — boshqa qoida <b>kuchliroq</b> bo'lib chiqdi.</p><p>Spetsifikligi kattaroq qoida yutadi. Shunday hisoblanadi:</p><ul><li>teg (<code>p</code>, <code>div</code>) — <b>1</b></li><li>sinf, atribut, psevdosinf (<code>.card</code>, <code>:hover</code>) — <b>10</b></li><li>identifikator (<code>#main</code>) — <b>100</b></li><li>teg ichidagi <code>style=\"…\"</code> atributi — <b>1000</b></li></ul><p>Spetsifiklik teng bo'lganda <b>faylda pastda</b> turgani yutadi. Fayllarni ulash tartibi ham muhim.</p><p>Va hammasini uradigan <code>!important</code> bor. Aynan shuning uchun uni deyarli hech qachon yozmaslik kerak: u jangda yutadi, urushda yutqazadi — keyingi odam o'z <code>!important</code> ini qo'shadi va shu tariqa aylanadi.</p>",
+        "en": "<p>The most common beginner question: “I wrote the style and it does not work”. The answer is almost always the same — another rule turned out to be <b>stronger</b>.</p><p>The rule with higher <b>specificity</b> wins. It is counted like this:</p><ul><li>a tag (<code>p</code>, <code>div</code>) — <b>1</b></li><li>a class, attribute or pseudo-class (<code>.card</code>, <code>:hover</code>) — <b>10</b></li><li>an id (<code>#main</code>) — <b>100</b></li><li>a <code>style=\"…\"</code> attribute right in the tag — <b>1000</b></li></ul><p>On equal specificity, whatever comes <b>later in the file</b> wins. The order in which files are linked matters too.</p><p>And there is <code>!important</code>, which beats everything. That is precisely why you should almost never write it: it wins the battle and loses the war — the next person adds their own <code>!important</code>, and round it goes.</p>"
+       }
+      },
+      {
+       "type": "webrun",
+       "kind": "css",
+       "html": "<div class=\"box\">\n  <p id=\"one\" class=\"text\">Победил идентификатор (100)</p>\n  <p class=\"text special\">Победил последний класс (10 + 10, ниже в файле)</p>\n  <p class=\"text\">Победил класс (10) над тегом (1)</p>\n  <p class=\"text\" style=\"color: #16a34a\">Победил style в теге (1000)</p>\n</div>",
+       "code": "/* специфичность 1: слабее всех */\np { color: #64748b; }\n\n/* 10: класс сильнее тега */\n.text { color: #2563eb; }\n\n/* 20: два класса сильнее одного */\n.text.special { color: #db2777; }\n\n/* 100: идентификатор сильнее любых классов */\n#one { color: #ea580c; }\n\n.box {\n  padding: 16px;\n  background: #f8fafc;\n  border-radius: 10px;\n  font-family: system-ui, sans-serif;\n}\n\n.box p { margin: 8px 0; font-weight: 600; }"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Обрати внимание на последнее правило: <code>.box p</code> имеет специфичность 11 (класс + тег) и задаёт отступы. Цвет он не трогает, поэтому цвета остались от правил выше — <b>каждое свойство побеждается отдельно</b>.</p><p>Практический вывод: не борись со специфичностью, а держи её низкой. Селектор вида <code>.card__title</code> лучше, чем <code>#page .content .card h2 span</code> — второй потом невозможно перебить ничем, кроме ещё более длинного селектора.</p><p>Отсюда и популярность утилитарного подхода вроде Tailwind: там у всех классов одинаковая специфичность, и вопрос «почему не применилось» просто не возникает.</p>",
+        "uz": "<p>Oxirgi qoidaga e'tibor bering: <code>.box p</code> ning spetsifikligi 11 (sinf va teg) va u chekinishlarni beradi. Rangga tegmaydi, shuning uchun ranglar yuqoridagi qoidalardan qoldi — <b>har xususiyat alohida yutiladi</b>.</p><p>Amaliy xulosa: spetsifiklik bilan kurashmang, uni past ushlang. <code>.card__title</code> ko'rinishidagi selektor <code>#page .content .card h2 span</code> dan yaxshi — ikkinchisini keyin yanada uzunroq selektordan boshqa hech nima bilan yenga olmaysiz.</p><p>Tailwind kabi utilitar yondashuvning mashhurligi ham shundan: u yerda barcha sinflarning spetsifikligi bir xil va «nega qo'llanmadi» savoli umuman tug'ilmaydi.</p>",
+        "en": "<p>Note the last rule: <code>.box p</code> has specificity 11 (class plus tag) and sets the margins. It does not touch the colour, so the colours came from the rules above — <b>each property is won separately</b>.</p><p>The practical conclusion: do not fight specificity, keep it low. A selector like <code>.card__title</code> beats <code>#page .content .card h2 span</code> — the latter can only ever be overridden by an even longer selector.</p><p>Hence the popularity of utility approaches like Tailwind: there every class has the same specificity, and the question “why did it not apply” simply never arises.</p>"
+       }
+      },
+      {
+       "type": "predict",
+       "lang": "css",
+       "code": "/* Какой цвет будет у <p class=\"a b\">? */\n.a { color: red; }\n.b { color: blue; }",
+       "options": [
+        { "ru": "Красный — класс a записан первым в атрибуте", "uz": "Qizil — a sinfi atributda birinchi yozilgan", "en": "Red — class a is written first in the attribute" },
+        { "ru": "Синий — специфичность равна, побеждает правило ниже в файле", "uz": "Ko'k — spetsifiklik teng, faylda pastdagi qoida yutadi", "en": "Blue — equal specificity, so the later rule in the file wins" },
+        { "ru": "Чёрный", "uz": "Qora", "en": "Black" },
+        { "ru": "Оба сразу", "uz": "Ikkalasi birdan", "en": "Both at once" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Порядок классов в атрибуте <code>class</code> не значит вообще ничего. Решает только порядок правил в CSS-файле.",
+        "uz": "<code>class</code> atributidagi sinflar tartibi umuman hech nima anglatmaydi. Faqat CSS fayldagi qoidalar tartibi hal qiladi.",
+        "en": "The order of classes in the <code>class</code> attribute means nothing at all. Only the order of the rules in the CSS file decides."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "Трансформации и анимация", "uz": "Transformatsiyalar va animatsiya", "en": "Transforms and animation" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p><code>transform</code> двигает, вращает и масштабирует элемент, <b>не трогая поток</b>: соседи остаются на месте.</p><ul><li><code>translate(10px, -4px)</code> — сдвиг</li><li><code>scale(1.05)</code> — увеличение</li><li><code>rotate(3deg)</code> — поворот</li></ul><p>Анимация бывает двух видов. <b><code>transition</code></b> — плавный переход между двумя состояниями: обычным и, например, <code>:hover</code>. <b><code>@keyframes</code></b> — своя последовательность кадров, которая может крутиться бесконечно.</p><p>Важная деталь про производительность: браузер умеет анимировать <code>transform</code> и <code>opacity</code> на видеокарте, а вот <code>width</code>, <code>height</code>, <code>top</code> и <code>margin</code> заставляют его пересчитывать раскладку каждый кадр. Отсюда правило: <b>анимируй transform и opacity, остальное — по необходимости</b>.</p>",
+        "uz": "<p><code>transform</code> elementni siljitadi, aylantiradi va masshtablaydi, <b>oqimga tegmasdan</b>: qo'shnilar joyida qoladi.</p><ul><li><code>translate(10px, -4px)</code> — siljish</li><li><code>scale(1.05)</code> — kattalashtirish</li><li><code>rotate(3deg)</code> — burilish</li></ul><p>Animatsiya ikki xil bo'ladi. <b><code>transition</code></b> — ikki holat orasidagi silliq o'tish: odatiy va, masalan, <code>:hover</code>. <b><code>@keyframes</code></b> — cheksiz aylanishi mumkin bo'lgan o'z kadrlar ketma-ketligi.</p><p>Unumdorlik haqida muhim tafsilot: brauzer <code>transform</code> va <code>opacity</code> ni videokartada animatsiya qila oladi, <code>width</code>, <code>height</code>, <code>top</code> va <code>margin</code> esa uni har kadrda joylashuvni qayta hisoblashga majbur qiladi. Shundan qoida: <b>transform va opacity ni animatsiya qiling, qolganini zarurat bo'yicha</b>.</p>",
+        "en": "<p><code>transform</code> moves, rotates and scales an element <b>without touching the flow</b>: its neighbours stay put.</p><ul><li><code>translate(10px, -4px)</code> — a shift</li><li><code>scale(1.05)</code> — enlargement</li><li><code>rotate(3deg)</code> — rotation</li></ul><p>Animation comes in two kinds. <b><code>transition</code></b> is a smooth move between two states: the normal one and, say, <code>:hover</code>. <b><code>@keyframes</code></b> is your own sequence of frames, which can loop forever.</p><p>An important performance detail: the browser can animate <code>transform</code> and <code>opacity</code> on the graphics card, while <code>width</code>, <code>height</code>, <code>top</code> and <code>margin</code> force it to recompute the layout on every frame. Hence the rule: <b>animate transform and opacity, the rest only when you must</b>.</p>"
+       }
+      },
+      {
+       "type": "webrun",
+       "kind": "css",
+       "html": "<div class=\"row\">\n  <button class=\"btn\">Наведи на меня</button>\n  <div class=\"pulse\">пульсирую</div>\n  <div class=\"spin\">кручусь</div>\n</div>",
+       "code": ".row {\n  display: flex;\n  gap: 20px;\n  align-items: center;\n  padding: 24px;\n  font-family: system-ui, sans-serif;\n}\n\n.btn {\n  padding: 10px 18px;\n  border: none;\n  border-radius: 8px;\n  background: #2563eb;\n  color: white;\n  font-size: 15px;\n  cursor: pointer;\n  /* что анимировать, сколько и с каким ускорением */\n  transition: transform 0.2s ease, background 0.2s ease;\n}\n\n.btn:hover {\n  background: #1d4ed8;\n  transform: translateY(-2px) scale(1.03);\n}\n\n.btn:active { transform: translateY(0) scale(0.98); }\n\n@keyframes pulse {\n  0%, 100% { opacity: 1; }\n  50%      { opacity: 0.35; }\n}\n\n.pulse {\n  padding: 10px 14px;\n  background: #fde68a;\n  border-radius: 8px;\n  animation: pulse 1.6s ease-in-out infinite;\n}\n\n@keyframes spin {\n  from { transform: rotate(0deg); }\n  to   { transform: rotate(360deg); }\n}\n\n.spin {\n  padding: 10px 14px;\n  background: #bbf7d0;\n  border-radius: 8px;\n  animation: spin 3s linear infinite;\n}\n\n/* уважение к настройке «меньше движения» в системе */\n@media (prefers-reduced-motion: reduce) {\n  .btn, .pulse, .spin { animation: none; transition: none; }\n}"
+      },
+      {
+       "type": "note",
+       "kind": "tip",
+       "html": {
+        "ru": "Последний блок — <code>@media (prefers-reduced-motion: reduce)</code> — это не формальность. У части людей от движущихся элементов кружится голова, и в системе стоит настройка «уменьшить движение». Три строки уважают её и ничего не стоят. На этой же платформе такой блок тоже есть.",
+        "uz": "Oxirgi blok — <code>@media (prefers-reduced-motion: reduce)</code> — bu rasmiyatchilik emas. Bir qism odamlarning harakatlanuvchi elementlardan boshi aylanadi va tizimda «harakatni kamaytirish» sozlamasi turadi. Uch qator unga hurmat bildiradi va hech nimaga turmaydi. Shu platformada ham bunday blok bor.",
+        "en": "The last block — <code>@media (prefers-reduced-motion: reduce)</code> — is not a formality. Moving elements make some people dizzy, and their system has a “reduce motion” setting. Three lines respect it and cost nothing. This very platform has such a block too."
+       }
+      },
+      {
+       "type": "summary",
+       "items": [
+        { "ru": "relative остаётся в потоке, absolute из него выпадает", "uz": "relative oqimda qoladi, absolute undan tushadi", "en": "relative stays in the flow, absolute leaves it" },
+        { "ru": "absolute считается от ближайшего родителя с position не static", "uz": "absolute position i static bo'lmagan eng yaqin ota-onadan hisoblanadi", "en": "absolute is measured from the nearest ancestor whose position is not static" },
+        { "ru": "sticky требует и смещения, и родителя с прокруткой", "uz": "sticky ga ham siljish, ham aylanadigan ota-ona kerak", "en": "sticky needs both an offset and a scrollable ancestor" },
+        { "ru": "Специфичность: тег 1, класс 10, идентификатор 100, style 1000", "uz": "Spetsifiklik: teg 1, sinf 10, identifikator 100, style 1000", "en": "Specificity: tag 1, class 10, id 100, style 1000" },
+        { "ru": "При равной силе побеждает правило ниже в файле", "uz": "Kuchlar teng bo'lganda faylda pastdagi qoida yutadi", "en": "On equal strength the later rule in the file wins" },
+        { "ru": "Порядок классов в атрибуте class ни на что не влияет", "uz": "class atributidagi sinflar tartibi hech nimaga ta'sir qilmaydi", "en": "The order of classes in the class attribute changes nothing" },
+        { "ru": "Анимируй transform и opacity — их считает видеокарта", "uz": "transform va opacity ni animatsiya qiling — ularni videokarta hisoblaydi", "en": "Animate transform and opacity — the graphics card handles them" },
+        { "ru": "prefers-reduced-motion уважает тех, кому движение мешает", "uz": "prefers-reduced-motion harakat xalaqit beradiganlarni hurmat qiladi", "en": "prefers-reduced-motion respects those who are hurt by motion" }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": { "ru": "Чем <code>relative</code> отличается от <code>absolute</code>?", "uz": "<code>relative</code> <code>absolute</code> dan nimasi bilan farq qiladi?", "en": "How does <code>relative</code> differ from <code>absolute</code>?" },
+     "options": [
+      { "ru": "Ничем, это синонимы", "uz": "Hech nimasi bilan, bu sinonimlar", "en": "Not at all, they are synonyms" },
+      { "ru": "relative остаётся в потоке и держит своё место, absolute из потока выпадает", "uz": "relative oqimda qolib, o'z joyini ushlaydi, absolute oqimdan tushadi", "en": "relative stays in the flow and keeps its space, absolute leaves the flow" },
+      { "ru": "absolute работает только в flex", "uz": "absolute faqat flex da ishlaydi", "en": "absolute works only inside flex" },
+      { "ru": "relative нельзя смещать", "uz": "relative ni siljitib bo'lmaydi", "en": "relative cannot be offset" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Поэтому после <code>absolute</code> соседи «схлопываются» на освободившееся место, а после <code>relative</code> — нет.",
+      "uz": "Shuning uchun <code>absolute</code> dan keyin qo'shnilar bo'shagan joyga «siqiladi», <code>relative</code> dan keyin esa yo'q.",
+      "en": "That is why after <code>absolute</code> the neighbours collapse into the freed space, and after <code>relative</code> they do not."
+     }
+    },
+    {
+     "q": { "ru": "Значок с <code>position: absolute</code> улетел в угол страницы. Что забыли?", "uz": "<code>position: absolute</code> li belgi sahifa burchagiga uchib ketdi. Nima unutildi?", "en": "A badge with <code>position: absolute</code> flew to the page corner. What was forgotten?" },
+     "options": [
+      { "ru": "z-index", "uz": "z-index", "en": "z-index" },
+      { "ru": "position: relative у родителя", "uz": "Ota-onada position: relative", "en": "position: relative on the parent" },
+      { "ru": "display: flex", "uz": "display: flex", "en": "display: flex" },
+      { "ru": "overflow: hidden", "uz": "overflow: hidden", "en": "overflow: hidden" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Без позиционированного родителя <code>absolute</code> считает координаты от всей страницы. Родителю ставят <code>relative</code> просто как якорь.",
+      "uz": "Joylashtirilgan ota-onasiz <code>absolute</code> koordinatalarni butun sahifadan hisoblaydi. Ota-onaga <code>relative</code> shunchaki langar sifatida qo'yiladi.",
+      "en": "With no positioned ancestor, <code>absolute</code> measures from the whole page. The parent gets <code>relative</code> purely as an anchor."
+     }
+    },
+    {
+     "q": { "ru": "У <code>&lt;p class=\"a b\"&gt;</code> оба класса задают цвет. Какой победит?", "uz": "<code>&lt;p class=\"a b\"&gt;</code> da ikkala sinf ham rang beradi. Qaysi biri yutadi?", "en": "For <code>&lt;p class=\"a b\"&gt;</code> both classes set a colour. Which wins?" },
+     "options": [
+      { "ru": "Тот, что первым в атрибуте class", "uz": "class atributida birinchi turgani", "en": "The one written first in the class attribute" },
+      { "ru": "Тот, чьё правило ниже в CSS-файле", "uz": "Qoidasi CSS faylda pastda turgani", "en": "The one whose rule comes later in the CSS file" },
+      { "ru": "Тот, у кого короче имя", "uz": "Nomi qisqarog'i", "en": "The one with the shorter name" },
+      { "ru": "Никакой, будет ошибка", "uz": "Hech qaysi, xato bo'ladi", "en": "Neither, it is an error" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Специфичность у обоих одинаковая (10), поэтому решает порядок в файле. Атрибут <code>class</code> на это не влияет вообще.",
+      "uz": "Ikkalasining spetsifikligi bir xil (10), shuning uchun fayldagi tartib hal qiladi. <code>class</code> atributi bunga umuman ta'sir qilmaydi.",
+      "en": "Both have the same specificity (10), so the file order decides. The <code>class</code> attribute has no influence at all."
+     }
+    },
+    {
+     "q": { "ru": "Что сильнее: <code>#main</code> или <code>.card .title span</code>?", "uz": "Qaysi biri kuchli: <code>#main</code> yoki <code>.card .title span</code>?", "en": "Which is stronger: <code>#main</code> or <code>.card .title span</code>?" },
+     "options": [
+      { "ru": "Второй — в нём три части", "uz": "Ikkinchisi — unda uch qism bor", "en": "The second — it has three parts" },
+      { "ru": "Первый: идентификатор это 100, а два класса и тег дают 21", "uz": "Birinchisi: identifikator 100, ikki sinf va teg esa 21 beradi", "en": "The first: an id is 100 while two classes and a tag give 21" },
+      { "ru": "Одинаково", "uz": "Bir xil", "en": "They are equal" },
+      { "ru": "Зависит от порядка", "uz": "Tartibga bog'liq", "en": "It depends on the order" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Один идентификатор перебивает сколько угодно классов. Поэтому в проектах их стараются не использовать для стилей вообще.",
+      "uz": "Bitta identifikator xohlagancha sinfni yengadi. Shuning uchun loyihalarda ularni uslublar uchun umuman ishlatmaslikka harakat qilishadi.",
+      "en": "A single id beats any number of classes. That is why projects try not to use ids for styling at all."
+     }
+    },
+    {
+     "q": { "ru": "Что дешевле анимировать?", "uz": "Nimani animatsiya qilish arzonroq?", "en": "Which is cheaper to animate?" },
+     "options": [
+      { "ru": "width и height", "uz": "width va height", "en": "width and height" },
+      { "ru": "transform и opacity — их считает видеокарта", "uz": "transform va opacity — ularni videokarta hisoblaydi", "en": "transform and opacity — the graphics card handles them" },
+      { "ru": "margin и padding", "uz": "margin va padding", "en": "margin and padding" },
+      { "ru": "Разницы нет", "uz": "Farqi yo'q", "en": "There is no difference" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Остальные свойства заставляют браузер пересчитывать раскладку каждый кадр — на слабом телефоне это заметно сразу.",
+      "uz": "Qolgan xususiyatlar brauzerni har kadrda joylashuvni qayta hisoblashga majbur qiladi — kuchsiz telefonda bu darhol seziladi.",
+      "en": "The other properties force the browser to recompute the layout every frame — on a weak phone you notice it at once."
+     }
+    },
+    {
+     "q": { "ru": "Зачем нужен <code>@media (prefers-reduced-motion: reduce)</code>?", "uz": "<code>@media (prefers-reduced-motion: reduce)</code> nima uchun kerak?", "en": "What is <code>@media (prefers-reduced-motion: reduce)</code> for?" },
+     "options": [
+      { "ru": "Ускорить сайт на слабых устройствах", "uz": "Kuchsiz qurilmalarda saytni tezlashtirish", "en": "To speed the site up on weak devices" },
+      { "ru": "Отключить анимации тем, кому движение вредит — так стоит у них в системе", "uz": "Harakat zarar keltiradiganlarga animatsiyani o'chirish — tizimida shunday turibdi", "en": "To disable animation for people harmed by motion — their system says so" },
+      { "ru": "Это для печати", "uz": "Bu chop etish uchun", "en": "It is for printing" },
+      { "ru": "Ни за чем, это устарело", "uz": "Hech nima uchun, bu eskirgan", "en": "For nothing, it is obsolete" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "У части людей от движения на экране начинается головокружение или тошнота. Три строки в CSS решают проблему полностью.",
+      "uz": "Bir qism odamlarda ekrandagi harakatdan bosh aylanishi yoki ko'ngil aynishi boshlanadi. CSS dagi uch qator muammoni to'liq hal qiladi.",
+      "en": "For some people on-screen motion triggers dizziness or nausea. Three lines of CSS solve it completely."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "css",
+     "title": { "ru": "Значок на карточке", "uz": "Kartochkadagi belgi", "en": "A badge on a card" },
+     "brief": { "ru": "relative + absolute", "uz": "relative va absolute", "en": "relative plus absolute" },
+     "desc": {
+      "ru": "<p>Разметка дана. Сделай так, чтобы значок <code>.badge</code> встал в правый верхний угол карточки <code>.card</code>, а не страницы.</p><ul><li><code>.card</code> — <code>position: relative</code>, отступ 20px;</li><li><code>.badge</code> — <code>position: absolute</code>, <code>top: 0</code>, <code>right: 0</code>.</li></ul>",
+      "uz": "<p>Разметка berilgan. <code>.badge</code> belgisi sahifaning emas, <code>.card</code> kartochkasining o'ng yuqori burchagiga turishini ta'minlang.</p><ul><li><code>.card</code> — <code>position: relative</code>, chekinish 20px;</li><li><code>.badge</code> — <code>position: absolute</code>, <code>top: 0</code>, <code>right: 0</code>.</li></ul>",
+      "en": "<p>The markup is given. Make the <code>.badge</code> sit in the top-right corner of the <code>.card</code>, not of the page.</p><ul><li><code>.card</code> — <code>position: relative</code>, padding 20px;</li><li><code>.badge</code> — <code>position: absolute</code>, <code>top: 0</code>, <code>right: 0</code>.</li></ul>"
+     },
+     "html": "<div class=\"card\"><span class=\"badge\">новинка</span><p>Курс</p></div>",
+     "starter": ".card {\n}\n\n.badge {\n}\n",
+     "tests": "var card = $('.card');\nvar badge = $('.badge');\nassert(card && badge, 'Нет .card или .badge');\nequal(style(card, 'position'), 'relative', 'position у .card');\nequal(style(card, 'padding-top'), '20px', 'Отступ .card');\nequal(style(badge, 'position'), 'absolute', 'position у .badge');\nequal(style(badge, 'top'), '0px', 'top у .badge');\nequal(style(badge, 'right'), '0px', 'right у .badge');",
+     "hint": {
+      "ru": "Родителю — <code>position: relative;</code> и <code>padding: 20px;</code>. Значку — <code>position: absolute; top: 0; right: 0;</code>. Без relative у родителя значок уедет к углу страницы.",
+      "uz": "Ota-onaga — <code>position: relative;</code> va <code>padding: 20px;</code>. Belgiga — <code>position: absolute; top: 0; right: 0;</code>. Ota-onada relative bo'lmasa, belgi sahifa burchagiga ketadi.",
+      "en": "The parent gets <code>position: relative;</code> and <code>padding: 20px;</code>. The badge gets <code>position: absolute; top: 0; right: 0;</code>. Without relative on the parent the badge drifts to the page corner."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "css",
+     "title": { "ru": "Кнопка с переходом", "uz": "O'tishli tugma", "en": "A button with a transition" },
+     "brief": { "ru": "transition и transform", "uz": "transition va transform", "en": "transition and transform" },
+     "desc": {
+      "ru": "<p>Оформи <code>.btn</code>: синий фон <code>#2563eb</code>, белый текст, отступы <code>10px 18px</code>, скругление <code>8px</code>.</p><p>Добавь плавность: <code>transition-duration: 0.2s</code>. При наведении (<code>:hover</code>) кнопка должна подниматься через <code>transform: translateY(-2px)</code>.</p>",
+      "uz": "<p><code>.btn</code> ni bezang: ko'k fon <code>#2563eb</code>, oq matn, chekinishlar <code>10px 18px</code>, yumaloqlash <code>8px</code>.</p><p>Silliqlik qo'shing: <code>transition-duration: 0.2s</code>. Sichqoncha ustiga kelganda (<code>:hover</code>) tugma <code>transform: translateY(-2px)</code> orqali ko'tarilishi kerak.</p>",
+      "en": "<p>Style <code>.btn</code>: blue background <code>#2563eb</code>, white text, padding <code>10px 18px</code>, radius <code>8px</code>.</p><p>Add smoothness: <code>transition-duration: 0.2s</code>. On hover the button must lift with <code>transform: translateY(-2px)</code>.</p>"
+     },
+     "html": "<button class=\"btn\">Начать курс</button>",
+     "starter": ".btn {\n}\n\n.btn:hover {\n}\n",
+     "tests": "var b = $('.btn');\nassert(b, 'Нет .btn');\nequal(style(b, 'background-color'), 'rgb(37, 99, 235)', 'Фон кнопки');\nequal(style(b, 'color'), 'rgb(255, 255, 255)', 'Цвет текста');\nequal(style(b, 'padding-top'), '10px', 'Вертикальный отступ');\nequal(style(b, 'padding-left'), '18px', 'Горизонтальный отступ');\nequal(style(b, 'border-top-left-radius'), '8px', 'Скругление');\nequal(style(b, 'transition-duration'), '0.2s', 'Длительность перехода');\nvar css = document.querySelector('style:last-of-type') ? document.querySelector('style:last-of-type').textContent : '';\nassert(/\\.btn\\s*:?\\s*hover|\\.btn:hover/.test(css), 'Нужно правило .btn:hover');\nassert(/translateY\\(\\s*-2px\\s*\\)/.test(css), 'В :hover нужен transform: translateY(-2px)');",
+     "hint": {
+      "ru": "В <code>.btn</code> — цвета, <code>padding: 10px 18px;</code>, <code>border-radius: 8px;</code> и <code>transition-duration: 0.2s;</code>. В <code>.btn:hover</code> — только <code>transform: translateY(-2px);</code>.",
+      "uz": "<code>.btn</code> da — ranglar, <code>padding: 10px 18px;</code>, <code>border-radius: 8px;</code> va <code>transition-duration: 0.2s;</code>. <code>.btn:hover</code> da — faqat <code>transform: translateY(-2px);</code>.",
+      "en": "In <code>.btn</code>: the colours, <code>padding: 10px 18px;</code>, <code>border-radius: 8px;</code> and <code>transition-duration: 0.2s;</code>. In <code>.btn:hover</code>: just <code>transform: translateY(-2px);</code>."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "css",
+     "title": { "ru": "Прилипающий заголовок", "uz": "Yopishuvchi sarlavha", "en": "A sticky heading" },
+     "brief": { "ru": "position: sticky", "uz": "position: sticky", "en": "position: sticky" },
+     "desc": {
+      "ru": "<p>Сделай список <code>.scroll</code> прокручиваемым: высота <code>140px</code> и <code>overflow-y: auto</code>.</p><p>Заголовок <code>.head</code> должен прилипать к верху при прокрутке: <code>position: sticky</code> и <code>top: 0</code>. Дай ему тёмный фон <code>#0f172a</code> и белый текст, чтобы строки не просвечивали.</p>",
+      "uz": "<p><code>.scroll</code> ro'yxatini aylanadigan qiling: balandlik <code>140px</code> va <code>overflow-y: auto</code>.</p><p><code>.head</code> sarlavhasi aylantirishda yuqoriga yopishishi kerak: <code>position: sticky</code> va <code>top: 0</code>. Qatorlar ko'rinib turmasligi uchun unga to'q fon <code>#0f172a</code> va oq matn bering.</p>",
+      "en": "<p>Make the list <code>.scroll</code> scrollable: height <code>140px</code> and <code>overflow-y: auto</code>.</p><p>The heading <code>.head</code> must stick to the top while scrolling: <code>position: sticky</code> and <code>top: 0</code>. Give it a dark background <code>#0f172a</code> and white text so the rows do not show through.</p>"
+     },
+     "html": "<div class=\"scroll\"><div class=\"head\">Список курсов</div><p>Python</p><p>SQL</p><p>Алгоритмы</p><p>C++</p><p>Java</p></div>",
+     "starter": ".scroll {\n}\n\n.head {\n}\n",
+     "tests": "var sc = $('.scroll');\nvar hd = $('.head');\nassert(sc && hd, 'Нет .scroll или .head');\nequal(style(sc, 'height'), '140px', 'Высота списка');\nequal(style(sc, 'overflow-y'), 'auto', 'Прокрутка по вертикали');\nequal(style(hd, 'position'), 'sticky', 'position у заголовка');\nequal(style(hd, 'top'), '0px', 'top у заголовка');\nequal(style(hd, 'background-color'), 'rgb(15, 23, 42)', 'Фон заголовка');\nequal(style(hd, 'color'), 'rgb(255, 255, 255)', 'Цвет текста заголовка');",
+     "hint": {
+      "ru": "Для <code>sticky</code> нужны обе вещи: смещение <code>top: 0</code> у самого заголовка и родитель с прокруткой — то есть <code>height</code> плюс <code>overflow-y: auto</code>.",
+      "uz": "<code>sticky</code> uchun ikkalasi kerak: sarlavhaning o'zida <code>top: 0</code> siljishi va aylanadigan ota-ona — ya'ni <code>height</code> va <code>overflow-y: auto</code>.",
+      "en": "<code>sticky</code> needs both: a <code>top: 0</code> offset on the heading itself and a scrollable parent — that is, a <code>height</code> plus <code>overflow-y: auto</code>."
+     }
+    }
+   ],
+   "exam": {
+    "time": 600,
+    "questions": [
+     {
+      "q": { "ru": "Элемент с <code>position: fixed</code> при прокрутке страницы…", "uz": "<code>position: fixed</code> li element sahifa aylantirilganda…", "en": "An element with <code>position: fixed</code> when the page scrolls…" },
+      "options": [
+       { "ru": "уезжает вместе с содержимым", "uz": "mazmun bilan birga ketadi", "en": "moves away with the content" },
+       { "ru": "остаётся на месте относительно окна", "uz": "oynaga nisbatan joyida qoladi", "en": "stays put relative to the window" },
+       { "ru": "исчезает", "uz": "yo'qoladi", "en": "disappears" },
+       { "ru": "растягивается", "uz": "cho'ziladi", "en": "stretches" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Стиль не применяется. Что проверить первым?", "uz": "Uslub qo'llanmayapti. Birinchi nimani tekshirish kerak?", "en": "A style is not applying. What do you check first?" },
+      "options": [
+       { "ru": "Версию браузера", "uz": "Brauzer versiyasini", "en": "The browser version" },
+       { "ru": "Нет ли правила сильнее — по специфичности или ниже в файле", "uz": "Kuchliroq qoida yo'qmi — spetsifiklik bo'yicha yoki faylda pastda", "en": "Whether a stronger rule exists — by specificity or later in the file" },
+       { "ru": "Кодировку файла", "uz": "Fayl kodlashini", "en": "The file encoding" },
+       { "ru": "Размер экрана", "uz": "Ekran o'lchamini", "en": "The screen size" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Почему <code>!important</code> считают плохой практикой?", "uz": "Nega <code>!important</code> yomon amaliyot hisoblanadi?", "en": "Why is <code>!important</code> considered bad practice?" },
+      "options": [
+       { "ru": "Он замедляет страницу", "uz": "U sahifani sekinlashtiradi", "en": "It slows the page down" },
+       { "ru": "Его можно перебить только другим !important — и так по кругу", "uz": "Uni faqat boshqa !important bilan yengish mumkin — va shu tariqa aylanadi", "en": "It can only be beaten by another !important — and round it goes" },
+       { "ru": "Он не работает в новых браузерах", "uz": "U yangi brauzerlarda ishlamaydi", "en": "It does not work in modern browsers" },
+       { "ru": "Он ломает специфичность навсегда", "uz": "U spetsifiklikni abadiy buzadi", "en": "It breaks specificity forever" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "<code>position: sticky</code> не работает. Самая частая причина?", "uz": "<code>position: sticky</code> ishlamayapti. Eng ko'p uchraydigan sabab?", "en": "<code>position: sticky</code> is not working. The most common cause?" },
+      "options": [
+       { "ru": "Браузер старый", "uz": "Brauzer eski", "en": "The browser is old" },
+       { "ru": "Не задано смещение (top) или у родителя нет прокрутки", "uz": "Siljish (top) berilmagan yoki ota-onada aylantirish yo'q", "en": "No offset (top) is set, or the parent has no scrolling" },
+       { "ru": "Нет z-index", "uz": "z-index yo'q", "en": "There is no z-index" },
+       { "ru": "Элемент внутри flex", "uz": "Element flex ichida", "en": "The element is inside a flex" }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "css",
+      "title": { "ru": "Карточка курса целиком", "uz": "Kurs kartochkasi to'liq", "en": "A complete course card" },
+      "desc": {
+       "ru": "<p>Собери всё вместе. Разметка дана.</p><ol><li><code>.card</code> — <code>position: relative</code>, белый фон, отступ <code>20px</code>, скругление <code>12px</code>, ширина <code>260px</code>.</li><li><code>.badge</code> — <code>position: absolute</code>, <code>top: 0</code>, <code>right: 0</code>, фон <code>#2563eb</code>, белый текст.</li><li><code>.card</code> — <code>transition-duration: 0.2s</code>, а при наведении на карточку — <code>transform: translateY(-4px)</code>.</li></ol>",
+       "uz": "<p>Hammasini birlashtiring. Разметка berilgan.</p><ol><li><code>.card</code> — <code>position: relative</code>, oq fon, chekinish <code>20px</code>, yumaloqlash <code>12px</code>, kenglik <code>260px</code>.</li><li><code>.badge</code> — <code>position: absolute</code>, <code>top: 0</code>, <code>right: 0</code>, fon <code>#2563eb</code>, oq matn.</li><li><code>.card</code> — <code>transition-duration: 0.2s</code>, kartochka ustiga kelganda esa — <code>transform: translateY(-4px)</code>.</li></ol>",
+       "en": "<p>Put it all together. The markup is given.</p><ol><li><code>.card</code> — <code>position: relative</code>, white background, padding <code>20px</code>, radius <code>12px</code>, width <code>260px</code>.</li><li><code>.badge</code> — <code>position: absolute</code>, <code>top: 0</code>, <code>right: 0</code>, background <code>#2563eb</code>, white text.</li><li><code>.card</code> — <code>transition-duration: 0.2s</code>, and on hover over the card — <code>transform: translateY(-4px)</code>.</li></ol>"
+      },
+      "html": "<div class=\"card\"><span class=\"badge\">новинка</span><h3>Python с нуля</h3><p>5 модулей</p></div>",
+      "starter": ".card {\n}\n\n.badge {\n}\n\n.card:hover {\n}\n",
+      "tests": "var card = $('.card');\nvar badge = $('.badge');\nassert(card && badge, 'Нет .card или .badge');\nequal(style(card, 'position'), 'relative', 'position у .card');\nequal(style(card, 'background-color'), 'rgb(255, 255, 255)', 'Фон карточки');\nequal(style(card, 'padding-top'), '20px', 'Отступ карточки');\nequal(style(card, 'border-top-left-radius'), '12px', 'Скругление карточки');\nequal(style(card, 'width'), '260px', 'Ширина карточки');\nequal(style(card, 'transition-duration'), '0.2s', 'Длительность перехода');\nequal(style(badge, 'position'), 'absolute', 'position у .badge');\nequal(style(badge, 'top'), '0px', 'top у .badge');\nequal(style(badge, 'right'), '0px', 'right у .badge');\nequal(style(badge, 'background-color'), 'rgb(37, 99, 235)', 'Фон значка');\nequal(style(badge, 'color'), 'rgb(255, 255, 255)', 'Цвет текста значка');\nvar css = document.querySelector('style:last-of-type') ? document.querySelector('style:last-of-type').textContent : '';\nassert(/\\.card:hover/.test(css), 'Нужно правило .card:hover');\nassert(/translateY\\(\\s*-4px\\s*\\)/.test(css), 'В :hover нужен transform: translateY(-4px)');",
+      "hint": {
+       "ru": "Ширину задавай через <code>width: 260px</code>, а не через <code>max-width</code>. Значок позиционируется от карточки только потому, что у неё <code>position: relative</code> — без этой строки он уедет к углу страницы.",
+       "uz": "Kenglikni <code>max-width</code> orqali emas, <code>width: 260px</code> orqali bering. Belgi kartochkadan faqat unda <code>position: relative</code> borligi uchun joylashadi — bu qatorsiz u sahifa burchagiga ketadi.",
+       "en": "Set the width with <code>width: 260px</code>, not <code>max-width</code>. The badge positions against the card only because it has <code>position: relative</code> — without that line it drifts to the page corner."
+      }
+     }
+    ]
+   }
   }
  ]
 }

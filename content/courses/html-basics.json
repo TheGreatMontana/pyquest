@@ -1315,6 +1315,352 @@
      }
     ]
    }
+  },
+  {
+   "id": "ht-03",
+   "title": { "ru": "Медиа, метаданные и скорость", "uz": "Media, metama'lumot va tezlik", "en": "Media, metadata and speed" },
+   "tagline": { "ru": "Картинки, которые не тормозят, и теги, которые видит поисковик", "uz": "Sekinlashtirmaydigan rasmlar va qidiruv tizimi ko'radigan teglar", "en": "Images that do not slow you down and tags the search engine sees" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "Голова документа: то, чего не видно", "uz": "Hujjat boshi: ko'rinmaydigan narsa", "en": "The document head: what you cannot see" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>В <code>&lt;head&gt;</code> нет ни одного видимого пикселя, но именно он решает, как страница выглядит в поиске, в мессенджере и на телефоне.</p><ul><li><code>&lt;meta charset=\"utf-8\"&gt;</code> — <b>первым делом</b>. Без него кириллица превратится в кракозябры.</li><li><code>&lt;meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"&gt;</code> — без этой строки телефон покажет уменьшенную десктопную версию, и вся адаптивность будет напрасной.</li><li><code>&lt;title&gt;</code> — вкладка браузера и синяя ссылка в поиске.</li><li><code>&lt;meta name=\"description\"&gt;</code> — серый текст под ссылкой в выдаче.</li><li><code>&lt;meta property=\"og:title\"&gt;</code> и <code>og:image</code> — карточка при отправке ссылки в Telegram или WhatsApp.</li><li><code>&lt;html lang=\"ru\"&gt;</code> — язык страницы: помогает поиску и скринридерам произносить текст правильно.</li></ul>",
+        "uz": "<p><code>&lt;head&gt;</code> da bitta ham ko'rinadigan piksel yo'q, lekin sahifa qidiruvda, messenjerda va telefonda qanday ko'rinishini aynan u hal qiladi.</p><ul><li><code>&lt;meta charset=\"utf-8\"&gt;</code> — <b>birinchi navbatda</b>. Usiz kirill tushunarsiz belgilarga aylanadi.</li><li><code>&lt;meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"&gt;</code> — bu qatorsiz telefon kichraytirilgan desktop versiyasini ko'rsatadi va butun moslashuvchanlik behuda bo'ladi.</li><li><code>&lt;title&gt;</code> — brauzer ilovasi va qidiruvdagi ko'k havola.</li><li><code>&lt;meta name=\"description\"&gt;</code> — natijadagi havola ostidagi kulrang matn.</li><li><code>&lt;meta property=\"og:title\"&gt;</code> va <code>og:image</code> — havolani Telegram yoki WhatsApp ga yuborgandagi kartochka.</li><li><code>&lt;html lang=\"ru\"&gt;</code> — sahifa tili: qidiruvga va skrinriderlarga matnni to'g'ri talaffuz qilishga yordam beradi.</li></ul>",
+        "en": "<p>There is not a single visible pixel in <code>&lt;head&gt;</code>, yet it decides how the page looks in search, in a messenger and on a phone.</p><ul><li><code>&lt;meta charset=\"utf-8\"&gt;</code> — <b>first of all</b>. Without it Cyrillic turns into gibberish.</li><li><code>&lt;meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"&gt;</code> — without this line a phone shows a shrunken desktop version and all your responsiveness is wasted.</li><li><code>&lt;title&gt;</code> — the browser tab and the blue link in search results.</li><li><code>&lt;meta name=\"description\"&gt;</code> — the grey text under that link.</li><li><code>&lt;meta property=\"og:title\"&gt;</code> and <code>og:image</code> — the card shown when the link is sent to Telegram or WhatsApp.</li><li><code>&lt;html lang=\"ru\"&gt;</code> — the page language: it helps search engines and lets screen readers pronounce the text correctly.</li></ul>"
+       }
+      },
+      {
+       "type": "webrun",
+       "kind": "html",
+       "code": "<article>\n  <h1>Что лежит в head этой страницы</h1>\n  <p>Ниже — тот самый набор, который стоит копировать в каждый новый проект.</p>\n\n  <pre><code>&lt;!DOCTYPE html&gt;\n&lt;html lang=\"ru\"&gt;\n&lt;head&gt;\n  &lt;meta charset=\"utf-8\"&gt;\n  &lt;meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"&gt;\n  &lt;title&gt;Курсы по программированию — PyQuest&lt;/title&gt;\n  &lt;meta name=\"description\" content=\"Учись Python, SQL и алгоритмам с проверкой кода прямо в браузере.\"&gt;\n\n  &lt;meta property=\"og:title\" content=\"PyQuest\"&gt;\n  &lt;meta property=\"og:description\" content=\"Код выполняется в браузере\"&gt;\n  &lt;meta property=\"og:image\" content=\"https://example.com/card.png\"&gt;\n\n  &lt;link rel=\"icon\" href=\"/favicon.ico\"&gt;\n  &lt;link rel=\"stylesheet\" href=\"/css/style.css\"&gt;\n&lt;/head&gt;</code></pre>\n\n  <h2>Что произойдёт, если забыть</h2>\n  <table>\n    <thead><tr><th>Забыли</th><th>Что увидит пользователь</th></tr></thead>\n    <tbody>\n      <tr><td>charset</td><td>Ð¿Ñ€Ð¸Ð²ÐµÑ‚ вместо «привет»</td></tr>\n      <tr><td>viewport</td><td>На телефоне — крошечная десктопная страница</td></tr>\n      <tr><td>title</td><td>В поиске — адрес файла вместо названия</td></tr>\n      <tr><td>description</td><td>Поисковик придумает текст сам, обычно неудачно</td></tr>\n      <tr><td>og:image</td><td>Ссылка в мессенджере — серый прямоугольник</td></tr>\n    </tbody>\n  </table>\n</article>"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Порядок в <code>&lt;head&gt;</code> имеет значение. <code>charset</code> ставят самой первой строкой, потому что браузер начинает разбирать байты сразу — и до этой строки он не знает, в какой кодировке их читать.</p><p>Про <code>viewport</code>: это единственная причина, по которой мобильные браузеры вообще показывают сайты в натуральную величину. Забудешь — и ни один медиазапрос из курса CSS не сработает так, как ты задумал.</p>",
+        "uz": "<p><code>&lt;head&gt;</code> dagi tartib muhim. <code>charset</code> eng birinchi qatorga qo'yiladi, chunki brauzer baytlarni darhol ajrata boshlaydi — va bu qatorgacha ularni qaysi kodlashda o'qishni bilmaydi.</p><p><code>viewport</code> haqida: mobil brauzerlar saytlarni tabiiy o'lchamda ko'rsatishining yagona sababi shu. Unutsangiz — CSS kursidagi birorta ham mediaso'rov siz o'ylagandek ishlamaydi.</p>",
+        "en": "<p>The order inside <code>&lt;head&gt;</code> matters. <code>charset</code> goes on the very first line because the browser starts parsing bytes immediately — and until that line it does not know which encoding to read them in.</p><p>About <code>viewport</code>: it is the only reason mobile browsers show sites at their natural size at all. Forget it and not one media query from the CSS course will behave the way you intended.</p>"
+       }
+      },
+      {
+       "type": "checkpoint",
+       "q": { "ru": "Забыли <code>&lt;meta name=\"viewport\"&gt;</code>. Что увидит человек с телефона?", "uz": "<code>&lt;meta name=\"viewport\"&gt;</code> unutildi. Telefondagi odam nima ko'radi?", "en": "You forgot <code>&lt;meta name=\"viewport\"&gt;</code>. What does a phone user see?" },
+       "options": [
+        { "ru": "Обычную мобильную версию", "uz": "Odatiy mobil versiyani", "en": "The normal mobile version" },
+        { "ru": "Уменьшенную десктопную страницу, в которую надо вглядываться", "uz": "Kichraytirilgan desktop sahifani, unga tikilib qarash kerak", "en": "A shrunken desktop page you have to squint at" },
+        { "ru": "Пустой экран", "uz": "Bo'sh ekran", "en": "A blank screen" },
+        { "ru": "Ошибку браузера", "uz": "Brauzer xatosini", "en": "A browser error" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Мобильный браузер по умолчанию притворяется широким экраном и масштабирует всё вниз. Медиазапросы при этом видят «широкий» экран — и адаптивность не включается.",
+        "uz": "Mobil brauzer sukut bo'yicha keng ekran bo'lib ko'rinadi va hammasini kichraytiradi. Mediaso'rovlar esa «keng» ekranni ko'radi — va moslashuvchanlik yoqilmaydi.",
+        "en": "A mobile browser pretends to be a wide screen by default and scales everything down. Media queries then see a “wide” screen — and responsiveness never kicks in."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "Картинки: alt, размеры и загрузка", "uz": "Rasmlar: alt, o'lchamlar va yuklash", "en": "Images: alt, dimensions and loading" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Картинки — обычно 70% веса страницы. Четыре атрибута решают почти всё.</p><ul><li><b><code>alt</code></b> — текст вместо картинки. Нужен слепым пользователям, поисковику и всем, у кого картинка не загрузилась. Если изображение декоративное, пиши <code>alt=\"\"</code> — пустой, но <b>обязательно присутствующий</b>: так скринридер поймёт, что читать нечего.</li><li><b><code>width</code> и <code>height</code></b> — браузер заранее резервирует место, и текст не прыгает при загрузке. Это не про размер на экране (его задаёт CSS), а про пропорции.</li><li><b><code>loading=\"lazy\"</code></b> — картинку ниже экрана браузер не грузит, пока до неё не долистают.</li><li><b><code>&lt;picture&gt;</code> и <code>srcset</code></b> — разные файлы для разных экранов: телефону не нужен файл на 3000 пикселей.</li></ul>",
+        "uz": "<p>Rasmlar — odatda sahifa vaznining 70% i. To'rt atribut deyarli hammasini hal qiladi.</p><ul><li><b><code>alt</code></b> — rasm o'rniga matn. Ko'zi ojiz foydalanuvchilarga, qidiruv tizimiga va rasmi yuklanmaganlarning barchasiga kerak. Tasvir bezak bo'lsa, <code>alt=\"\"</code> yozing — bo'sh, lekin <b>albatta mavjud</b>: shunda skrinrider o'qiydigan narsa yo'qligini tushunadi.</li><li><b><code>width</code> va <code>height</code></b> — brauzer joyni oldindan zaxiralaydi va yuklashda matn sakramaydi. Bu ekrandagi o'lcham haqida emas (uni CSS beradi), nisbatlar haqida.</li><li><b><code>loading=\"lazy\"</code></b> — ekrandan pastdagi rasmni unga yetib kelmaguncha brauzer yuklamaydi.</li><li><b><code>&lt;picture&gt;</code> va <code>srcset</code></b> — turli ekranlar uchun turli fayllar: telefonga 3000 pikselli fayl kerak emas.</li></ul>",
+        "en": "<p>Images are usually 70% of a page's weight. Four attributes decide almost everything.</p><ul><li><b><code>alt</code></b> — text instead of the image. Needed by blind users, by search engines and by everyone whose image failed to load. If the image is decorative, write <code>alt=\"\"</code> — empty but <b>definitely present</b>: that tells a screen reader there is nothing to read.</li><li><b><code>width</code> and <code>height</code></b> — the browser reserves the space in advance so text does not jump while loading. This is not about the on-screen size (CSS decides that) but about the aspect ratio.</li><li><b><code>loading=\"lazy\"</code></b> — an image below the fold is not fetched until the user scrolls to it.</li><li><b><code>&lt;picture&gt;</code> and <code>srcset</code></b> — different files for different screens: a phone does not need a 3000-pixel file.</li></ul>"
+       }
+      },
+      {
+       "type": "webrun",
+       "kind": "html",
+       "code": "<article>\n  <h2>Как писать картинку правильно</h2>\n\n  <h3>Осмысленная — alt описывает содержимое</h3>\n  <pre><code>&lt;img src=\"chart.png\"\n     alt=\"График роста продаж: с 200 до 650 за три месяца\"\n     width=\"640\" height=\"360\" loading=\"lazy\"&gt;</code></pre>\n\n  <h3>Декоративная — alt пустой, но есть</h3>\n  <pre><code>&lt;img src=\"divider.svg\" alt=\"\" width=\"600\" height=\"4\"&gt;</code></pre>\n\n  <h3>Разные файлы под разные экраны</h3>\n  <pre><code>&lt;img src=\"photo-800.jpg\"\n     srcset=\"photo-400.jpg 400w, photo-800.jpg 800w, photo-1600.jpg 1600w\"\n     sizes=\"(max-width: 600px) 100vw, 800px\"\n     alt=\"Команда на встрече\" width=\"800\" height=\"500\"&gt;</code></pre>\n\n  <h3>Плохо и почему</h3>\n  <ul>\n    <li><code>alt=\"картинка\"</code> — не описывает ничего, только мешает</li>\n    <li><code>alt=\"фото.jpg\"</code> — имя файла читать вслух бессмысленно</li>\n    <li>совсем без <code>alt</code> — скринридер прочитает адрес файла целиком</li>\n    <li>без <code>width</code> и <code>height</code> — текст прыгнет, когда картинка догрузится</li>\n  </ul>\n\n  <figure>\n    <img src=\"data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='120'%3E%3Crect width='320' height='120' fill='%232563eb'/%3E%3Ctext x='160' y='68' font-size='20' fill='white' text-anchor='middle'%3E320%C3%97120%3C/text%3E%3C/svg%3E\"\n         alt=\"Синий прямоугольник с подписью 320 на 120\" width=\"320\" height=\"120\">\n    <figcaption>figure и figcaption связывают картинку с подписью</figcaption>\n  </figure>\n</article>"
+      },
+      {
+       "type": "note",
+       "kind": "trap",
+       "html": {
+        "ru": "<code>alt</code> и <code>title</code> — не одно и то же. <code>title</code> показывает всплывающую подсказку при наведении мышью и <b>недоступен с клавиатуры и на телефоне</b>. Класть туда важное — значит спрятать это от части пользователей. Всё, что нужно понять для работы со страницей, должно быть в тексте или в <code>alt</code>.",
+        "uz": "<code>alt</code> va <code>title</code> — bir xil narsa emas. <code>title</code> sichqoncha ustiga kelganda qalqib chiquvchi maslahat ko'rsatadi va <b>klaviatura hamda telefonda mavjud emas</b>. U yerga muhim narsani qo'yish — uni foydalanuvchilarning bir qismidan yashirish demakdir. Sahifa bilan ishlash uchun tushunish kerak bo'lgan hamma narsa matnda yoki <code>alt</code> da bo'lishi kerak.",
+        "en": "<code>alt</code> and <code>title</code> are not the same. <code>title</code> shows a tooltip on mouse hover and is <b>unavailable from the keyboard and on phones</b>. Putting something important there hides it from part of your audience. Everything needed to use the page must be in the text or in <code>alt</code>."
+       }
+      },
+      {
+       "type": "checkpoint",
+       "q": { "ru": "Картинка чисто декоративная — линия-разделитель. Какой <code>alt</code>?", "uz": "Rasm sof bezak — ajratuvchi chiziq. Qanday <code>alt</code>?", "en": "The image is purely decorative — a divider line. Which <code>alt</code>?" },
+       "options": [
+        { "ru": "Не писать alt вообще", "uz": "alt ni umuman yozmaslik", "en": "Do not write alt at all" },
+        { "ru": "<code>alt=\"\"</code> — пустой, но присутствующий", "uz": "<code>alt=\"\"</code> — bo'sh, lekin mavjud", "en": "<code>alt=\"\"</code> — empty but present" },
+        { "ru": "<code>alt=\"разделитель\"</code>", "uz": "<code>alt=\"ajratuvchi\"</code>", "en": "<code>alt=\"divider\"</code>" },
+        { "ru": "<code>alt=\"картинка\"</code>", "uz": "<code>alt=\"rasm\"</code>", "en": "<code>alt=\"image\"</code>" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Пустой <code>alt</code> — это сообщение «здесь нечего читать», и скринридер молча пропустит картинку. Без атрибута он прочитает имя файла, а с текстом «разделитель» — засорит чтение бесполезным словом.",
+        "uz": "Bo'sh <code>alt</code> — «bu yerda o'qiydigan narsa yo'q» xabari va skrinrider rasmni jimgina o'tkazib yuboradi. Atributsiz u fayl nomini o'qiydi, «ajratuvchi» matni bilan esa o'qishni foydasiz so'z bilan iflos qiladi.",
+        "en": "An empty <code>alt</code> says “nothing to read here” and the screen reader skips the image silently. With no attribute it reads out the file name, and with the text “divider” it clutters the reading with a useless word."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "Видео, аудио и встраивание", "uz": "Video, audio va o'rnatish", "en": "Video, audio and embedding" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Для медиа в HTML есть свои теги, и им не нужны плагины.</p><ul><li><code>&lt;video controls&gt;</code> — плеер с кнопками. Внутрь кладут несколько <code>&lt;source&gt;</code> с разными форматами: браузер возьмёт первый, который умеет.</li><li><code>&lt;audio controls&gt;</code> — то же для звука.</li><li><code>poster=\"…\"</code> — картинка до нажатия «play».</li><li><code>&lt;track kind=\"captions\"&gt;</code> — субтитры. Нужны не только глухим: половина людей смотрит видео без звука.</li><li><code>&lt;iframe&gt;</code> — чужая страница внутри твоей: карта, YouTube, форма.</li></ul><p>Важное правило: <b>не ставь <code>autoplay</code> со звуком</b>. Браузеры это блокируют, а пользователи ненавидят. Автовоспроизведение допустимо только с <code>muted</code>.</p>",
+        "uz": "<p>HTML da media uchun o'z teglari bor va ularga plaginlar kerak emas.</p><ul><li><code>&lt;video controls&gt;</code> — tugmali pleer. Ichiga turli formatli bir necha <code>&lt;source&gt;</code> qo'yiladi: brauzer biladigan birinchisini oladi.</li><li><code>&lt;audio controls&gt;</code> — tovush uchun xuddi shunday.</li><li><code>poster=\"…\"</code> — «play» bosilgungacha ko'rinadigan rasm.</li><li><code>&lt;track kind=\"captions\"&gt;</code> — subtitrlar. Faqat karlarga emas: odamlarning yarmi videoni tovushsiz ko'radi.</li><li><code>&lt;iframe&gt;</code> — sizning sahifangiz ichidagi begona sahifa: xarita, YouTube, shakl.</li></ul><p>Muhim qoida: <b>tovushli <code>autoplay</code> qo'ymang</b>. Brauzerlar buni bloklaydi, foydalanuvchilar esa yomon ko'radi. Avtoijro faqat <code>muted</code> bilan joiz.</p>",
+        "en": "<p>HTML has its own tags for media, and they need no plugins.</p><ul><li><code>&lt;video controls&gt;</code> — a player with buttons. Inside it you put several <code>&lt;source&gt;</code> elements with different formats: the browser takes the first one it understands.</li><li><code>&lt;audio controls&gt;</code> — the same for sound.</li><li><code>poster=\"…\"</code> — the image shown before “play” is pressed.</li><li><code>&lt;track kind=\"captions\"&gt;</code> — subtitles. Not only for the deaf: half of all viewers watch video without sound.</li><li><code>&lt;iframe&gt;</code> — someone else's page inside yours: a map, YouTube, a form.</li></ul><p>An important rule: <b>never use <code>autoplay</code> with sound</b>. Browsers block it and users hate it. Autoplay is acceptable only with <code>muted</code>.</p>"
+       }
+      },
+      {
+       "type": "webrun",
+       "kind": "html",
+       "code": "<article>\n  <h2>Медиа-теги</h2>\n\n  <h3>Видео с несколькими форматами</h3>\n  <pre><code>&lt;video controls width=\"640\" poster=\"preview.jpg\"&gt;\n  &lt;source src=\"lesson.webm\" type=\"video/webm\"&gt;\n  &lt;source src=\"lesson.mp4\"  type=\"video/mp4\"&gt;\n  &lt;track kind=\"captions\" src=\"ru.vtt\" srclang=\"ru\" label=\"Русские\" default&gt;\n  Ваш браузер не умеет video — &lt;a href=\"lesson.mp4\"&gt;скачайте файл&lt;/a&gt;.\n&lt;/video&gt;</code></pre>\n  <p>Текст внутри тега увидят только те, чей браузер не понимает <code>video</code>. Это запасной выход, а не подпись.</p>\n\n  <h3>Аудио</h3>\n  <pre><code>&lt;audio controls src=\"podcast.mp3\"&gt;\n  &lt;a href=\"podcast.mp3\"&gt;Скачать выпуск&lt;/a&gt;\n&lt;/audio&gt;</code></pre>\n\n  <h3>Чужая страница внутри своей</h3>\n  <pre><code>&lt;iframe src=\"https://example.com/map\"\n        width=\"600\" height=\"400\"\n        title=\"Карта офиса\"\n        loading=\"lazy\"\n        sandbox=\"allow-scripts\"&gt;&lt;/iframe&gt;</code></pre>\n  <p><code>title</code> у iframe обязателен: без него скринридер объявит «фрейм» и замолчит.</p>\n\n  <h3>Так делать не надо</h3>\n  <pre><code>&lt;video autoplay src=\"ad.mp4\"&gt;&lt;/video&gt;</code></pre>\n  <p>Браузер это заблокирует, а если и запустит — пользователь уйдёт со страницы.</p>\n</article>"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Про <code>&lt;iframe&gt;</code> стоит знать две вещи.</p><p><b>Атрибут <code>title</code></b> — не украшение. Для человека со скринридером фрейм без него звучит как «фрейм» и всё: непонятно, стоит ли туда заходить.</p><p><b>Атрибут <code>sandbox</code></b> ограничивает права чужой страницы. Без него встроенный сайт может, например, увести пользователя на свой адрес. Именно так работают предпросмотры в этом курсе: код студента живёт в iframe с <code>sandbox</code>, и до основной страницы он не дотянется.</p>",
+        "uz": "<p><code>&lt;iframe&gt;</code> haqida ikki narsani bilish kerak.</p><p><b><code>title</code> atributi</b> — bezak emas. Skrinriderli odam uchun usiz freym «freym» deb yangraydi va tamom: u yerga kirish kerakmi yo'qmi tushunarsiz.</p><p><b><code>sandbox</code> atributi</b> begona sahifa huquqlarini cheklaydi. Usiz o'rnatilgan sayt, masalan, foydalanuvchini o'z manziliga olib ketishi mumkin. Bu kursdagi ko'rib chiqishlar aynan shunday ishlaydi: talaba kodi <code>sandbox</code> li iframe da yashaydi va asosiy sahifaga yeta olmaydi.</p>",
+        "en": "<p>Two things are worth knowing about <code>&lt;iframe&gt;</code>.</p><p><b>The <code>title</code> attribute</b> is not decoration. To someone using a screen reader, a frame without it sounds like “frame” and nothing more: there is no way to tell whether it is worth entering.</p><p><b>The <code>sandbox</code> attribute</b> limits what the foreign page may do. Without it an embedded site can, for example, navigate the user away to its own address. This is exactly how the previews in this course work: the student's code lives in a sandboxed iframe and cannot reach the main page.</p>"
+       }
+      },
+      {
+       "type": "summary",
+       "items": [
+        { "ru": "charset — первой строкой head, иначе кириллица ломается", "uz": "charset — head ning birinchi qatorida, aks holda kirill buziladi", "en": "charset goes on the first line of head, or Cyrillic breaks" },
+        { "ru": "Без viewport телефон покажет уменьшённый десктоп", "uz": "viewport siz telefon kichraytirilgan desktopni ko'rsatadi", "en": "Without viewport a phone shows a shrunken desktop" },
+        { "ru": "title и description — это то, что видно в поиске", "uz": "title va description — qidiruvda ko'rinadigan narsa", "en": "title and description are what people see in search results" },
+        { "ru": "og:image рисует карточку при отправке ссылки", "uz": "og:image havola yuborilganda kartochka chizadi", "en": "og:image draws the card when the link is shared" },
+        { "ru": "alt обязателен всегда; у декоративной картинки он пустой", "uz": "alt doim majburiy; bezak rasmda u bo'sh", "en": "alt is always required; for a decorative image it is empty" },
+        { "ru": "width и height не дают тексту прыгать при загрузке", "uz": "width va height yuklashda matnni sakratmaydi", "en": "width and height stop the text jumping while loading" },
+        { "ru": "loading=\"lazy\" откладывает картинки ниже экрана", "uz": "loading=\"lazy\" ekrandan pastdagi rasmlarni kechiktiradi", "en": "loading=\"lazy\" defers images below the fold" },
+        { "ru": "У iframe обязателен title, а sandbox ограничивает его права", "uz": "iframe da title majburiy, sandbox esa uning huquqlarini cheklaydi", "en": "An iframe needs a title, and sandbox limits its powers" }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": { "ru": "Какая строка в <code>&lt;head&gt;</code> должна быть первой?", "uz": "<code>&lt;head&gt;</code> dagi qaysi qator birinchi bo'lishi kerak?", "en": "Which line in <code>&lt;head&gt;</code> must come first?" },
+     "options": [
+      { "ru": "&lt;title&gt;", "uz": "&lt;title&gt;", "en": "&lt;title&gt;" },
+      { "ru": "&lt;meta charset=\"utf-8\"&gt;", "uz": "&lt;meta charset=\"utf-8\"&gt;", "en": "&lt;meta charset=\"utf-8\"&gt;" },
+      { "ru": "&lt;link rel=\"stylesheet\"&gt;", "uz": "&lt;link rel=\"stylesheet\"&gt;", "en": "&lt;link rel=\"stylesheet\"&gt;" },
+      { "ru": "Порядок не важен", "uz": "Tartib muhim emas", "en": "The order does not matter" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Браузер начинает разбирать байты сразу и до этой строки не знает кодировку. Поэтому её ставят раньше всего остального.",
+      "uz": "Brauzer baytlarni darhol ajrata boshlaydi va bu qatorgacha kodlashni bilmaydi. Shuning uchun u hamma narsadan oldin qo'yiladi.",
+      "en": "The browser starts parsing bytes at once and does not know the encoding until this line. So it goes before everything else."
+     }
+    },
+    {
+     "q": { "ru": "Что делает <code>loading=\"lazy\"</code> у картинки?", "uz": "Rasmdagi <code>loading=\"lazy\"</code> nima qiladi?", "en": "What does <code>loading=\"lazy\"</code> do on an image?" },
+     "options": [
+      { "ru": "Сжимает файл", "uz": "Faylni siqadi", "en": "It compresses the file" },
+      { "ru": "Откладывает загрузку, пока до картинки не долистают", "uz": "Rasmga yetib kelmaguncha yuklashni kechiktiradi", "en": "It defers loading until the user scrolls to the image" },
+      { "ru": "Показывает заглушку", "uz": "O'rniga vaqtinchalik rasm ko'rsatadi", "en": "It shows a placeholder" },
+      { "ru": "Отключает картинку", "uz": "Rasmni o'chiradi", "en": "It disables the image" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "На длинной странице это экономит мегабайты трафика: то, что человек так и не увидел, не скачивается.",
+      "uz": "Uzun sahifada bu megabaytlab trafikni tejaydi: odam ko'rmagan narsa yuklab olinmaydi.",
+      "en": "On a long page this saves megabytes of traffic: what the person never sees is never downloaded."
+     }
+    },
+    {
+     "q": { "ru": "Картинка декоративная. Как правильно?", "uz": "Rasm bezak. Qanday to'g'ri?", "en": "The image is decorative. What is correct?" },
+     "options": [
+      { "ru": "Убрать атрибут alt", "uz": "alt atributini olib tashlash", "en": "Remove the alt attribute" },
+      { "ru": "Оставить <code>alt=\"\"</code>", "uz": "<code>alt=\"\"</code> qoldirish", "en": "Keep <code>alt=\"\"</code>" },
+      { "ru": "Написать <code>alt=\"декор\"</code>", "uz": "<code>alt=\"bezak\"</code> yozish", "en": "Write <code>alt=\"decoration\"</code>" },
+      { "ru": "Написать имя файла", "uz": "Fayl nomini yozish", "en": "Write the file name" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Пустой <code>alt</code> явно говорит «читать нечего». Отсутствие атрибута заставит скринридер зачитать адрес файла вслух.",
+      "uz": "Bo'sh <code>alt</code> «o'qiydigan narsa yo'q» deb aniq aytadi. Atribut yo'qligi skrinriderni fayl manzilini ovoz chiqarib o'qishga majbur qiladi.",
+      "en": "An empty <code>alt</code> explicitly says “nothing to read”. A missing attribute makes the screen reader announce the file's address out loud."
+     }
+    },
+    {
+     "q": { "ru": "Зачем у <code>&lt;img&gt;</code> писать width и height, если размер задаёт CSS?", "uz": "O'lchamni CSS bersa, <code>&lt;img&gt;</code> ga nega width va height yoziladi?", "en": "Why write width and height on <code>&lt;img&gt;</code> if CSS sets the size?" },
+     "options": [
+      { "ru": "Так требует стандарт", "uz": "Standart shuni talab qiladi", "en": "The standard requires it" },
+      { "ru": "Браузер резервирует место заранее, и контент не прыгает при загрузке", "uz": "Brauzer joyni oldindan zaxiralaydi va yuklashda kontent sakramaydi", "en": "The browser reserves the space in advance so content does not jump while loading" },
+      { "ru": "Чтобы картинка сжалась", "uz": "Rasm siqilishi uchun", "en": "So the image is compressed" },
+      { "ru": "Для поисковика", "uz": "Qidiruv tizimi uchun", "en": "For the search engine" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Прыгающий контент — одна из метрик, по которым Google оценивает качество страницы. Два атрибута решают проблему бесплатно.",
+      "uz": "Sakrab turadigan kontent — Google sahifa sifatini baholaydigan metrikalardan biri. Ikki atribut muammoni bepul hal qiladi.",
+      "en": "Jumping content is one of the metrics Google uses to judge page quality. Two attributes solve it for free."
+     }
+    },
+    {
+     "q": { "ru": "Почему нельзя класть важную информацию только в <code>title</code>?", "uz": "Nega muhim axborotni faqat <code>title</code> ga qo'yib bo'lmaydi?", "en": "Why must important information not live only in <code>title</code>?" },
+     "options": [
+      { "ru": "Он слишком короткий", "uz": "U juda qisqa", "en": "It is too short" },
+      { "ru": "Подсказка не появится с клавиатуры и на телефоне", "uz": "Maslahat klaviaturadan va telefonda chiqmaydi", "en": "The tooltip never appears from the keyboard or on a phone" },
+      { "ru": "Поисковик его игнорирует", "uz": "Qidiruv tizimi uni e'tiborsiz qoldiradi", "en": "Search engines ignore it" },
+      { "ru": "Он замедляет страницу", "uz": "U sahifani sekinlashtiradi", "en": "It slows the page down" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Всплывающая подсказка привязана к мыши. Всё, без чего страницей нельзя пользоваться, должно быть в тексте или в <code>alt</code>.",
+      "uz": "Qalqib chiquvchi maslahat sichqonchaga bog'langan. Sahifadan foydalanib bo'lmaydigan hamma narsa matnda yoki <code>alt</code> da bo'lishi kerak.",
+      "en": "A tooltip is tied to the mouse. Anything the page cannot be used without must be in the text or in <code>alt</code>."
+     }
+    },
+    {
+     "q": { "ru": "Что обязательно у <code>&lt;iframe&gt;</code>?", "uz": "<code>&lt;iframe&gt;</code> da nima majburiy?", "en": "What is mandatory on an <code>&lt;iframe&gt;</code>?" },
+     "options": [
+      { "ru": "Атрибут alt", "uz": "alt atributi", "en": "The alt attribute" },
+      { "ru": "Атрибут title — иначе скринридер объявит просто «фрейм»", "uz": "title atributi — aks holda skrinrider shunchaki «freym» deydi", "en": "The title attribute — otherwise a screen reader just announces “frame”" },
+      { "ru": "Атрибут lang", "uz": "lang atributi", "en": "The lang attribute" },
+      { "ru": "Ничего", "uz": "Hech nima", "en": "Nothing" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "У картинки за смысл отвечает <code>alt</code>, у фрейма — <code>title</code>. А <code>sandbox</code> ограничивает, что чужая страница может сделать с твоей.",
+      "uz": "Rasmda ma'no uchun <code>alt</code>, freymda esa <code>title</code> javob beradi. <code>sandbox</code> esa begona sahifa sizniki bilan nima qila olishini cheklaydi.",
+      "en": "For an image the meaning lives in <code>alt</code>, for a frame in <code>title</code>. And <code>sandbox</code> limits what the foreign page may do to yours."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "html",
+     "title": { "ru": "Картинка по правилам", "uz": "Qoidalar bo'yicha rasm", "en": "An image done right" },
+     "brief": { "ru": "alt, размеры, ленивая загрузка", "uz": "alt, o'lchamlar, dangasa yuklash", "en": "alt, dimensions, lazy loading" },
+     "desc": {
+      "ru": "<p>Сделай блок <code>&lt;figure&gt;</code>, внутри которого:</p><ul><li><code>&lt;img&gt;</code> с <code>src=\"chart.png\"</code>, осмысленным <code>alt</code> (любой непустой текст), <code>width=\"640\"</code>, <code>height=\"360\"</code> и <code>loading=\"lazy\"</code>;</li><li><code>&lt;figcaption&gt;</code> с подписью.</li></ul>",
+      "uz": "<p><code>&lt;figure&gt;</code> bloki yarating, ichida:</p><ul><li><code>src=\"chart.png\"</code>, mazmunli <code>alt</code> (har qanday bo'sh bo'lmagan matn), <code>width=\"640\"</code>, <code>height=\"360\"</code> va <code>loading=\"lazy\"</code> li <code>&lt;img&gt;</code>;</li><li>imzoli <code>&lt;figcaption&gt;</code>.</li></ul>",
+      "en": "<p>Build a <code>&lt;figure&gt;</code> block containing:</p><ul><li>an <code>&lt;img&gt;</code> with <code>src=\"chart.png\"</code>, a meaningful <code>alt</code> (any non-empty text), <code>width=\"640\"</code>, <code>height=\"360\"</code> and <code>loading=\"lazy\"</code>;</li><li>a <code>&lt;figcaption&gt;</code> with a caption.</li></ul>"
+     },
+     "starter": "<figure>\n  <img src=\"chart.png\">\n  <figcaption></figcaption>\n</figure>\n",
+     "tests": "var img = $('figure img');\nassert(img, 'Нет картинки внутри figure');\nequal(img.getAttribute('src'), 'chart.png', 'src картинки');\nassert(img.getAttribute('alt') && img.getAttribute('alt').length > 3, 'alt должен быть осмысленным, а не пустым');\nequal(img.getAttribute('width'), '640', 'Атрибут width');\nequal(img.getAttribute('height'), '360', 'Атрибут height');\nequal(img.getAttribute('loading'), 'lazy', 'Атрибут loading');\nvar cap = $('figure figcaption');\nassert(cap && cap.textContent.trim().length > 0, 'figcaption не должен быть пустым');",
+     "hint": {
+      "ru": "Все атрибуты пишутся прямо в теге: <code>&lt;img src=\"chart.png\" alt=\"…\" width=\"640\" height=\"360\" loading=\"lazy\"&gt;</code>. В <code>figcaption</code> добавь любой текст подписи.",
+      "uz": "Barcha atributlar teg ichida yoziladi: <code>&lt;img src=\"chart.png\" alt=\"…\" width=\"640\" height=\"360\" loading=\"lazy\"&gt;</code>. <code>figcaption</code> ga istalgan imzo matnini qo'shing.",
+      "en": "All the attributes go right in the tag: <code>&lt;img src=\"chart.png\" alt=\"…\" width=\"640\" height=\"360\" loading=\"lazy\"&gt;</code>. Put any caption text in the <code>figcaption</code>."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "html",
+     "title": { "ru": "Видео с субтитрами", "uz": "Subtitrli video", "en": "Video with subtitles" },
+     "brief": { "ru": "source, track, запасной текст", "uz": "source, track, zaxira matn", "en": "source, track, fallback text" },
+     "desc": {
+      "ru": "<p>Собери плеер <code>&lt;video&gt;</code> с атрибутом <code>controls</code>, внутри которого:</p><ul><li>два <code>&lt;source&gt;</code>: <code>lesson.webm</code> и <code>lesson.mp4</code>;</li><li><code>&lt;track kind=\"captions\"&gt;</code> с <code>src=\"ru.vtt\"</code> и <code>srclang=\"ru\"</code>;</li><li>текстовая ссылка на скачивание — на случай, если браузер не понимает видео.</li></ul>",
+      "uz": "<p><code>controls</code> atributli <code>&lt;video&gt;</code> pleerini yig'ing, ichida:</p><ul><li>ikkita <code>&lt;source&gt;</code>: <code>lesson.webm</code> va <code>lesson.mp4</code>;</li><li><code>src=\"ru.vtt\"</code> va <code>srclang=\"ru\"</code> li <code>&lt;track kind=\"captions\"&gt;</code>;</li><li>brauzer videoni tushunmasa deb yuklab olish uchun matnli havola.</li></ul>",
+      "en": "<p>Build a <code>&lt;video&gt;</code> player with the <code>controls</code> attribute containing:</p><ul><li>two <code>&lt;source&gt;</code> elements: <code>lesson.webm</code> and <code>lesson.mp4</code>;</li><li>a <code>&lt;track kind=\"captions\"&gt;</code> with <code>src=\"ru.vtt\"</code> and <code>srclang=\"ru\"</code>;</li><li>a text download link in case the browser does not understand video.</li></ul>"
+     },
+     "starter": "<video>\n</video>\n",
+     "tests": "var v = $('video');\nassert(v, 'Нет тега video');\nassert(v.hasAttribute('controls'), 'Нужен атрибут controls');\nvar sources = $$('video source');\nequal(sources.length, 2, 'Количество source');\nvar srcs = sources.map(function(s){ return s.getAttribute('src'); });\nassert(srcs.indexOf('lesson.webm') !== -1, 'Нет source с lesson.webm');\nassert(srcs.indexOf('lesson.mp4') !== -1, 'Нет source с lesson.mp4');\nvar track = $('video track');\nassert(track, 'Нет тега track');\nequal(track.getAttribute('kind'), 'captions', 'kind у track');\nequal(track.getAttribute('src'), 'ru.vtt', 'src у track');\nequal(track.getAttribute('srclang'), 'ru', 'srclang у track');\nassert($('video a'), 'Нужна запасная ссылка на скачивание внутри video');",
+     "hint": {
+      "ru": "Порядок внутри <code>&lt;video controls&gt;</code>: сначала оба <code>&lt;source&gt;</code>, потом <code>&lt;track&gt;</code>, потом запасной текст со ссылкой <code>&lt;a href=\"lesson.mp4\"&gt;…&lt;/a&gt;</code>.",
+      "uz": "<code>&lt;video controls&gt;</code> ichidagi tartib: avval ikkala <code>&lt;source&gt;</code>, keyin <code>&lt;track&gt;</code>, so'ng <code>&lt;a href=\"lesson.mp4\"&gt;…&lt;/a&gt;</code> havolali zaxira matn.",
+      "en": "The order inside <code>&lt;video controls&gt;</code>: both <code>&lt;source&gt;</code> elements first, then the <code>&lt;track&gt;</code>, then the fallback text with an <code>&lt;a href=\"lesson.mp4\"&gt;…&lt;/a&gt;</code> link."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "html",
+     "title": { "ru": "Безопасный iframe", "uz": "Xavfsiz iframe", "en": "A safe iframe" },
+     "brief": { "ru": "title, sandbox, ленивая загрузка", "uz": "title, sandbox, dangasa yuklash", "en": "title, sandbox, lazy loading" },
+     "desc": {
+      "ru": "<p>Встрой карту через <code>&lt;iframe&gt;</code>: адрес <code>https://example.com/map</code>, размеры 600×400, обязательный <code>title</code>, <code>loading=\"lazy\"</code> и <code>sandbox=\"allow-scripts\"</code>.</p>",
+      "uz": "<p><code>&lt;iframe&gt;</code> orqali xaritani o'rnating: manzil <code>https://example.com/map</code>, o'lchamlar 600×400, majburiy <code>title</code>, <code>loading=\"lazy\"</code> va <code>sandbox=\"allow-scripts\"</code>.</p>",
+      "en": "<p>Embed a map with an <code>&lt;iframe&gt;</code>: the address <code>https://example.com/map</code>, size 600×400, a mandatory <code>title</code>, <code>loading=\"lazy\"</code> and <code>sandbox=\"allow-scripts\"</code>.</p>"
+     },
+     "starter": "<iframe src=\"https://example.com/map\"></iframe>\n",
+     "tests": "var f = $('iframe');\nassert(f, 'Нет тега iframe');\nequal(f.getAttribute('src'), 'https://example.com/map', 'Адрес iframe');\nequal(f.getAttribute('width'), '600', 'Ширина');\nequal(f.getAttribute('height'), '400', 'Высота');\nassert(f.getAttribute('title') && f.getAttribute('title').length > 2, 'Нужен осмысленный title');\nequal(f.getAttribute('loading'), 'lazy', 'Атрибут loading');\nequal(f.getAttribute('sandbox'), 'allow-scripts', 'Атрибут sandbox');",
+     "hint": {
+      "ru": "Все атрибуты — в одном теге: <code>&lt;iframe src=\"…\" width=\"600\" height=\"400\" title=\"Карта офиса\" loading=\"lazy\" sandbox=\"allow-scripts\"&gt;&lt;/iframe&gt;</code>. Закрывающий тег обязателен.",
+      "uz": "Barcha atributlar bitta tegda: <code>&lt;iframe src=\"…\" width=\"600\" height=\"400\" title=\"Ofis xaritasi\" loading=\"lazy\" sandbox=\"allow-scripts\"&gt;&lt;/iframe&gt;</code>. Yopuvchi teg majburiy.",
+      "en": "All the attributes in one tag: <code>&lt;iframe src=\"…\" width=\"600\" height=\"400\" title=\"Office map\" loading=\"lazy\" sandbox=\"allow-scripts\"&gt;&lt;/iframe&gt;</code>. The closing tag is required."
+     }
+    }
+   ],
+   "exam": {
+    "time": 540,
+    "questions": [
+     {
+      "q": { "ru": "Ссылку отправили в Telegram, а карточка пустая. Чего не хватает?", "uz": "Havola Telegram ga yuborildi, kartochka esa bo'sh. Nima yetishmaydi?", "en": "A link was shared to Telegram and the card is blank. What is missing?" },
+      "options": [
+       { "ru": "favicon", "uz": "favicon", "en": "A favicon" },
+       { "ru": "Тегов og:title, og:description и og:image", "uz": "og:title, og:description va og:image teglari", "en": "The og:title, og:description and og:image tags" },
+       { "ru": "Атрибута lang", "uz": "lang atributi", "en": "The lang attribute" },
+       { "ru": "Тега main", "uz": "main tegi", "en": "The main tag" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Страница на телефоне выглядит как уменьшенный десктоп. Причина?", "uz": "Sahifa telefonda kichraytirilgan desktopdek ko'rinadi. Sababi?", "en": "The page on a phone looks like a shrunken desktop. The reason?" },
+      "options": [
+       { "ru": "Нет CSS", "uz": "CSS yo'q", "en": "There is no CSS" },
+       { "ru": "Нет meta viewport", "uz": "meta viewport yo'q", "en": "There is no meta viewport" },
+       { "ru": "Нет charset", "uz": "charset yo'q", "en": "There is no charset" },
+       { "ru": "Картинки слишком большие", "uz": "Rasmlar juda katta", "en": "The images are too large" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Текст на странице прыгает, пока грузятся картинки. Что добавить?", "uz": "Rasmlar yuklanayotganda sahifadagi matn sakraydi. Nima qo'shish kerak?", "en": "Text jumps around while images load. What do you add?" },
+      "options": [
+       { "ru": "loading=\"lazy\"", "uz": "loading=\"lazy\"", "en": "loading=\"lazy\"" },
+       { "ru": "width и height каждой картинке", "uz": "Har rasmga width va height", "en": "width and height on every image" },
+       { "ru": "alt каждой картинке", "uz": "Har rasmga alt", "en": "alt on every image" },
+       { "ru": "Тег picture", "uz": "picture tegi", "en": "A picture tag" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Зачем внутри <code>&lt;video&gt;</code> писать текст со ссылкой?", "uz": "<code>&lt;video&gt;</code> ichiga nega havolali matn yoziladi?", "en": "Why put text with a link inside <code>&lt;video&gt;</code>?" },
+      "options": [
+       { "ru": "Это подпись под плеером", "uz": "Bu pleer ostidagi imzo", "en": "It is a caption under the player" },
+       { "ru": "Это запасной вариант для браузеров, которые не умеют video", "uz": "Bu videoni bilmaydigan brauzerlar uchun zaxira variant", "en": "It is the fallback for browsers that cannot play video" },
+       { "ru": "Для поисковика", "uz": "Qidiruv tizimi uchun", "en": "For search engines" },
+       { "ru": "Это субтитры", "uz": "Bu subtitrlar", "en": "They are the subtitles" }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "html",
+      "title": { "ru": "Карточка статьи целиком", "uz": "Maqola kartochkasi to'liq", "en": "A complete article card" },
+      "desc": {
+       "ru": "<p>Собери семантическую карточку статьи <code>&lt;article&gt;</code>, внутри которой:</p><ol><li><code>&lt;h2&gt;</code> с заголовком;</li><li><code>&lt;figure&gt;</code> с картинкой <code>cover.jpg</code>: осмысленный <code>alt</code>, <code>width=\"800\"</code>, <code>height=\"450\"</code>, <code>loading=\"lazy\"</code> — и <code>&lt;figcaption&gt;</code>;</li><li><code>&lt;p&gt;</code> с текстом;</li><li><code>&lt;a&gt;</code> со ссылкой <code>/article/1</code>.</li></ol>",
+       "uz": "<p>Semantik <code>&lt;article&gt;</code> maqola kartochkasini yig'ing, ichida:</p><ol><li>sarlavhali <code>&lt;h2&gt;</code>;</li><li><code>cover.jpg</code> rasmli <code>&lt;figure&gt;</code>: mazmunli <code>alt</code>, <code>width=\"800\"</code>, <code>height=\"450\"</code>, <code>loading=\"lazy\"</code> — va <code>&lt;figcaption&gt;</code>;</li><li>matnli <code>&lt;p&gt;</code>;</li><li><code>/article/1</code> havolali <code>&lt;a&gt;</code>.</li></ol>",
+       "en": "<p>Build a semantic <code>&lt;article&gt;</code> card containing:</p><ol><li>an <code>&lt;h2&gt;</code> with a heading;</li><li>a <code>&lt;figure&gt;</code> with the image <code>cover.jpg</code>: a meaningful <code>alt</code>, <code>width=\"800\"</code>, <code>height=\"450\"</code>, <code>loading=\"lazy\"</code> — and a <code>&lt;figcaption&gt;</code>;</li><li>a <code>&lt;p&gt;</code> with some text;</li><li>an <code>&lt;a&gt;</code> linking to <code>/article/1</code>.</li></ol>"
+      },
+      "starter": "<article>\n\n</article>\n",
+      "tests": "var art = $('article');\nassert(art, 'Нет тега article');\nassert($('article h2') && $('article h2').textContent.trim(), 'Нужен непустой h2');\nvar img = $('article figure img');\nassert(img, 'Картинка должна лежать внутри figure');\nequal(img.getAttribute('src'), 'cover.jpg', 'src картинки');\nassert(img.getAttribute('alt') && img.getAttribute('alt').length > 3, 'Осмысленный alt');\nequal(img.getAttribute('width'), '800', 'width');\nequal(img.getAttribute('height'), '450', 'height');\nequal(img.getAttribute('loading'), 'lazy', 'loading');\nassert($('article figure figcaption'), 'Нужен figcaption');\nassert($('article p') && $('article p').textContent.trim(), 'Нужен непустой абзац');\nvar a = $('article a');\nassert(a, 'Нужна ссылка');\nequal(a.getAttribute('href'), '/article/1', 'Адрес ссылки');",
+      "hint": {
+       "ru": "Структура сверху вниз: <code>h2</code>, потом <code>figure</code> с <code>img</code> и <code>figcaption</code>, потом <code>p</code>, в конце <code>a</code>. Все атрибуты картинки — в одном теге.",
+       "uz": "Yuqoridan pastga tuzilma: <code>h2</code>, keyin <code>img</code> va <code>figcaption</code> li <code>figure</code>, so'ng <code>p</code>, oxirida <code>a</code>. Rasmning barcha atributlari bitta tegda.",
+       "en": "Top to bottom: <code>h2</code>, then a <code>figure</code> with <code>img</code> and <code>figcaption</code>, then <code>p</code>, and <code>a</code> at the end. All the image attributes go in one tag."
+      }
+     }
+    ]
+   }
   }
  ]
 }

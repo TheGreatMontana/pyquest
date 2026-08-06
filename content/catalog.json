@@ -839,14 +839,14 @@
    "color": "#f97316",
    "level": "beginner",
    "status": "full",
-   "estimatedHours": 22,
+   "estimatedHours": 28,
    "requires": [],
    "grants": [
     "html-semantics",
     "html-forms"
    ],
    "legacyIds": [],
-   "moduleCount": 2,
+   "moduleCount": 3,
    "runner": "html"
   },
   {
@@ -865,7 +865,7 @@
    "color": "#2563eb",
    "level": "beginner",
    "status": "full",
-   "estimatedHours": 24,
+   "estimatedHours": 30,
    "requires": [
     "html-semantics"
    ],
@@ -874,7 +874,7 @@
     "css-responsive"
    ],
    "legacyIds": [],
-   "moduleCount": 2,
+   "moduleCount": 3,
    "runner": "css"
   },
   {
@@ -893,7 +893,7 @@
    "color": "#06b6d4",
    "level": "beginner",
    "status": "full",
-   "estimatedHours": 18,
+   "estimatedHours": 24,
    "requires": [
     "css-layout"
    ],
@@ -901,7 +901,7 @@
     "css-frameworks"
    ],
    "legacyIds": [],
-   "moduleCount": 2,
+   "moduleCount": 3,
    "runner": "tailwind"
   },
   {

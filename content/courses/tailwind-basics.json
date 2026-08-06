@@ -904,6 +904,352 @@
      }
     ]
    }
+  },
+  {
+   "id": "tw-03",
+   "title": { "ru": "Типографика, формы и настройка", "uz": "Tipografika, shakllar va sozlash", "en": "Typography, forms and configuration" },
+   "tagline": { "ru": "Читаемый текст, аккуратные поля ввода и свои цвета вместо чужих", "uz": "O'qiladigan matn, ozoda kiritish maydonlari va begona ranglar o'rniga o'zingizniki", "en": "Readable text, tidy inputs and your own colours instead of someone else's" },
+   "lessons": [
+    {
+     "id": "l1",
+     "title": { "ru": "Текст: размер, вес, интервалы", "uz": "Matn: o'lcham, vazn, oraliqlar", "en": "Text: size, weight, spacing" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>У Tailwind своя шкала для текста, и она подобрана так, чтобы соседние размеры заметно отличались:</p><ul><li><code>text-xs</code> 12px · <code>text-sm</code> 14px · <code>text-base</code> 16px · <code>text-lg</code> 18px · <code>text-xl</code> 20px · <code>text-2xl</code> 24px и дальше</li><li>Вес: <code>font-normal</code> 400, <code>font-medium</code> 500, <code>font-semibold</code> 600, <code>font-bold</code> 700</li><li>Межстрочный: <code>leading-tight</code>, <code>leading-normal</code>, <code>leading-relaxed</code></li><li>Выравнивание: <code>text-left</code>, <code>text-center</code>, <code>text-right</code></li></ul><p>Два класса стоит запомнить отдельно.</p><p><b><code>max-w-prose</code></b> ограничивает строку примерно 65 символами. Это не прихоть дизайнера: глазу трудно найти начало следующей строки, если она слишком длинная. Текст во всю ширину монитора читать физически неудобно.</p><p><b><code>truncate</code></b> обрезает длинную строку многоточием — то, что нужно в карточках и таблицах, где место фиксировано.</p>",
+        "uz": "<p>Tailwind da matn uchun o'z shkalasi bor va u qo'shni o'lchamlar sezilarli farq qiladigan qilib tanlangan:</p><ul><li><code>text-xs</code> 12px · <code>text-sm</code> 14px · <code>text-base</code> 16px · <code>text-lg</code> 18px · <code>text-xl</code> 20px · <code>text-2xl</code> 24px va boshqalar</li><li>Vazn: <code>font-normal</code> 400, <code>font-medium</code> 500, <code>font-semibold</code> 600, <code>font-bold</code> 700</li><li>Qatorlararo: <code>leading-tight</code>, <code>leading-normal</code>, <code>leading-relaxed</code></li><li>Tekislash: <code>text-left</code>, <code>text-center</code>, <code>text-right</code></li></ul><p>Ikki sinfni alohida eslab qolish kerak.</p><p><b><code>max-w-prose</code></b> qatorni taxminan 65 belgi bilan cheklaydi. Bu dizayner injiqligi emas: qator juda uzun bo'lsa, ko'zga keyingi qator boshini topish qiyin. Monitor kengligidagi matnni o'qish jismonan noqulay.</p><p><b><code>truncate</code></b> uzun qatorni ko'p nuqta bilan qirqadi — joyi qat'iy kartochka va jadvallarda kerak bo'ladigan narsa.</p>",
+        "en": "<p>Tailwind has its own text scale, chosen so that neighbouring sizes differ noticeably:</p><ul><li><code>text-xs</code> 12px · <code>text-sm</code> 14px · <code>text-base</code> 16px · <code>text-lg</code> 18px · <code>text-xl</code> 20px · <code>text-2xl</code> 24px and onwards</li><li>Weight: <code>font-normal</code> 400, <code>font-medium</code> 500, <code>font-semibold</code> 600, <code>font-bold</code> 700</li><li>Line height: <code>leading-tight</code>, <code>leading-normal</code>, <code>leading-relaxed</code></li><li>Alignment: <code>text-left</code>, <code>text-center</code>, <code>text-right</code></li></ul><p>Two classes deserve special mention.</p><p><b><code>max-w-prose</code></b> caps a line at roughly 65 characters. That is not a designer's whim: the eye struggles to find the start of the next line when it is too long. Text spanning a whole monitor is physically uncomfortable to read.</p><p><b><code>truncate</code></b> cuts a long line with an ellipsis — exactly what cards and tables with fixed space need.</p>"
+       }
+      },
+      {
+       "type": "webrun",
+       "kind": "tailwind",
+       "code": "<div class=\"p-6 bg-slate-100 space-y-6\">\n\n  <div class=\"bg-white p-5 rounded-xl\">\n    <h1 class=\"text-2xl font-bold text-slate-900\">Заголовок 24px, вес 700</h1>\n    <h2 class=\"text-lg font-semibold text-slate-800 mt-2\">Подзаголовок 18px, вес 600</h2>\n    <p class=\"text-base text-slate-600 mt-2\">Основной текст 16px — размер по умолчанию.</p>\n    <p class=\"text-sm text-slate-500 mt-1\">Вспомогательный 14px: подписи, даты, сноски.</p>\n  </div>\n\n  <div class=\"bg-white p-5 rounded-xl\">\n    <p class=\"text-slate-700 mb-3\">Без ограничения ширины строка тянется на весь экран, и глаз теряет начало следующей. Прочитай этот абзац и следующий — разница чувствуется сразу, даже на одном и том же тексте одинакового размера.</p>\n    <p class=\"text-slate-700 max-w-prose leading-relaxed\">С max-w-prose строка обрывается примерно на 65 символах. Прочитай этот абзац и предыдущий — разница чувствуется сразу, даже на одном и том же тексте одинакового размера.</p>\n  </div>\n\n  <div class=\"bg-white p-5 rounded-xl w-64\">\n    <p class=\"font-semibold\">truncate в узкой карточке:</p>\n    <p class=\"truncate text-slate-600\">Очень длинное название курса, которое точно не поместится в эту карточку целиком</p>\n    <p class=\"text-xs text-slate-400 mt-2\">Без truncate текст сломал бы вёрстку</p>\n  </div>\n\n</div>"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Обрати внимание на <code>space-y-6</code> у внешнего блока: он ставит вертикальный отступ <b>между</b> детьми, но не перед первым и не после последнего. Это удобнее, чем вешать <code>mb-6</code> каждому ребёнку и потом убирать у последнего.</p><p>Есть и горизонтальный вариант — <code>space-x-4</code>. Работает так же: отступы только между соседями.</p>",
+        "uz": "<p>Tashqi blokdagi <code>space-y-6</code> ga e'tibor bering: u bolalar <b>orasiga</b> vertikal chekinish qo'yadi, lekin birinchisidan oldin va oxirgisidan keyin qo'ymaydi. Bu har bolaga <code>mb-6</code> osib, keyin oxirgisidan olib tashlashdan qulayroq.</p><p>Gorizontal varianti ham bor — <code>space-x-4</code>. Xuddi shunday ishlaydi: chekinishlar faqat qo'shnilar orasida.</p>",
+        "en": "<p>Note <code>space-y-6</code> on the outer block: it adds vertical spacing <b>between</b> children but not before the first or after the last. That is handier than putting <code>mb-6</code> on every child and then removing it from the last one.</p><p>There is a horizontal variant too — <code>space-x-4</code>. It works the same way: gaps only between neighbours.</p>"
+       }
+      },
+      {
+       "type": "checkpoint",
+       "q": { "ru": "Зачем ограничивать ширину текста через <code>max-w-prose</code>?", "uz": "Matn kengligini <code>max-w-prose</code> bilan nega cheklash kerak?", "en": "Why cap the text width with <code>max-w-prose</code>?" },
+       "options": [
+        { "ru": "Чтобы страница грузилась быстрее", "uz": "Sahifa tezroq yuklanishi uchun", "en": "So the page loads faster" },
+        { "ru": "Длинную строку тяжело читать: глаз теряет начало следующей", "uz": "Uzun qatorni o'qish og'ir: ko'z keyingisining boshini yo'qotadi", "en": "A long line is hard to read: the eye loses the start of the next one" },
+        { "ru": "Так требует Tailwind", "uz": "Tailwind shuni talab qiladi", "en": "Tailwind requires it" },
+        { "ru": "Чтобы работал truncate", "uz": "truncate ishlashi uchun", "en": "So truncate works" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Комфортная длина строки — 50–75 символов, это выяснили типографы задолго до вебa. <code>max-w-prose</code> просто ставит эту ширину одним классом.",
+        "uz": "Qulay qator uzunligi — 50–75 belgi, buni tipograflar vebdan ancha oldin aniqlashgan. <code>max-w-prose</code> shu kenglikni bitta sinf bilan qo'yadi.",
+        "en": "A comfortable line is 50–75 characters — typographers established that long before the web. <code>max-w-prose</code> simply sets that width with one class."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l2",
+     "title": { "ru": "Формы: поля, которыми удобно пользоваться", "uz": "Shakllar: foydalanish qulay maydonlar", "en": "Forms: inputs people can actually use" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Поля ввода в Tailwind собираются из тех же кирпичиков, но у них есть свои состояния:</p><ul><li><code>border</code> и <code>border-slate-300</code> — рамка</li><li><code>rounded-lg</code>, <code>px-3 py-2</code> — форма и внутренние отступы</li><li><code>focus:outline-none focus:ring-2 focus:ring-blue-500</code> — как поле выглядит в фокусе</li><li><code>placeholder:text-slate-400</code> — цвет подсказки внутри</li><li><code>disabled:bg-slate-100 disabled:cursor-not-allowed</code> — вид выключенного поля</li><li><code>w-full</code> — на всю ширину контейнера</li></ul><p>И самое главное, что часто забывают: у каждого поля должен быть <code>&lt;label&gt;</code> с <code>for</code>, совпадающим с <code>id</code> поля. Тогда клик по подписи ставит курсор в поле, а скринридер называет поле по имени. Плейсхолдер подписью <b>не является</b>: он исчезает, как только начинаешь печатать.</p>",
+        "uz": "<p>Tailwind dagi kiritish maydonlari o'sha g'ishtchalardan yig'iladi, lekin ularning o'z holatlari bor:</p><ul><li><code>border</code> va <code>border-slate-300</code> — ramka</li><li><code>rounded-lg</code>, <code>px-3 py-2</code> — shakl va ichki chekinishlar</li><li><code>focus:outline-none focus:ring-2 focus:ring-blue-500</code> — maydon fokusda qanday ko'rinishi</li><li><code>placeholder:text-slate-400</code> — ichidagi maslahat rangi</li><li><code>disabled:bg-slate-100 disabled:cursor-not-allowed</code> — o'chirilgan maydon ko'rinishi</li><li><code>w-full</code> — konteynerning butun kengligiga</li></ul><p>Va eng muhimi, ko'pincha unutiladi: har maydonda maydon <code>id</code> siga mos <code>for</code> li <code>&lt;label&gt;</code> bo'lishi kerak. Shunda imzoga bosish kursorni maydonga qo'yadi, skrinrider esa maydonni nomi bilan ataydi. Pleysxolder imzo <b>emas</b>: yoza boshlashingiz bilan u yo'qoladi.</p>",
+        "en": "<p>Inputs in Tailwind are assembled from the same bricks, but they have their own states:</p><ul><li><code>border</code> and <code>border-slate-300</code> — the frame</li><li><code>rounded-lg</code>, <code>px-3 py-2</code> — shape and inner padding</li><li><code>focus:outline-none focus:ring-2 focus:ring-blue-500</code> — how the field looks when focused</li><li><code>placeholder:text-slate-400</code> — the colour of the hint inside</li><li><code>disabled:bg-slate-100 disabled:cursor-not-allowed</code> — the look of a disabled field</li><li><code>w-full</code> — full width of the container</li></ul><p>And the thing most often forgotten: every field needs a <code>&lt;label&gt;</code> whose <code>for</code> matches the field's <code>id</code>. Then clicking the label focuses the field and a screen reader announces the field by name. A placeholder is <b>not</b> a label: it disappears the moment you start typing.</p>"
+       }
+      },
+      {
+       "type": "webrun",
+       "kind": "tailwind",
+       "code": "<div class=\"p-6 bg-slate-100\">\n  <form class=\"max-w-sm mx-auto bg-white p-6 rounded-xl space-y-4\">\n\n    <h2 class=\"text-xl font-bold text-slate-900\">Записаться на курс</h2>\n\n    <div>\n      <label for=\"name\" class=\"block text-sm font-medium text-slate-700 mb-1\">Имя</label>\n      <input id=\"name\" type=\"text\" placeholder=\"Азиз\"\n             class=\"w-full border border-slate-300 rounded-lg px-3 py-2\n                    placeholder:text-slate-400\n                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500\">\n    </div>\n\n    <div>\n      <label for=\"mail\" class=\"block text-sm font-medium text-slate-700 mb-1\">Почта</label>\n      <input id=\"mail\" type=\"email\" placeholder=\"you@example.com\"\n             class=\"w-full border border-slate-300 rounded-lg px-3 py-2\n                    placeholder:text-slate-400\n                    focus:outline-none focus:ring-2 focus:ring-blue-500\">\n      <p class=\"text-xs text-slate-500 mt-1\">Пришлём только расписание, без рекламы.</p>\n    </div>\n\n    <div>\n      <label for=\"level\" class=\"block text-sm font-medium text-slate-700 mb-1\">Уровень</label>\n      <select id=\"level\" class=\"w-full border border-slate-300 rounded-lg px-3 py-2 bg-white\n                                focus:outline-none focus:ring-2 focus:ring-blue-500\">\n        <option>Новичок</option>\n        <option>Уже писал код</option>\n      </select>\n    </div>\n\n    <div>\n      <label for=\"paid\" class=\"block text-sm font-medium text-slate-400 mb-1\">Промокод (пока недоступен)</label>\n      <input id=\"paid\" type=\"text\" disabled placeholder=\"скоро\"\n             class=\"w-full border border-slate-300 rounded-lg px-3 py-2\n                    disabled:bg-slate-100 disabled:cursor-not-allowed disabled:text-slate-400\">\n    </div>\n\n    <button type=\"submit\"\n            class=\"w-full bg-blue-600 text-white font-medium px-4 py-2 rounded-lg\n                   transition hover:bg-blue-700\n                   focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400\">\n      Записаться\n    </button>\n\n  </form>\n</div>"
+      },
+      {
+       "type": "note",
+       "kind": "trap",
+       "html": {
+        "ru": "<code>focus:outline-none</code> без замены — прямой путь к недоступному сайту. Убрав системную обводку, ты обязан дать своё видимое состояние фокуса: <code>focus:ring-2</code>. Иначе человек, идущий по форме клавишей Tab, просто перестаёт понимать, где находится. Проверить легко: нажми Tab на своей форме и посмотри, видно ли текущее поле.",
+        "uz": "Almashtirmasdan <code>focus:outline-none</code> — mavjud bo'lmagan saytga to'g'ridan-to'g'ri yo'l. Tizim chegarasini olib tashlab, o'z ko'rinadigan fokus holatingizni berishingiz shart: <code>focus:ring-2</code>. Aks holda shakl bo'ylab Tab tugmasi bilan yurgan odam qayerdaligini tushunmay qoladi. Tekshirish oson: shaklingizda Tab ni bosing va joriy maydon ko'rinadimi qarang.",
+        "en": "<code>focus:outline-none</code> with nothing in its place is a direct route to an inaccessible site. Having removed the system outline you must provide your own visible focus state: <code>focus:ring-2</code>. Otherwise a person tabbing through the form simply loses track of where they are. Easy to test: press Tab on your own form and see whether the current field is visible."
+       }
+      },
+      {
+       "type": "checkpoint",
+       "q": { "ru": "Можно ли заменить <code>&lt;label&gt;</code> плейсхолдером?", "uz": "<code>&lt;label&gt;</code> ni pleysxolder bilan almashtirish mumkinmi?", "en": "Can a placeholder replace a <code>&lt;label&gt;</code>?" },
+       "options": [
+        { "ru": "Да, это то же самое и короче", "uz": "Ha, bu bir xil va qisqaroq", "en": "Yes, it is the same thing and shorter" },
+        { "ru": "Нет: плейсхолдер исчезает при вводе, и человек забывает, что за поле", "uz": "Yo'q: pleysxolder yozganda yo'qoladi va odam bu qanday maydon ekanini unutadi", "en": "No: the placeholder vanishes as you type and people forget which field it was" },
+        { "ru": "Да, если поле обязательное", "uz": "Ha, maydon majburiy bo'lsa", "en": "Yes, if the field is required" },
+        { "ru": "Только в мобильной версии", "uz": "Faqat mobil versiyada", "en": "Only in the mobile version" }
+       ],
+       "a": 1,
+       "explain": {
+        "ru": "Плюс скринридер часто не читает плейсхолдер вовсе. Подпись должна оставаться на экране всё время — это <code>&lt;label&gt;</code>.",
+        "uz": "Qo'shimchasiga skrinrider pleysxolderni ko'pincha umuman o'qimaydi. Imzo ekranda doim qolishi kerak — bu <code>&lt;label&gt;</code>.",
+        "en": "On top of that, screen readers often do not read placeholders at all. The label must stay on screen the whole time — that is <code>&lt;label&gt;</code>."
+       }
+      }
+     ]
+    },
+    {
+     "id": "l3",
+     "title": { "ru": "Свои цвета и границы подхода", "uz": "O'z ranglaringiz va yondashuv chegaralari", "en": "Your own colours and the limits of the approach" },
+     "blocks": [
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Палитра Tailwind хороша, но у любого проекта есть свой фирменный цвет. Настраивают его в конфигурации:</p><pre class=\"code\">// tailwind.config.js\nmodule.exports = {\n  theme: {\n    extend: {                       // extend, а не theme напрямую!\n      colors: {\n        brand: {\n          500: '#7c3aed',\n          600: '#6d28d9',\n        },\n      },\n      fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },\n    },\n  },\n};</pre><p>После этого работают <code>bg-brand-500</code>, <code>text-brand-600</code>, <code>ring-brand-500</code> — как родные.</p><p>Слово <code>extend</code> здесь ключевое: оно <b>добавляет</b> к стандартной палитре. Если написать <code>colors</code> прямо в <code>theme</code>, все встроенные цвета исчезнут, и <code>bg-blue-600</code> перестанет работать по всему проекту.</p><p>Для разовых значений есть произвольные: <code>bg-[#1a2b3c]</code>, <code>w-[347px]</code>, <code>top-[13px]</code>. Удобно, но если такое повторяется — пора в конфигурацию.</p>",
+        "uz": "<p>Tailwind palitrasi yaxshi, lekin har loyihaning o'z firma rangi bor. U konfiguratsiyada sozlanadi:</p><pre class=\"code\">// tailwind.config.js\nmodule.exports = {\n  theme: {\n    extend: {                       // to'g'ridan-to'g'ri theme emas, extend!\n      colors: {\n        brand: {\n          500: '#7c3aed',\n          600: '#6d28d9',\n        },\n      },\n      fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },\n    },\n  },\n};</pre><p>Shundan keyin <code>bg-brand-500</code>, <code>text-brand-600</code>, <code>ring-brand-500</code> o'ziniki kabi ishlaydi.</p><p>Bu yerdagi <code>extend</code> so'zi kalit: u standart palitraga <b>qo'shadi</b>. <code>colors</code> ni to'g'ridan-to'g'ri <code>theme</code> ga yozsangiz, barcha o'rnatilgan ranglar yo'qoladi va <code>bg-blue-600</code> butun loyihada ishlamay qoladi.</p><p>Bir martalik qiymatlar uchun ixtiyoriylari bor: <code>bg-[#1a2b3c]</code>, <code>w-[347px]</code>, <code>top-[13px]</code>. Qulay, lekin bunday narsa takrorlansa — konfiguratsiyaga vaqt keldi.</p>",
+        "en": "<p>Tailwind's palette is good, but every project has its own brand colour. You configure it like this:</p><pre class=\"code\">// tailwind.config.js\nmodule.exports = {\n  theme: {\n    extend: {                       // extend, not theme directly!\n      colors: {\n        brand: {\n          500: '#7c3aed',\n          600: '#6d28d9',\n        },\n      },\n      fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },\n    },\n  },\n};</pre><p>After that <code>bg-brand-500</code>, <code>text-brand-600</code> and <code>ring-brand-500</code> work like built-ins.</p><p>The word <code>extend</code> is the key one: it <b>adds to</b> the standard palette. Write <code>colors</code> directly inside <code>theme</code> and every built-in colour disappears — <code>bg-blue-600</code> stops working across the whole project.</p><p>For one-off values there are arbitrary ones: <code>bg-[#1a2b3c]</code>, <code>w-[347px]</code>, <code>top-[13px]</code>. Handy, but once they repeat, it is time for the config.</p>"
+       }
+      },
+      {
+       "type": "webrun",
+       "kind": "tailwind",
+       "code": "<div class=\"p-6 bg-slate-100 space-y-4\">\n\n  <div class=\"bg-white p-5 rounded-xl\">\n    <h3 class=\"font-bold mb-3\">Произвольные значения без конфигурации</h3>\n    <div class=\"flex gap-3 items-center flex-wrap\">\n      <span class=\"bg-[#7c3aed] text-white px-3 py-1 rounded-lg text-sm\">bg-[#7c3aed]</span>\n      <span class=\"bg-blue-600 text-white px-3 py-1 rounded-lg text-sm\">bg-blue-600</span>\n      <span class=\"border-2 border-[#7c3aed] text-[#7c3aed] px-3 py-1 rounded-lg text-sm\">своя рамка</span>\n    </div>\n    <p class=\"text-sm text-slate-500 mt-3\">Работает сразу, но повторять по всему проекту — плохая идея: поменять цвет потом придётся в сорока местах.</p>\n  </div>\n\n  <div class=\"bg-white p-5 rounded-xl\">\n    <h3 class=\"font-bold mb-3\">Где утилиты неудобны — там обычный CSS</h3>\n    <div class=\"h-24 rounded-xl\" style=\"background: linear-gradient(120deg, #7c3aed, #2563eb 60%, #0ea5e9)\"></div>\n    <p class=\"text-sm text-slate-500 mt-3\">Сложный градиент проще написать в CSS, чем собирать из классов. Tailwind этому не мешает — это не религия, а инструмент.</p>\n  </div>\n\n  <div class=\"bg-white p-5 rounded-xl\">\n    <h3 class=\"font-bold mb-3\">Порядок классов не влияет ни на что</h3>\n    <div class=\"flex gap-3\">\n      <div class=\"p-3 bg-emerald-100 rounded-lg text-sm\">p-3 bg-emerald-100 rounded-lg</div>\n      <div class=\"rounded-lg bg-emerald-100 p-3 text-sm\">rounded-lg bg-emerald-100 p-3</div>\n    </div>\n    <p class=\"text-sm text-slate-500 mt-3\">Обе карточки выглядят одинаково: у всех утилит одна специфичность, побеждает не порядок в атрибуте, а порядок в самом CSS.</p>\n  </div>\n\n</div>"
+      },
+      {
+       "type": "text",
+       "html": {
+        "ru": "<p>Последний блок — важный ответ на частый вопрос «в каком порядке писать классы». Ни в каком: результат одинаковый. Порядок нужен только людям, поэтому команды договариваются о нём и ставят автоформатирование, а не спорят.</p><p>И честно о границах. Tailwind плохо подходит там, где стилей мало и они простые — статичная страница на три экрана обойдётся обычным CSS. Он же почти незаменим там, где интерфейса много и его собирает несколько человек: единая шкала не даёт развести двадцать оттенков серого и пятнадцать размеров отступа.</p>",
+        "uz": "<p>Oxirgi blok — «sinflarni qanday tartibda yozish» degan tez-tez beriladigan savolga muhim javob. Hech qanday tartibda: natija bir xil. Tartib faqat odamlarga kerak, shuning uchun jamoalar u haqda kelishib, avtoformatlash qo'yadi, bahslashmaydi.</p><p>Va chegaralar haqida halol. Tailwind uslublar kam va sodda bo'lgan joyda yomon mos keladi — uch ekranli statik sahifa oddiy CSS bilan chiqadi. U interfeys ko'p va uni bir necha odam yig'adigan joyda esa deyarli o'rnini bosib bo'lmaydi: yagona shkala yigirmata kulrang tus va o'n beshta chekinish o'lchamini yoyib yuborishga yo'l qo'ymaydi.</p>",
+        "en": "<p>The last block is the important answer to a frequent question: “in what order should I write classes?” In none: the result is identical. The order matters only to humans, so teams agree on one and install a formatter rather than arguing.</p><p>And honestly about the limits. Tailwind fits poorly where there are few, simple styles — a static three-screen page is fine with plain CSS. It is nearly irreplaceable where there is a lot of interface built by several people: a single scale stops twenty shades of grey and fifteen padding sizes from breeding.</p>"
+       }
+      },
+      {
+       "type": "summary",
+       "items": [
+        { "ru": "Шкала текста: text-sm 14px, text-base 16px, text-lg 18px, text-xl 20px", "uz": "Matn shkalasi: text-sm 14px, text-base 16px, text-lg 18px, text-xl 20px", "en": "The text scale: text-sm 14px, text-base 16px, text-lg 18px, text-xl 20px" },
+        { "ru": "max-w-prose ограничивает строку ради читаемости", "uz": "max-w-prose o'qilishi uchun qatorni cheklaydi", "en": "max-w-prose caps the line for readability" },
+        { "ru": "space-y-* ставит отступы только между соседями", "uz": "space-y-* chekinishlarni faqat qo'shnilar orasiga qo'yadi", "en": "space-y-* adds gaps only between neighbours" },
+        { "ru": "У каждого поля свой label с for — плейсхолдер его не заменит", "uz": "Har maydonda for li o'z label i — pleysxolder uni almashtirmaydi", "en": "Every field needs its own label with for — a placeholder is no substitute" },
+        { "ru": "Убрал outline — обязан дать focus:ring, иначе Tab становится вслепую", "uz": "outline ni olib tashladingiz — focus:ring berishingiz shart, aks holda Tab ko'r bo'ladi", "en": "Removed the outline? You must add focus:ring, or tabbing goes blind" },
+        { "ru": "Свои цвета добавляют в theme.extend, иначе встроенные исчезнут", "uz": "O'z ranglaringizni theme.extend ga qo'shing, aks holda o'rnatilganlari yo'qoladi", "en": "Add your colours under theme.extend, or the built-in ones vanish" },
+        { "ru": "Произвольные значения bg-[#…] — для разового, не для всего проекта", "uz": "Ixtiyoriy qiymatlar bg-[#…] — bir martalik uchun, butun loyiha uchun emas", "en": "Arbitrary values like bg-[#…] are for one-offs, not for a whole project" },
+        { "ru": "Порядок классов в атрибуте не влияет ни на что", "uz": "Atributdagi sinflar tartibi hech nimaga ta'sir qilmaydi", "en": "The order of classes in the attribute affects nothing" }
+       ]
+      }
+     ]
+    }
+   ],
+   "quiz": [
+    {
+     "q": { "ru": "Сколько пикселей у <code>text-lg</code>?", "uz": "<code>text-lg</code> necha piksel?", "en": "How many pixels is <code>text-lg</code>?" },
+     "options": [
+      { "ru": "14px", "uz": "14px", "en": "14px" },
+      { "ru": "18px", "uz": "18px", "en": "18px" },
+      { "ru": "24px", "uz": "24px", "en": "24px" },
+      { "ru": "32px", "uz": "32px", "en": "32px" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Шкала идёт так: <code>sm</code> 14, <code>base</code> 16, <code>lg</code> 18, <code>xl</code> 20, <code>2xl</code> 24.",
+      "uz": "Shkala shunday ketadi: <code>sm</code> 14, <code>base</code> 16, <code>lg</code> 18, <code>xl</code> 20, <code>2xl</code> 24.",
+      "en": "The scale runs: <code>sm</code> 14, <code>base</code> 16, <code>lg</code> 18, <code>xl</code> 20, <code>2xl</code> 24."
+     }
+    },
+    {
+     "q": { "ru": "Что делает <code>space-y-4</code> у контейнера?", "uz": "Konteynerdagi <code>space-y-4</code> nima qiladi?", "en": "What does <code>space-y-4</code> do on a container?" },
+     "options": [
+      { "ru": "Добавляет отступ снаружи контейнера", "uz": "Konteyner tashqarisiga chekinish qo'shadi", "en": "Adds space outside the container" },
+      { "ru": "Ставит вертикальный отступ между детьми, но не по краям", "uz": "Bolalar orasiga vertikal chekinish qo'yadi, chetlariga emas", "en": "Adds vertical space between children but not at the edges" },
+      { "ru": "Делает контейнер сеткой", "uz": "Konteynerni to'r qiladi", "en": "Turns the container into a grid" },
+      { "ru": "Увеличивает межстрочный интервал", "uz": "Qatorlararo oraliqni oshiradi", "en": "Increases the line height" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Удобно тем, что не надо убирать лишний отступ у последнего элемента — его там просто нет.",
+      "uz": "Qulayligi shundaki, oxirgi elementdan ortiqcha chekinishni olib tashlash shart emas — u yerda u shunchaki yo'q.",
+      "en": "Handy because you never have to strip the extra gap from the last element — there simply is none."
+     }
+    },
+    {
+     "q": { "ru": "Можно ли обойтись плейсхолдером вместо label?", "uz": "label o'rniga pleysxolder bilan cheklanish mumkinmi?", "en": "Can a placeholder stand in for a label?" },
+     "options": [
+      { "ru": "Да, это современнее", "uz": "Ha, bu zamonaviyroq", "en": "Yes, it is more modern" },
+      { "ru": "Нет: он исчезает при вводе и часто не читается скринридером", "uz": "Yo'q: u yozganda yo'qoladi va ko'pincha skrinrider o'qimaydi", "en": "No: it vanishes as you type and is often skipped by screen readers" },
+      { "ru": "Да, если поле одно", "uz": "Ha, maydon bitta bo'lsa", "en": "Yes, if there is only one field" },
+      { "ru": "Только для пароля", "uz": "Faqat parol uchun", "en": "Only for passwords" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Человек заполнил половину формы, отвлёкся — и уже не помнит, что в третьем поле. Подпись должна оставаться видимой.",
+      "uz": "Odam shaklning yarmini to'ldirdi, chalg'idi — va uchinchi maydonda nima borligini eslay olmaydi. Imzo ko'rinib turishi kerak.",
+      "en": "Someone fills half the form, gets distracted — and no longer remembers what the third field was. The label must stay visible."
+     }
+    },
+    {
+     "q": { "ru": "Написали <code>focus:outline-none</code> и больше ничего. Что сломали?", "uz": "<code>focus:outline-none</code> yozildi va boshqa hech nima. Nima buzildi?", "en": "You wrote <code>focus:outline-none</code> and nothing else. What did you break?" },
+     "options": [
+      { "ru": "Ничего", "uz": "Hech nima", "en": "Nothing" },
+      { "ru": "Навигацию с клавиатуры: не видно, какое поле сейчас активно", "uz": "Klaviatura bilan harakatni: qaysi maydon faolligi ko'rinmaydi", "en": "Keyboard navigation: you cannot see which field is active" },
+      { "ru": "Мобильную версию", "uz": "Mobil versiyani", "en": "The mobile version" },
+      { "ru": "Отправку формы", "uz": "Shaklni yuborishni", "en": "Form submission" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "Убирать системную обводку можно только вместе с заменой: <code>focus:ring-2</code> или <code>focus-visible:ring-2</code>.",
+      "uz": "Tizim chegarasini faqat almashtirish bilan birga olib tashlash mumkin: <code>focus:ring-2</code> yoki <code>focus-visible:ring-2</code>.",
+      "en": "You may remove the system outline only together with a replacement: <code>focus:ring-2</code> or <code>focus-visible:ring-2</code>."
+     }
+    },
+    {
+     "q": { "ru": "Свой цвет добавили в <code>theme.colors</code>, а не в <code>theme.extend.colors</code>. Что будет?", "uz": "O'z rangi <code>theme.extend.colors</code> ga emas, <code>theme.colors</code> ga qo'shildi. Nima bo'ladi?", "en": "You added your colour to <code>theme.colors</code> instead of <code>theme.extend.colors</code>. What happens?" },
+     "options": [
+      { "ru": "Ничего, это одно и то же", "uz": "Hech nima, bu bir xil", "en": "Nothing, they are the same" },
+      { "ru": "Встроенная палитра исчезнет, и bg-blue-600 перестанет работать", "uz": "O'rnatilgan palitra yo'qoladi va bg-blue-600 ishlamay qoladi", "en": "The built-in palette disappears and bg-blue-600 stops working" },
+      { "ru": "Проект не соберётся", "uz": "Loyiha yig'ilmaydi", "en": "The project will not build" },
+      { "ru": "Цвета продублируются", "uz": "Ranglar takrorlanadi", "en": "The colours get duplicated" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "<code>theme</code> заменяет секцию целиком, <code>extend</code> дополняет её. Отсюда правило: почти всегда пиши в <code>extend</code>.",
+      "uz": "<code>theme</code> bo'limni butunlay almashtiradi, <code>extend</code> uni to'ldiradi. Shundan qoida: deyarli doim <code>extend</code> ga yozing.",
+      "en": "<code>theme</code> replaces the whole section while <code>extend</code> adds to it. Hence the rule: almost always write into <code>extend</code>."
+     }
+    },
+    {
+     "q": { "ru": "В каком порядке надо писать классы Tailwind?", "uz": "Tailwind sinflarini qanday tartibda yozish kerak?", "en": "In what order must Tailwind classes be written?" },
+     "options": [
+      { "ru": "Сначала цвета, потом размеры", "uz": "Avval ranglar, keyin o'lchamlar", "en": "Colours first, then sizes" },
+      { "ru": "В любом: на результат порядок в атрибуте не влияет", "uz": "Har qanday: atributdagi tartib natijaga ta'sir qilmaydi", "en": "Any order: the attribute order does not affect the result" },
+      { "ru": "По алфавиту, иначе не сработает", "uz": "Alifbo bo'yicha, aks holda ishlamaydi", "en": "Alphabetically, otherwise it fails" },
+      { "ru": "Состояния обязательно первыми", "uz": "Holatlar albatta birinchi", "en": "States must come first" }
+     ],
+     "a": 1,
+     "explain": {
+      "ru": "У всех утилит одинаковая специфичность. Порядок важен только для чтения человеком — поэтому команды ставят автоформатирование и не спорят.",
+      "uz": "Barcha utilitalarning spetsifikligi bir xil. Tartib faqat odam o'qishi uchun muhim — shuning uchun jamoalar avtoformatlash qo'yadi va bahslashmaydi.",
+      "en": "All utilities have the same specificity. The order matters only for human reading — so teams install a formatter and stop arguing."
+     }
+    }
+   ],
+   "tasks": [
+    {
+     "id": "t1",
+     "kind": "tailwind",
+     "title": { "ru": "Читаемый абзац", "uz": "O'qiladigan xatboshi", "en": "A readable paragraph" },
+     "brief": { "ru": "Размер, цвет, ширина строки", "uz": "O'lcham, rang, qator kengligi", "en": "Size, colour, line width" },
+     "desc": {
+      "ru": "<p>Оформи абзац <code>&lt;p&gt;</code>: размер <code>text-lg</code>, цвет <code>text-slate-700</code>, межстрочный <code>leading-relaxed</code> и ограничение ширины <code>max-w-prose</code>.</p>",
+      "uz": "<p><code>&lt;p&gt;</code> xatboshini bezang: o'lcham <code>text-lg</code>, rang <code>text-slate-700</code>, qatorlararo <code>leading-relaxed</code> va kenglik cheklovi <code>max-w-prose</code>.</p>",
+      "en": "<p>Style the <code>&lt;p&gt;</code>: size <code>text-lg</code>, colour <code>text-slate-700</code>, line height <code>leading-relaxed</code> and the width cap <code>max-w-prose</code>.</p>"
+     },
+     "starter": "<p class=\"\">Длинный текст урока, который должен читаться удобно и не тянуться на весь экран монитора.</p>\n",
+     "tests": "var p = $('p');\nassert(p, 'Нет тега <p>');\nequal(style(p, 'font-size'), '18px', 'Размер текста (text-lg)');\nequal(style(p, 'color'), 'rgb(51, 65, 85)', 'Цвет текста (text-slate-700)');\nequal(style(p, 'line-height'), '29.25px', 'Межстрочный интервал (leading-relaxed)');\nassert(p.className.indexOf('max-w-prose') !== -1, 'Нет класса max-w-prose');",
+     "hint": {
+      "ru": "Все четыре класса в одну строку через пробел: <code>text-lg text-slate-700 leading-relaxed max-w-prose</code>.",
+      "uz": "To'rtala sinf ham bir qatorda bo'shliq bilan: <code>text-lg text-slate-700 leading-relaxed max-w-prose</code>.",
+      "en": "All four classes on one line separated by spaces: <code>text-lg text-slate-700 leading-relaxed max-w-prose</code>."
+     }
+    },
+    {
+     "id": "t2",
+     "kind": "tailwind",
+     "title": { "ru": "Поле ввода с фокусом", "uz": "Fokusli kiritish maydoni", "en": "An input with focus" },
+     "brief": { "ru": "Рамка, отступы, кольцо фокуса", "uz": "Ramka, chekinishlar, fokus halqasi", "en": "Border, padding, focus ring" },
+     "desc": {
+      "ru": "<p>Оформи <code>&lt;input&gt;</code>: на всю ширину <code>w-full</code>, рамка <code>border border-slate-300</code>, скругление <code>rounded-lg</code>, отступы <code>px-3 py-2</code>.</p><p>Добавь состояния: <code>focus:outline-none</code> и обязательно замену — <code>focus:ring-2</code>.</p>",
+      "uz": "<p><code>&lt;input&gt;</code> ni bezang: butun kenglikka <code>w-full</code>, ramka <code>border border-slate-300</code>, yumaloqlash <code>rounded-lg</code>, chekinishlar <code>px-3 py-2</code>.</p><p>Holatlar qo'shing: <code>focus:outline-none</code> va albatta almashtirish — <code>focus:ring-2</code>.</p>",
+      "en": "<p>Style the <code>&lt;input&gt;</code>: full width <code>w-full</code>, border <code>border border-slate-300</code>, radius <code>rounded-lg</code>, padding <code>px-3 py-2</code>.</p><p>Add the states: <code>focus:outline-none</code> and, crucially, its replacement — <code>focus:ring-2</code>.</p>"
+     },
+     "starter": "<label for=\"mail\">Почта</label>\n<input id=\"mail\" type=\"email\" class=\"\">\n",
+     "tests": "var i = $('input');\nassert(i, 'Нет тега <input>');\nequal(style(i, 'border-top-width'), '1px', 'Толщина рамки (border)');\nequal(style(i, 'border-top-color'), 'rgb(203, 213, 225)', 'Цвет рамки (border-slate-300)');\nequal(style(i, 'border-top-left-radius'), '8px', 'Скругление (rounded-lg)');\nequal(style(i, 'padding-left'), '12px', 'Отступ по горизонтали (px-3)');\nequal(style(i, 'padding-top'), '8px', 'Отступ по вертикали (py-2)');\nvar cls = i.className;\nassert(cls.indexOf('w-full') !== -1, 'Нет класса w-full');\nassert(cls.indexOf('focus:outline-none') !== -1, 'Нет класса focus:outline-none');\nassert(cls.indexOf('focus:ring-2') !== -1, 'Убрав outline, надо дать focus:ring-2');",
+     "hint": {
+      "ru": "Одна строка классов: <code>w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2</code>. Без последнего класса поле в фокусе станет невидимым для тех, кто идёт по Tab.",
+      "uz": "Bitta sinflar qatori: <code>w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2</code>. Oxirgi sinfsiz fokusdagi maydon Tab bilan yurganlar uchun ko'rinmas bo'ladi.",
+      "en": "One line of classes: <code>w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2</code>. Without the last class the focused field becomes invisible to anyone tabbing through."
+     }
+    },
+    {
+     "id": "t3",
+     "kind": "tailwind",
+     "title": { "ru": "Карточка с обрезкой текста", "uz": "Matni qirqiladigan kartochka", "en": "A card with truncated text" },
+     "brief": { "ru": "truncate и своя ширина", "uz": "truncate va o'z kengligi", "en": "truncate and a custom width" },
+     "desc": {
+      "ru": "<p>Сделай карточку <code>&lt;div&gt;</code>: ширина <code>w-64</code>, белый фон, отступ <code>p-4</code>, скругление <code>rounded-xl</code>.</p><p>Внутреннему <code>&lt;p&gt;</code> добавь <code>truncate</code>, чтобы длинное название не ломало вёрстку.</p>",
+      "uz": "<p><code>&lt;div&gt;</code> kartochkasini yarating: kenglik <code>w-64</code>, oq fon, chekinish <code>p-4</code>, yumaloqlash <code>rounded-xl</code>.</p><p>Ichki <code>&lt;p&gt;</code> ga <code>truncate</code> qo'shing — uzun nom верстка ni buzmasin.</p>",
+      "en": "<p>Build a <code>&lt;div&gt;</code> card: width <code>w-64</code>, white background, padding <code>p-4</code>, radius <code>rounded-xl</code>.</p><p>Give the inner <code>&lt;p&gt;</code> a <code>truncate</code> so a long title does not break the layout.</p>"
+     },
+     "starter": "<div class=\"\">\n  <p class=\"\">Очень длинное название курса, которое точно не поместится целиком</p>\n</div>\n",
+     "tests": "var card = $('div');\nassert(card, 'Нет карточки div');\nequal(style(card, 'width'), '256px', 'Ширина (w-64)');\nequal(style(card, 'background-color'), 'rgb(255, 255, 255)', 'Фон (bg-white)');\nequal(style(card, 'padding-top'), '16px', 'Отступ (p-4)');\nequal(style(card, 'border-top-left-radius'), '12px', 'Скругление (rounded-xl)');\nvar p = $('div p');\nassert(p, 'Нет абзаца внутри карточки');\nequal(style(p, 'overflow'), 'hidden', 'truncate должен скрывать переполнение');\nequal(style(p, 'text-overflow'), 'ellipsis', 'truncate должен ставить многоточие');\nequal(style(p, 'white-space'), 'nowrap', 'truncate должен запрещать перенос');",
+     "hint": {
+      "ru": "Карточке — <code>w-64 bg-white p-4 rounded-xl</code>. Абзацу достаточно одного класса <code>truncate</code>: он сразу задаёт overflow, text-overflow и white-space.",
+      "uz": "Kartochkaga — <code>w-64 bg-white p-4 rounded-xl</code>. Xatboshiga bitta <code>truncate</code> sinfi yetarli: u darhol overflow, text-overflow va white-space ni beradi.",
+      "en": "The card gets <code>w-64 bg-white p-4 rounded-xl</code>. The paragraph needs just one class, <code>truncate</code>: it sets overflow, text-overflow and white-space at once."
+     }
+    }
+   ],
+   "exam": {
+    "time": 600,
+    "questions": [
+     {
+      "q": { "ru": "Текст в карточке вылезает за её границы. Что добавить?", "uz": "Kartochkadagi matn uning chegarasidan chiqmoqda. Nima qo'shish kerak?", "en": "Text overflows the card's edges. What do you add?" },
+      "options": [
+       { "ru": "text-sm", "uz": "text-sm", "en": "text-sm" },
+       { "ru": "truncate", "uz": "truncate", "en": "truncate" },
+       { "ru": "leading-tight", "uz": "leading-tight", "en": "leading-tight" },
+       { "ru": "font-bold", "uz": "font-bold", "en": "font-bold" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Между карточками в колонке нужны одинаковые отступы. Проще всего…", "uz": "Ustundagi kartochkalar orasida bir xil chekinish kerak. Eng osoni…", "en": "You need equal gaps between cards in a column. The simplest way…" },
+      "options": [
+       { "ru": "поставить mb-4 каждой и убрать у последней", "uz": "har biriga mb-4 qo'yib, oxirgisidan olib tashlash", "en": "put mb-4 on each and strip it from the last" },
+       { "ru": "поставить контейнеру space-y-4", "uz": "konteynerga space-y-4 qo'yish", "en": "put space-y-4 on the container" },
+       { "ru": "добавить пустые div-разделители", "uz": "bo'sh div-ajratuvchilar qo'shish", "en": "add empty divider divs" },
+       { "ru": "использовать padding", "uz": "padding ishlatish", "en": "use padding" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Фирменный цвет нужен по всему проекту. Где его прописать?", "uz": "Firma rangi butun loyihada kerak. Uni qayerga yozish kerak?", "en": "A brand colour is needed across the project. Where do you declare it?" },
+      "options": [
+       { "ru": "Писать bg-[#7c3aed] в каждом месте", "uz": "Har joyda bg-[#7c3aed] yozish", "en": "Write bg-[#7c3aed] everywhere" },
+       { "ru": "В tailwind.config.js, в theme.extend.colors", "uz": "tailwind.config.js da, theme.extend.colors ichida", "en": "In tailwind.config.js, under theme.extend.colors" },
+       { "ru": "В отдельном CSS-файле", "uz": "Alohida CSS faylda", "en": "In a separate CSS file" },
+       { "ru": "В атрибуте style", "uz": "style atributida", "en": "In a style attribute" }
+      ],
+      "a": 1
+     },
+     {
+      "q": { "ru": "Что связывает подпись с полем ввода?", "uz": "Imzoni kiritish maydoni bilan nima bog'laydi?", "en": "What links a label to its input?" },
+      "options": [
+       { "ru": "Соседство в разметке", "uz": "Разметкadagi qo'shnilik", "en": "Being next to each other in the markup" },
+       { "ru": "Атрибут for у label, совпадающий с id поля", "uz": "label dagi maydon id siga mos for atributi", "en": "The label's for attribute matching the field's id" },
+       { "ru": "Одинаковый класс", "uz": "Bir xil sinf", "en": "The same class" },
+       { "ru": "Плейсхолдер", "uz": "Pleysxolder", "en": "The placeholder" }
+      ],
+      "a": 1
+     }
+    ],
+    "tasks": [
+     {
+      "id": "e1",
+      "kind": "tailwind",
+      "title": { "ru": "Форма подписки", "uz": "Obuna shakli", "en": "A subscription form" },
+      "desc": {
+       "ru": "<p>Собери форму целиком.</p><ol><li><code>&lt;form&gt;</code> — <code>max-w-sm</code>, белый фон, <code>p-6</code>, <code>rounded-xl</code> и <code>space-y-4</code>.</li><li><code>&lt;label&gt;</code> — <code>block text-sm font-medium</code>, атрибут <code>for=\"mail\"</code> уже стоит.</li><li><code>&lt;input&gt;</code> — <code>w-full border border-slate-300 rounded-lg px-3 py-2</code> плюс <code>focus:outline-none</code> и <code>focus:ring-2</code>.</li><li><code>&lt;button&gt;</code> — <code>w-full bg-blue-600 text-white px-4 py-2 rounded-lg</code> и состояние <code>hover:bg-blue-700</code>.</li></ol>",
+       "uz": "<p>Shaklni to'liq yig'ing.</p><ol><li><code>&lt;form&gt;</code> — <code>max-w-sm</code>, oq fon, <code>p-6</code>, <code>rounded-xl</code> va <code>space-y-4</code>.</li><li><code>&lt;label&gt;</code> — <code>block text-sm font-medium</code>, <code>for=\"mail\"</code> atributi allaqachon turibdi.</li><li><code>&lt;input&gt;</code> — <code>w-full border border-slate-300 rounded-lg px-3 py-2</code> hamda <code>focus:outline-none</code> va <code>focus:ring-2</code>.</li><li><code>&lt;button&gt;</code> — <code>w-full bg-blue-600 text-white px-4 py-2 rounded-lg</code> va <code>hover:bg-blue-700</code> holati.</li></ol>",
+       "en": "<p>Assemble the whole form.</p><ol><li>The <code>&lt;form&gt;</code> — <code>max-w-sm</code>, white background, <code>p-6</code>, <code>rounded-xl</code> and <code>space-y-4</code>.</li><li>The <code>&lt;label&gt;</code> — <code>block text-sm font-medium</code>; the <code>for=\"mail\"</code> attribute is already there.</li><li>The <code>&lt;input&gt;</code> — <code>w-full border border-slate-300 rounded-lg px-3 py-2</code> plus <code>focus:outline-none</code> and <code>focus:ring-2</code>.</li><li>The <code>&lt;button&gt;</code> — <code>w-full bg-blue-600 text-white px-4 py-2 rounded-lg</code> and the <code>hover:bg-blue-700</code> state.</li></ol>"
+      },
+      "starter": "<form class=\"\">\n  <label for=\"mail\" class=\"\">Почта</label>\n  <input id=\"mail\" type=\"email\" class=\"\">\n  <button type=\"submit\" class=\"\">Подписаться</button>\n</form>\n",
+      "tests": "var f = $('form');\nassert(f, 'Нет тега form');\nequal(style(f, 'background-color'), 'rgb(255, 255, 255)', 'Фон формы');\nequal(style(f, 'padding-top'), '24px', 'Отступ формы (p-6)');\nequal(style(f, 'border-top-left-radius'), '12px', 'Скругление формы (rounded-xl)');\nassert(f.className.indexOf('max-w-sm') !== -1, 'Нет класса max-w-sm');\nassert(f.className.indexOf('space-y-4') !== -1, 'Нет класса space-y-4');\nvar lab = $('label');\nassert(lab, 'Нет label');\nequal(style(lab, 'display'), 'block', 'label должен быть block');\nequal(style(lab, 'font-size'), '14px', 'Размер подписи (text-sm)');\nequal(style(lab, 'font-weight'), '500', 'Вес подписи (font-medium)');\nequal(lab.getAttribute('for'), 'mail', 'Атрибут for должен указывать на поле');\nvar i = $('input');\nassert(i, 'Нет поля input');\nequal(style(i, 'border-top-color'), 'rgb(203, 213, 225)', 'Цвет рамки поля');\nequal(style(i, 'padding-left'), '12px', 'Отступ поля (px-3)');\nassert(i.className.indexOf('focus:ring-2') !== -1, 'У поля нет focus:ring-2');\nvar b = $('button');\nassert(b, 'Нет кнопки');\nequal(style(b, 'background-color'), 'rgb(37, 99, 235)', 'Фон кнопки');\nequal(style(b, 'color'), 'rgb(255, 255, 255)', 'Цвет текста кнопки');\nassert(b.className.indexOf('hover:bg-blue-700') !== -1, 'У кнопки нет hover:bg-blue-700');",
+      "hint": {
+       "ru": "Форме — <code>max-w-sm bg-white p-6 rounded-xl space-y-4</code>. Подписи — <code>block text-sm font-medium</code>. Полю и кнопке — наборы из условия, каждый одной строкой через пробел.",
+       "uz": "Shaklga — <code>max-w-sm bg-white p-6 rounded-xl space-y-4</code>. Imzoga — <code>block text-sm font-medium</code>. Maydon va tugmaga — shartdagi to'plamlar, har biri bir qatorda bo'shliq bilan.",
+       "en": "The form gets <code>max-w-sm bg-white p-6 rounded-xl space-y-4</code>. The label gets <code>block text-sm font-medium</code>. The input and button get the sets from the brief, each on one line separated by spaces."
+      }
+     }
+    ]
+   }
   }
  ]
 }
