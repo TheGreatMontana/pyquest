@@ -974,7 +974,7 @@
    "color": "#38bdf8",
    "level": "intermediate",
    "status": "full",
-   "estimatedHours": 15,
+   "estimatedHours": 21,
    "requires": [
     "python-collections"
    ],
@@ -982,7 +982,7 @@
     "nlp-basics"
    ],
    "legacyIds": [],
-   "moduleCount": 2,
+   "moduleCount": 3,
    "runner": "python"
   },
   {

@@ -1408,4 +1408,59 @@ def activate(values, kind):
     loss = sum((w1 * w2 * x - y) ** 2 for x, y in samples) / len(samples)
     return (round(w1, 4), round(w2, 4), round(loss, 6))
 """,
+
+    'nlp-intro/nl-03/t1': """def ngrams(tokens, n):
+    if n < 1 or n > len(tokens):
+        return []
+    return [tuple(tokens[i:i + n]) for i in range(len(tokens) - n + 1)]
+""",
+
+    'nlp-intro/nl-03/t2': """import math
+
+
+def nearest(word, vectors, top):
+    if word not in vectors or top <= 0:
+        return []
+
+    def cosine(a, b):
+        dot = sum(x * y for x, y in zip(a, b))
+        na = math.sqrt(sum(x * x for x in a))
+        nb = math.sqrt(sum(y * y for y in b))
+        return dot / (na * nb)
+
+    base = vectors[word]
+    pairs = [(other, cosine(base, vec)) for other, vec in vectors.items() if other != word]
+    pairs.sort(key=lambda item: (-item[1], item[0]))
+    return [other for other, _ in pairs[:top]]
+""",
+
+    'nlp-intro/nl-03/t3': """import math
+
+
+def attention(query, keys, values):
+    scores = [sum(q * k for q, k in zip(query, key)) for key in keys]
+    top = max(scores)
+    exps = [math.exp(s - top) for s in scores]
+    total = sum(exps)
+    weights = [e / total for e in exps]
+
+    size = len(values[0])
+    result = [0.0] * size
+    for weight, value in zip(weights, values):
+        for j in range(size):
+            result[j] += weight * value[j]
+    return result
+""",
+
+    'nlp-intro/nl-03/exam0': """def predict_next(tokens, context, n):
+    wanted = tuple(context)
+    counts = {}
+    for i in range(len(tokens) - n + 1):
+        if tuple(tokens[i:i + n - 1]) == wanted:
+            nxt = tokens[i + n - 1]
+            counts[nxt] = counts.get(nxt, 0) + 1
+    if not counts:
+        return None
+    return sorted(counts, key=lambda w: (-counts[w], w))[0]
+""",
 }

@@ -640,6 +640,490 @@
      }
     ]
    }
+  },
+  {
+    "id": "nl-03",
+    "title": {
+      "ru": "От слов к смыслу: n-граммы, эмбеддинги и внимание",
+      "uz": "So'zlardan ma'noga: n-grammalar, embeddinglar va e'tibor",
+      "en": "From words to meaning: n-grams, embeddings and attention"
+    },
+    "tagline": {
+      "ru": "Что мешок слов теряет, как слово превращают в вектор и на чём держатся современные языковые модели",
+      "uz": "So'zlar qopi nimani yo'qotadi, so'z qanday vektorga aylanadi va zamonaviy til modellari nimaga tayanadi",
+      "en": "What the bag of words loses, how a word becomes a vector, and what modern language models rest on"
+    },
+    "lessons": [
+      {
+        "id": "l1",
+        "title": {
+          "ru": "Порядок слов: n-граммы",
+          "uz": "So'zlar tartibi: n-grammalar",
+          "en": "Word order: n-grams"
+        },
+        "blocks": [
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>Мешок слов из nl-01 отлично работает для спам-фильтра: там важно, <i>какие</i> слова встретились, а не в каком порядке. Но у него есть слепое пятно — он вообще не видит порядка.</p><p>«Собака укусила человека» и «человека укусила собака» дают один и тот же мешок. Для новостной ленты это разные заголовки, для модели — одинаковые.</p>",
+              "uz": "<p>nl-01 dagi so'zlar qopi spam-filtr uchun ajoyib ishlaydi: u yerda <i>qaysi</i> so'zlar uchragani muhim, qanday tartibda emas. Lekin uning ko'r nuqtasi bor — u tartibni umuman ko'rmaydi.</p><p>«It odamni tishladi» va «odamni it tishladi» bir xil qop beradi. Yangiliklar lentasi uchun bular turli sarlavha, model uchun — bir xil.</p>",
+              "en": "<p>The bag of words from nl-01 works splendidly for a spam filter: there it matters <i>which</i> words appeared, not in what order. But it has a blind spot — it does not see order at all.</p><p>\"The dog bit the man\" and \"the man bit the dog\" produce the same bag. For a news feed those are different headlines; for the model they are identical.</p>"
+            }
+          },
+          {
+            "type": "run",
+            "code": "def bag(text):\n    counts = {}\n    for word in text.lower().split():\n        counts[word] = counts.get(word, 0) + 1\n    return counts\n\na = \"собака укусила человека\"\nb = \"человека укусила собака\"\n\nprint(bag(a))\nprint(bag(b))\nprint(\"мешки совпадают:\", bag(a) == bag(b))"
+          },
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>Первое и самое дешёвое лекарство — <b>n-граммы</b>. Вместо отдельных слов считают идущие подряд группы из <code>n</code> слов: биграммы (по два), триграммы (по три) и так далее.</p><p>Из «я люблю кофе» получаются биграммы <code>(я, люблю)</code> и <code>(люблю, кофе)</code>. Теперь порядок хотя бы частично сохранён: «не очень» и «очень не» дадут разные биграммы, хотя мешок слов у них одинаковый.</p><p>Плата за это — размер. Слов в языке сотни тысяч, пар слов — миллиарды, и почти все они в тексте не встретятся ни разу. Поэтому на практике берут <code>n = 2</code> или <code>3</code> и добавляют их к обычному мешку слов, а не заменяют его.</p>",
+              "uz": "<p>Birinchi va eng arzon davo — <b>n-grammalar</b>. Alohida so'zlar o'rniga ketma-ket keladigan <code>n</code> ta so'zdan iborat guruhlar sanaladi: bigrammalar (ikkitadan), trigrammalar (uchtadan) va hokazo.</p><p>«men kofe yaxshi ko'raman» dan <code>(men, kofe)</code> va <code>(kofe, yaxshi)</code> bigrammalari chiqadi. Endi tartib hech bo'lmasa qisman saqlangan: «unchalik emas» va «emas unchalik» turli bigramma beradi, so'zlar qopi esa ularda bir xil.</p><p>Buning narxi — hajm. Tilda so'zlar yuz minglab, so'z juftlari milliardlab va ularning deyarli hammasi matnda bir marta ham uchramaydi. Shuning uchun amalda <code>n = 2</code> yoki <code>3</code> olinadi va ular oddiy so'zlar qopini almashtirmasdan, unga qo'shiladi.</p>",
+              "en": "<p>The first and cheapest cure is <b>n-grams</b>. Instead of individual words you count consecutive groups of <code>n</code> words: bigrams (pairs), trigrams (triples) and so on.</p><p>\"I love coffee\" yields the bigrams <code>(I, love)</code> and <code>(love, coffee)</code>. Order is now at least partly preserved: \"not very\" and \"very not\" produce different bigrams even though their bag of words is the same.</p><p>The price is size. A language has hundreds of thousands of words and billions of word pairs, and almost none of those pairs will ever appear in your text. So in practice you take <code>n = 2</code> or <code>3</code> and add them to the plain bag of words rather than replacing it.</p>"
+            }
+          },
+          {
+            "type": "run",
+            "code": "def ngrams(tokens, n):\n    return [tuple(tokens[i:i + n]) for i in range(len(tokens) - n + 1)]\n\nwords = \"я люблю кофе я люблю чай\".split()\nprint(\"биграммы:\", ngrams(words, 2))\n\ncounts = {}\nfor pair in ngrams(words, 2):\n    counts[pair] = counts.get(pair, 0) + 1\n\nfor pair, c in sorted(counts.items(), key=lambda kv: (-kv[1], kv[0])):\n    print(pair, \"->\", c)"
+          },
+          {
+            "type": "checkpoint",
+            "q": {
+              "ru": "В отзыве «фильм не понравился» модель на мешке слов увидела слово «понравился» и решила, что отзыв хороший. Что поможет?",
+              "uz": "«film yoqmadi» sharhida so'zlar qopiga tayangan model «yoqdi» so'zini ko'rib, sharhni yaxshi deb hisobladi. Nima yordam beradi?",
+              "en": "In the review \"the film did not impress\" a bag-of-words model saw \"impress\" and decided the review was positive. What helps?"
+            },
+            "options": [
+              { "ru": "Увеличить размер обучающей выборки", "uz": "O'qitish tanlanmasi hajmini oshirish", "en": "Increase the size of the training sample" },
+              { "ru": "Добавить биграммы — пара «не понравился» станет отдельным признаком", "uz": "Bigrammalar qo'shish — «yoqmadi» juftligi alohida belgi bo'ladi", "en": "Add bigrams — the pair \"not impress\" becomes its own feature" },
+              { "ru": "Убрать стоп-слова", "uz": "Stop-so'zlarni olib tashlash", "en": "Remove stop words" },
+              { "ru": "Перевести текст в нижний регистр", "uz": "Matnni quyi registrga o'tkazish", "en": "Lowercase the text" }
+            ],
+            "a": 1,
+            "explain": {
+              "ru": "Мешок слов видит «не» и «понравился» как два независимых признака. Биграмма <code>(не, понравился)</code> склеивает их в один — и модель может выучить, что он означает противоположное. Кстати, удаление стоп-слов тут только навредит: «не» обычно как раз в списке стоп-слов.",
+              "uz": "So'zlar qopi «yoq» va «yoqdi» ni ikki mustaqil belgi sifatida ko'radi. <code>(yoq, yoqdi)</code> bigrammasi ularni bittaga yopishtiradi — va model uning teskari ma'no berishini o'rganishi mumkin. Aytgancha, stop-so'zlarni olib tashlash bu yerda faqat zarar qiladi: inkor odatda aynan stop-so'zlar ro'yxatida bo'ladi.",
+              "en": "The bag of words sees \"not\" and \"impress\" as two independent features. The bigram <code>(not, impress)</code> glues them into one — and the model can learn that it means the opposite. Removing stop words would actually hurt here: \"not\" is usually on the stop-word list."
+            }
+          }
+        ]
+      },
+      {
+        "id": "l2",
+        "title": {
+          "ru": "Эмбеддинги: слово как точка в пространстве",
+          "uz": "Embeddinglar: so'z fazodagi nuqta sifatida",
+          "en": "Embeddings: a word as a point in space"
+        },
+        "blocks": [
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>У мешка слов есть вторая проблема, серьёзнее первой: для него «кот» и «кошка» — два никак не связанных признака, ровно настолько же далёких друг от друга, как «кот» и «бетон».</p><p>В мешке каждое слово — это отдельная позиция вектора: единица на своём месте, нули везде. Такое представление называют <b>one-hot</b>. Расстояние между любыми двумя разными словами в нём одинаковое, так что о смысле оно не говорит ничего.</p><p><b>Эмбеддинг</b> — это другое представление: слово задаётся коротким плотным вектором вещественных чисел, скажем из 300 штук. Числа подбирают обучением, и подбирают так, чтобы слова с похожим смыслом получили похожие векторы.</p><p>Откуда модель узнаёт смысл? Из соседей. Основная идея звучит так: <i>слово характеризуется тем, в каком окружении оно встречается</i>. Если «кот» и «кошка» тысячи раз стояли рядом с «мяукает», «лапы», «корм», их векторы неизбежно сойдутся.</p>",
+              "uz": "<p>So'zlar qopining ikkinchi muammosi bor, u birinchisidan jiddiyroq: uning uchun «mushuk» va «pishak» — hech qanday bog'liq bo'lmagan ikki belgi, bir-biridan «mushuk» va «beton» kabi uzoq.</p><p>Qopda har bir so'z — vektorning alohida pozitsiyasi: o'z joyida bir, qolgan joyda nol. Bunday tasvirni <b>one-hot</b> deyishadi. Unda istalgan ikki turli so'z orasidagi masofa bir xil, shuning uchun u ma'no haqida hech nima aytmaydi.</p><p><b>Embedding</b> — bu boshqa tasvir: so'z qisqa zich haqiqiy sonlar vektori bilan, aytaylik 300 tasi bilan beriladi. Sonlar o'qitish orqali tanlanadi va shunday tanlanadiki, ma'nosi o'xshash so'zlar o'xshash vektor oladi.</p><p>Model ma'noni qayerdan biladi? Qo'shnilardan. Asosiy g'oya shunday: <i>so'z u qanday muhitda uchrashi bilan tavsiflanadi</i>. Agar «mushuk» va «pishak» minglab marta «miyovlaydi», «panja», «yem» yonida turgan bo'lsa, ularning vektorlari muqarrar yaqinlashadi.</p>",
+              "en": "<p>The bag of words has a second problem, worse than the first: to it \"cat\" and \"kitten\" are two unrelated features, exactly as far apart as \"cat\" and \"concrete\".</p><p>In the bag every word is its own vector position: a one in its slot, zeros everywhere else. That representation is called <b>one-hot</b>. The distance between any two distinct words in it is identical, so it says nothing about meaning.</p><p>An <b>embedding</b> is a different representation: a word is given by a short dense vector of real numbers, say 300 of them. The numbers are learned, and learned so that words with similar meaning end up with similar vectors.</p><p>Where does the model get meaning from? From neighbours. The core idea goes: <i>a word is characterized by the company it keeps</i>. If \"cat\" and \"kitten\" stood next to \"meows\", \"paws\", \"food\" a thousand times, their vectors inevitably converge.</p>"
+            }
+          },
+          {
+            "type": "run",
+            "code": "import math\n\nvectors = {\n    \"кот\":    [0.9, 0.1, 0.0],\n    \"кошка\":  [0.8, 0.2, 0.1],\n    \"пёс\":    [0.7, 0.3, 0.0],\n    \"машина\": [0.0, 0.1, 0.9],\n}\n\ndef cosine(a, b):\n    dot = sum(x * y for x, y in zip(a, b))\n    na = math.sqrt(sum(x * x for x in a))\n    nb = math.sqrt(sum(y * y for y in b))\n    return dot / (na * nb)\n\nbase = \"кот\"\nfor word, vec in vectors.items():\n    if word == base:\n        continue\n    print(base, \"~\", word, \"->\", round(cosine(vectors[base], vec), 3))"
+          },
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>Близость векторов меряют косинусом — той же формулой, что в nl-01. Косинус смотрит на <b>направление</b>, а не на длину, поэтому редкое и частое слово с одинаковым смыслом окажутся рядом.</p><p>Самое известное свойство эмбеддингов — арифметика. В обученном пространстве работает <code>король − мужчина + женщина ≈ королева</code>: разница между «королём» и «мужчиной» оказывается тем же направлением, что разница между «королевой» и «женщиной». Никто это не программировал — оно возникло само из статистики соседей.</p>",
+              "uz": "<p>Vektorlar yaqinligi kosinus bilan o'lchanadi — nl-01 dagi xuddi shu formula bilan. Kosinus uzunlikka emas, <b>yo'nalishga</b> qaraydi, shuning uchun ma'nosi bir xil bo'lgan kam va ko'p uchraydigan so'zlar yonma-yon chiqadi.</p><p>Embeddinglarning eng mashhur xususiyati — arifmetika. O'qitilgan fazoda <code>qirol − erkak + ayol ≈ qirolicha</code> ishlaydi: «qirol» va «erkak» orasidagi farq «qirolicha» va «ayol» orasidagi farq bilan bir xil yo'nalish bo'lib chiqadi. Buni hech kim dasturlamagan — u qo'shnilar statistikasidan o'zi paydo bo'lgan.</p>",
+              "en": "<p>Vector closeness is measured with the cosine — the same formula as in nl-01. The cosine looks at <b>direction</b>, not length, so a rare and a frequent word with the same meaning end up side by side.</p><p>The best-known property of embeddings is arithmetic. In a trained space <code>king − man + woman ≈ queen</code> holds: the difference between \"king\" and \"man\" turns out to be the same direction as the difference between \"queen\" and \"woman\". Nobody programmed that — it emerged on its own from neighbour statistics.</p>"
+            }
+          },
+          {
+            "type": "predict",
+            "lang": "python",
+            "code": "import math\n\ndef cosine(a, b):\n    dot = sum(x * y for x, y in zip(a, b))\n    na = math.sqrt(sum(x * x for x in a))\n    nb = math.sqrt(sum(y * y for y in b))\n    return dot / (na * nb)\n\nprint(round(cosine([1.0, 0.0], [2.0, 0.0]), 2))",
+            "options": [
+              { "ru": "0.5", "uz": "0.5", "en": "0.5" },
+              { "ru": "1.0", "uz": "1.0", "en": "1.0" },
+              { "ru": "2.0", "uz": "2.0", "en": "2.0" },
+              { "ru": "0.0", "uz": "0.0", "en": "0.0" }
+            ],
+            "a": 1,
+            "explain": {
+              "ru": "Второй вектор — это первый, умноженный на два: направление то же, длина другая. Косинус измеряет только угол, поэтому равен <code>1.0</code>. Именно поэтому длинный документ и короткий документ об одном и том же оказываются близкими.",
+              "uz": "Ikkinchi vektor — birinchisining ikkiga ko'paytirilgani: yo'nalish o'sha, uzunlik boshqa. Kosinus faqat burchakni o'lchaydi, shuning uchun u <code>1.0</code> ga teng. Aynan shuning uchun bir mavzudagi uzun va qisqa hujjat yaqin chiqadi.",
+              "en": "The second vector is the first one doubled: same direction, different length. The cosine measures only the angle, so it equals <code>1.0</code>. That is exactly why a long and a short document about the same thing come out close together."
+            }
+          },
+          {
+            "type": "note",
+            "kind": "trap",
+            "html": {
+              "ru": "Эмбеддинги учат по реальным текстам — и они впитывают из них всё, включая предвзятость. Классический результат: в векторах, обученных на новостях, «врач» оказывался ближе к «мужчина», а «медсестра» — к «женщина», просто потому, что так было в текстах. Если такие векторы использовать в отборе резюме, модель воспроизведёт перекос и будет выглядеть объективной. Эмбеддинг — это статистика корпуса, а не знание о мире.",
+              "uz": "Embeddinglar haqiqiy matnlarda o'qitiladi — va ulardan hamma narsani, jumladan xolislikning yo'qligini ham o'zlashtiradi. Klassik natija: yangiliklarda o'qitilgan vektorlarda «shifokor» «erkak» ga, «hamshira» esa «ayol» ga yaqinroq chiqqan, chunki matnlarda shunday edi. Bunday vektorlarni rezyume saralashda ishlatsangiz, model bu qiyshiqlikni takrorlaydi va xolis ko'rinadi. Embedding — bu korpus statistikasi, dunyo haqidagi bilim emas.",
+              "en": "Embeddings are trained on real texts — and they absorb everything in them, bias included. A classic result: in vectors trained on news, \"doctor\" landed closer to \"man\" and \"nurse\" closer to \"woman\", simply because that is how the texts read. Use such vectors to screen résumés and the model reproduces the skew while looking objective. An embedding is corpus statistics, not knowledge about the world."
+            }
+          }
+        ]
+      },
+      {
+        "id": "l3",
+        "title": {
+          "ru": "Внимание: слово смотрит на контекст",
+          "uz": "E'tibor: so'z kontekstga qaraydi",
+          "en": "Attention: a word looks at its context"
+        },
+        "blocks": [
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>У эмбеддингов из прошлого урока есть ограничение: у слова один вектор навсегда. А «коса» бывает причёской, инструментом и песчаной отмелью — и один вектор на все три случая означает компромисс, который не подходит ни одному.</p><p>Решение — <b>внимание</b> (attention). Идея: вектор слова не фиксирован, а собирается заново для каждого предложения, из окружающих слов. Слово как бы спрашивает: «кто из соседей мне сейчас важен?» — и берёт от них тем больше, чем важнее.</p><p>Механика проще, чем звучит, и укладывается в три шага:</p><ol><li>Считаем <b>похожесть</b> запроса на каждый ключ — обычным скалярным произведением.</li><li>Превращаем похожести в веса функцией <b>softmax</b>: она делает все числа положительными и суммирует их в единицу.</li><li>Складываем значения соседей с этими весами.</li></ol>",
+              "uz": "<p>O'tgan darsdagi embeddinglarning cheklovi bor: so'zning bitta vektori abadiy. «Kosa» esa soch turmagi ham, asbob ham, qumli sayozlik ham bo'ladi — uchalasi uchun bitta vektor esa hech biriga to'g'ri kelmaydigan murosani anglatadi.</p><p>Yechim — <b>e'tibor</b> (attention). G'oya: so'z vektori qat'iy emas, u har bir gap uchun atrofdagi so'zlardan qaytadan yig'iladi. So'z go'yo so'raydi: «hozir qo'shnilardan qaysi biri menga muhim?» — va qanchalik muhim bo'lsa, shunchalik ko'p oladi.</p><p>Mexanikasi eshitilganidan sodda va uch qadamga sig'adi:</p><ol><li>So'rovning har bir kalitga <b>o'xshashligini</b> hisoblaymiz — oddiy skalyar ko'paytma bilan.</li><li>O'xshashliklarni <b>softmax</b> funksiyasi bilan vaznlarga aylantiramiz: u barcha sonlarni musbat qiladi va yig'indisini birga keltiradi.</li><li>Qo'shnilarning qiymatlarini shu vaznlar bilan qo'shamiz.</li></ol>",
+              "en": "<p>The embeddings from the last lesson have a limit: a word gets one vector forever. But \"bank\" can be a financial institution, a river edge or a tilt of an aircraft — and one vector for all three is a compromise that fits none of them.</p><p>The answer is <b>attention</b>. The idea: a word's vector is not fixed but reassembled for every sentence out of the surrounding words. The word effectively asks \"which of my neighbours matters to me right now?\" — and takes more from those that matter more.</p><p>The mechanics are simpler than they sound and fit into three steps:</p><ol><li>Compute the <b>similarity</b> of the query to every key — with an ordinary dot product.</li><li>Turn the similarities into weights with the <b>softmax</b> function: it makes every number positive and makes them sum to one.</li><li>Add up the neighbours' values with those weights.</li></ol>"
+            }
+          },
+          {
+            "type": "run",
+            "code": "import math\n\ndef softmax(scores):\n    top = max(scores)                      # вычитаем максимум ради устойчивости\n    exps = [math.exp(s - top) for s in scores]\n    total = sum(exps)\n    return [e / total for e in exps]\n\nquery = [1.0, 0.0]                              # что мы ищем\nkeys = [[1.0, 0.0], [0.0, 1.0], [0.7, 0.7]]     # чем представлены соседи\nvalues = [10.0, 20.0, 30.0]                     # что соседи несут\n\nscores = [sum(q * k for q, k in zip(query, key)) for key in keys]\nweights = softmax(scores)\n\nprint(\"похожесть:\", [round(s, 2) for s in scores])\nprint(\"веса:     \", [round(w, 3) for w in weights])\nprint(\"сумма весов:\", round(sum(weights), 6))\nprint(\"итог:     \", round(sum(w * v for w, v in zip(weights, values)), 3))"
+          },
+          {
+            "type": "text",
+            "html": {
+              "ru": "<p>Первый сосед совпал с запросом по направлению, поэтому получил самый большой вес; второй перпендикулярен и получил меньше всех. Итог — не значение одного соседа, а их смесь, в которой похожие важнее.</p><p><b>Трансформер</b> — это архитектура, целиком построенная на таком внимании: каждое слово смотрит на все остальные, слои повторяют это много раз, и векторы постепенно вбирают в себя контекст. На трансформерах работают все современные большие языковые модели.</p><p>Два практических следствия, которые стоит унести:</p><ul><li><b>Токены — не слова.</b> Современные модели режут текст на куски-подслова: редкое слово распадается на несколько токенов, а частое остаётся одним. Поэтому счёт «по токенам» никогда не совпадает со счётом по словам, и для русского текста токенов выходит заметно больше, чем для английского.</li><li><b>Контекст ограничен.</b> Внимание сравнивает каждое слово с каждым, а значит его стоимость растёт как квадрат длины текста. Отсюда и лимит контекстного окна, и его цена.</li></ul>",
+              "uz": "<p>Birinchi qo'shni so'rov bilan yo'nalishi bo'yicha mos keldi, shuning uchun eng katta vaznni oldi; ikkinchisi perpendikulyar va eng kamini oldi. Natija — bitta qo'shnining qiymati emas, ularning aralashmasi, unda o'xshashlari muhimroq.</p><p><b>Transformer</b> — bu butunlay shunday e'tiborga qurilgan arxitektura: har bir so'z qolgan hammasiga qaraydi, qatlamlar buni ko'p marta takrorlaydi va vektorlar asta-sekin kontekstni o'ziga singdiradi. Barcha zamonaviy katta til modellari transformerlarda ishlaydi.</p><p>Olib ketishga arziydigan ikki amaliy xulosa:</p><ul><li><b>Tokenlar — so'z emas.</b> Zamonaviy modellar matnni so'z-osti bo'laklarga kesadi: kam uchraydigan so'z bir necha tokenga bo'linadi, ko'p uchraydigani bitta bo'lib qoladi. Shuning uchun «tokenlar bo'yicha» hisob hech qachon so'zlar bo'yicha hisob bilan mos kelmaydi va rus tili matni uchun tokenlar ingliz tilinikidan sezilarli ko'p chiqadi.</li><li><b>Kontekst cheklangan.</b> E'tibor har bir so'zni har biri bilan taqqoslaydi, demak uning narxi matn uzunligining kvadrati kabi o'sadi. Kontekst oynasining chegarasi ham, narxi ham shundan.</li></ul>",
+              "en": "<p>The first neighbour matched the query in direction, so it got the largest weight; the second is perpendicular and got the least. The result is not one neighbour's value but a blend in which the similar ones count more.</p><p>A <b>transformer</b> is an architecture built entirely on such attention: every word looks at every other, layers repeat that many times, and the vectors gradually soak up context. Every modern large language model runs on transformers.</p><p>Two practical takeaways worth keeping:</p><ul><li><b>Tokens are not words.</b> Modern models cut text into subword pieces: a rare word breaks into several tokens while a frequent one stays a single token. So a count \"in tokens\" never matches a word count, and non-English text yields noticeably more tokens than English.</li><li><b>Context is limited.</b> Attention compares every word with every other, so its cost grows as the square of the text length. Hence both the context window limit and its price.</li></ul>"
+            }
+          },
+          {
+            "type": "note",
+            "kind": "trap",
+            "html": {
+              "ru": "Softmax без вычитания максимума падает на больших числах: <code>math.exp(1000)</code> — это переполнение. В настоящем коде всегда пишут <code>exp(s − max(scores))</code>. Результат от этого не меняется — множитель сокращается в числителе и знаменателе, — а переполнения не случается.",
+              "uz": "Maksimumni ayirmasdan softmax katta sonlarda yiqiladi: <code>math.exp(1000)</code> — bu to'lib ketish. Haqiqiy kodda doim <code>exp(s − max(scores))</code> yoziladi. Natija bundan o'zgarmaydi — ko'paytuvchi surat va maxrajda qisqaradi — to'lib ketish esa bo'lmaydi.",
+              "en": "Softmax without subtracting the maximum blows up on large numbers: <code>math.exp(1000)</code> overflows. Real code always writes <code>exp(s − max(scores))</code>. The result is unchanged — the factor cancels in numerator and denominator — but the overflow never happens."
+            }
+          },
+          {
+            "type": "summary",
+            "items": [
+              { "ru": "Мешок слов теряет порядок; n-граммы возвращают его частично", "uz": "So'zlar qopi tartibni yo'qotadi; n-grammalar uni qisman qaytaradi", "en": "The bag of words loses order; n-grams bring part of it back" },
+              { "ru": "One-hot делает все слова одинаково далёкими друг от друга", "uz": "One-hot barcha so'zlarni bir-biridan bir xil uzoq qiladi", "en": "One-hot makes every word equally distant from every other" },
+              { "ru": "Эмбеддинг — плотный вектор; смысл берётся из соседей по тексту", "uz": "Embedding — zich vektor; ma'no matndagi qo'shnilardan olinadi", "en": "An embedding is a dense vector; meaning comes from neighbours in the text" },
+              { "ru": "Близость эмбеддингов меряют косинусом — по направлению, не по длине", "uz": "Embeddinglar yaqinligi kosinus bilan o'lchanadi — yo'nalish bo'yicha, uzunlik bo'yicha emas", "en": "Embedding closeness is measured by cosine — by direction, not length" },
+              { "ru": "Внимание собирает вектор слова заново под каждое предложение", "uz": "E'tibor so'z vektorini har bir gap uchun qaytadan yig'adi", "en": "Attention rebuilds a word's vector for each sentence" },
+              { "ru": "Softmax превращает похожести в веса, сумма которых равна единице", "uz": "Softmax o'xshashliklarni yig'indisi birga teng vaznlarga aylantiradi", "en": "Softmax turns similarities into weights that sum to one" },
+              { "ru": "Токен ≠ слово, а стоимость внимания растёт как квадрат длины", "uz": "Token ≠ so'z, e'tibor narxi esa uzunlik kvadrati kabi o'sadi", "en": "A token is not a word, and attention cost grows as the square of the length" }
+            ]
+          }
+        ]
+      }
+    ],
+    "quiz": [
+      {
+        "q": {
+          "ru": "Что теряет мешок слов?",
+          "uz": "So'zlar qopi nimani yo'qotadi?",
+          "en": "What does the bag of words lose?"
+        },
+        "options": [
+          { "ru": "Частоту слов", "uz": "So'zlar chastotasini", "en": "Word frequency" },
+          { "ru": "Порядок слов и связи между соседними словами", "uz": "So'zlar tartibini va qo'shni so'zlar orasidagi bog'lanishni", "en": "Word order and the links between neighbouring words" },
+          { "ru": "Регистр букв", "uz": "Harflar registrini", "en": "Letter case" },
+          { "ru": "Длину документа", "uz": "Hujjat uzunligini", "en": "Document length" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Мешок хранит именно частоты — а вот порядок исчезает полностью. «Собака укусила человека» и «человека укусила собака» дают идентичные векторы.",
+          "uz": "Qop aynan chastotalarni saqlaydi — tartib esa butunlay yo'qoladi. «It odamni tishladi» va «odamni it tishladi» bir xil vektor beradi.",
+          "en": "The bag stores frequencies precisely — it is the order that disappears entirely. \"The dog bit the man\" and \"the man bit the dog\" give identical vectors."
+        }
+      },
+      {
+        "q": {
+          "ru": "Сколько биграмм даст текст из 6 слов?",
+          "uz": "6 so'zdan iborat matn nechta bigramma beradi?",
+          "en": "How many bigrams does a 6-word text produce?"
+        },
+        "options": [
+          { "ru": "6", "uz": "6", "en": "6" },
+          { "ru": "5", "uz": "5", "en": "5" },
+          { "ru": "12", "uz": "12", "en": "12" },
+          { "ru": "3", "uz": "3", "en": "3" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Пар подряд идущих слов ровно <code>len − n + 1 = 6 − 2 + 1 = 5</code>. Для триграмм было бы 4, а для 7-грамм — ноль: они просто не помещаются.",
+          "uz": "Ketma-ket so'z juftlari aynan <code>len − n + 1 = 6 − 2 + 1 = 5</code> ta. Trigrammalar uchun 4 bo'lardi, 7-grammalar uchun esa nol: ular sig'maydi.",
+          "en": "There are exactly <code>len − n + 1 = 6 − 2 + 1 = 5</code> consecutive pairs. Trigrams would give 4, and 7-grams zero: they simply do not fit."
+        }
+      },
+      {
+        "q": {
+          "ru": "Чем эмбеддинг лучше one-hot представления?",
+          "uz": "Embedding one-hot tasvirdan nimasi bilan yaxshi?",
+          "en": "How is an embedding better than a one-hot representation?"
+        },
+        "options": [
+          { "ru": "Он занимает больше памяти и потому точнее", "uz": "U ko'proq xotira egallaydi va shuning uchun aniqroq", "en": "It uses more memory and is therefore more precise" },
+          { "ru": "Близкие по смыслу слова получают близкие векторы", "uz": "Ma'nosi yaqin so'zlar yaqin vektor oladi", "en": "Words close in meaning get close vectors" },
+          { "ru": "Он не требует обучения", "uz": "U o'qitishni talab qilmaydi", "en": "It requires no training" },
+          { "ru": "Он сохраняет регистр слов", "uz": "U so'zlar registrini saqlaydi", "en": "It preserves word case" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "В one-hot любые два разных слова равноудалены — расстояние ничего не значит. Эмбеддинг обучается так, что расстояние начинает отражать смысл, и он при этом гораздо компактнее.",
+          "uz": "One-hot da istalgan ikki turli so'z teng uzoqlikda — masofa hech nimani anglatmaydi. Embedding shunday o'qitiladiki, masofa ma'noni aks ettira boshlaydi va u ancha ixcham.",
+          "en": "In one-hot any two distinct words are equidistant — the distance means nothing. An embedding is trained so that distance starts to reflect meaning, and it is far more compact besides."
+        }
+      },
+      {
+        "q": {
+          "ru": "Откуда эмбеддинги «узнают» смысл слова?",
+          "uz": "Embeddinglar so'z ma'nosini qayerdan «biladi»?",
+          "en": "Where do embeddings \"learn\" a word's meaning from?"
+        },
+        "options": [
+          { "ru": "Из словаря, который загружают вместе с моделью", "uz": "Model bilan birga yuklanadigan lug'atdan", "en": "From a dictionary loaded together with the model" },
+          { "ru": "Из статистики: в каком окружении слово встречается в текстах", "uz": "Statistikadan: so'z matnlarda qanday muhitda uchraydi", "en": "From statistics: what company the word keeps in texts" },
+          { "ru": "Из разметки, которую делают люди", "uz": "Odamlar qiladigan belgilashdan", "en": "From labels created by people" },
+          { "ru": "Из длины слова и его букв", "uz": "So'z uzunligi va harflaridan", "en": "From the word's length and its letters" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Работает дистрибутивная гипотеза: слова с похожим смыслом стоят в похожем окружении. Никакой ручной разметки не нужно — достаточно большого корпуса текстов.",
+          "uz": "Distributiv gipoteza ishlaydi: ma'nosi o'xshash so'zlar o'xshash muhitda turadi. Hech qanday qo'lda belgilash kerak emas — katta matn korpusi yetarli.",
+          "en": "The distributional hypothesis is at work: words with similar meaning appear in similar company. No manual labelling is needed — a large corpus of text suffices."
+        }
+      },
+      {
+        "q": {
+          "ru": "Что делает softmax в механизме внимания?",
+          "uz": "E'tibor mexanizmida softmax nima qiladi?",
+          "en": "What does softmax do in the attention mechanism?"
+        },
+        "options": [
+          { "ru": "Выбирает одного самого похожего соседа", "uz": "Eng o'xshash bitta qo'shnini tanlaydi", "en": "Picks the single most similar neighbour" },
+          { "ru": "Превращает похожести в положительные веса, сумма которых равна 1", "uz": "O'xshashliklarni yig'indisi 1 ga teng musbat vaznlarga aylantiradi", "en": "Turns similarities into positive weights that sum to 1" },
+          { "ru": "Нормализует длину векторов", "uz": "Vektorlar uzunligini normallashtiradi", "en": "Normalizes the length of the vectors" },
+          { "ru": "Удаляет стоп-слова", "uz": "Stop-so'zlarni olib tashlaydi", "en": "Removes stop words" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Softmax не выбирает победителя, а распределяет внимание: похожие соседи получают больший вес, но и остальные вносят вклад. Именно поэтому результат — смесь, а не копия одного соседа.",
+          "uz": "Softmax g'olibni tanlamaydi, e'tiborni taqsimlaydi: o'xshash qo'shnilar kattaroq vazn oladi, lekin qolganlari ham hissa qo'shadi. Aynan shuning uchun natija — aralashma, bitta qo'shnining nusxasi emas.",
+          "en": "Softmax does not pick a winner — it distributes attention: similar neighbours get more weight, but the others still contribute. That is exactly why the result is a blend, not a copy of one neighbour."
+        }
+      },
+      {
+        "q": {
+          "ru": "Почему один и тот же текст на русском даёт больше токенов, чем на английском?",
+          "uz": "Nega bir xil matn rus tilida ingliz tilidagidan ko'proq token beradi?",
+          "en": "Why does the same text in a non-English language yield more tokens than in English?"
+        },
+        "options": [
+          { "ru": "Русские слова длиннее", "uz": "Ruscha so'zlar uzunroq", "en": "Those words are longer" },
+          { "ru": "Токенизатор обучен в основном на английских текстах, поэтому режет остальные языки на более мелкие куски", "uz": "Tokenizator asosan ingliz matnlarida o'qitilgan, shuning uchun boshqa tillarni maydaroq bo'laklarga kesadi", "en": "The tokenizer was trained mostly on English, so it cuts other languages into smaller pieces" },
+          { "ru": "В русском больше стоп-слов", "uz": "Rus tilida stop-so'zlar ko'proq", "en": "Those languages have more stop words" },
+          { "ru": "Это ошибка модели", "uz": "Bu modelning xatosi", "en": "It is a bug in the model" }
+        ],
+        "a": 1,
+        "explain": {
+          "ru": "Подсловный токенизатор оставляет целыми те куски, которые часто встречались при обучении. Английские слова в корпусе частые и остаются одним токеном, а слова других языков распадаются на два-три — отсюда и разница в цене запроса.",
+          "uz": "So'z-osti tokenizator o'qitishda ko'p uchragan bo'laklarni butun qoldiradi. Korpusda inglizcha so'zlar ko'p uchraydi va bitta token bo'lib qoladi, boshqa tillarniki esa ikki-uchga bo'linadi — so'rov narxidagi farq shundan.",
+          "en": "A subword tokenizer keeps whole those pieces that were frequent during training. English words are frequent in the corpus and stay one token, while words in other languages break into two or three — hence the difference in request cost."
+        }
+      }
+    ],
+    "tasks": [
+      {
+        "id": "t1",
+        "kind": "python",
+        "title": {
+          "ru": "N-граммы",
+          "uz": "N-grammalar",
+          "en": "N-grams"
+        },
+        "brief": {
+          "ru": "Собери из токенов группы по n подряд",
+          "uz": "Tokenlardan ketma-ket n talik guruhlar yig'ing",
+          "en": "Build groups of n consecutive tokens"
+        },
+        "desc": {
+          "ru": "Напиши функцию <code>ngrams(tokens, n)</code>. Она возвращает список кортежей: каждый кортеж — <code>n</code> идущих подряд токенов. Кортежи идут в порядке появления, соседние перекрываются.<br><br>Если <code>n</code> меньше <code>1</code> или больше длины списка, верни пустой список.<br><br>Пример: <code>ngrams([\"a\", \"b\", \"c\"], 2)</code> → <code>[(\"a\", \"b\"), (\"b\", \"c\")]</code>.",
+          "uz": "<code>ngrams(tokens, n)</code> funksiyasini yozing. U kortejlar ro'yxatini qaytaradi: har bir kortej — ketma-ket keladigan <code>n</code> ta token. Kortejlar paydo bo'lish tartibida boradi, qo'shnilari ustma-ust tushadi.<br><br>Agar <code>n</code> <code>1</code> dan kichik yoki ro'yxat uzunligidan katta bo'lsa, bo'sh ro'yxat qaytaring.<br><br>Misol: <code>ngrams([\"a\", \"b\", \"c\"], 2)</code> → <code>[(\"a\", \"b\"), (\"b\", \"c\")]</code>.",
+          "en": "Write a function <code>ngrams(tokens, n)</code>. It returns a list of tuples: each tuple holds <code>n</code> consecutive tokens. The tuples come in order of appearance and neighbouring ones overlap.<br><br>If <code>n</code> is below <code>1</code> or larger than the list length, return an empty list.<br><br>Example: <code>ngrams([\"a\", \"b\", \"c\"], 2)</code> → <code>[(\"a\", \"b\"), (\"b\", \"c\")]</code>."
+        },
+        "starter": "def ngrams(tokens, n):\n    # список кортежей из n подряд идущих токенов\n    ...\n",
+        "tests": "assert ngrams([\"a\", \"b\", \"c\"], 1) == [(\"a\",), (\"b\",), (\"c\",)]\nassert ngrams([\"a\", \"b\", \"c\"], 2) == [(\"a\", \"b\"), (\"b\", \"c\")]\nassert ngrams([\"a\", \"b\", \"c\"], 3) == [(\"a\", \"b\", \"c\")]\nassert ngrams([\"a\", \"b\", \"c\"], 4) == []\nassert ngrams([\"a\", \"b\", \"c\"], 0) == []\nassert ngrams([\"a\", \"b\", \"c\"], -1) == []\nassert ngrams([], 2) == []\nassert ngrams(\"я люблю кофе и чай\".split(), 2) == [(\"я\", \"люблю\"), (\"люблю\", \"кофе\"), (\"кофе\", \"и\"), (\"и\", \"чай\")]\n",
+        "hint": {
+          "ru": "Сначала отсеки плохие случаи: <code>if n &lt; 1 or n &gt; len(tokens): return []</code>. Дальше срез внутри списочного включения: <code>[tuple(tokens[i:i + n]) for i in range(len(tokens) - n + 1)]</code>. Не забудь <code>tuple()</code> — срез списка даёт список, а нужен кортеж.",
+          "uz": "Avval yomon holatlarni kesing: <code>if n &lt; 1 or n &gt; len(tokens): return []</code>. Keyin ro'yxat ichkilashi ichida kesma: <code>[tuple(tokens[i:i + n]) for i in range(len(tokens) - n + 1)]</code>. <code>tuple()</code> ni unutmang — ro'yxat kesmasi ro'yxat beradi, kortej esa kerak.",
+          "en": "First cut off the bad cases: <code>if n &lt; 1 or n &gt; len(tokens): return []</code>. Then a slice inside a list comprehension: <code>[tuple(tokens[i:i + n]) for i in range(len(tokens) - n + 1)]</code>. Don't forget <code>tuple()</code> — slicing a list gives a list, and you need a tuple."
+        }
+      },
+      {
+        "id": "t2",
+        "kind": "python",
+        "title": {
+          "ru": "Ближайшие по смыслу",
+          "uz": "Ma'nosi eng yaqinlari",
+          "en": "Nearest by meaning"
+        },
+        "brief": {
+          "ru": "Найди слова с самыми похожими векторами",
+          "uz": "Vektorlari eng o'xshash so'zlarni toping",
+          "en": "Find the words with the most similar vectors"
+        },
+        "desc": {
+          "ru": "Напиши функцию <code>nearest(word, vectors, top)</code>. <code>vectors</code> — словарь «слово → список чисел» (эмбеддинги одинаковой длины, ненулевые). Верни список из <code>top</code> слов, ближайших к <code>word</code> по косинусной близости, от самого близкого к менее близкому. Само слово в результат не включай.<br><br>Если два слова одинаково близки, первым идёт то, что раньше по алфавиту. Если слова нет в словаре или <code>top</code> не больше нуля, верни пустой список. Модуль <code>math</code> уже импортирован.",
+          "uz": "<code>nearest(word, vectors, top)</code> funksiyasini yozing. <code>vectors</code> — «so'z → sonlar ro'yxati» lug'ati (bir xil uzunlikdagi, nolga teng bo'lmagan embeddinglar). <code>word</code> ga kosinus yaqinligi bo'yicha eng yaqin <code>top</code> ta so'z ro'yxatini eng yaqinidan kamroq yaqiniga qarab qaytaring. So'zning o'zini natijaga qo'shmang.<br><br>Agar ikki so'z bir xil yaqin bo'lsa, alifboda oldinrog'i birinchi turadi. Agar so'z lug'atda bo'lmasa yoki <code>top</code> noldan katta bo'lmasa, bo'sh ro'yxat qaytaring. <code>math</code> moduli allaqachon import qilingan.",
+          "en": "Write a function <code>nearest(word, vectors, top)</code>. <code>vectors</code> maps a word to a list of numbers (equal-length, non-zero embeddings). Return the <code>top</code> words closest to <code>word</code> by cosine similarity, from closest to least close. Do not include the word itself.<br><br>If two words are equally close, the alphabetically earlier one comes first. If the word is missing from the dict or <code>top</code> is not positive, return an empty list. The <code>math</code> module is already imported."
+        },
+        "starter": "import math\n\n\ndef nearest(word, vectors, top):\n    # top ближайших слов по косинусной близости\n    ...\n",
+        "tests": "vectors = {\n    \"кот\": [1.0, 0.0],\n    \"кошка\": [0.9, 0.1],\n    \"пёс\": [0.0, 1.0],\n    \"машина\": [-1.0, 0.0],\n}\nassert nearest(\"кот\", vectors, 1) == [\"кошка\"]\nassert nearest(\"кот\", vectors, 2) == [\"кошка\", \"пёс\"]\nassert nearest(\"кот\", vectors, 10) == [\"кошка\", \"пёс\", \"машина\"]\nassert nearest(\"кот\", vectors, 0) == []\nassert nearest(\"кот\", vectors, -3) == []\nassert nearest(\"нет-такого\", vectors, 2) == []\ntie = {\"a\": [1.0, 0.0], \"c\": [0.0, 1.0], \"b\": [0.0, 2.0]}\nassert nearest(\"a\", tie, 2) == [\"b\", \"c\"]\n",
+        "hint": {
+          "ru": "Косинус: <code>dot / (len_a * len_b)</code>, где <code>dot = sum(x * y for x, y in zip(a, b))</code>, а длина вектора — <code>math.sqrt(sum(x * x for x in a))</code>. Собери пары «слово, близость» для всех слов кроме исходного, отсортируй по ключу <code>(-близость, слово)</code> и возьми срез <code>[:top]</code>.",
+          "uz": "Kosinus: <code>dot / (len_a * len_b)</code>, bu yerda <code>dot = sum(x * y for x, y in zip(a, b))</code>, vektor uzunligi esa <code>math.sqrt(sum(x * x for x in a))</code>. Asl so'zdan boshqa hamma so'z uchun «so'z, yaqinlik» juftlarini yig'ing, <code>(-yaqinlik, so'z)</code> kaliti bo'yicha tartiblang va <code>[:top]</code> kesmasini oling.",
+          "en": "Cosine: <code>dot / (len_a * len_b)</code>, where <code>dot = sum(x * y for x, y in zip(a, b))</code> and a vector's length is <code>math.sqrt(sum(x * x for x in a))</code>. Collect (word, similarity) pairs for every word but the original, sort by the key <code>(-similarity, word)</code> and take the slice <code>[:top]</code>."
+        }
+      },
+      {
+        "id": "t3",
+        "kind": "python",
+        "title": {
+          "ru": "Механизм внимания",
+          "uz": "E'tibor mexanizmi",
+          "en": "The attention mechanism"
+        },
+        "brief": {
+          "ru": "Похожесть → softmax → взвешенная сумма",
+          "uz": "O'xshashlik → softmax → vaznli yig'indi",
+          "en": "Similarity → softmax → weighted sum"
+        },
+        "desc": {
+          "ru": "Напиши функцию <code>attention(query, keys, values)</code> — один шаг внимания.<br><br><code>query</code> — вектор запроса. <code>keys</code> — список векторов такой же длины. <code>values</code> — список векторов (их длина своя, но у всех одинаковая), по одному на каждый ключ.<br><br>Порядок действий: посчитай похожесть запроса с каждым ключом скалярным произведением; переведи похожести в веса через softmax <code>eˢ / Σeˢ</code>; верни поэлементную взвешенную сумму значений — список той же длины, что и элементы <code>values</code>. Для устойчивости вычитай из всех похожестей их максимум перед возведением в экспоненту. Модуль <code>math</code> уже импортирован.",
+          "uz": "<code>attention(query, keys, values)</code> funksiyasini yozing — e'tiborning bitta qadami.<br><br><code>query</code> — so'rov vektori. <code>keys</code> — xuddi shu uzunlikdagi vektorlar ro'yxati. <code>values</code> — vektorlar ro'yxati (uzunligi o'zicha, lekin hammasida bir xil), har bir kalitga bittadan.<br><br>Ish tartibi: so'rovning har bir kalit bilan o'xshashligini skalyar ko'paytma bilan hisoblang; o'xshashliklarni softmax <code>eˢ / Σeˢ</code> orqali vaznlarga o'tkazing; qiymatlarning elementma-element vaznli yig'indisini qaytaring — <code>values</code> elementlari bilan bir xil uzunlikdagi ro'yxat. Barqarorlik uchun eksponentaga ko'tarishdan oldin barcha o'xshashliklardan ularning maksimumini ayiring. <code>math</code> moduli allaqachon import qilingan.",
+          "en": "Write a function <code>attention(query, keys, values)</code> — a single attention step.<br><br><code>query</code> is the query vector. <code>keys</code> is a list of vectors of the same length. <code>values</code> is a list of vectors (their own length, the same for all), one per key.<br><br>The order of work: compute the query's similarity to each key with a dot product; convert the similarities into weights via softmax <code>eˢ / Σeˢ</code>; return the element-wise weighted sum of the values — a list as long as the elements of <code>values</code>. For stability, subtract the maximum from all similarities before exponentiating. The <code>math</code> module is already imported."
+        },
+        "starter": "import math\n\n\ndef attention(query, keys, values):\n    # похожести -> softmax -> взвешенная сумма значений\n    ...\n",
+        "tests": "import math\nout = attention([1.0], [[2.0]], [[7.0, 3.0]])\nassert abs(out[0] - 7.0) < 1e-9 and abs(out[1] - 3.0) < 1e-9\n\nout = attention([0.0, 0.0], [[1.0, 0.0], [0.0, 1.0]], [[4.0], [8.0]])\nassert abs(out[0] - 6.0) < 1e-9\n\nq = [1.0, 0.0]\nkeys = [[1.0, 0.0], [0.0, 1.0]]\nvalues = [[10.0, 0.0], [0.0, 10.0]]\nout = attention(q, keys, values)\nw = math.exp(1.0) / (math.exp(1.0) + math.exp(0.0))\nassert abs(out[0] - 10.0 * w) < 1e-9\nassert abs(out[1] - 10.0 * (1 - w)) < 1e-9\nassert out[0] > out[1]\n\nbig = attention([1000.0], [[1.0], [0.0]], [[1.0], [0.0]])\nassert abs(big[0] - 1.0) < 1e-6\n",
+        "hint": {
+          "ru": "Три шага в три строки. Похожести: <code>scores = [sum(q * k for q, k in zip(query, key)) for key in keys]</code>. Веса: вычти <code>max(scores)</code>, возведи в <code>math.exp</code>, подели каждое на сумму. Сумма: заведи список нулей длиной <code>len(values[0])</code> и в двойном цикле прибавляй <code>weight * value[j]</code>.",
+          "uz": "Uch qadam uch qatorda. O'xshashliklar: <code>scores = [sum(q * k for q, k in zip(query, key)) for key in keys]</code>. Vaznlar: <code>max(scores)</code> ni ayiring, <code>math.exp</code> ga ko'taring, har birini yig'indiga bo'ling. Yig'indi: <code>len(values[0])</code> uzunlikdagi nollar ro'yxatini oling va ikki qavatli siklda <code>weight * value[j]</code> ni qo'shib boring.",
+          "en": "Three steps in three lines. Similarities: <code>scores = [sum(q * k for q, k in zip(query, key)) for key in keys]</code>. Weights: subtract <code>max(scores)</code>, raise with <code>math.exp</code>, divide each by the sum. The sum: start a list of zeros of length <code>len(values[0])</code> and add <code>weight * value[j]</code> in a double loop."
+        }
+      }
+    ],
+    "exam": {
+      "time": 660,
+      "questions": [
+        {
+          "q": {
+            "ru": "Зачем к мешку слов добавляют биграммы?",
+            "uz": "So'zlar qopiga bigrammalar nega qo'shiladi?",
+            "en": "Why are bigrams added to a bag of words?"
+          },
+          "options": [
+            { "ru": "Чтобы уменьшить число признаков", "uz": "Belgilar sonini kamaytirish uchun", "en": "To reduce the number of features" },
+            { "ru": "Чтобы модель видела короткие сочетания вроде «не понравился»", "uz": "Model «yoqmadi» kabi qisqa birikmalarni ko'rishi uchun", "en": "So the model can see short combinations like \"not impressed\"" },
+            { "ru": "Чтобы ускорить обучение", "uz": "O'qitishni tezlashtirish uchun", "en": "To speed up training" },
+            { "ru": "Чтобы избавиться от редких слов", "uz": "Kam uchraydigan so'zlardan qutulish uchun", "en": "To get rid of rare words" }
+          ],
+          "a": 1
+        },
+        {
+          "q": {
+            "ru": "В one-hot представлении расстояние между «кот» и «кошка»...",
+            "uz": "One-hot tasvirda «mushuk» va «pishak» orasidagi masofa...",
+            "en": "In a one-hot representation the distance between \"cat\" and \"kitten\" is..."
+          },
+          "options": [
+            { "ru": "Такое же, как между «кот» и «бетон»", "uz": "«mushuk» va «beton» orasidagidek", "en": "The same as between \"cat\" and \"concrete\"" },
+            { "ru": "Меньше, потому что слова похожи", "uz": "Kichikroq, chunki so'zlar o'xshash", "en": "Smaller, because the words are similar" },
+            { "ru": "Зависит от частоты слов", "uz": "So'zlar chastotasiga bog'liq", "en": "Dependent on word frequency" },
+            { "ru": "Равно нулю", "uz": "Nolga teng", "en": "Zero" }
+          ],
+          "a": 0
+        },
+        {
+          "q": {
+            "ru": "Почему близость эмбеддингов меряют косинусом, а не обычным расстоянием?",
+            "uz": "Nega embeddinglar yaqinligi oddiy masofa bilan emas, kosinus bilan o'lchanadi?",
+            "en": "Why is embedding closeness measured with the cosine rather than plain distance?"
+          },
+          "options": [
+            { "ru": "Косинус быстрее считается", "uz": "Kosinus tezroq hisoblanadi", "en": "The cosine is faster to compute" },
+            { "ru": "Косинус смотрит на направление, а не на длину вектора", "uz": "Kosinus vektor uzunligiga emas, yo'nalishiga qaraydi", "en": "The cosine looks at direction, not at vector length" },
+            { "ru": "Обычное расстояние нельзя посчитать для 300 чисел", "uz": "Oddiy masofani 300 ta son uchun hisoblab bo'lmaydi", "en": "Plain distance can't be computed for 300 numbers" },
+            { "ru": "Косинус всегда положителен", "uz": "Kosinus doim musbat", "en": "The cosine is always positive" }
+          ],
+          "a": 1
+        },
+        {
+          "q": {
+            "ru": "Какую задачу решает механизм внимания, с которой не справляется обычный эмбеддинг?",
+            "uz": "E'tibor mexanizmi oddiy embedding uddalay olmaydigan qanday vazifani hal qiladi?",
+            "en": "What problem does attention solve that a plain embedding cannot?"
+          },
+          "options": [
+            { "ru": "Ускоряет обучение модели", "uz": "Model o'qitishni tezlashtiradi", "en": "It speeds up model training" },
+            { "ru": "Даёт слову разный вектор в зависимости от предложения", "uz": "So'zga gapga qarab turli vektor beradi", "en": "It gives a word a different vector depending on the sentence" },
+            { "ru": "Уменьшает размер словаря", "uz": "Lug'at hajmini kamaytiradi", "en": "It shrinks the vocabulary" },
+            { "ru": "Убирает необходимость в токенизации", "uz": "Tokenizatsiya zaruratini yo'q qiladi", "en": "It removes the need for tokenization" }
+          ],
+          "a": 1
+        },
+        {
+          "q": {
+            "ru": "Почему из softmax вычитают максимум перед экспонентой?",
+            "uz": "Nega softmax da eksponentadan oldin maksimum ayiriladi?",
+            "en": "Why is the maximum subtracted in softmax before exponentiating?"
+          },
+          "options": [
+            { "ru": "Чтобы результат изменился в нужную сторону", "uz": "Natija kerakli tomonga o'zgarishi uchun", "en": "To shift the result in the right direction" },
+            { "ru": "Чтобы <code>math.exp</code> не переполнился на больших числах; результат при этом не меняется", "uz": "<code>math.exp</code> katta sonlarda to'lib ketmasligi uchun; natija esa o'zgarmaydi", "en": "So <code>math.exp</code> doesn't overflow on large numbers; the result stays the same" },
+            { "ru": "Чтобы веса стали отрицательными", "uz": "Vaznlar manfiy bo'lishi uchun", "en": "So the weights become negative" },
+            { "ru": "Это требование библиотеки math", "uz": "Bu math kutubxonasining talabi", "en": "It is a requirement of the math library" }
+          ],
+          "a": 1
+        },
+        {
+          "q": {
+            "ru": "Почему у языковых моделей есть предел длины контекста?",
+            "uz": "Nega til modellarida kontekst uzunligi chegarasi bor?",
+            "en": "Why do language models have a context length limit?"
+          },
+          "options": [
+            { "ru": "Столько влезает в оперативную память диска", "uz": "Disk operativ xotirasiga shuncha sig'adi", "en": "That's all that fits in disk memory" },
+            { "ru": "Внимание сравнивает каждое слово с каждым, и стоимость растёт как квадрат длины", "uz": "E'tibor har bir so'zni har biri bilan taqqoslaydi va narx uzunlik kvadrati kabi o'sadi", "en": "Attention compares every word with every other, so cost grows as the square of the length" },
+            { "ru": "Модель не умеет читать длинные тексты", "uz": "Model uzun matnlarni o'qiy olmaydi", "en": "The model cannot read long texts" },
+            { "ru": "Так решили разработчики без причины", "uz": "Ishlab chiquvchilar sababsiz shunday qaror qilgan", "en": "The developers decided so for no reason" }
+          ],
+          "a": 1
+        }
+      ],
+      "tasks": [
+        {
+          "id": "e1",
+          "kind": "python",
+          "title": {
+            "ru": "Предсказание следующего слова",
+            "uz": "Keyingi so'zni bashorat qilish",
+            "en": "Predicting the next word"
+          },
+          "desc": {
+            "ru": "Собери простейшую языковую модель на n-граммах.<br><br>Напиши функцию <code>predict_next(tokens, context, n)</code>. Пройди по всем <code>n</code>-граммам списка <code>tokens</code>: у каждой первые <code>n − 1</code> элементов — это контекст, а последний — продолжение. Найди все продолжения, которые встречались после заданного <code>context</code> (список длиной <code>n − 1</code>), и верни самое частое. При равной частоте верни то, что раньше по алфавиту. Если такой контекст ни разу не встречался, верни <code>None</code>.",
+            "uz": "n-grammalarda eng sodda til modelini yig'ing.<br><br><code>predict_next(tokens, context, n)</code> funksiyasini yozing. <code>tokens</code> ro'yxatining barcha <code>n</code>-grammalari bo'ylab yuring: har birida birinchi <code>n − 1</code> element — kontekst, oxirgisi — davomi. Berilgan <code>context</code> (uzunligi <code>n − 1</code> bo'lgan ro'yxat) dan keyin uchragan barcha davomlarni toping va eng ko'p uchraganini qaytaring. Chastota teng bo'lsa, alifboda oldinrog'ini qaytaring. Agar bunday kontekst bir marta ham uchramagan bo'lsa, <code>None</code> qaytaring.",
+            "en": "Build the simplest n-gram language model.<br><br>Write a function <code>predict_next(tokens, context, n)</code>. Walk every <code>n</code>-gram of the <code>tokens</code> list: in each one the first <code>n − 1</code> elements are the context and the last is the continuation. Find all continuations that followed the given <code>context</code> (a list of length <code>n − 1</code>) and return the most frequent one. On equal frequency return the alphabetically earlier one. If the context never occurred, return <code>None</code>."
+          },
+          "starter": "def predict_next(tokens, context, n):\n    # самое частое продолжение заданного контекста\n    ...\n",
+          "tests": "words = \"я люблю кофе я люблю чай я пью кофе\".split()\nassert predict_next(words, [\"я\"], 2) == \"люблю\"\nassert predict_next(words, [\"люблю\"], 2) == \"кофе\"\nassert predict_next(words, [\"пью\"], 2) == \"кофе\"\nassert predict_next(words, [\"нет\"], 2) is None\nassert predict_next(words, [\"я\", \"люблю\"], 3) == \"кофе\"\nassert predict_next(words, [\"я\", \"пью\"], 3) == \"кофе\"\nassert predict_next([], [\"я\"], 2) is None\nassert predict_next([\"a\", \"b\"], [\"a\"], 2) == \"b\"\n",
+          "hint": {
+            "ru": "Контекст — список, а ключом словаря он быть не может: приведи его к кортежу через <code>tuple(context)</code>. Дальше пройди по индексам <code>range(len(tokens) - n + 1)</code>, сравни <code>tuple(tokens[i:i + n - 1])</code> с контекстом и копи продолжения <code>tokens[i + n - 1]</code> в словарь счётчиков. В конце — <code>sorted(counts, key=lambda w: (-counts[w], w))[0]</code>, не забыв про пустой словарь.",
+            "uz": "Kontekst — ro'yxat va lug'at kaliti bo'la olmaydi: uni <code>tuple(context)</code> orqali kortejga o'tkazing. Keyin <code>range(len(tokens) - n + 1)</code> indekslari bo'ylab yuring, <code>tuple(tokens[i:i + n - 1])</code> ni kontekst bilan solishtiring va <code>tokens[i + n - 1]</code> davomlarini hisoblagichlar lug'atiga yig'ing. Oxirida — <code>sorted(counts, key=lambda w: (-counts[w], w))[0]</code>, bo'sh lug'atni unutmang.",
+            "en": "The context is a list and cannot be a dict key: convert it with <code>tuple(context)</code>. Then walk the indices <code>range(len(tokens) - n + 1)</code>, compare <code>tuple(tokens[i:i + n - 1])</code> with the context and accumulate the continuations <code>tokens[i + n - 1]</code> in a counter dict. Finish with <code>sorted(counts, key=lambda w: (-counts[w], w))[0]</code>, remembering the empty-dict case."
+          }
+        }
+      ]
+    }
   }
  ]
 }
